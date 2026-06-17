@@ -25,3 +25,4 @@ supabase/.branches/
 
 # === Config local de IA (scratch) ===
 **/.claude/settings.local.json
+.github/workflows/ci.yml  # habilitar com: gh auth refresh -s workflow
