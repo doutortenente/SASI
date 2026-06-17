@@ -1,0 +1,27 @@
+# === Segredos / ambiente (NUNCA commitar) ===
+.env
+.env.*
+!.env.example
+chaves_secretas.txt
+**/.env
+**/.env.local
+
+# === Dependências ===
+node_modules/
+vendor/
+
+# === Build / artefatos ===
+dist/
+build/
+*.tsbuildinfo
+
+# === Supabase local ===
+supabase/.temp/
+supabase/.branches/
+
+# === Logs / temporários do SO ===
+*.log
+.DS_Store
+
+# === Config local de IA (scratch) ===
+**/.claude/settings.local.json
