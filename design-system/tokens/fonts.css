@@ -1,0 +1,9 @@
+/* ============================================================================
+   SASI — Fonts
+   The deployed app uses the system UI stack (ui-sans-serif, system-ui).
+   For the design system we adopt IBM Plex Sans (clinical, technical, precise)
+   and IBM Plex Mono for tabular instrument readouts (vitals, SOFA, bed nums).
+   ⚠️ SUBSTITUTION: loaded from Google Fonts CDN — swap for self-hosted/system
+   stack in production if preferred. See README "Visual Foundations → Type".
+   ============================================================================ */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');

@@ -1,0 +1,136 @@
+<!-- @template name="Comando UTI — Passagem de Turno" description="Síntese de plantão por leito: uma linha de identificação, uma de mudanças que impactam conduta e uma de pendências/riscos — pronta para exportar PDF." -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SASI · Passagem de Turno</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="./ds-base.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-sans); background: var(--surface-app); color: var(--text-body); }
+  .page { max-width: 1100px; margin: 0 auto; padding: 22px 24px 60px; }
+  .head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .head h1 { margin: 0; font-size: var(--text-lg); font-weight: 700; color: var(--text-heading); white-space: nowrap; }
+  .head p { margin: 2px 0 0; font-size: var(--text-xs); color: var(--text-muted); }
+  .head__right { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; }
+  .sheet { background: var(--surface-card); border: 1px solid var(--border-default); border-radius: var(--radius-xl); box-shadow: var(--shadow-card); overflow: hidden; }
+  .leito { padding: 14px 18px; display: grid; grid-template-columns: 180px 1fr; gap: 16px; }
+  .leito + .leito { border-top: 1px solid var(--border-subtle); }
+  .leito__bed { display: flex; align-items: baseline; gap: 7px; margin-bottom: 5px; }
+  .leito__bed b { font-family: var(--font-mono); font-size: var(--text-md); font-weight: 700; color: var(--text-heading); }
+  .leito__bed small { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+  .leito__nm { font-weight: 700; font-size: var(--text-sm); color: var(--text-heading); }
+  .leito__badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; align-items: center; }
+  .lines { display: flex; flex-direction: column; gap: 7px; }
+  .line { display: flex; gap: 9px; align-items: flex-start; }
+  .line__n { flex-shrink: 0; width: 18px; height: 18px; border-radius: var(--radius-sm); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; font-family: var(--font-mono); }
+  .line__lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-right: 8px; }
+  .line__tx { font-size: var(--text-sm); color: var(--text-body); line-height: 1.55; }
+  .icobtn { width: 34px; height: 34px; border-radius: var(--radius-md); border: 1px solid var(--border-default); background: var(--surface-card); color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .icobtn svg { width: 16px; height: 16px; }
+  @media print {
+    body { background: #fff; }
+    .head__right { display: none; }
+    .sheet { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+(function mount() {
+  const NS = window.SASIComandoUTIDesignSystem_157e25;
+  if (!NS) { setTimeout(mount, 30); return; }
+  const { Button, GravityBadge, SofaBadge } = NS;
+
+  // --- Starting-point data: replace with your real shift ---
+  const LEITOS = [
+    { bed: '07', uti: 'UTI2', name: 'João Silva', age: 62, gravity: 'stable', sofa: 4, deltaSofa: -1,
+      sintese: 'Sepse de foco pulmonar, em desmame ventilatório',
+      muda: 'TRE 2h bem tolerado, reduzido FiO₂ para 30%',
+      riscos: 'Aguardar gasometria pós-extubação' },
+    { bed: '08', uti: 'UTI2', name: 'Maria Oliveira', age: 58, gravity: 'watcher', sofa: 6, deltaSofa: 1,
+      sintese: 'Choque séptico de foco abdominal pós-laparotomia',
+      muda: 'Lactato em queda (4.1→2.4), nora reduzida para 0,10',
+      riscos: 'Vigiar débito do dreno · risco de re-laparotomia' },
+    { bed: '09', uti: 'UTI3', name: 'Carlos Mendes', age: 71, gravity: 'critical', sofa: 13, deltaSofa: 3,
+      sintese: 'IRA dialítica + SDRA grave, foco pulmonar',
+      muda: '↑SOFA +3, iniciada 2ª DVA; SDRA com P/F 130',
+      riscos: 'Cultura de hemato pendente 48h · risco de PCR' },
+    { bed: '10', uti: 'UTI3', name: 'Ana Costa', age: 45, gravity: 'unstable', sofa: 9, deltaSofa: 2,
+      sintese: 'Pós-PCR / choque cardiogênico, ECMO VA',
+      muda: 'Flow ECMO mantido 4.2; lactato 3.8, sem clareamento',
+      riscos: 'Decisão de weaning ECMO em discussão' },
+    { bed: '05', uti: 'UTI4', name: 'Rosa Lima', age: 79, gravity: 'watcher', sofa: 5, deltaSofa: -1,
+      sintese: 'AVCi extenso, NIHSS 14, em vigilância neuro',
+      muda: 'PA controlada, NIHSS estável em 14',
+      riscos: 'TC de controle amanhã · risco de transformação hemorrágica' },
+  ];
+
+  function Line({ n, color, lbl, tx }) {
+    return (
+      <div className="line">
+        <span className="line__n" style={{ background: color }}>{n}</span>
+        <div>
+          <span className="line__lbl" style={{ color }}>{lbl}</span>
+          <span className="line__tx">{tx}</span>
+        </div>
+      </div>
+    );
+  }
+
+  function Passagem() {
+    const [theme, setTheme] = React.useState('clinical');
+    React.useEffect(() => {
+      document.documentElement.setAttribute('data-theme', theme === 'tactical' ? 'tactical' : '');
+      if (window.lucide) window.lucide.createIcons();
+    });
+    return (
+      <div className="page">
+        <div className="head">
+          <div>
+            <h1>Passagem de Turno</h1>
+            <p>{LEITOS.length} leitos ativos · UTI 2/3/4 · 12/05 07:00 → 19:00</p>
+          </div>
+          <div className="head__right">
+            <Button size="sm" variant="secondary" icon={<i data-lucide="clipboard-copy"></i>}>Copiar texto</Button>
+            <Button size="sm" variant="primary" icon={<i data-lucide="file-down"></i>} onClick={() => window.print()}>Exportar PDF</Button>
+            <button className="icobtn" title="Tema" onClick={() => setTheme(theme === 'tactical' ? 'clinical' : 'tactical')}>
+              <i data-lucide={theme === 'tactical' ? 'sun' : 'moon'}></i>
+            </button>
+          </div>
+        </div>
+
+        <div className="sheet">
+          {LEITOS.map((p) => (
+            <div className="leito" key={p.bed}>
+              <div>
+                <div className="leito__bed"><b>{p.bed}</b><small>{p.uti}</small></div>
+                <div className="leito__nm">{p.name}, {p.age}</div>
+                <div className="leito__badges">
+                  <GravityBadge level={p.gravity} size="sm" />
+                  <SofaBadge score={p.sofa} delta={p.deltaSofa} showIcon={false} />
+                </div>
+              </div>
+              <div className="lines">
+                <Line n="1" color="var(--accent)" lbl="Síntese" tx={p.sintese} />
+                <Line n="2" color="var(--warning)" lbl="Muda conduta" tx={p.muda} />
+                <Line n="3" color="var(--danger)" lbl="Pendências / Riscos" tx={p.riscos} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Passagem />);
+  setTimeout(() => window.lucide && window.lucide.createIcons(), 80);
+})();
+</script>
+</body>
+</html>

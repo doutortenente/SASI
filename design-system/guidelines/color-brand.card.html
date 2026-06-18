@@ -1,0 +1,32 @@
+<!-- @dsCard group="Colors" viewport="700x180" name="Brand & Command" subtitle="Navy chrome, blue clinical accent, red tactical accent" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; font-family: var(--font-sans); background: var(--surface-card); color: var(--text-body); }
+  .wrap { padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .row { display: flex; gap: 12px; }
+  .sw { flex: 1; border-radius: var(--radius-lg); padding: 12px; min-height: 64px; display: flex; flex-direction: column; justify-content: flex-end; border: 1px solid var(--border-subtle); }
+  .sw .name { font-size: var(--text-2xs); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .sw .hex { font-family: var(--font-mono); font-size: var(--text-2xs); opacity: .8; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="row">
+      <div class="sw" style="background: var(--chrome-bg);"><span class="name" style="color:#fff">Chrome / Navy</span><span class="hex" style="color:#aebfd4">--chrome-bg</span></div>
+      <div class="sw" style="background: var(--blue-600); color:#fff"><span class="name">Accent · Clinical</span><span class="hex">#2563EB</span></div>
+      <div class="sw" style="background: var(--red-600); color:#fff"><span class="name">Accent · Tactical</span><span class="hex">#DC2626</span></div>
+      <div class="sw" style="background: var(--accent-soft);"><span class="name" style="color:var(--accent-text)">Accent Soft</span><span class="hex" style="color:var(--accent-text)">--accent-soft</span></div>
+    </div>
+    <div class="row">
+      <div class="sw" style="background:#0a1c33;"><span class="name" style="color:#fff">navy-900</span><span class="hex" style="color:#7d93b0">#0A1C33</span></div>
+      <div class="sw" style="background:#0f2742;"><span class="name" style="color:#fff">navy-800</span><span class="hex" style="color:#7d93b0">#0F2742</span></div>
+      <div class="sw" style="background:#16365a;"><span class="name" style="color:#fff">navy-700</span><span class="hex" style="color:#aebfd4">#16365A</span></div>
+      <div class="sw" style="background:#1e4878;"><span class="name" style="color:#fff">navy-600</span><span class="hex" style="color:#aebfd4">#1E4878</span></div>
+    </div>
+  </div>
+</body>
+</html>
