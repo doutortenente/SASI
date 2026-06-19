@@ -76,6 +76,8 @@ Fonte fiel: `SASI_schema_LIVE_10JUN26.sql` (dump do catálogo via `pg_get_*`). 9
 
 > ⚠️ **`eventos_clinicos` está VAZIA.** A timeseries nunca foi populada — o Meta-Vision está “cego” (sem ΔSOFA real, sem BH acumulado, sem tendências). Prioridade de FASE CHARLIE/DELTA.
 
+> 📌 **Onde vivem Interconsultas / Programação / Pendências (View 2):** NÃO são tabelas próprias. `interconsultas[]` e `programacao[]` ficam no JSONB **`pacientes.patient_summary`** (lido via `from('pacientes').select('*')` → `paciente.patient_summary`). **Pendências** é a tabela própria **`pendencias`** (RLS `pendencias_all_own` por `EXISTS` no paciente dono) — **fonte única** que alimenta tanto a View 2 quanto a linha de Pendências da Passagem de Turno (View 5). Logo, a View 2 do CORRECTION **não exige DDL novo**: a arquitetura jsonb já a comporta (o CORRECTION oferecia “tabelas OU jsonb”; o app já escolheu jsonb). RLS `_own` correta em ambas — mas **anulada pelo `dev_bypass`** (ver §5).
+
 -----
 
 ## 5. 🔴 ACHADO DE SEGURANÇA P0 — Buraco LGPD (NÃO RESOLVIDO)
