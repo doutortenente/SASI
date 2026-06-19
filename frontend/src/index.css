@@ -47,7 +47,7 @@
    TACTICAL (padrão) — war-room escuro, acento vermelho
    ---------------------------------------------------------------------------- */
 :root,
-body.theme-tactical {
+[data-theme="tactical"] {
   --app-bg: 15 23 42;            /* surface-app  #0f172a */
   --app-card: 30 41 59;          /* surface-card #1e293b */
   --app-tertiary: 51 65 85;      /* surface-raised #334155 */
@@ -77,7 +77,7 @@ body.theme-tactical {
 /* ----------------------------------------------------------------------------
    CLINICAL — rounds diurnos, canvas cinza-claro + cards brancos, acento azul
    ---------------------------------------------------------------------------- */
-body.theme-clinical {
+[data-theme="clinical"] {
   --app-bg: 238 241 246;         /* surface-app  #eef1f6 */
   --app-card: 255 255 255;       /* surface-card #ffffff */
   --app-tertiary: 232 237 243;   /* surface-sunken #e8edf3 */
@@ -240,6 +240,18 @@ body {
 .sasi-critical-pulse { animation: sasi-critical-pulse 2s ease-in-out infinite; }
 .sasi-spin { animation: sasi-spin 0.6s linear infinite; }
 
+/* DS: todo movimento respeita prefers-reduced-motion. Mantém o spinner de
+   loading (curto, funcional) mas desliga fade/slide/pulse e transições. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .sasi-fade-in, .sasi-slide-in, .sasi-critical-pulse { animation: none !important; }
+}
+
 /* ============================================================================
    Scrollbar
    ============================================================================ */
@@ -257,10 +269,11 @@ body {
 .gravidade-critico  { background:#7f1d1d; color:#fca5a5; border:1px solid #dc2626; }
 .gravidade-obito    { background:#1e293b; color:#94a3b8; border:1px solid #475569; }
 
-body.theme-clinical .gravidade-estavel  { background:#d1fae5; color:#065f46; border-color:#10b981; }
-body.theme-clinical .gravidade-moderado { background:#fef3c7; color:#92400e; border-color:#f59e0b; }
-body.theme-clinical .gravidade-grave    { background:#ffedd5; color:#9a3412; border-color:#f97316; }
-body.theme-clinical .gravidade-critico  { background:#fee2e2; color:#991b1b; border-color:#dc2626; }
+[data-theme="clinical"] .gravidade-estavel  { background:#d1fae5; color:#065f46; border-color:#10b981; }
+[data-theme="clinical"] .gravidade-moderado { background:#fef3c7; color:#92400e; border-color:#f59e0b; }
+[data-theme="clinical"] .gravidade-grave    { background:#ffedd5; color:#9a3412; border-color:#f97316; }
+[data-theme="clinical"] .gravidade-critico  { background:#fee2e2; color:#991b1b; border-color:#dc2626; }
+[data-theme="clinical"] .gravidade-obito    { background:#e2e8f0; color:#334155; border-color:#475569; }
 
 /* ============================================================================
    SOFA color thresholds
@@ -270,10 +283,10 @@ body.theme-clinical .gravidade-critico  { background:#fee2e2; color:#991b1b; bor
 .sofa-high     { color: #fb923c; }
 .sofa-critical { color: #f87171; }
 
-body.theme-clinical .sofa-low      { color: #059669; }
-body.theme-clinical .sofa-medium   { color: #d97706; }
-body.theme-clinical .sofa-high     { color: #ea580c; }
-body.theme-clinical .sofa-critical { color: #dc2626; }
+[data-theme="clinical"] .sofa-low      { color: #059669; }
+[data-theme="clinical"] .sofa-medium   { color: #d97706; }
+[data-theme="clinical"] .sofa-high     { color: #ea580c; }
+[data-theme="clinical"] .sofa-critical { color: #dc2626; }
 
 /* ============================================================================
    Dose calculator pills
@@ -281,27 +294,27 @@ body.theme-clinical .sofa-critical { color: #dc2626; }
 .dose-ok      { background:#064e3b; color:#6ee7b7; }
 .dose-warning { background:#7f1d1d; color:#fca5a5; }
 
-body.theme-clinical .dose-ok      { background:#d1fae5; color:#065f46; }
-body.theme-clinical .dose-warning { background:#fee2e2; color:#991b1b; }
+[data-theme="clinical"] .dose-ok      { background:#d1fae5; color:#065f46; }
+[data-theme="clinical"] .dose-warning { background:#fee2e2; color:#991b1b; }
 
 /* ============================================================================
    System colors — Clinical overrides (Tactical usa utilitários Tailwind direto)
    ============================================================================ */
-body.theme-clinical .sys-neuro   { background:#faf5ff; border-left-color:#a855f7; }
-body.theme-clinical .sys-resp    { background:#f0f9ff; border-left-color:#0ea5e9; }
-body.theme-clinical .sys-hemo    { background:#fff1f2; border-left-color:#f43f5e; }
-body.theme-clinical .sys-tgi     { background:#fffbeb; border-left-color:#f59e0b; }
-body.theme-clinical .sys-renal   { background:#f7fee7; border-left-color:#84cc16; }
-body.theme-clinical .sys-hemato  { background:#fdf2f8; border-left-color:#ec4899; }
-body.theme-clinical .sys-infecto { background:#f0fdfa; border-left-color:#14b8a6; }
+[data-theme="clinical"] .sys-neuro   { background:#faf5ff; border-left-color:#a855f7; }
+[data-theme="clinical"] .sys-resp    { background:#f0f9ff; border-left-color:#0ea5e9; }
+[data-theme="clinical"] .sys-hemo    { background:#fff1f2; border-left-color:#f43f5e; }
+[data-theme="clinical"] .sys-tgi     { background:#fffbeb; border-left-color:#f59e0b; }
+[data-theme="clinical"] .sys-renal   { background:#f7fee7; border-left-color:#84cc16; }
+[data-theme="clinical"] .sys-hemato  { background:#fdf2f8; border-left-color:#ec4899; }
+[data-theme="clinical"] .sys-infecto { background:#f0fdfa; border-left-color:#14b8a6; }
 
-body.theme-clinical .sys-neuro .sys-title   { color:#7e22ce; }
-body.theme-clinical .sys-resp .sys-title    { color:#0369a1; }
-body.theme-clinical .sys-hemo .sys-title    { color:#be123c; }
-body.theme-clinical .sys-tgi .sys-title     { color:#b45309; }
-body.theme-clinical .sys-renal .sys-title   { color:#4d7c0f; }
-body.theme-clinical .sys-hemato .sys-title  { color:#be185d; }
-body.theme-clinical .sys-infecto .sys-title { color:#0f766e; }
+[data-theme="clinical"] .sys-neuro .sys-title   { color:#7e22ce; }
+[data-theme="clinical"] .sys-resp .sys-title    { color:#0369a1; }
+[data-theme="clinical"] .sys-hemo .sys-title    { color:#be123c; }
+[data-theme="clinical"] .sys-tgi .sys-title     { color:#b45309; }
+[data-theme="clinical"] .sys-renal .sys-title   { color:#4d7c0f; }
+[data-theme="clinical"] .sys-hemato .sys-title  { color:#be185d; }
+[data-theme="clinical"] .sys-infecto .sys-title { color:#0f766e; }
 
 /* Card gravity left-border accent */
 .card-grav-estavel  { border-left: var(--gravity-bar) solid #10b981; background: rgba(16,185,129,.06); }
@@ -310,11 +323,11 @@ body.theme-clinical .sys-infecto .sys-title { color:#0f766e; }
 .card-grav-critico  { border-left: var(--gravity-bar) solid #dc2626; background: rgba(220,38,38,.08); }
 .card-grav-obito    { border-left: var(--gravity-bar) solid #475569; background: rgba(71,85,105,.06); }
 
-body.theme-clinical .card-grav-estavel  { background: rgba(16,185,129,.08); }
-body.theme-clinical .card-grav-moderado { background: rgba(245,158,11,.08); }
-body.theme-clinical .card-grav-grave    { background: rgba(249,115,22,.08); }
-body.theme-clinical .card-grav-critico  { background: rgba(220,38,38,.10); }
-body.theme-clinical .card-grav-obito    { background: rgba(71,85,105,.08); }
+[data-theme="clinical"] .card-grav-estavel  { background: rgba(16,185,129,.08); }
+[data-theme="clinical"] .card-grav-moderado { background: rgba(245,158,11,.08); }
+[data-theme="clinical"] .card-grav-grave    { background: rgba(249,115,22,.08); }
+[data-theme="clinical"] .card-grav-critico  { background: rgba(220,38,38,.10); }
+[data-theme="clinical"] .card-grav-obito    { background: rgba(71,85,105,.08); }
 
 /* ============================================================================
    Clinical badge pills (Tactical default + Clinical override)
@@ -329,17 +342,63 @@ body.theme-clinical .card-grav-obito    { background: rgba(71,85,105,.08); }
 .badge-sofa-lo { background: rgb(var(--app-tertiary)); color: rgb(var(--app-text-muted)); }
 .badge-sepsis  { background: #dc2626; color: white; }
 
-body.theme-clinical .badge-dva     { background: #ffe4e6; color: #9f1239; }
-body.theme-clinical .badge-sed     { background: #f3e8ff; color: #6b21a8; }
-body.theme-clinical .badge-vm      { background: #e0f2fe; color: #0c4a6e; }
-body.theme-clinical .badge-vni     { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
-body.theme-clinical .badge-atb     { background: #ccfbf1; color: #115e59; }
-body.theme-clinical .badge-pend    { background: #fef3c7; color: #92400e; }
-body.theme-clinical .badge-sofa-hi { background: #fff7ed; color: #9a3412; }
-body.theme-clinical .badge-sepsis  { background: #dc2626; color: white; }
+[data-theme="clinical"] .badge-dva     { background: #ffe4e6; color: #9f1239; }
+[data-theme="clinical"] .badge-sed     { background: #f3e8ff; color: #6b21a8; }
+[data-theme="clinical"] .badge-vm      { background: #e0f2fe; color: #0c4a6e; }
+[data-theme="clinical"] .badge-vni     { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
+[data-theme="clinical"] .badge-atb     { background: #ccfbf1; color: #115e59; }
+[data-theme="clinical"] .badge-pend    { background: #fef3c7; color: #92400e; }
+[data-theme="clinical"] .badge-sofa-hi { background: #fff7ed; color: #9a3412; }
+[data-theme="clinical"] .badge-sepsis  { background: #dc2626; color: white; }
 
 /* Drug name inline colors (theme-aware) */
 .drug-dva  { color: #fda4af; }
 .drug-sed  { color: #d8b4fe; }
-body.theme-clinical .drug-dva  { color: #be123c; }
-body.theme-clinical .drug-sed  { color: #7e22ce; }
+[data-theme="clinical"] .drug-dva  { color: #be123c; }
+[data-theme="clinical"] .drug-sed  { color: #7e22ce; }
+
+/* ============================================================================
+   Cor semântica theme-aware (.tx-* / .stat-*)
+   ----------------------------------------------------------------------------
+   Os shades Tailwind -400 funcionam no Tactical (escuro) mas lavam sobre o
+   card branco do Clinical (contraste < 3:1). Estas classes resolvem o tom
+   certo por tema: tom claro no Tactical, tom escuro (-600/-700) no Clinical.
+   REGRA: usar para TEXTO sólido de status/sistema. bg/border com opacidade
+   (ex.: bg a 10%, border a 30%) já são theme-neutros — deixar como Tailwind.
+   ============================================================================ */
+
+/* Status de alerta (vitais, labs, tendência, delta, vetor de problema) */
+.tx-danger { color: #f87171; }  /* high / piora / ↑ / alerta */
+.tx-info   { color: #38bdf8; }  /* low / abaixo da faixa */
+.tx-warn   { color: #fcd34d; }  /* absurdo / implausível / BH+ */
+.tx-ok     { color: #34d399; }  /* normal / melhora / ↓ */
+[data-theme="clinical"] .tx-danger { color: #dc2626; }
+[data-theme="clinical"] .tx-info   { color: #0284c7; }
+[data-theme="clinical"] .tx-warn   { color: #b45309; }
+[data-theme="clinical"] .tx-ok     { color: #059669; }
+
+/* Sistemas (labels/acentos inline — escurecem no Clinical, par dos .sys-title) */
+.tx-neuro   { color: #c084fc; }
+.tx-resp    { color: #38bdf8; }
+.tx-hemo    { color: #fb7185; }
+.tx-tgi     { color: #fbbf24; }
+.tx-renal   { color: #a3e635; }
+.tx-hemato  { color: #f472b6; }
+.tx-infecto { color: #2dd4bf; }
+[data-theme="clinical"] .tx-neuro   { color: #7e22ce; }
+[data-theme="clinical"] .tx-resp    { color: #0369a1; }
+[data-theme="clinical"] .tx-hemo    { color: #be123c; }
+[data-theme="clinical"] .tx-tgi     { color: #b45309; }
+[data-theme="clinical"] .tx-renal   { color: #4d7c0f; }
+[data-theme="clinical"] .tx-hemato  { color: #be185d; }
+[data-theme="clinical"] .tx-infecto { color: #0f766e; }
+
+/* Chips de status de vital (texto + fundo) — VitalsLabsPanel */
+.stat-high   { color: #f87171; background: rgba(127,29,29,.30); }
+.stat-low    { color: #38bdf8; background: rgba(8,47,73,.30); }
+.stat-absurd { color: #fcd34d; background: rgba(120,53,15,.40); box-shadow: inset 0 0 0 1px rgba(245,158,11,.50); }
+.stat-ok     { color: #34d399; background: rgba(6,78,59,.20); }
+[data-theme="clinical"] .stat-high   { color: #b91c1c; background: #fee2e2; }
+[data-theme="clinical"] .stat-low    { color: #0369a1; background: #e0f2fe; }
+[data-theme="clinical"] .stat-absurd { color: #92400e; background: #fef3c7; box-shadow: inset 0 0 0 1px #f59e0b; }
+[data-theme="clinical"] .stat-ok     { color: #047857; background: #d1fae5; }

@@ -20,8 +20,8 @@ export default function VitalsTableEditable({ rows, onChange }: Props) {
     <div className="overflow-x-auto rounded-lg border border-app-border">
       <table className="w-full text-[11px] border-collapse">
         <thead>
-          <tr className="bg-slate-900 text-slate-200">
-            <th className="text-left px-2 py-1.5 font-bold border-r border-app-border w-36 sticky left-0 bg-slate-900 z-10">Parâmetro</th>
+          <tr className="bg-app-tertiary text-app-text-2">
+            <th className="text-left px-2 py-1.5 font-bold border-r border-app-border w-36 sticky left-0 bg-app-tertiary z-10">Parâmetro</th>
             <th className="text-center px-2 py-1.5 font-bold border-r border-app-border min-w-[56px]">Máximo</th>
             <th className="text-center px-2 py-1.5 font-bold border-r border-app-border min-w-[56px]">Mínimo</th>
             <th className="text-center px-2 py-1.5 font-bold border-r border-app-border w-16">Unidade</th>

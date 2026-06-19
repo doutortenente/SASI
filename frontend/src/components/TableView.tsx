@@ -59,9 +59,9 @@ function vitalCellClass(key: string, value: number | null): string {
   if (value == null) return 'text-app-text-muted';
   const status = checkVitalAlert(key, value);
   switch (status) {
-    case 'high': return 'text-red-400 font-bold';
-    case 'low': return 'text-sky-400 font-bold';
-    case 'absurd': return 'text-amber-300 font-black animate-pulse';
+    case 'high': return 'tx-danger font-bold';
+    case 'low': return 'tx-info font-bold';
+    case 'absurd': return 'tx-warn font-black animate-pulse';
     default: return 'text-app-text-2';
   }
 }
@@ -181,7 +181,7 @@ export default function TableView({ patients, onSelect }: Props) {
             const evol = evolMap[p.paciente_id] ?? null;
             const v = extractVitals(evol);
             const delta = p.delta_sofa_24h ?? 0;
-            const deltaClass = delta > 0 ? 'text-red-400' : delta < 0 ? 'text-emerald-400' : 'text-app-text-muted';
+            const deltaClass = delta > 0 ? 'tx-danger' : delta < 0 ? 'tx-ok' : 'text-app-text-muted';
             const dvaCount = Array.isArray(p.dvas) ? p.dvas.length : 0;
             const sedCount = Array.isArray(p.sedativos) ? p.sedativos.length : 0;
 
@@ -233,7 +233,7 @@ export default function TableView({ patients, onSelect }: Props) {
                 <Td className={`tabular-nums ${vitalCellClass('tax', v.tax)}`}>
                   {v.tax != null ? `${v.tax}°` : '—'}
                 </Td>
-                <Td className={`tabular-nums ${v.bh != null && v.bh > 0 ? 'text-amber-400' : v.bh != null && v.bh < 0 ? 'text-sky-400' : 'text-app-text-muted'}`}>
+                <Td className={`tabular-nums ${v.bh != null && v.bh > 0 ? 'tx-warn' : v.bh != null && v.bh < 0 ? 'tx-info' : 'text-app-text-muted'}`}>
                   {v.bh != null ? `${v.bh > 0 ? '+' : ''}${v.bh}` : '—'}
                 </Td>
                 <Td className="tabular-nums text-app-text-2">
@@ -243,9 +243,9 @@ export default function TableView({ patients, onSelect }: Props) {
                 {/* DVA */}
                 <Td>
                   {dvaCount > 0 ? (
-                    <span className="text-rose-400 font-bold">{dvaCount}</span>
+                    <span className="tx-hemo font-bold">{dvaCount}</span>
                   ) : sedCount > 0 ? (
-                    <span className="text-purple-400 text-[10px]">Sed:{sedCount}</span>
+                    <span className="tx-neuro text-[10px]">Sed:{sedCount}</span>
                   ) : (
                     <span className="text-app-text-muted">—</span>
                   )}
@@ -254,7 +254,7 @@ export default function TableView({ patients, onSelect }: Props) {
                 {/* Infeccioso */}
                 <Td>
                   {hasInfecto ? (
-                    <span className="inline-flex items-center gap-0.5 text-teal-400 font-semibold">
+                    <span className="inline-flex items-center gap-0.5 tx-infecto font-semibold">
                       <AlertTriangle className="w-2.5 h-2.5" /> Sim
                     </span>
                   ) : (
@@ -265,7 +265,7 @@ export default function TableView({ patients, onSelect }: Props) {
                 {/* Pendências */}
                 <Td className="tabular-nums">
                   {p.pendencias_abertas > 0 ? (
-                    <span className="text-amber-400 font-bold">{p.pendencias_abertas}</span>
+                    <span className="tx-warn font-bold">{p.pendencias_abertas}</span>
                   ) : '—'}
                 </Td>
 

@@ -58,25 +58,25 @@ function parseNum(v: unknown): number | null {
 
 function alertColor(status: string): string {
   switch (status) {
-    case 'low': return 'text-sky-400 bg-sky-950/30';
-    case 'high': return 'text-red-400 bg-red-950/30';
-    case 'absurd': return 'text-amber-300 bg-amber-950/40 ring-1 ring-amber-500/50';
-    default: return 'text-emerald-400 bg-emerald-950/20';
+    case 'low': return 'stat-low';
+    case 'high': return 'stat-high';
+    case 'absurd': return 'stat-absurd';
+    default: return 'stat-ok';
   }
 }
 
 function labAlertColor(status: string): string {
   switch (status) {
-    case 'low': return 'text-sky-400';
-    case 'high': return 'text-red-400';
+    case 'low': return 'tx-info';
+    case 'high': return 'tx-danger';
     default: return 'text-app-text-2';
   }
 }
 
 function trendIcon(val1: number | null, val2: number | null) {
   if (val1 == null || val2 == null) return null;
-  if (val1 > val2) return <TrendingUp className="w-3 h-3 text-red-400" />;
-  if (val1 < val2) return <TrendingDown className="w-3 h-3 text-emerald-400" />;
+  if (val1 > val2) return <TrendingUp className="w-3 h-3 tx-danger" />;
+  if (val1 < val2) return <TrendingDown className="w-3 h-3 tx-ok" />;
   return <Minus className="w-3 h-3 text-app-text-muted" />;
 }
 
@@ -222,7 +222,7 @@ export default function VitalsLabsPanel({ vitals, labs }: Props) {
             {(v.bh != null && v.bh !== '') && (
               <div className="flex flex-col items-center p-2 rounded-lg bg-app-tertiary/50">
                 <span className="text-[9px] font-bold uppercase tracking-wider text-app-text-muted opacity-80 mb-1">BH</span>
-                <span className={`text-lg font-black tabular-nums ${parseNum(v.bh) != null && parseNum(v.bh)! > 0 ? 'text-amber-400' : 'text-sky-400'}`}>
+                <span className={`text-lg font-black tabular-nums ${parseNum(v.bh) != null && parseNum(v.bh)! > 0 ? 'tx-warn' : 'tx-info'}`}>
                   {parseNum(v.bh) != null && parseNum(v.bh)! > 0 ? '+' : ''}{v.bh}
                 </span>
                 <span className="text-[8px] opacity-50 mt-0.5">ml</span>
@@ -236,7 +236,7 @@ export default function VitalsLabsPanel({ vitals, labs }: Props) {
       {labEntries.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <FlaskConical className="w-3.5 h-3.5 text-lime-400" />
+            <FlaskConical className="w-3.5 h-3.5 tx-renal" />
             <span className="text-[10px] font-bold uppercase tracking-widest text-app-text-muted">
               Laboratório
             </span>

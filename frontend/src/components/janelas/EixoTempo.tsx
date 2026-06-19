@@ -116,7 +116,7 @@ export default function EixoTempo({ pacienteId, summary, evolucoes, pendencias, 
                 <tr key={p.id} className="border-b border-app-border/40">
                   <td className="py-1.5">
                     <span className={`text-[10px] font-bold px-1 rounded ${
-                      p.prioridade === 1 ? 'bg-red-900 text-red-200' : 'bg-amber-900 text-amber-200'
+                      p.prioridade === 1 ? 'bg-red-500/15 tx-danger' : 'bg-amber-500/15 tx-warn'
                     }`}>P{p.prioridade}</span>
                   </td>
                   <td className="py-1.5 text-app-text-2">{p.tarefa}</td>

@@ -35,7 +35,7 @@ export default function PrescricaoTable({ items, editable = false, onChange }: P
     <div className="overflow-x-auto rounded-lg border border-app-border">
       <table className="w-full text-[11px] border-collapse">
         <thead>
-          <tr className="bg-slate-900 text-slate-200">
+          <tr className="bg-app-tertiary text-app-text-2">
             <th className="text-left px-2 py-1.5 font-bold border-r border-app-border w-28">Sistema</th>
             <th className="text-left px-2 py-1.5 font-bold border-r border-app-border">Medicamento</th>
             <th className="text-left px-2 py-1.5 font-bold border-r border-app-border w-20">Dose</th>

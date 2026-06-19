@@ -344,7 +344,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
           {saving ? 'Salvando...' : 'Salvar Ficha de Evolução'}
         </button>
         {saveMsg && (
-          <span className={`text-xs font-semibold ${saveMsg.ok ? 'text-emerald-400' : 'text-red-400'}`}>
+          <span className={`text-xs font-semibold ${saveMsg.ok ? 'tx-ok' : 'tx-danger'}`}>
             {saveMsg.text}
           </span>
         )}
@@ -359,15 +359,15 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
       }`}>
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${isSeptic ? 'bg-red-600 text-white' : 'bg-app-text-muted/20 text-app-text-2'}`}>
+            <div className={`p-2 rounded-lg ${isSeptic ? 'bg-red-500/15 text-white' : 'bg-app-text-muted/20 text-app-text-2'}`}>
               {isSeptic ? <Flame className="w-5 h-5" /> : <Calculator className="w-5 h-5" />}
             </div>
             <div>
-              <h3 className={`font-black uppercase tracking-wider text-xs ${isSeptic ? 'text-red-300' : 'text-app-text-2'}`}>
+              <h3 className={`font-black uppercase tracking-wider text-xs ${isSeptic ? 'tx-danger' : 'text-app-text-2'}`}>
                 {isSeptic ? 'ALERTA SEPSE-3 DETECTADO' : 'INTELIGÊNCIA CLÍNICA · SOFA'}
               </h3>
               <p className="text-[11px] text-app-text-muted">
-                Score SOFA: <span className={`font-black text-sm ${isSeptic ? 'text-red-400' : 'text-app-text'}`}>{sofaTotal}</span>
+                Score SOFA: <span className={`font-black text-sm ${isSeptic ? 'tx-danger' : 'text-app-text'}`}>{sofaTotal}</span>
               </p>
             </div>
           </div>
@@ -441,7 +441,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             <label className="font-bold text-app-text-muted uppercase text-xs tracking-wider">Peso(kg):</label>
             <input
               type="number"
-              className="w-16 border-b border-app-border focus:border-app-accent focus:outline-none rounded px-1 bg-transparent text-center font-bold text-emerald-400"
+              className="w-16 border-b border-app-border focus:border-app-accent focus:outline-none rounded px-1 bg-transparent text-center font-bold tx-ok"
               value={pacDraft.peso ?? ''}
               onChange={e => setPacDraft(d => ({ ...d, peso: e.target.value ? Number(e.target.value) : undefined }))}
             />
@@ -456,11 +456,11 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             />
           </div>
           <div className="flex items-center gap-2 flex-1 min-w-[150px]">
-            <label className="font-bold text-red-400 uppercase text-xs tracking-wider shrink-0">Alergias:</label>
+            <label className="font-bold tx-danger uppercase text-xs tracking-wider shrink-0">Alergias:</label>
             <input
               type="text"
               placeholder="Nega alergias"
-              className="flex-1 border-b border-red-500/40 focus:border-red-500 focus:outline-none rounded px-1 bg-transparent text-red-300 font-medium"
+              className="flex-1 border-b border-red-500/40 focus:border-red-500 focus:outline-none rounded px-1 bg-transparent tx-danger font-medium"
               value={pacDraft.alergias ?? ''}
               onChange={e => setPacDraft(d => ({ ...d, alergias: e.target.value }))}
             />
@@ -517,7 +517,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   </button>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2 pr-6">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-bold text-purple-400 uppercase">Fármaco</label>
+                      <label className="text-[10px] font-bold tx-neuro uppercase">Fármaco</label>
                       <select
                         className="bg-app-tertiary border border-purple-500/30 p-1.5 rounded text-xs font-bold text-app-text-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                         value={sed.droga ?? ''}
@@ -529,7 +529,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                     </div>
                     {sed.droga && SEDACAO_DICT[sed.droga] && (
                       <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-bold text-purple-400 uppercase">Diluição</label>
+                        <label className="text-[10px] font-bold tx-neuro uppercase">Diluição</label>
                         <select
                           className="bg-app-tertiary border border-purple-500/30 p-1.5 rounded text-xs text-app-text-2"
                           value={sed.diluicao ?? 0}
@@ -545,7 +545,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   {sed.droga && (
                     <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-purple-500/5 p-2 rounded-lg border border-purple-500/20">
                       <div className="flex items-center gap-2 bg-app-card px-2 py-1 rounded border border-purple-500/30">
-                        <label className="font-bold text-[10px] uppercase text-purple-400">Vazão:</label>
+                        <label className="font-bold text-[10px] uppercase tx-neuro">Vazão:</label>
                         <input
                           type="number" step="0.1" placeholder="ml/h"
                           className="w-14 border-b-2 border-purple-500/40 focus:border-purple-500 focus:outline-none rounded text-center font-bold text-sm bg-transparent text-app-text"
@@ -557,16 +557,16 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                       <div className="flex-1">
                         {dose ? (
                           dose.error ? (
-                            <span className="text-[10px] font-bold text-red-400 flex items-center gap-1">
+                            <span className="text-[10px] font-bold tx-danger flex items-center gap-1">
                               <AlertTriangle className="w-3 h-3" /> {dose.error}
                             </span>
                           ) : (
                             <div className="flex flex-col">
                               <span className="font-black text-app-text text-sm">
-                                {dose.value} <span className="text-[10px] font-bold text-purple-400">{dose.unit}</span>
+                                {dose.value} <span className="text-[10px] font-bold tx-neuro">{dose.unit}</span>
                               </span>
                               <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded mt-1 w-fit ${
-                                dose.isOk ? 'bg-emerald-500/15 text-emerald-300' : 'bg-orange-500/15 text-orange-300'
+                                dose.isOk ? 'bg-emerald-500/15 tx-ok' : 'bg-orange-500/15 tx-warn'
                               }`}>
                                 Faixa: {dose.min} a {dose.max}
                               </span>
@@ -581,7 +581,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             })}
             <button
               onClick={() => addInf('sed')}
-              className="w-full py-2 flex items-center justify-center gap-2 text-purple-400 bg-purple-500/10 hover:bg-purple-500/20 border-2 border-purple-500/30 border-dashed rounded-xl text-xs font-bold transition"
+              className="w-full py-2 flex items-center justify-center gap-2 tx-neuro bg-purple-500/10 hover:bg-purple-500/20 border-2 border-purple-500/30 border-dashed rounded-xl text-xs font-bold transition"
             >
               <Plus className="w-3.5 h-3.5" /> Adicionar Sedação
             </button>
@@ -623,7 +623,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                     </select>
                     {esc.nome && (
                       <div className="flex items-center gap-2 bg-purple-500/10 px-2 py-1 rounded">
-                        <label className="font-bold text-[10px] uppercase text-purple-400">Score:</label>
+                        <label className="font-bold text-[10px] uppercase tx-neuro">Score:</label>
                         <input
                           type="text" placeholder="..."
                           className="w-16 border-b-2 border-purple-500/40 focus:border-purple-500 focus:outline-none rounded text-center bg-transparent font-bold text-sm text-app-text"
@@ -638,7 +638,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                     )}
                   </div>
                   {esc.nome && ESCALAS_NEURO[esc.nome] && (
-                    <span className="text-[10px] text-purple-400 italic bg-purple-500/10 px-2 py-1 rounded border border-purple-500/20">
+                    <span className="text-[10px] tx-neuro italic bg-purple-500/10 px-2 py-1 rounded border border-purple-500/20">
                       {ESCALAS_NEURO[esc.nome].desc} · faixa {ESCALAS_NEURO[esc.nome].range}
                     </span>
                   )}
@@ -650,7 +650,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                 const arr = [...((neuroDraft.escalas as Escala[]) ?? []), { nome: '', valor: '' }];
                 setDraft('neuro', { escalas: arr });
               }}
-              className="w-full py-2 flex items-center justify-center gap-2 text-purple-400 bg-purple-500/10 hover:bg-purple-500/20 border-2 border-purple-500/30 border-dashed rounded-xl text-xs font-bold transition"
+              className="w-full py-2 flex items-center justify-center gap-2 tx-neuro bg-purple-500/10 hover:bg-purple-500/20 border-2 border-purple-500/30 border-dashed rounded-xl text-xs font-bold transition"
             >
               <Plus className="w-3.5 h-3.5" /> Adicionar Escala
             </button>
@@ -659,7 +659,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
           {/* Pupilas + Analgesia + CAM-ICU */}
           <div className="flex flex-col gap-3 pt-3 mt-3 border-t border-purple-500/20">
             <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-              <label className="font-bold text-xs uppercase text-purple-400 shrink-0">Pupilas:</label>
+              <label className="font-bold text-xs uppercase tx-neuro shrink-0">Pupilas:</label>
               <input
                 type="text"
                 className="w-full bg-transparent border-b border-purple-500/40 focus:border-purple-500 focus:outline-none rounded px-1 font-medium text-app-text-2"
@@ -669,12 +669,12 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-3 pt-1">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-xs uppercase text-purple-400">Analgesia:</span>
+                <span className="font-bold text-xs uppercase tx-neuro">Analgesia:</span>
                 <InlineInput val={neuroDraft.analgesia as string} onChange={updField('neuro', 'analgesia')} ph="____" w="w-20" />
               </div>
               <div className="hidden sm:block w-px h-6 bg-purple-500/30" />
               <div className="flex items-center gap-2 bg-app-card p-1.5 rounded-lg shadow-sm border border-purple-500/20">
-                <span className="font-bold text-xs uppercase text-purple-400 px-1">CAM-ICU:</span>
+                <span className="font-bold text-xs uppercase tx-neuro px-1">CAM-ICU:</span>
                 <label className="flex items-center gap-1 cursor-pointer font-bold text-app-text-2 text-xs bg-purple-500/10 px-2 py-1 rounded hover:bg-purple-500/20">
                   <input
                     type="radio" name={`camicu-${paciente.id}`}
@@ -708,7 +708,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
           <div className="space-y-4">
             <div className="bg-app-card p-3 rounded-xl border border-sky-500/20 shadow-sm">
               <div className="flex flex-wrap items-center gap-3">
-                <label className="font-bold text-xs uppercase text-sky-400">Suporte O2:</label>
+                <label className="font-bold text-xs uppercase tx-resp">Suporte O2:</label>
                 <select
                   className="bg-app-tertiary border border-sky-500/30 p-1.5 rounded-lg text-sm font-bold text-app-text-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
                   value={String(respDraft.suporte ?? '')}
@@ -723,29 +723,29 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
 
                 {respDraft.suporte === 'IOT + VM' && (
                   <div className="flex items-center gap-2 bg-sky-500/10 border border-sky-500/30 px-2 py-1 rounded">
-                    <span className="text-[10px] font-bold text-sky-400 uppercase">Data IOT:</span>
+                    <span className="text-[10px] font-bold tx-resp uppercase">Data IOT:</span>
                     <InlineInput val={respDraft.dataIntubacao as string} onChange={updField('resp', 'dataIntubacao')} ph="dd/mm" w="w-16" />
                   </div>
                 )}
                 {respDraft.suporte === 'CNL O2' && (
                   <div className="flex items-center gap-2 bg-sky-500/10 border border-sky-500/30 px-2 py-1 rounded">
-                    <span className="text-[10px] font-bold text-sky-400 uppercase">Vazão:</span>
+                    <span className="text-[10px] font-bold tx-resp uppercase">Vazão:</span>
                     <InlineInput val={respDraft.vazaoO2 as string} onChange={updField('resp', 'vazaoO2')} ph="L/m" w="w-12" type="number" />
-                    <span className="text-xs font-bold text-sky-400">L/min</span>
+                    <span className="text-xs font-bold tx-resp">L/min</span>
                   </div>
                 )}
                 {respDraft.suporte === 'CNAF' && (
                   <div className="flex flex-wrap items-center gap-3 bg-sky-500/10 border border-sky-500/30 px-3 py-1 rounded">
                     <div className="flex items-center gap-1">
-                      <span className="text-[10px] font-bold text-sky-400 uppercase">Vazão:</span>
+                      <span className="text-[10px] font-bold tx-resp uppercase">Vazão:</span>
                       <InlineInput val={respDraft.vazaoO2 as string} onChange={updField('resp', 'vazaoO2')} ph="L/m" w="w-10" type="number" />
-                      <span className="text-[10px] font-bold text-sky-400">L/min</span>
+                      <span className="text-[10px] font-bold tx-resp">L/min</span>
                     </div>
                     <div className="w-px h-4 bg-sky-500/40" />
                     <div className="flex items-center gap-1">
-                      <span className="text-[10px] font-bold text-sky-400 uppercase">FiO2:</span>
+                      <span className="text-[10px] font-bold tx-resp uppercase">FiO2:</span>
                       <InlineInput val={respDraft.fio2O2 as string} onChange={updField('resp', 'fio2O2')} ph="%" w="w-10" type="number" />
-                      <span className="text-[10px] font-bold text-sky-400">%</span>
+                      <span className="text-[10px] font-bold tx-resp">%</span>
                     </div>
                   </div>
                 )}
@@ -755,7 +755,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
               {respDraft.suporte === 'IOT + VM' && (
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 bg-sky-500/5 p-3 rounded-lg border border-sky-500/20 mt-3">
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold uppercase text-sky-400">Modo</label>
+                    <label className="text-[10px] font-bold uppercase tx-resp">Modo</label>
                     <select
                       className="bg-app-tertiary border border-sky-500/30 rounded p-1 text-xs font-bold text-app-text-2"
                       value={String(respDraft.vmModo ?? '')}
@@ -769,19 +769,19 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                     </select>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold uppercase text-sky-400">PEEP</span>
+                    <span className="text-[10px] font-bold uppercase tx-resp">PEEP</span>
                     <InlineInput val={respDraft.vmPeep as string} onChange={updField('resp', 'vmPeep')} w="w-full" type="number" />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold uppercase text-sky-400">FiO2 (%)</span>
+                    <span className="text-[10px] font-bold uppercase tx-resp">FiO2 (%)</span>
                     <InlineInput val={respDraft.vmFio2 as string} onChange={updField('resp', 'vmFio2')} w="w-full" type="number" />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold uppercase text-sky-400">Vol. Corr.</span>
+                    <span className="text-[10px] font-bold uppercase tx-resp">Vol. Corr.</span>
                     <InlineInput val={respDraft.vmVc as string} onChange={updField('resp', 'vmVc')} w="w-full" type="number" />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold uppercase text-sky-400">P.Insp/PS</span>
+                    <span className="text-[10px] font-bold uppercase tx-resp">P.Insp/PS</span>
                     <InlineInput val={respDraft.vmPinspPs as string} onChange={updField('resp', 'vmPinspPs')} w="w-full" type="number" />
                   </div>
                 </div>
@@ -791,29 +791,29 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             {/* Vitais Resp */}
             <div className="flex flex-wrap gap-x-6 gap-y-3 bg-app-card p-3 rounded-xl border border-sky-500/20 shadow-sm">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-xs uppercase text-sky-400">PaO2:</span>
+                <span className="font-bold text-xs uppercase tx-resp">PaO2:</span>
                 <InlineInput val={respDraft.pao2 as string} onChange={updField('resp', 'pao2')} w="w-10" type="number" />
-                <span className="font-bold text-[10px] text-sky-400">mmHg</span>
+                <span className="font-bold text-[10px] tx-resp">mmHg</span>
               </div>
               <div className="hidden sm:block w-px h-6 bg-sky-500/30" />
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-bold text-xs uppercase text-sky-400">FR:</span>
+                <span className="font-bold text-xs uppercase tx-resp">FR:</span>
                 <InlineInput val={respDraft.fr1 as string} onChange={updField('resp', 'fr1')} w="w-10" type="number" />
                 <span className="text-app-text-muted">-</span>
                 <InlineInput val={respDraft.fr2 as string} onChange={updField('resp', 'fr2')} w="w-10" type="number" />
                 {isHigh(respDraft.fr1, respDraft.fr2, 20) && (
-                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded">
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 tx-danger border border-red-500/30 px-1.5 py-0.5 rounded">
                     <AlertTriangle className="w-2.5 h-2.5" />(<InlineInput val={respDraft.frX as string} onChange={updField('resp', 'frX')} w="w-6" type="number" />x &gt; 20)
                   </span>
                 )}
               </div>
               <div className="hidden sm:block w-px h-6 bg-sky-500/30" />
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-bold text-xs uppercase text-sky-400">SpO2:</span>
+                <span className="font-bold text-xs uppercase tx-resp">SpO2:</span>
                 <InlineInput val={respDraft.spo2 as string} onChange={updField('resp', 'spo2')} w="w-10" type="number" />
-                <span className="text-xs font-bold text-sky-400">%</span>
+                <span className="text-xs font-bold tx-resp">%</span>
                 {isLow(respDraft.spo2, '', 92) && (
-                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded">
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 tx-danger border border-red-500/30 px-1.5 py-0.5 rounded">
                     <AlertTriangle className="w-2.5 h-2.5" />(<InlineInput val={respDraft.spo2X as string} onChange={updField('resp', 'spo2X')} w="w-6" type="number" />x &lt; 92)
                   </span>
                 )}
@@ -822,7 +822,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
 
             {/* Ausculta */}
             <div className="flex flex-col gap-1">
-              <label className="font-bold text-[10px] uppercase text-sky-400">Ausculta Pulmonar:</label>
+              <label className="font-bold text-[10px] uppercase tx-resp">Ausculta Pulmonar:</label>
               <select
                 className="w-full bg-app-card border border-sky-500/30 p-2.5 rounded-lg text-sm font-bold text-app-text-2 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
                 value={String(respDraft.ausculta ?? '')}
@@ -872,7 +872,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   </button>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2 pr-6">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-bold text-rose-400 uppercase">Fármaco</label>
+                      <label className="text-[10px] font-bold tx-hemo uppercase">Fármaco</label>
                       <select
                         className="bg-app-tertiary border border-rose-500/30 p-1.5 rounded text-xs font-bold text-app-text-2"
                         value={dva.droga ?? ''}
@@ -884,7 +884,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                     </div>
                     {dva.droga && DVA_DICT[dva.droga] && (
                       <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-bold text-rose-400 uppercase">Diluição</label>
+                        <label className="text-[10px] font-bold tx-hemo uppercase">Diluição</label>
                         <select
                           className="bg-app-tertiary border border-rose-500/30 p-1.5 rounded text-xs text-app-text-2"
                           value={dva.diluicao ?? 0}
@@ -900,7 +900,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   {dva.droga && (
                     <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-rose-500/5 p-2 rounded-lg border border-rose-500/20">
                       <div className="flex items-center gap-2 bg-app-card px-2 py-1 rounded border border-rose-500/30">
-                        <label className="font-bold text-[10px] uppercase text-rose-400">Vazão:</label>
+                        <label className="font-bold text-[10px] uppercase tx-hemo">Vazão:</label>
                         <input
                           type="number" step="0.1" placeholder="ml/h"
                           className="w-14 border-b-2 border-rose-500/40 focus:border-rose-500 focus:outline-none rounded text-center font-bold text-sm bg-transparent text-app-text"
@@ -912,16 +912,16 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                       <div className="flex-1">
                         {dose ? (
                           dose.error ? (
-                            <span className="text-[10px] font-bold text-red-400 flex items-center gap-1">
+                            <span className="text-[10px] font-bold tx-danger flex items-center gap-1">
                               <AlertTriangle className="w-3 h-3" /> {dose.error}
                             </span>
                           ) : (
                             <div className="flex flex-col">
                               <span className="font-black text-app-text text-sm">
-                                {dose.value} <span className="text-[10px] font-bold text-rose-400">{dose.unit}</span>
+                                {dose.value} <span className="text-[10px] font-bold tx-hemo">{dose.unit}</span>
                               </span>
                               <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded mt-1 w-fit ${
-                                dose.isOk ? 'bg-emerald-500/15 text-emerald-300' : 'bg-orange-500/15 text-orange-300'
+                                dose.isOk ? 'bg-emerald-500/15 tx-ok' : 'bg-orange-500/15 tx-warn'
                               }`}>
                                 Faixa: {dose.min} a {dose.max}
                               </span>
@@ -936,7 +936,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             })}
             <button
               onClick={() => addInf('dvas')}
-              className="w-full py-2 flex items-center justify-center gap-2 text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border-2 border-rose-500/30 border-dashed rounded-xl text-xs font-bold transition"
+              className="w-full py-2 flex items-center justify-center gap-2 tx-hemo bg-rose-500/10 hover:bg-rose-500/20 border-2 border-rose-500/30 border-dashed rounded-xl text-xs font-bold transition"
             >
               <Plus className="w-3.5 h-3.5" /> Adicionar DVA
             </button>
@@ -952,17 +952,17 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                 { label: 'FC',  k1: 'fc1',  k2: 'fc2',  high: 100, low: -1,  kxH: 'fcX100',  kxL: ''        },
               ].map(({ label, k1, k2, high, low, kxH, kxL }) => (
                 <div key={label} className="flex flex-wrap items-center gap-2 border-b border-rose-500/10 pb-2">
-                  <span className="font-bold text-xs uppercase text-rose-400 w-8">{label}:</span>
+                  <span className="font-bold text-xs uppercase tx-hemo w-8">{label}:</span>
                   <InlineInput val={hemoDraft[k1] as string} onChange={updField('hemo', k1)} w="w-10" />
                   <span className="text-app-text-muted">-</span>
                   <InlineInput val={hemoDraft[k2] as string} onChange={updField('hemo', k2)} w="w-10" />
                   {isHigh(hemoDraft[k1], hemoDraft[k2], high) && (
-                    <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded">
+                    <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 tx-danger border border-red-500/30 px-1.5 py-0.5 rounded">
                       <AlertTriangle className="w-2.5 h-2.5" />(<InlineInput val={hemoDraft[kxH] as string} onChange={updField('hemo', kxH)} w="w-6" type="number" />x &gt; {high})
                     </span>
                   )}
                   {kxL && low > 0 && isLow(hemoDraft[k1], hemoDraft[k2], low) && (
-                    <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded">
+                    <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 tx-danger border border-red-500/30 px-1.5 py-0.5 rounded">
                       <AlertTriangle className="w-2.5 h-2.5" />(<InlineInput val={hemoDraft[kxL] as string} onChange={updField('hemo', kxL)} w="w-6" type="number" />x &lt; {low})
                     </span>
                   )}
@@ -972,7 +972,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
 
             <div className="space-y-3 sm:border-l-2 border-rose-500/20 sm:pl-4">
               <div className="flex flex-col gap-1">
-                <label className="font-bold text-[10px] uppercase text-rose-400">Ausculta Cardíaca:</label>
+                <label className="font-bold text-[10px] uppercase tx-hemo">Ausculta Cardíaca:</label>
                 <input
                   type="text"
                   className="w-full bg-transparent border-b border-rose-500/40 focus:border-rose-500 focus:outline-none rounded px-1 font-bold text-app-text-2"
@@ -981,7 +981,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="font-bold text-[10px] uppercase text-rose-400">Pele, Pulso e Extremidades:</label>
+                <label className="font-bold text-[10px] uppercase tx-hemo">Pele, Pulso e Extremidades:</label>
                 <input
                   type="text"
                   className="w-full bg-transparent border-b border-rose-500/40 focus:border-rose-500 focus:outline-none rounded px-1 font-medium text-sm text-app-text-2"
@@ -1006,7 +1006,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             <div className="flex flex-col gap-4 bg-app-card p-4 rounded-xl border border-amber-500/20 shadow-sm">
               <div className="flex flex-wrap items-center gap-y-3 gap-x-6 border-b border-amber-500/15 pb-3">
                 <div className="flex flex-wrap items-center gap-2 flex-1 min-w-[200px]">
-                  <label className="font-bold text-xs uppercase text-amber-400">Dieta:</label>
+                  <label className="font-bold text-xs uppercase tx-tgi">Dieta:</label>
                   <select
                     className="bg-app-tertiary border border-amber-500/30 p-1.5 rounded-lg text-sm font-bold text-app-text-2"
                     value={String(tgiDraft.viaDieta ?? '')}
@@ -1030,15 +1030,15 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   )}
                   {!!tgiDraft.viaDieta && tgiDraft.viaDieta !== 'Via oral' && tgiDraft.viaDieta !== 'Jejum' && (
                     <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-2 py-1 rounded">
-                      <span className="text-[10px] font-bold text-amber-400 uppercase">Vazão:</span>
+                      <span className="text-[10px] font-bold tx-tgi uppercase">Vazão:</span>
                       <InlineInput val={tgiDraft.vazaoDieta as string} onChange={updField('tgi', 'vazaoDieta')} ph="ml/h" w="w-12" type="number" />
-                      <span className="text-[10px] font-bold text-amber-400">ml/h</span>
+                      <span className="text-[10px] font-bold tx-tgi">ml/h</span>
                     </div>
                   )}
                 </div>
                 <div className="hidden sm:block w-px h-8 bg-amber-500/20" />
                 <div className="flex items-center gap-2">
-                  <label className="font-bold text-[10px] uppercase text-amber-400">Aceitação:</label>
+                  <label className="font-bold text-[10px] uppercase tx-tgi">Aceitação:</label>
                   <select
                     className="bg-app-tertiary border border-amber-500/30 p-1.5 rounded-lg text-sm font-bold text-app-text-2"
                     value={String(tgiDraft.aceitacao ?? '')}
@@ -1056,23 +1056,23 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
 
               <div className="flex flex-wrap items-center gap-y-3 gap-x-6">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-[10px] uppercase text-amber-400">Bilirrubina:</span>
+                  <span className="font-bold text-[10px] uppercase tx-tgi">Bilirrubina:</span>
                   <InlineInput val={tgiDraft.bb as string} onChange={updField('tgi', 'bb')} w="w-12" />
                 </div>
                 <div className="hidden sm:block w-px h-8 bg-amber-500/20" />
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-bold text-xs uppercase text-amber-400">DX:</span>
+                  <span className="font-bold text-xs uppercase tx-tgi">DX:</span>
                   <InlineInput val={tgiDraft.dx as string} onChange={updField('tgi', 'dx')} w="w-12" />
-                  <span className="font-bold text-xs text-amber-400">mg/dL</span>
+                  <span className="font-bold text-xs tx-tgi">mg/dL</span>
                   {isHigh(tgiDraft.dx, '', 180) && (
-                    <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded">
+                    <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 tx-danger border border-red-500/30 px-1.5 py-0.5 rounded">
                       <AlertTriangle className="w-2.5 h-2.5" />(<InlineInput val={tgiDraft.dxX180 as string} onChange={updField('tgi', 'dxX180')} w="w-6" type="number" />x &gt; 180)
                     </span>
                   )}
                 </div>
                 <div className="hidden sm:block w-px h-8 bg-amber-500/20" />
                 <div className="flex items-center gap-2 flex-1 flex-wrap">
-                  <label className="font-bold text-[10px] uppercase text-amber-400">Evacuações:</label>
+                  <label className="font-bold text-[10px] uppercase tx-tgi">Evacuações:</label>
                   <select
                     className="bg-app-tertiary border border-amber-500/30 p-1.5 rounded-lg text-sm font-bold text-app-text-2"
                     value={String(tgiDraft.evacuou ?? '')}
@@ -1085,7 +1085,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   {tgiDraft.evacuou === 'Sim' && (
                     <div className="flex flex-wrap items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-2 py-1 rounded">
                       <InlineInput val={tgiDraft.evacuacoesNum as string} onChange={updField('tgi', 'evacuacoesNum')} ph="Nº" w="w-6" type="number" />
-                      <span className="text-[10px] font-bold text-amber-400">x</span>
+                      <span className="text-[10px] font-bold tx-tgi">x</span>
                       <input
                         type="text" placeholder="Ex: Pastosa"
                         className="w-24 border-b border-amber-500/40 focus:border-amber-500 focus:outline-none rounded px-1 bg-transparent text-xs font-medium text-app-text-2"
@@ -1096,7 +1096,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   )}
                   {tgiDraft.evacuou === 'Não' && (
                     <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-2 py-1 rounded">
-                      <span className="text-[10px] font-bold text-amber-400 uppercase">Data últ:</span>
+                      <span className="text-[10px] font-bold tx-tgi uppercase">Data últ:</span>
                       <InlineInput val={tgiDraft.evacuacoesDataUltima as string} onChange={updField('tgi', 'evacuacoesDataUltima')} ph="dd/mm" w="w-14" />
                     </div>
                   )}
@@ -1105,7 +1105,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             </div>
 
             <div className="flex flex-col gap-1 px-1">
-              <label className="text-[10px] font-bold uppercase text-amber-400">Exame Físico Abdome:</label>
+              <label className="text-[10px] font-bold uppercase tx-tgi">Exame Físico Abdome:</label>
               <input
                 type="text"
                 className="w-full bg-transparent border-b border-amber-500/40 focus:border-amber-500 focus:outline-none rounded px-1 text-sm font-medium text-app-text-2"
@@ -1129,7 +1129,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             <div className="flex flex-col sm:flex-row gap-4 bg-app-card p-4 rounded-xl border border-lime-500/20 shadow-sm">
               <div className="flex flex-col gap-3 justify-center min-w-[110px]">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold w-6 text-right text-xs uppercase text-lime-400">Ur:</span>
+                  <span className="font-bold w-6 text-right text-xs uppercase tx-renal">Ur:</span>
                   <InlineInput val={renalDraft.ur1 as string} onChange={updField('renal', 'ur1')} w="w-10" />
                   <span className="text-app-text-muted">&gt;</span>
                   <InlineInput val={renalDraft.ur2 as string} onChange={updField('renal', 'ur2')} w="w-10" />
@@ -1137,7 +1137,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   <InlineInput val={renalDraft.ur3 as string} onChange={updField('renal', 'ur3')} w="w-10" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold w-6 text-right text-xs uppercase text-lime-400">CR:</span>
+                  <span className="font-bold w-6 text-right text-xs uppercase tx-renal">CR:</span>
                   <InlineInput val={renalDraft.cr1 as string} onChange={updField('renal', 'cr1')} w="w-10" />
                   <span className="text-app-text-muted">&gt;</span>
                   <InlineInput val={renalDraft.cr2 as string} onChange={updField('renal', 'cr2')} w="w-10" />
@@ -1148,19 +1148,19 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
               <div className="hidden sm:block w-px bg-lime-500/20" />
               <div className="grid grid-cols-2 gap-x-4 gap-y-3 flex-1 items-center">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase text-lime-400 w-5">Mg</span>
+                  <span className="text-[10px] font-bold uppercase tx-renal w-5">Mg</span>
                   <InlineInput val={renalDraft.mg as string} onChange={updField('renal', 'mg')} w="w-full max-w-[60px]" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase text-lime-400 w-5">Na</span>
+                  <span className="text-[10px] font-bold uppercase tx-renal w-5">Na</span>
                   <InlineInput val={renalDraft.na as string} onChange={updField('renal', 'na')} w="w-full max-w-[60px]" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase text-lime-400 w-5">Cai</span>
+                  <span className="text-[10px] font-bold uppercase tx-renal w-5">Cai</span>
                   <InlineInput val={renalDraft.cai as string} onChange={updField('renal', 'cai')} w="w-full max-w-[60px]" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase text-lime-400 w-5">K</span>
+                  <span className="text-[10px] font-bold uppercase tx-renal w-5">K</span>
                   <InlineInput val={renalDraft.k as string} onChange={updField('renal', 'k')} w="w-full max-w-[60px]" />
                 </div>
               </div>
@@ -1168,7 +1168,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
 
             <div className="flex flex-wrap items-center gap-x-3 gap-y-3 bg-app-card p-3 rounded-xl border border-lime-500/20 shadow-sm">
               <div className="flex items-center gap-2 flex-wrap">
-                <label className="font-bold text-[10px] uppercase text-lime-400">Diurese:</label>
+                <label className="font-bold text-[10px] uppercase tx-renal">Diurese:</label>
                 <select
                   className="bg-app-tertiary border border-lime-500/30 p-1.5 rounded-md text-xs font-bold text-app-text-2"
                   value={String(renalDraft.tipoDiurese ?? '')}
@@ -1181,21 +1181,21 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                 </select>
                 <div className="flex items-center bg-lime-500/10 border border-lime-500/30 px-2 py-1 rounded">
                   <InlineInput val={renalDraft.diureseHoras as string ?? '24'} onChange={updField('renal', 'diureseHoras')} w="w-6" type="number" />
-                  <span className="text-[10px] text-lime-400 font-bold mr-2">h:</span>
+                  <span className="text-[10px] tx-renal font-bold mr-2">h:</span>
                   <input
                     type="text"
                     className="w-16 border-b-2 border-lime-500/40 focus:border-lime-500 focus:outline-none rounded px-1 text-center bg-transparent font-black text-[15px] text-app-text"
                     value={String(renalDraft.diurese ?? '')}
                     onChange={e => setDraft('renal', { diurese: e.target.value })}
                   />
-                  <span className="text-[10px] text-lime-400 font-bold ml-1">ml</span>
+                  <span className="text-[10px] tx-renal font-bold ml-1">ml</span>
                 </div>
               </div>
               <div className="hidden sm:block w-px h-6 bg-lime-500/30" />
               <div className="flex items-center gap-2 bg-lime-500/10 border border-lime-500/30 px-2 py-1.5 rounded-md">
-                <span className="font-bold text-[10px] uppercase text-lime-400">BH:</span>
+                <span className="font-bold text-[10px] uppercase tx-renal">BH:</span>
                 <InlineInput val={renalDraft.bh as string} onChange={updField('renal', 'bh')} w="w-14" />
-                <span className="text-[10px] font-bold text-lime-400">ml</span>
+                <span className="text-[10px] font-bold tx-renal">ml</span>
               </div>
               <div className="w-full sm:w-auto bg-lime-600 px-3 py-1.5 rounded-lg flex items-center justify-center gap-2 sm:ml-auto shadow-sm">
                 <span className="font-bold text-[10px] uppercase text-lime-100">Ef:</span>
@@ -1218,27 +1218,27 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-8 gap-y-3 bg-app-card p-4 rounded-xl border border-pink-500/20 shadow-sm">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-[10px] uppercase text-pink-400">Hb:</span>
+                <span className="font-bold text-[10px] uppercase tx-hemato">Hb:</span>
                 <InlineInput val={hematoDraft.hb1 as string} onChange={updField('hemato', 'hb1')} w="w-12" />
-                <span className="text-[10px] font-bold text-pink-400">g/dL</span>
+                <span className="text-[10px] font-bold tx-hemato">g/dL</span>
               </div>
               <div className="hidden sm:block w-px h-6 bg-pink-500/30" />
               <div className="flex items-center gap-2">
-                <span className="font-bold text-[10px] uppercase text-pink-400">HT:</span>
+                <span className="font-bold text-[10px] uppercase tx-hemato">HT:</span>
                 <InlineInput val={hematoDraft.ht1 as string} onChange={updField('hemato', 'ht1')} w="w-12" />
-                <span className="text-[10px] font-bold text-pink-400">%</span>
+                <span className="text-[10px] font-bold tx-hemato">%</span>
               </div>
               <div className="hidden sm:block w-px h-6 bg-pink-500/30" />
               <div className="flex items-center gap-2">
-                <span className="font-bold text-[10px] uppercase text-pink-400">Plaq:</span>
+                <span className="font-bold text-[10px] uppercase tx-hemato">Plaq:</span>
                 <InlineInput val={hematoDraft.plaq1 as string} onChange={updField('hemato', 'plaq1')} w="w-16" />
               </div>
             </div>
 
             <div className="flex flex-col gap-2 bg-app-card/50 p-3 rounded-xl border border-pink-500/20">
-              <span className="font-bold text-[10px] uppercase text-pink-400 mb-1 block">Profilaxias</span>
+              <span className="font-bold text-[10px] uppercase tx-hemato mb-1 block">Profilaxias</span>
               <div className="flex items-center gap-3 bg-app-card p-1.5 rounded-lg border border-pink-500/15 shadow-sm">
-                <div className="bg-pink-500/15 p-1.5 rounded-md text-pink-400"><ShieldAlert className="w-3.5 h-3.5" /></div>
+                <div className="bg-pink-500/15 p-1.5 rounded-md tx-hemato"><ShieldAlert className="w-3.5 h-3.5" /></div>
                 <select
                   className="flex-1 bg-transparent outline-none font-bold text-xs text-app-text-2"
                   value={String(hematoDraft.profilaxiaTvp ?? '')}
@@ -1251,7 +1251,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                 </select>
               </div>
               <div className="flex items-center gap-3 bg-app-card p-1.5 rounded-lg border border-pink-500/15 shadow-sm">
-                <div className="bg-pink-500/15 p-1.5 rounded-md text-pink-400"><Pill className="w-3.5 h-3.5" /></div>
+                <div className="bg-pink-500/15 p-1.5 rounded-md tx-hemato"><Pill className="w-3.5 h-3.5" /></div>
                 <select
                   className="flex-1 bg-transparent outline-none font-bold text-xs text-app-text-2"
                   value={String(hematoDraft.profilaxiaUlcera ?? '')}
@@ -1279,20 +1279,20 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-8 gap-y-3 bg-app-card p-4 rounded-xl border border-teal-500/20 shadow-sm">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-bold text-[10px] uppercase text-teal-400">Tax:</span>
+                <span className="font-bold text-[10px] uppercase tx-infecto">Tax:</span>
                 <InlineInput val={infectoDraft.tmax as string} onChange={updField('infecto', 'tmax')} w="w-12" />
-                <span className="font-bold text-[10px] text-teal-400">°C</span>
+                <span className="font-bold text-[10px] tx-infecto">°C</span>
                 {isHigh(infectoDraft.tmax, '', 38) && (
-                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded ml-2">
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-red-500/15 tx-danger border border-red-500/30 px-1.5 py-0.5 rounded ml-2">
                     <AlertTriangle className="w-2.5 h-2.5" />(<InlineInput val={infectoDraft.tmaxX38 as string} onChange={updField('infecto', 'tmaxX38')} w="w-6" type="number" />x &gt; 38)
                   </span>
                 )}
               </div>
               <div className="hidden sm:block w-px h-6 bg-teal-500/30" />
               <div className="flex items-center gap-2">
-                <span className="font-bold text-[10px] uppercase text-teal-400">Leucócitos:</span>
+                <span className="font-bold text-[10px] uppercase tx-infecto">Leucócitos:</span>
                 <InlineInput val={infectoDraft.leuco1 as string} onChange={updField('infecto', 'leuco1')} w="w-16" />
-                <span className="text-[10px] font-bold text-teal-400">/µL</span>
+                <span className="text-[10px] font-bold tx-infecto">/µL</span>
               </div>
             </div>
 
@@ -1307,7 +1307,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             >
               {/* ATBs */}
               <div className="mb-4 border-b border-teal-500/20 pb-4">
-                <h5 className="text-[10px] font-bold text-teal-400 uppercase mb-3 flex items-center gap-1">
+                <h5 className="text-[10px] font-bold tx-infecto uppercase mb-3 flex items-center gap-1">
                   <Activity className="w-3 h-3" /> Antibioticoterapia Ativa
                 </h5>
                 {((infectoDraft.atbs as AtbItem[]) ?? []).map((atb, idx) => (
@@ -1323,7 +1323,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                     </button>
                     <div className="flex flex-col sm:flex-row gap-3 pr-6">
                       <div className="flex flex-col gap-1 flex-[2] min-w-[140px]">
-                        <label className="text-[10px] font-bold text-teal-400 uppercase">Fármaco</label>
+                        <label className="text-[10px] font-bold tx-infecto uppercase">Fármaco</label>
                         <select
                           className="bg-app-tertiary border border-teal-500/30 p-1.5 rounded-md text-xs font-bold text-app-text-2"
                           value={atb.nome ?? ''}
@@ -1357,7 +1357,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                         )}
                       </div>
                       <div className="flex flex-col gap-1 flex-1 min-w-[100px]">
-                        <label className="text-[10px] font-bold text-teal-400 uppercase">Dose</label>
+                        <label className="text-[10px] font-bold tx-infecto uppercase">Dose</label>
                         <input
                           type="text" placeholder="Ex: 1g 12/12h"
                           className="w-full bg-teal-500/5 border border-teal-500/20 px-2 py-1.5 rounded-md text-xs font-medium text-app-text-2"
@@ -1370,9 +1370,9 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                         />
                       </div>
                       <div className="flex flex-col gap-1 w-16 shrink-0">
-                        <label className="text-[10px] font-bold text-teal-400 uppercase text-center">Dia</label>
+                        <label className="text-[10px] font-bold tx-infecto uppercase text-center">Dia</label>
                         <div className="flex items-center justify-center bg-teal-500/5 border border-teal-500/20 px-1 py-1.5 rounded-md">
-                          <span className="font-bold text-teal-400 text-[10px] mr-1">D</span>
+                          <span className="font-bold tx-infecto text-[10px] mr-1">D</span>
                           <input
                             type="number" placeholder="1"
                             className="w-6 border-b-2 border-teal-500/40 focus:border-teal-500 focus:outline-none rounded px-1 text-center bg-transparent font-bold text-sm text-app-text"
@@ -1393,7 +1393,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                     const arr = [...((infectoDraft.atbs as AtbItem[]) ?? []), { nome: '', dose: '', dias: '' }];
                     setDraft('infecto', { atbs: arr });
                   }}
-                  className="w-full py-2 mt-2 flex items-center justify-center gap-2 text-teal-400 bg-teal-500/10 hover:bg-teal-500/20 border-2 border-teal-500/30 border-dashed rounded-xl text-xs font-bold transition"
+                  className="w-full py-2 mt-2 flex items-center justify-center gap-2 tx-infecto bg-teal-500/10 hover:bg-teal-500/20 border-2 border-teal-500/30 border-dashed rounded-xl text-xs font-bold transition"
                 >
                   <Plus className="w-3.5 h-3.5" /> Adicionar ATB
                 </button>
@@ -1401,7 +1401,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
 
               {/* Culturas */}
               <div>
-                <h5 className="text-[10px] font-bold text-teal-400 uppercase mb-3 flex items-center gap-1">
+                <h5 className="text-[10px] font-bold tx-infecto uppercase mb-3 flex items-center gap-1">
                   <TestTube className="w-3 h-3" /> Monitorização de Culturas
                 </h5>
                 {((infectoDraft.culturas as CulturaItem[]) ?? []).map((cult, idx) => (
@@ -1427,7 +1427,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                         }}
                       />
                       <div className="flex items-center gap-1 bg-teal-500/10 px-2 py-1 rounded-md border border-teal-500/30">
-                        <label className="text-[10px] font-bold text-teal-400">Data:</label>
+                        <label className="text-[10px] font-bold tx-infecto">Data:</label>
                         <input
                           type="text" placeholder="dd/mm"
                           className="w-14 border-b border-teal-500/40 focus:border-teal-500 focus:outline-none rounded px-1 bg-transparent text-xs text-center text-app-text-2"
@@ -1458,12 +1458,12 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                     </div>
                     {(cult.status === 'Parcial positiva' || cult.status === 'Positiva') && (
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 bg-yellow-500/10 p-2.5 rounded-lg border border-yellow-500/30 mt-3">
-                        <label className="text-[10px] font-bold text-yellow-400 uppercase shrink-0 flex items-center gap-1">
+                        <label className="text-[10px] font-bold tx-warn uppercase shrink-0 flex items-center gap-1">
                           <AlertTriangle className="w-3 h-3" /> Isolamento:
                         </label>
                         <input
                           type="text" placeholder="Ex: E. coli ESBL / Antibiograma..."
-                          className="flex-1 bg-transparent border-b border-yellow-500/40 focus:border-yellow-500 focus:outline-none rounded px-1 text-xs text-yellow-300 font-medium w-full"
+                          className="flex-1 bg-transparent border-b border-yellow-500/40 focus:border-yellow-500 focus:outline-none rounded px-1 text-xs tx-warn font-medium w-full"
                           value={cult.detalhe ?? ''}
                           onChange={e => {
                             const arr = [...((infectoDraft.culturas as CulturaItem[]) ?? [])];
@@ -1480,7 +1480,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                     const arr = [...((infectoDraft.culturas as CulturaItem[]) ?? []), { tipo: '', data: '', status: '' }];
                     setDraft('infecto', { culturas: arr });
                   }}
-                  className="w-full py-2 mt-2 flex items-center justify-center gap-2 text-teal-400 bg-teal-500/10 hover:bg-teal-500/20 border-2 border-teal-500/30 border-dashed rounded-xl text-xs font-bold transition"
+                  className="w-full py-2 mt-2 flex items-center justify-center gap-2 tx-infecto bg-teal-500/10 hover:bg-teal-500/20 border-2 border-teal-500/30 border-dashed rounded-xl text-xs font-bold transition"
                 >
                   <Plus className="w-3.5 h-3.5" /> Adicionar Cultura
                 </button>
@@ -1495,7 +1495,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
       {/* TEXTOS LIVRES — Problemas / Plano / Pendências */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div className="bg-app-card border border-app-border rounded-xl p-4 shadow-sm">
-          <h4 className="font-bold text-red-400 uppercase tracking-widest text-sm flex items-center gap-2 mb-3 border-b border-red-500/20 pb-2">
+          <h4 className="font-bold tx-danger uppercase tracking-widest text-sm flex items-center gap-2 mb-3 border-b border-red-500/20 pb-2">
             <AlertCircle className="w-4 h-4" /> Problemas Ativos
           </h4>
           <div className="space-y-2">
@@ -1518,7 +1518,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
         </div>
 
         <div className="bg-app-card border border-app-border rounded-xl p-4 shadow-sm">
-          <h4 className="font-bold text-emerald-400 uppercase tracking-widest text-sm flex items-center gap-2 mb-3 border-b border-emerald-500/20 pb-2">
+          <h4 className="font-bold tx-ok uppercase tracking-widest text-sm flex items-center gap-2 mb-3 border-b border-emerald-500/20 pb-2">
             <ListChecks className="w-4 h-4" /> Plano 12-24h
           </h4>
           <div className="space-y-2">
@@ -1541,7 +1541,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
         </div>
 
         <div className="bg-orange-500/5 border border-orange-500/30 rounded-xl p-4 shadow-sm md:col-span-2">
-          <h4 className="font-bold text-orange-400 uppercase tracking-widest text-sm flex items-center gap-2 mb-3 border-b border-orange-500/20 pb-2">
+          <h4 className="font-bold tx-warn uppercase tracking-widest text-sm flex items-center gap-2 mb-3 border-b border-orange-500/20 pb-2">
             <ClipboardList className="w-4 h-4" /> Pendências / Riscos e Contingências
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
@@ -1559,7 +1559,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                 />
                 <input
                   type="text" placeholder="Descreva a pendência..."
-                  className="flex-1 bg-transparent border-b border-orange-500/30 focus:border-orange-500 focus:outline-none rounded px-1 text-sm font-medium text-orange-300 placeholder:text-orange-500/40"
+                  className="flex-1 bg-transparent border-b border-orange-500/30 focus:border-orange-500 focus:outline-none rounded px-1 text-sm font-medium tx-warn placeholder:text-orange-500/40"
                   value={pend.tarefa}
                   onChange={e => {
                     const copy = [...pendenciasDraft];
@@ -1571,7 +1571,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             ))}
             <button
               onClick={() => setPendenciasDraft([...pendenciasDraft, { tarefa: '', concluida: false }])}
-              className="flex items-center gap-1 text-[11px] text-orange-400 hover:text-orange-300 font-bold"
+              className="flex items-center gap-1 text-[11px] tx-warn font-bold"
             >
               <Plus className="w-3 h-3" /> Adicionar pendência
             </button>
@@ -1590,7 +1590,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
           {saving ? 'Salvando...' : 'Salvar Ficha de Evolução'}
         </button>
         {saveMsg && (
-          <span className={`text-xs font-semibold ${saveMsg.ok ? 'text-emerald-400' : 'text-red-400'}`}>
+          <span className={`text-xs font-semibold ${saveMsg.ok ? 'tx-ok' : 'tx-danger'}`}>
             {saveMsg.text}
           </span>
         )}
@@ -1602,7 +1602,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
       <div className="mt-6 border-t border-app-border pt-6">
         <div className="flex items-center gap-3 mb-4">
           <h3 className="font-bold text-sm tracking-widest">SÍNTESE CLÍNICA</h3>
-          <div className="text-[10px] px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded">Use a estruturada quando possível (melhor para SASI)</div>
+          <div className="text-[10px] px-2 py-0.5 bg-emerald-500/10 tx-ok rounded">Use a estruturada quando possível (melhor para SASI)</div>
         </div>
 
         {/* Versão Texto Livre (mantida por compatibilidade e flexibilidade) */}
@@ -1613,7 +1613,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Problemas Ativos - Texto Livre */}
             <div className="bg-app-card border border-app-border rounded-xl p-4">
-              <h4 className="font-bold text-red-400 text-sm mb-2">Problemas Ativos (Texto Livre)</h4>
+              <h4 className="font-bold tx-danger text-sm mb-2">Problemas Ativos (Texto Livre)</h4>
               {impressaoDraft.map((linha, i) => (
                 <div key={i} className="flex items-center gap-2 mb-1.5">
                   <span className="text-app-text-muted/60 font-bold text-xs w-4">{i + 1}.</span>
@@ -1631,7 +1631,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
 
             {/* Conduta - Texto Livre */}
             <div className="bg-app-card border border-app-border rounded-xl p-4">
-              <h4 className="font-bold text-emerald-400 text-sm mb-2">Conduta / Plano (Texto Livre)</h4>
+              <h4 className="font-bold tx-ok text-sm mb-2">Conduta / Plano (Texto Livre)</h4>
               {condutaDraft.map((linha, i) => (
                 <div key={i} className="flex items-center gap-2 mb-1.5">
                   <span className="text-app-text-muted/60 font-bold text-xs w-4">{i + 1}.</span>
@@ -1651,7 +1651,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
 
         {/* Versão Estruturada (SASI v2.0) */}
         <div>
-          <div className="text-xs font-bold text-emerald-400 mb-2 flex items-center gap-2">
+          <div className="text-xs font-bold tx-ok mb-2 flex items-center gap-2">
             <span>VERSÃO ESTRUTURADA — SASI v2.0 (Recomendada)</span>
           </div>
           <SasiSynthesis
@@ -1686,8 +1686,8 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             <div className="mt-4 p-4 bg-sky-500/10 border-2 border-sky-400/70 rounded-2xl shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div className="flex-1">
-                  <div className="text-sm font-semibold text-sky-200">Dados estruturados prontos</div>
-                  <div className="text-xs text-sky-300 mt-0.5">Sincronize problemas + metas com o Patient Summary da admissão.</div>
+                  <div className="text-sm font-semibold tx-info">Dados estruturados prontos</div>
+                  <div className="text-xs tx-info mt-0.5">Sincronize problemas + metas com o Patient Summary da admissão.</div>
                 </div>
                 <button
                   onClick={handleSyncToPatientSummary}

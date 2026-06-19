@@ -16,13 +16,13 @@ interface Props {
 }
 
 const COLORS = {
-  purple: { iconBg: 'bg-purple-500/15', iconText: 'text-purple-400', text: 'text-purple-300', badge: 'bg-purple-600', border: 'border-purple-500/20', hover: 'hover:bg-purple-500/5', ring: 'focus:ring-purple-500/50' },
-  rose:   { iconBg: 'bg-rose-500/15',   iconText: 'text-rose-400',   text: 'text-rose-300',   badge: 'bg-rose-600',   border: 'border-rose-500/20',   hover: 'hover:bg-rose-500/5',   ring: 'focus:ring-rose-500/50' },
-  teal:   { iconBg: 'bg-teal-500/15',   iconText: 'text-teal-400',   text: 'text-teal-300',   badge: 'bg-teal-600',   border: 'border-teal-500/20',   hover: 'hover:bg-teal-500/5',   ring: 'focus:ring-teal-500/50' },
-  sky:    { iconBg: 'bg-sky-500/15',    iconText: 'text-sky-400',    text: 'text-sky-300',    badge: 'bg-sky-600',    border: 'border-sky-500/20',    hover: 'hover:bg-sky-500/5',    ring: 'focus:ring-sky-500/50' },
-  amber:  { iconBg: 'bg-amber-500/15',  iconText: 'text-amber-400',  text: 'text-amber-300',  badge: 'bg-amber-600',  border: 'border-amber-500/20',  hover: 'hover:bg-amber-500/5',  ring: 'focus:ring-amber-500/50' },
-  lime:   { iconBg: 'bg-lime-500/15',   iconText: 'text-lime-400',   text: 'text-lime-300',   badge: 'bg-lime-600',   border: 'border-lime-500/20',   hover: 'hover:bg-lime-500/5',   ring: 'focus:ring-lime-500/50' },
-  pink:   { iconBg: 'bg-pink-500/15',   iconText: 'text-pink-400',   text: 'text-pink-300',   badge: 'bg-pink-600',   border: 'border-pink-500/20',   hover: 'hover:bg-pink-500/5',   ring: 'focus:ring-pink-500/50' },
+  purple: { iconBg: 'bg-purple-500/15', iconText: 'tx-neuro', text: 'tx-neuro', badge: 'bg-purple-600', border: 'border-purple-500/20', hover: 'hover:bg-purple-500/5', ring: 'focus:ring-purple-500/50' },
+  rose:   { iconBg: 'bg-rose-500/15',   iconText: 'tx-hemo',   text: 'tx-hemo',   badge: 'bg-rose-600',   border: 'border-rose-500/20',   hover: 'hover:bg-rose-500/5',   ring: 'focus:ring-rose-500/50' },
+  teal:   { iconBg: 'bg-teal-500/15',   iconText: 'tx-infecto',   text: 'tx-infecto',   badge: 'bg-teal-600',   border: 'border-teal-500/20',   hover: 'hover:bg-teal-500/5',   ring: 'focus:ring-teal-500/50' },
+  sky:    { iconBg: 'bg-sky-500/15',    iconText: 'tx-resp',    text: 'tx-resp',    badge: 'bg-sky-600',    border: 'border-sky-500/20',    hover: 'hover:bg-sky-500/5',    ring: 'focus:ring-sky-500/50' },
+  amber:  { iconBg: 'bg-amber-500/15',  iconText: 'tx-tgi',  text: 'tx-tgi',  badge: 'bg-amber-600',  border: 'border-amber-500/20',  hover: 'hover:bg-amber-500/5',  ring: 'focus:ring-amber-500/50' },
+  lime:   { iconBg: 'bg-lime-500/15',   iconText: 'tx-renal',   text: 'tx-renal',   badge: 'bg-lime-600',   border: 'border-lime-500/20',   hover: 'hover:bg-lime-500/5',   ring: 'focus:ring-lime-500/50' },
+  pink:   { iconBg: 'bg-pink-500/15',   iconText: 'tx-hemato',   text: 'tx-hemato',   badge: 'bg-pink-600',   border: 'border-pink-500/20',   hover: 'hover:bg-pink-500/5',   ring: 'focus:ring-pink-500/50' },
 };
 
 export default function Accordion({ title, icon: Icon, count = 0, isOpen, onToggle, color, children }: Props) {

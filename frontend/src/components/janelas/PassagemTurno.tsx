@@ -107,7 +107,7 @@ export default function PassagemTurno({ rows, loading, userEmail }: Props) {
       <div className="overflow-x-auto rounded-xl border border-app-border shadow-sm">
         <table className="w-full text-[11px] border-collapse min-w-[900px]">
           <thead>
-            <tr className="bg-slate-900 text-slate-200 sticky top-0 z-10">
+            <tr className="bg-app-tertiary text-app-text-2 sticky top-0 z-10">
               <th className="px-2 py-2 text-left font-bold border-r border-app-border w-12">UTI</th>
               <th className="px-2 py-2 text-center font-bold border-r border-app-border w-10">Lt</th>
               <th className="px-2 py-2 text-left font-bold border-r border-app-border w-36">Nome</th>
@@ -138,7 +138,7 @@ export default function PassagemTurno({ rows, loading, userEmail }: Props) {
                   <td className={`px-2 py-2 text-center font-bold tabular-nums border-r border-app-border/30 ${sofaColorClass(row.sofa_total)}`}>
                     {row.sofa_total ?? '—'}
                     {delta != null && delta !== 0 && (
-                      <span className={`block text-[9px] ${delta > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                      <span className={`block text-[9px] ${delta > 0 ? 'tx-danger' : 'tx-ok'}`}>
                         {delta > 0 ? '↑' : '↓'}{Math.abs(delta)}
                       </span>
                     )}

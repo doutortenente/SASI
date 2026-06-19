@@ -207,7 +207,7 @@ export default function SplitView({ patients, onOpenFull }: Props) {
             <div className="flex flex-wrap gap-2">
               {filled.map(({ key, label, display, n, unit }) => {
                 const status = n != null ? checkVitalAlert(key, n) : 'ok';
-                const color = status === 'high' ? 'text-red-400 bg-red-950/30' : status === 'low' ? 'text-sky-400 bg-sky-950/30' : 'text-app-text-2 bg-app-tertiary/50';
+                const color = status === 'high' ? 'stat-high' : status === 'low' ? 'stat-low' : 'text-app-text-2 bg-app-tertiary/50';
                 return (
                   <div key={key} className={`flex flex-col items-center px-2 py-1 rounded-lg ${color}`}>
                     <span className="text-[8px] font-bold uppercase opacity-70">{label}</span>
@@ -221,7 +221,7 @@ export default function SplitView({ patients, onOpenFull }: Props) {
                 if (bhText === '') return null;
                 const n = clinicalNum(bh);
                 return (
-                  <div className={`flex flex-col items-center px-2 py-1 rounded-lg ${n != null && n > 0 ? 'text-amber-400 bg-amber-950/20' : 'text-sky-400 bg-sky-950/20'}`}>
+                  <div className={`flex flex-col items-center px-2 py-1 rounded-lg ${n != null && n > 0 ? 'stat-high' : 'stat-low'}`}>
                     <span className="text-[8px] font-bold uppercase opacity-70">BH</span>
                     <span className="text-sm font-black tabular-nums">{n != null && n > 0 ? '+' : ''}{bhText}</span>
                   </div>
@@ -255,7 +255,7 @@ export default function SplitView({ patients, onOpenFull }: Props) {
         {/* Pendências rápidas */}
         {pendencias.length > 0 && (
           <div className="rounded-r-lg border-l-2 border-l-amber-500 bg-amber-950/10 p-2">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-amber-300 mb-1">
+            <div className="text-[10px] font-bold uppercase tracking-wider tx-warn mb-1">
               Pendências ({pendencias.length})
             </div>
             <ul className="space-y-1">
@@ -264,7 +264,7 @@ export default function SplitView({ patients, onOpenFull }: Props) {
                   <CheckCircle2 className="w-3 h-3 text-app-text-muted shrink-0" />
                   <span className="truncate">{p.tarefa}</span>
                   <span className={`ml-auto text-[9px] font-bold px-1 rounded ${
-                    p.prioridade === 1 ? 'bg-red-950 text-red-300' : 'bg-app-tertiary text-app-text-muted'
+                    p.prioridade === 1 ? 'bg-red-500/15 tx-danger' : 'bg-app-tertiary text-app-text-muted'
                   }`}>
                     P{p.prioridade}
                   </span>

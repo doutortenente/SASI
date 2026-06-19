@@ -2,7 +2,7 @@
 // Patient Summary — base tabular editável (espelho Excel FASE 3)
 // ============================================================================
 import { useState, useEffect } from 'react';
-import { Save, Loader2, Database } from 'lucide-react';
+import { Save, Loader2, Database, OctagonAlert } from 'lucide-react';
 import type { PatientSummary, ResumoSistemaRow } from '../lib/supabaseClient';
 import { PATIENT_SUMMARY_ROWS } from '../lib/sasiSchema';
 
@@ -103,7 +103,7 @@ export default function PatientSummaryTable({ summary, pacienteId, loading, onSa
               { label: 'HPMA', key: 'hpma' as const, rows: 3 },
               { label: 'Antecedentes', key: 'antecedentes' as const, rows: 2 },
               { label: 'Alergias', key: 'alergias' as const, rows: 1 },
-              { label: '🛑 Iatrogenias / Interações', key: 'iatrogenias' as const, rows: 2 },
+              { label: <><OctagonAlert size={13} className="inline tx-danger" /> Iatrogenias / Interações</>, key: 'iatrogenias' as const, rows: 2 },
               { label: 'Sutilezas / Monitoramento', key: 'sutilezas' as const, rows: 2 },
               { label: 'DVA / Fluidos', key: 'dva_fluidos' as const, rows: 2 },
             ].map(row => (
@@ -129,7 +129,7 @@ export default function PatientSummaryTable({ summary, pacienteId, loading, onSa
       <div className="overflow-x-auto rounded-lg border border-app-border">
         <table className="w-full text-[11px] border-collapse">
           <thead>
-            <tr className="bg-slate-900 text-slate-200">
+            <tr className="bg-app-tertiary text-app-text-2">
               <th className="text-left px-2 py-1.5 font-bold w-52 border-r border-app-border">Sistema</th>
               <th className="text-left px-2 py-1.5 font-bold">Resumo / Status Atual</th>
             </tr>

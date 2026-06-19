@@ -173,9 +173,9 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
       {/* ====================== ÁREA DE IA ====================== */}
       <div className="border border-app-border bg-app-tertiary/30 rounded-2xl p-4">
         <div className="flex items-center gap-2 mb-2">
-          <Sparkles className="w-4 h-4 text-purple-400" />
+          <Sparkles className="w-4 h-4 tx-neuro" />
           <span className="font-bold text-sm">Gerar Síntese com IA</span>
-          <span className="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded">Grok API · Local · Manual</span>
+          <span className="text-[10px] bg-purple-500/10 tx-neuro px-2 py-0.5 rounded">Grok API · Local · Manual</span>
         </div>
 
         <textarea
@@ -222,7 +222,7 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
         )}
 
         {lastError && (
-          <p className="text-[10px] text-red-400 mt-1">
+          <p className="text-[10px] tx-danger mt-1">
             Erro Grok: {lastError}
           </p>
         )}
@@ -231,12 +231,12 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
       <div>
         <div className="flex justify-between items-center mb-3">
           <div>
-            <h4 className="font-bold text-red-400 text-sm tracking-widest">PROBLEMAS ATIVOS</h4>
+            <h4 className="font-bold tx-danger text-sm tracking-widest">PROBLEMAS ATIVOS</h4>
             <p className="text-[10px] text-app-text-muted">Com vetor (↑ piora / ↓ melhora / = estável)</p>
           </div>
           <button 
             onClick={addProblema}
-            className="flex items-center gap-1 px-3 py-1 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition"
+            className="flex items-center gap-1 px-3 py-1 text-xs bg-red-500/10 hover:bg-red-500/20 tx-danger rounded-lg transition"
           >
             <Plus className="w-3.5 h-3.5" /> Novo Problema
           </button>
@@ -295,12 +295,12 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
       <div>
         <div className="flex justify-between items-center mb-3">
           <div>
-            <h4 className="font-bold text-emerald-400 text-sm tracking-widest">CONDUTA POR SISTEMAS</h4>
+            <h4 className="font-bold tx-ok text-sm tracking-widest">CONDUTA POR SISTEMAS</h4>
             <p className="text-[10px] text-app-text-muted">Com meta numérica clara + prazo</p>
           </div>
           <button 
             onClick={addConduta}
-            className="flex items-center gap-1 px-3 py-1 text-xs bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg transition"
+            className="flex items-center gap-1 px-3 py-1 text-xs bg-emerald-500/10 hover:bg-emerald-500/20 tx-ok rounded-lg transition"
           >
             <Plus className="w-3.5 h-3.5" /> Nova Conduta
           </button>

@@ -68,9 +68,9 @@ const GRAVIDADE_LABEL: Record<string, string> = {
 };
 
 const VETOR_STYLE: Record<string, { badge: string; row: string }> = {
-  '↑': { badge: 'text-red-400 font-black text-base leading-none', row: 'text-app-text font-medium' },
-  '↓': { badge: 'text-emerald-400 font-black text-base leading-none', row: 'text-app-text-2' },
-  '=': { badge: 'text-slate-400 font-bold text-sm leading-none', row: 'text-app-text-muted' },
+  '↑': { badge: 'tx-danger font-black text-base leading-none', row: 'text-app-text font-medium' },
+  '↓': { badge: 'tx-ok font-black text-base leading-none', row: 'text-app-text-2' },
+  '=': { badge: 'text-app-text-muted font-bold text-sm leading-none', row: 'text-app-text-muted' },
 };
 
 export default function LeitoCard({ row, onSelect, compact = false }: Props) {
@@ -125,7 +125,7 @@ export default function LeitoCard({ row, onSelect, compact = false }: Props) {
             {row.sofa_total ?? '—'}
           </span>
           {delta != null && delta !== 0 && (
-            <span className={`ml-0.5 font-mono font-bold tabular-nums ${deltaIsBad ? 'text-red-400' : deltaIsGood ? 'text-emerald-400' : 'text-app-text-muted'}`}>
+            <span className={`ml-0.5 font-mono font-bold tabular-nums ${deltaIsBad ? 'tx-danger' : deltaIsGood ? 'tx-ok' : 'text-app-text-muted'}`}>
               {deltaIsBad && '↑'}
               {deltaIsGood && '↓'}
               {delta > 0 ? '+' : ''}{delta}

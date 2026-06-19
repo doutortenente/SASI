@@ -243,7 +243,7 @@ export default function NovoLeitoModal({ userId, onClose, onSuccess }: Props) {
 
           {/* Error */}
           {error && (
-            <div className="flex items-start gap-2 p-3 bg-red-950 border border-red-900 rounded-lg text-sm text-red-300">
+            <div className="flex items-start gap-2 p-3 bg-red-500/15 border border-red-900 rounded-lg text-sm tx-danger">
               <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
               <span>{error}</span>
             </div>

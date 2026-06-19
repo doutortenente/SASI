@@ -40,7 +40,7 @@ export default function Login() {
 
         {sent ? (
           <div className="text-center py-6">
-            <Mail className="w-12 h-12 mx-auto text-emerald-400 mb-3" />
+            <Mail className="w-12 h-12 mx-auto tx-ok mb-3" />
             <p className="text-app-text-2 font-medium">
               Link enviado pra <span className="text-app-text">{email}</span>
             </p>
@@ -63,7 +63,7 @@ export default function Login() {
             </label>
 
             {error && (
-              <div className="flex items-start gap-2 p-3 bg-red-950 border border-red-900 rounded-lg text-sm text-red-300">
+              <div className="flex items-start gap-2 p-3 bg-red-500/15 border border-red-900 rounded-lg text-sm tx-danger">
                 <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
                 <span>{error}</span>
               </div>

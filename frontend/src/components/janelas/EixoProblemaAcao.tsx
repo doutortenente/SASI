@@ -13,9 +13,9 @@ interface Props {
 }
 
 const VETOR_CLASS: Record<string, string> = {
-  '↑': 'text-red-400',
-  '↓': 'text-emerald-400',
-  '=': 'text-slate-400',
+  '↑': 'tx-danger',
+  '↓': 'tx-ok',
+  '=': 'text-app-text-muted',
 };
 
 export default function EixoProblemaAcao({ evolucao, loading, onOpenFicha }: Props) {
@@ -100,7 +100,7 @@ export default function EixoProblemaAcao({ evolucao, loading, onOpenFicha }: Pro
                       <>
                         <p className="text-sm text-app-text-2">{cond.texto}</p>
                         {cond.meta && (
-                          <div className="mt-1.5 text-xs font-semibold text-emerald-400 bg-emerald-950/30 px-2 py-1 rounded inline-block">
+                          <div className="mt-1.5 text-xs font-semibold tx-ok bg-emerald-950/30 px-2 py-1 rounded inline-block">
                             Meta: {cond.meta}
                           </div>
                         )}

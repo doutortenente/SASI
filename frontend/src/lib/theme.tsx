@@ -1,7 +1,7 @@
 // ============================================================================
 // SASI · theme.tsx
 // Estado global: 2 temas (Tactical default ⇄ Clinical) + 5 janelas de navegação.
-// Persiste em localStorage. Aplica `body.theme-{tema}` pra CSS vars.
+// Persiste em localStorage. Aplica `[data-theme]` no <html> pra CSS vars.
 // Novo design (Jun 2026): consolidação dos antigos 3 modos em 2 co-iguais.
 // ============================================================================
 import {
@@ -85,9 +85,9 @@ export function UIProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    const body = document.body;
-    body.classList.remove('theme-dark', 'theme-clinical', 'theme-light', 'theme-tactical');
-    body.classList.add(`theme-${theme}`);
+    // DS: tema via `[data-theme]` no <html>. `:root` = Tactical (default);
+    // `[data-theme="clinical"]` ativa os overrides claros.
+    document.documentElement.setAttribute('data-theme', theme);
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', theme === 'clinical' ? '#eef1f6' : '#0f172a');
     try {

@@ -45,7 +45,7 @@ export default function FiltersBar({
             <button
               onClick={() => setSmartFilter(smartFilter === 'critico' ? 'todos' : 'critico')}
               className={`transition hover:opacity-80 rounded px-1 font-semibold ${
-                smartFilter === 'critico' ? 'text-red-300 underline underline-offset-2' : 'text-red-400'
+                smartFilter === 'critico' ? 'tx-danger underline underline-offset-2' : 'tx-danger'
               }`}
               title="Filtrar críticos"
             >
@@ -53,7 +53,7 @@ export default function FiltersBar({
             </button>
           )}
           {stats.graves > 0 && (
-            <span className="text-orange-400">
+            <span className="tx-warn">
               <b>{stats.graves}</b> grave{stats.graves > 1 ? 's' : ''}
             </span>
           )}
@@ -61,7 +61,7 @@ export default function FiltersBar({
             <button
               onClick={() => setSmartFilter(smartFilter === 'sofa_up' ? 'todos' : 'sofa_up')}
               className={`transition hover:opacity-80 rounded px-1 ${
-                smartFilter === 'sofa_up' ? 'text-red-200 underline underline-offset-2' : 'text-red-300'
+                smartFilter === 'sofa_up' ? 'tx-danger underline underline-offset-2' : 'tx-danger'
               }`}
               title="Filtrar ↑SOFA"
             >

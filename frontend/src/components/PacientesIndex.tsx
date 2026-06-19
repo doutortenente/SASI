@@ -78,7 +78,7 @@ export default function PacientesIndex({ patients, loading, onOpen }: Props) {
               visible.map((p) => {
                 const delta = p.delta_sofa_24h ?? 0;
                 const deltaClass =
-                  delta > 0 ? 'text-red-400' : delta < 0 ? 'text-emerald-400' : '';
+                  delta > 0 ? 'tx-danger' : delta < 0 ? 'tx-ok' : '';
                 return (
                   <tr
                     key={p.paciente_id}
@@ -114,7 +114,7 @@ export default function PacientesIndex({ patients, loading, onOpen }: Props) {
                     </td>
                     <td className="px-2 py-2 tabular-nums">
                       {p.pendencias_abertas > 0 ? (
-                        <span className="text-amber-400 font-bold">{p.pendencias_abertas}</span>
+                        <span className="tx-warn font-bold">{p.pendencias_abertas}</span>
                       ) : (
                         '—'
                       )}
