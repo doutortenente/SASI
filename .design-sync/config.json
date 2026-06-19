@@ -1,0 +1,6 @@
+{
+  "projectId": "157e2542-4b5d-48fd-82c8-5f3f693011a6",
+  "shape": "package",
+  "sourceDir": "design-system",
+  "note": "Bundle pré-compilado (export do Claude Design). Sem package.json/storybook/dist — sync off-script: espelha design-system/ -> projeto."
+}

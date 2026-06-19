@@ -16,11 +16,12 @@ import {
   type SmartFilter, type UtiFilter,
 } from '../lib/dashboardFilters';
 import LeitoCard from './LeitoCard';
-import PatientModal from './PatientModal';
 import CriticalAlerts from './CriticalAlerts';
 import SplitView from './SplitView';
 import TableView from './TableView';
 import Sidebar, { type SasiView } from './Sidebar';
+import PassagemTurno from './janelas/PassagemTurno';
+import Exames from './Exames';
 import PacientesIndex from './PacientesIndex';
 import PacientePage from './PacientePage';
 import TopBar from './TopBar';
@@ -135,11 +136,19 @@ export default function Dashboard({ session }: Props) {
     setPacientePageId(null);
   }, []);
 
+  // Lembra de onde a Ficha foi aberta, p/ o "voltar" retornar ao contexto certo
+  // (board de plantão vs. índice de Pacientes).
+  const [prontuarioOrigem, setProntuarioOrigem] = useState<SasiView>('pacientes');
   const openProntuario = useCallback((id: string) => {
     setSelectedId(null);
+    setProntuarioOrigem(activeView);
     setActiveView('pacientes');
     setPacientePageId(id);
-  }, []);
+  }, [activeView]);
+  const closeProntuario = useCallback(() => {
+    setPacientePageId(null);
+    setActiveView(prontuarioOrigem);
+  }, [prontuarioOrigem]);
 
   const emptyTitle = (() => {
     if (smartFilter !== 'todos') {
@@ -160,7 +169,7 @@ export default function Dashboard({ session }: Props) {
       <Sidebar
         activeView={activeView}
         onNavigate={handleNavigate}
-        onPassagemClick={handleExportPDF}
+        onPassagemClick={() => { setPacientePageId(null); setActiveView('passagem'); }}
         onAlertasClick={scrollToAlertas}
         alertasCriticos={totalCriticos}
       />
@@ -182,7 +191,7 @@ export default function Dashboard({ session }: Props) {
               {pacientePageId ? (
                 <PacientePage
                   pacienteId={pacientePageId}
-                  onBack={() => setPacientePageId(null)}
+                  onBack={closeProntuario}
                 />
               ) : (
                 <PacientesIndex
@@ -191,6 +200,22 @@ export default function Dashboard({ session }: Props) {
                   onOpen={setPacientePageId}
                 />
               )}
+            </main>
+          )}
+
+          {activeView === 'passagem' && (
+            <main className="px-5 py-4">
+              <PassagemTurno
+                rows={visible}
+                loading={loading}
+                userEmail={session.user.email ?? undefined}
+              />
+            </main>
+          )}
+
+          {activeView === 'exames' && (
+            <main className="px-5 py-4">
+              <Exames patients={visible} onSelect={openProntuario} />
             </main>
           )}
 
@@ -209,7 +234,7 @@ export default function Dashboard({ session }: Props) {
 
           <main className="px-5 py-4">
             <div ref={alertsRef} className="scroll-mt-2">
-              <CriticalAlerts patients={visible} onSelect={setSelectedId} />
+              <CriticalAlerts patients={visible} onSelect={openProntuario} />
             </div>
 
             {loading && viewMode === 'plantao' && (
@@ -225,7 +250,7 @@ export default function Dashboard({ session }: Props) {
             )}
 
             {error && (
-              <div className="bg-red-950 border border-red-900 rounded-lg p-4 text-red-300 text-sm">
+              <div className="bg-red-500/15 border border-red-500/30 rounded-lg p-4 tx-danger text-sm">
                 Erro: {error}
               </div>
             )}
@@ -239,14 +264,14 @@ export default function Dashboard({ session }: Props) {
                 {viewMode === 'plantao' && (
                   <div className="max-w-[1400px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                     {visible.map(row => (
-                      <LeitoCard key={row.paciente_id} row={row} onSelect={setSelectedId} />
+                      <LeitoCard key={row.paciente_id} row={row} onSelect={openProntuario} />
                     ))}
                   </div>
                 )}
                 {viewMode === 'round' && (
-                  <SplitView patients={visible} onOpenFull={setSelectedId} />
+                  <SplitView patients={visible} onOpenFull={openProntuario} />
                 )}
-                {viewMode === 'editor' && <TableView patients={visible} onSelect={setSelectedId} />}
+                {viewMode === 'editor' && <TableView patients={visible} onSelect={openProntuario} />}
               </>
             )}
           </main>
@@ -265,13 +290,6 @@ export default function Dashboard({ session }: Props) {
         </div>
       </div>
 
-      {selectedId && (
-        <PatientModal
-          pacienteId={selectedId}
-          onClose={() => setSelectedId(null)}
-          onOpenProntuario={openProntuario}
-        />
-      )}
 
       {showNovoLeito && (
         <NovoLeitoModal

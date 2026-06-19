@@ -20,7 +20,7 @@ interface Props {
 export default function InfusionEditor({ infusions, isDVA, peso }: Props) {
   const dict = isDVA ? DVA_DICT : SEDACAO_DICT;
   const Icon = isDVA ? Heart : Droplets;
-  const titleColor = isDVA ? 'text-red-300' : 'text-purple-300';
+  const titleColor = isDVA ? 'tx-danger' : 'tx-neuro';
 
   if (!infusions || infusions.length === 0) {
     return (

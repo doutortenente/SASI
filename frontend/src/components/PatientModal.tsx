@@ -232,7 +232,7 @@ function EvolucaoTab({
           </button>
         </div>
         {msg && (
-          <div className={`mt-2 text-xs font-medium ${msg.ok ? 'text-emerald-400' : 'text-red-400'}`}>
+          <div className={`mt-2 text-xs font-medium ${msg.ok ? 'tx-ok' : 'tx-danger'}`}>
             {msg.text}
           </div>
         )}
@@ -455,7 +455,7 @@ export default function PatientModal({ pacienteId, onClose, onOpenProntuario }: 
                         className="flex items-center gap-1 px-2 py-1 rounded-lg bg-app-tertiary hover:bg-app-tertiary/70 text-app-text-muted hover:text-app-text-2 text-[11px] font-medium transition"
                         title="Copiar passagem de turno"
                       >
-                        {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                        {copied ? <Check className="w-3 h-3 tx-ok" /> : <Copy className="w-3 h-3" />}
                         {copied ? 'Copiado!' : 'Copiar'}
                       </button>
                       <button
@@ -592,7 +592,7 @@ export default function PatientModal({ pacienteId, onClose, onOpenProntuario }: 
                   {/* DVAs */}
                   {(dvasInfusions.length > 0 || dvasStrings.length > 0) && (
                     <div>
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-rose-300 mb-2">
+                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest tx-hemo mb-2">
                         <Heart className="w-3.5 h-3.5" />
                         Drogas Vasoativas ({dvasInfusions.length + dvasStrings.length})
                       </div>
@@ -608,7 +608,7 @@ export default function PatientModal({ pacienteId, onClose, onOpenProntuario }: 
                           {dvasStrings.map((d, i) => (
                             <li
                               key={i}
-                              className="text-xs text-rose-300 bg-rose-950/30 px-2.5 py-1.5 rounded-lg"
+                              className="text-xs tx-hemo bg-rose-950/30 px-2.5 py-1.5 rounded-lg"
                             >
                               {d}
                             </li>
@@ -621,7 +621,7 @@ export default function PatientModal({ pacienteId, onClose, onOpenProntuario }: 
                   {/* SEDAÇÃO */}
                   {(sedInfusions.length > 0 || sedStrings.length > 0) && (
                     <div>
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-purple-300 mb-2">
+                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest tx-neuro mb-2">
                         <Droplets className="w-3.5 h-3.5" />
                         Sedação / Analgesia ({sedInfusions.length + sedStrings.length})
                       </div>
@@ -637,7 +637,7 @@ export default function PatientModal({ pacienteId, onClose, onOpenProntuario }: 
                           {sedStrings.map((s, i) => (
                             <li
                               key={i}
-                              className="text-xs text-purple-300 bg-purple-950/30 px-2.5 py-1.5 rounded-lg"
+                              className="text-xs tx-neuro bg-purple-950/30 px-2.5 py-1.5 rounded-lg"
                             >
                               {s}
                             </li>
@@ -698,14 +698,14 @@ export default function PatientModal({ pacienteId, onClose, onOpenProntuario }: 
                   {/* IMPRESSÃO CLÍNICA */}
                   {evolucao && Array.isArray(evolucao.impressao) && evolucao.impressao.length > 0 && (
                     <div className="rounded-r-xl border-l-4 border-l-red-500 bg-red-950/10 p-3">
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-red-300 mb-2">
+                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest tx-danger mb-2">
                         <ClipboardList className="w-3.5 h-3.5" />
                         Problemas Ativos / Impressão ({(evolucao.impressao as string[]).length})
                       </div>
                       <ul className="space-y-1.5">
                         {(evolucao.impressao as string[]).map((imp, i) => (
                           <li key={i} className="flex gap-2 text-xs text-app-text-2">
-                            <span className="shrink-0 text-red-400 font-bold">{i + 1}.</span>
+                            <span className="shrink-0 tx-danger font-bold">{i + 1}.</span>
                             {imp}
                           </li>
                         ))}
@@ -716,14 +716,14 @@ export default function PatientModal({ pacienteId, onClose, onOpenProntuario }: 
                   {/* CONDUTA */}
                   {evolucao && Array.isArray(evolucao.conduta) && evolucao.conduta.length > 0 && (
                     <div className="rounded-r-xl border-l-4 border-l-emerald-500 bg-emerald-950/10 p-3">
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-300 mb-2">
+                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest tx-ok mb-2">
                         <ChevronRight className="w-3.5 h-3.5" />
                         Plano / Conduta ({(evolucao.conduta as string[]).length})
                       </div>
                       <ul className="space-y-1.5">
                         {(evolucao.conduta as string[]).map((c, i) => (
                           <li key={i} className="flex gap-2 text-xs text-app-text-2">
-                            <span className="shrink-0 text-emerald-400 font-bold">{i + 1}.</span>
+                            <span className="shrink-0 tx-ok font-bold">{i + 1}.</span>
                             {c}
                           </li>
                         ))}
@@ -734,7 +734,7 @@ export default function PatientModal({ pacienteId, onClose, onOpenProntuario }: 
                   {/* PENDÊNCIAS */}
                   {pendencias.length > 0 && (
                     <div className="rounded-r-xl border-l-4 border-l-amber-500 bg-amber-950/10 p-3">
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-amber-300 mb-2">
+                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest tx-warn mb-2">
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         Pendências abertas ({pendencias.length})
                       </div>
@@ -746,7 +746,7 @@ export default function PatientModal({ pacienteId, onClose, onOpenProntuario }: 
                             onClick={() => togglePendencia(p.id, p.concluida)}
                           >
                             {p.concluida ? (
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                              <CheckCircle2 className="w-3.5 h-3.5 tx-ok shrink-0" />
                             ) : (
                               <Circle className="w-3.5 h-3.5 text-app-text-muted shrink-0" />
                             )}
@@ -762,9 +762,9 @@ export default function PatientModal({ pacienteId, onClose, onOpenProntuario }: 
                             <span
                               className={`ml-auto text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
                                 p.prioridade === 1
-                                  ? 'bg-red-950 text-red-300'
+                                  ? 'bg-red-500/15 tx-danger'
                                   : p.prioridade === 2
-                                  ? 'bg-amber-950 text-amber-300'
+                                  ? 'bg-amber-500/15 tx-warn'
                                   : 'bg-app-tertiary text-app-text-muted'
                               }`}
                             >

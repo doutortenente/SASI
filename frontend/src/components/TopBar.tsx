@@ -40,12 +40,12 @@ export default function TopBar({
 
         <div className="flex items-center gap-2">
           {totalCriticos > 0 && (
-            <div className="flex items-center gap-1.5 bg-red-950 text-red-300 px-2.5 py-1 rounded-lg text-xs font-bold">
+            <div className="flex items-center gap-1.5 bg-red-500/15 tx-danger px-2.5 py-1 rounded-lg text-xs font-bold">
               <Bell className="w-3.5 h-3.5" /> {totalCriticos} CRÍTICOS
             </div>
           )}
           {totalWarnings > 0 && (
-            <div className="flex items-center gap-1.5 bg-amber-950 text-amber-300 px-2.5 py-1 rounded-lg text-xs">
+            <div className="flex items-center gap-1.5 bg-amber-500/15 tx-warn px-2.5 py-1 rounded-lg text-xs">
               {totalWarnings} warnings
             </div>
           )}

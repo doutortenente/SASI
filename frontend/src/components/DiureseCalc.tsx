@@ -80,10 +80,10 @@ export default function DiureseCalc({ pesoInicial }: Props) {
       {result && (
         <div className={`mt-2 text-center py-1.5 rounded-lg text-xs font-bold ${
           result.isOliguria
-            ? 'bg-red-950 text-red-300'
+            ? 'bg-red-500/15 tx-danger'
             : result.isPoliuria
-            ? 'bg-amber-950 text-amber-300'
-            : 'bg-emerald-950 text-emerald-300'
+            ? 'bg-amber-500/15 tx-warn'
+            : 'bg-emerald-500/15 tx-ok'
         }`}>
           {result.mlKgH.toFixed(2)} ml/kg/h — {result.label}
         </div>

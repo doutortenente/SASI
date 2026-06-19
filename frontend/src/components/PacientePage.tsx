@@ -43,9 +43,9 @@ const SYSTEM_LABELS: Record<SystemKey, string> = {
 };
 
 const VETOR_CLASS: Record<string, string> = {
-  '↑': 'text-red-400',
-  '↓': 'text-emerald-400',
-  '=': 'text-slate-400',
+  '↑': 'tx-danger',
+  '↓': 'tx-ok',
+  '=': 'text-app-text-muted',
 };
 
 /** Resumo de uma evolução pro histórico: impressão legada ou problemas SASI. */
@@ -111,9 +111,9 @@ function VitalChip({
 }) {
   const color =
     status === 'high' || status === 'absurd'
-      ? 'text-red-400 bg-red-950/30'
+      ? 'stat-high'
       : status === 'low'
-        ? 'text-sky-400 bg-sky-950/30'
+        ? 'stat-low'
         : 'text-app-text bg-app-tertiary/50';
   return (
     <div className={`px-2.5 py-1.5 rounded-lg ${color}`}>
@@ -530,7 +530,7 @@ export default function PacientePage({ pacienteId, onBack }: Props) {
                                 {cond.texto}
                               </div>
                               {cond.meta && (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 mt-1">
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold tx-ok mt-1">
                                   <Target className="w-3 h-3" />
                                   META: {cond.meta}
                                 </span>
@@ -608,9 +608,9 @@ export default function PacientePage({ pacienteId, onBack }: Props) {
                           const alert = n != null ? checkLabAlert(row.key, n) : 'normal';
                           const valClass =
                             alert === 'high'
-                              ? 'text-red-400 font-bold'
+                              ? 'tx-danger font-bold'
                               : alert === 'low'
-                                ? 'text-sky-400 font-bold'
+                                ? 'tx-info font-bold'
                                 : 'text-app-text';
                           return (
                             <tr key={row.key} className="border-b border-app-border/30 last:border-0">

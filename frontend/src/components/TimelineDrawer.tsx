@@ -18,12 +18,12 @@ interface Props {
 }
 
 const TIPO_META: Record<string, { Icon: LucideIcon; label: string; unit: string; color: string }> = {
-  sofa:      { Icon: Activity,      label: 'SOFA',    unit: 'pts',   color: 'text-red-400' },
-  lactato:   { Icon: FlaskConical,  label: 'Lactato', unit: 'mmol/L', color: 'text-amber-400' },
-  pam:       { Icon: Heart,         label: 'PAM',     unit: 'mmHg',  color: 'text-rose-400' },
-  pf_ratio:  { Icon: Zap,           label: 'P/F',     unit: '',      color: 'text-blue-400' },
-  diurese:   { Icon: Droplets,      label: 'Diurese', unit: 'mL/h',  color: 'text-cyan-400' },
-  temp:      { Icon: Thermometer,   label: 'Temp',    unit: '°C',    color: 'text-orange-400' },
+  sofa:      { Icon: Activity,      label: 'SOFA',    unit: 'pts',   color: 'tx-danger' },
+  lactato:   { Icon: FlaskConical,  label: 'Lactato', unit: 'mmol/L', color: 'tx-warn' },
+  pam:       { Icon: Heart,         label: 'PAM',     unit: 'mmHg',  color: 'tx-hemo' },
+  pf_ratio:  { Icon: Zap,           label: 'P/F',     unit: '',      color: 'tx-resp' },
+  diurese:   { Icon: Droplets,      label: 'Diurese', unit: 'mL/h',  color: 'tx-renal' },
+  temp:      { Icon: Thermometer,   label: 'Temp',    unit: '°C',    color: 'tx-warn' },
   custom:    { Icon: Clock,         label: 'Evento',  unit: '',      color: 'text-app-text-2' },
 };
 

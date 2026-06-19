@@ -8,7 +8,7 @@ import {
   Activity, LayoutGrid, Users, ClipboardList, FlaskConical, Bell,
 } from 'lucide-react';
 
-export type SasiView = 'overview' | 'pacientes';
+export type SasiView = 'overview' | 'pacientes' | 'passagem' | 'exames';
 
 interface Props {
   activeView: SasiView;
@@ -48,12 +48,20 @@ export default function Sidebar({
         <span>Pacientes</span>
       </button>
 
-      <button className="sasi-rail__item" type="button" onClick={onPassagemClick}>
+      <button
+        className={`sasi-rail__item${activeView === 'passagem' ? ' on' : ''}`}
+        type="button"
+        onClick={onPassagemClick}
+      >
         <ClipboardList className="w-[17px] h-[17px]" />
         <span>Passagem de Turno</span>
       </button>
 
-      <button className="sasi-rail__item" type="button" disabled title="Em breve">
+      <button
+        className={`sasi-rail__item${activeView === 'exames' ? ' on' : ''}`}
+        type="button"
+        onClick={() => onNavigate('exames')}
+      >
         <FlaskConical className="w-[17px] h-[17px]" />
         <span>Exames</span>
       </button>

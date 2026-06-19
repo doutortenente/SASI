@@ -39,7 +39,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           {/* Icon */}
           <div className="flex justify-center mb-4">
             <div className="p-3 rounded-full bg-red-950/50 border border-red-900">
-              <AlertCircle className="w-10 h-10 text-red-400" />
+              <AlertCircle className="w-10 h-10 tx-danger" />
             </div>
           </div>
 

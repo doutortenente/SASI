@@ -30,8 +30,8 @@ export default function TabelaoLabsEditable({ rows, onChange }: Props) {
     <div className="overflow-x-auto rounded-lg border border-app-border">
       <table className="w-full text-[11px] border-collapse">
         <thead>
-          <tr className="bg-slate-900 text-slate-200">
-            <th className="text-left px-2 py-1.5 font-bold border-r border-app-border sticky left-0 bg-slate-900 z-10">Exame</th>
+          <tr className="bg-app-tertiary text-app-text-2">
+            <th className="text-left px-2 py-1.5 font-bold border-r border-app-border sticky left-0 bg-app-tertiary z-10">Exame</th>
             <th className="text-center px-2 py-1.5 font-bold border-r border-app-border min-w-[52px]">Val 1</th>
             <th className="text-center px-2 py-1.5 font-bold border-r border-app-border min-w-[52px]">Val 2 →</th>
             <th className="text-center px-2 py-1.5 font-bold border-r border-app-border">Unid</th>
@@ -67,7 +67,7 @@ export default function TabelaoLabsEditable({ rows, onChange }: Props) {
                 {row.ref || '—'}
               </td>
               <td className={`px-2 py-1 text-center border-r border-app-border/30 ${
-                row.tendencia.includes('→') ? 'text-amber-400' : 'text-app-text-muted'
+                row.tendencia.includes('→') ? 'tx-warn' : 'text-app-text-muted'
               }`}>
                 {row.tendencia || '—'}
               </td>

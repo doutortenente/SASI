@@ -131,30 +131,30 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
         // VISUALIZAÇÃO
         <div className="space-y-4 text-sm">
           <div>
-            <div className="font-bold text-xs text-red-400 mb-1">MOTIVO DA ADMISSÃO / DIAGNÓSTICOS PRINCIPAIS</div>
+            <div className="font-bold text-xs tx-danger mb-1">MOTIVO DA ADMISSÃO / DIAGNÓSTICOS PRINCIPAIS</div>
             <p className="text-app-text-2 leading-snug">{current?.motivo_admissao || '—'}</p>
           </div>
 
           {current?.hpma && (
             <div>
-              <div className="font-bold text-xs text-amber-400 mb-1">HPMA (História da Doença Atual)</div>
+              <div className="font-bold text-xs tx-warn mb-1">HPMA (História da Doença Atual)</div>
               <p className="text-app-text-2 whitespace-pre-wrap leading-snug">{current.hpma}</p>
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div>
-              <div className="font-bold text-xs text-amber-400 mb-1">ANTECEDENTES RELEVANTES</div>
+              <div className="font-bold text-xs tx-warn mb-1">ANTECEDENTES RELEVANTES</div>
               <p className="text-app-text-2">{current?.antecedentes || '—'}</p>
             </div>
 
             <div>
-              <div className="font-bold text-xs text-amber-400 mb-1">ALERGIAS</div>
-              <p className="text-red-400">{current?.alergias || 'Nenhuma informada'}</p>
+              <div className="font-bold text-xs tx-warn mb-1">ALERGIAS</div>
+              <p className="tx-danger">{current?.alergias || 'Nenhuma informada'}</p>
             </div>
 
             <div>
-              <div className="font-bold text-xs text-amber-400 mb-1">PESO / ALTURA</div>
+              <div className="font-bold text-xs tx-warn mb-1">PESO / ALTURA</div>
               <p className="text-app-text-2">
                 {current?.peso ? `${current.peso} kg` : '—'} 
                 {current?.altura ? ` / ${current.altura} cm` : ''}
@@ -162,7 +162,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
             </div>
 
             <div>
-              <div className="font-bold text-xs text-sky-400 mb-1 flex items-center gap-1">
+              <div className="font-bold text-xs tx-info mb-1 flex items-center gap-1">
                 <Activity className="w-3 h-3" /> DISPOSITIVOS
               </div>
               {current?.dispositivos?.length ? (
@@ -175,7 +175,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
             </div>
 
             <div>
-              <div className="font-bold text-xs text-purple-400 mb-1">SUPORTE ATUAL</div>
+              <div className="font-bold text-xs tx-neuro mb-1">SUPORTE ATUAL</div>
               <div className="text-xs text-app-text-2 space-y-0.5">
                 {current?.suporte_atual?.dvas && Array.isArray(current.suporte_atual.dvas) && current.suporte_atual.dvas.length > 0 && (
                   <div>DVAs: {current.suporte_atual.dvas.map((d: any) => d.droga || d).join(', ')}</div>
@@ -188,10 +188,10 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
 
           {current?.plano_terapeutico_atual && (
             <div>
-              <div className="font-bold text-xs text-emerald-400 mb-1 flex items-center gap-2">
+              <div className="font-bold text-xs tx-ok mb-1 flex items-center gap-2">
                 PLANO TERAPÊUTICO ATUAL / METAS
                 {current.plano_terapeutico_atual.includes('Última síntese SASI') && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium">Sincronizado via SASI</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 tx-ok font-medium">Sincronizado via SASI</span>
                 )}
               </div>
               <p className="text-sm text-app-text-2 whitespace-pre-wrap">{current.plano_terapeutico_atual}</p>
@@ -200,14 +200,14 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
 
           {current?.medicamentos_domiciliares && current.medicamentos_domiciliares.length > 0 && (
             <div>
-              <div className="font-bold text-xs text-purple-400 mb-1">MEDICAMENTOS DOMICILIARES</div>
+              <div className="font-bold text-xs tx-neuro mb-1">MEDICAMENTOS DOMICILIARES</div>
               <p className="text-xs text-app-text-2">{current.medicamentos_domiciliares.join(' • ')}</p>
             </div>
           )}
 
           {current?.exames_relevantes && (
             <div>
-              <div className="font-bold text-xs text-sky-400 mb-1">EXAMES RELEVANTES</div>
+              <div className="font-bold text-xs tx-info mb-1">EXAMES RELEVANTES</div>
               <p className="text-sm text-app-text-2 whitespace-pre-wrap">{current.exames_relevantes}</p>
             </div>
           )}
@@ -216,7 +216,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
         // EDIÇÃO
         <div className="space-y-4 text-sm">
           <div>
-            <label className="block text-xs font-bold text-red-400 mb-1">MOTIVO DA ADMISSÃO / DIAGNÓSTICOS PRINCIPAIS</label>
+            <label className="block text-xs font-bold tx-danger mb-1">MOTIVO DA ADMISSÃO / DIAGNÓSTICOS PRINCIPAIS</label>
             <textarea
               value={draft.motivo_admissao || ''}
               onChange={(e) => setDraft({ ...draft, motivo_admissao: e.target.value })}
@@ -226,7 +226,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-amber-400 mb-1">HPMA (História da Doença Atual)</label>
+            <label className="block text-xs font-bold tx-warn mb-1">HPMA (História da Doença Atual)</label>
             <textarea
               value={draft.hpma || ''}
               onChange={(e) => setDraft({ ...draft, hpma: e.target.value })}
@@ -237,7 +237,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-amber-400 mb-1">ANTECEDENTES RELEVANTES</label>
+              <label className="block text-xs font-bold tx-warn mb-1">ANTECEDENTES RELEVANTES</label>
               <textarea
                 value={draft.antecedentes || ''}
                 onChange={(e) => setDraft({ ...draft, antecedentes: e.target.value })}
@@ -246,7 +246,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-amber-400 mb-1">ALERGIAS</label>
+              <label className="block text-xs font-bold tx-warn mb-1">ALERGIAS</label>
               <input
                 type="text"
                 value={draft.alergias || ''}
@@ -257,7 +257,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-amber-400 mb-1">PESO (kg)</label>
+              <label className="block text-xs font-bold tx-warn mb-1">PESO (kg)</label>
               <input
                 type="number"
                 step="0.1"
@@ -269,7 +269,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-amber-400 mb-1">ALTURA (cm)</label>
+              <label className="block text-xs font-bold tx-warn mb-1">ALTURA (cm)</label>
               <input
                 type="number"
                 value={draft.altura || ''}
@@ -282,7 +282,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
 
           {/* Dispositivos - lista editável simples */}
           <div>
-            <label className="block text-xs font-bold text-sky-400 mb-1">DISPOSITIVOS</label>
+            <label className="block text-xs font-bold tx-info mb-1">DISPOSITIVOS</label>
             <div className="space-y-2">
               {(draft.dispositivos || []).map((d, i) => (
                 <div key={i} className="flex gap-2">
@@ -322,7 +322,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
                   <button onClick={() => {
                     const newList = (draft.dispositivos || []).filter((_, idx) => idx !== i);
                     setDraft({ ...draft, dispositivos: newList });
-                  }} className="text-red-400">
+                  }} className="tx-danger">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -332,7 +332,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
                   ...draft, 
                   dispositivos: [...(draft.dispositivos || []), { tipo: '', local: '', data_insercao: '' }] 
                 })}
-                className="text-xs flex items-center gap-1 text-sky-400"
+                className="text-xs flex items-center gap-1 tx-info"
               >
                 <Plus className="w-3 h-3" /> Adicionar dispositivo
               </button>
@@ -340,7 +340,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-emerald-400 mb-1">PLANO TERAPÊUTICO ATUAL / METAS PRINCIPAIS</label>
+            <label className="block text-xs font-bold tx-ok mb-1">PLANO TERAPÊUTICO ATUAL / METAS PRINCIPAIS</label>
             <textarea
               value={draft.plano_terapeutico_atual || ''}
               onChange={(e) => setDraft({ ...draft, plano_terapeutico_atual: e.target.value })}
@@ -350,7 +350,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-purple-400 mb-1">MEDICAMENTOS DE USO DOMICILIAR</label>
+            <label className="block text-xs font-bold tx-neuro mb-1">MEDICAMENTOS DE USO DOMICILIAR</label>
             <textarea
               value={(draft.medicamentos_domiciliares || []).join('\n')}
               onChange={(e) => {
@@ -363,7 +363,7 @@ export default function PatientSummaryView({ summary, loading = false, onSave, o
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-sky-400 mb-1">EXAMES RELEVANTES PRÉVIOS</label>
+            <label className="block text-xs font-bold tx-info mb-1">EXAMES RELEVANTES PRÉVIOS</label>
             <textarea
               value={draft.exames_relevantes || ''}
               onChange={(e) => setDraft({ ...draft, exames_relevantes: e.target.value })}
