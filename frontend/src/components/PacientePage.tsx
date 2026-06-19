@@ -10,7 +10,7 @@
 import { useState, type ReactNode } from 'react';
 import {
   ArrowLeft, ArrowRight, BarChart3, ClipboardList, Clock, FileText,
-  History, PencilLine, Target, X,
+  History, PencilLine, Target, X, Stethoscope, CalendarClock, AlertTriangle,
 } from 'lucide-react';
 import type {
   DashboardRow, Evolucao, Paciente, PatientSummary, SystemKey,
@@ -47,6 +47,22 @@ const VETOR_CLASS: Record<string, string> = {
   '↓': 'tx-ok',
   '=': 'text-app-text-muted',
 };
+
+/**
+ * Mapa de status de interconsulta → rótulo + classe semântica do tema (sem hex).
+ * Aceita o vocabulário do app (pendente/agendada/realizada/cancelada) e o do
+ * design system standalone (ativa/aguardando/concluida). Herda os 2 temas.
+ */
+const IC_STATUS: Record<string, { label: string; tx: string }> = {
+  ativa: { label: 'Ativa', tx: 'tx-resp' },
+  agendada: { label: 'Agendada', tx: 'tx-resp' },
+  pendente: { label: 'Aguardando', tx: 'tx-warn' },
+  aguardando: { label: 'Aguardando', tx: 'tx-warn' },
+  realizada: { label: 'Concluída', tx: 'tx-ok' },
+  concluida: { label: 'Concluída', tx: 'tx-ok' },
+  cancelada: { label: 'Cancelada', tx: 'tx-danger' },
+};
+const IC_STATUS_DEFAULT = { label: 'Ativa', tx: 'tx-resp' };
 
 /** Resumo de uma evolução pro histórico: impressão legada ou problemas SASI. */
 function resumoEvolucao(e: Evolucao): string {
@@ -244,6 +260,19 @@ export default function PacientePage({ pacienteId, onBack }: Props) {
   const tabelao = extractTabelaoLabs(evolucoes)
     .map((row, i) => ({ ...row, key: TABELAO_LABS[i].key }))
     .filter((row) => row.val1 || row.val2);
+
+  // View 2 (CORRECTION 19/06): Interconsultas + Programação/Pendências.
+  // ZERO ALUCINAÇÃO — só renderiza o que existe. Pendências = fonte única
+  // (`pendencias`), a mesma que alimenta a Passagem de Turno (View 5).
+  const interconsultas = (summary?.interconsultas ?? []).filter((ic) => ic.especialidade);
+  const progPend: { tipo: 'prog' | 'pend'; texto: string }[] = [
+    ...(summary?.programacao ?? [])
+      .filter((p) => p.descricao)
+      .map((p) => ({ tipo: 'prog' as const, texto: p.descricao })),
+    ...pendencias
+      .filter((p) => !p.concluida && p.tarefa)
+      .map((p) => ({ tipo: 'pend' as const, texto: p.tarefa })),
+  ];
 
   const copiarPassagem = () => {
     if (!rowSintetica) return;
@@ -637,6 +666,92 @@ export default function PacientePage({ pacienteId, onBack }: Props) {
                         })}
                       </tbody>
                     </table>
+                  </div>
+                )}
+
+                {/* Interconsultas + Programação & Pendências (CORRECTION View 2) */}
+                {(interconsultas.length > 0 || progPend.length > 0) && (
+                  <div className="grid md:grid-cols-2 gap-4 mt-4">
+                    {/* Interconsultas */}
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-app-text-muted mb-2">
+                        Interconsultas
+                      </div>
+                      {interconsultas.length === 0 ? (
+                        <p className="text-xs text-app-text-muted/60 italic m-0">
+                          Nenhuma interconsulta registrada.
+                        </p>
+                      ) : (
+                        <div className="flex flex-col gap-1.5">
+                          {interconsultas.map((ic, i) => {
+                            const s = IC_STATUS[ic.status ?? ''] ?? IC_STATUS_DEFAULT;
+                            return (
+                              <div
+                                key={i}
+                                className="flex items-start gap-2.5 bg-app-tertiary/50 border border-app-border rounded-lg px-3 py-2"
+                              >
+                                <Stethoscope className="w-3.5 h-3.5 text-app-text-muted mt-0.5 shrink-0" />
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <b className="text-xs text-app-text">{ic.especialidade}</b>
+                                    <span
+                                      className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${s.tx}`}
+                                    >
+                                      {s.label}
+                                    </span>
+                                  </div>
+                                  {ic.notas && (
+                                    <div className="text-xs text-app-text-2 mt-0.5">{ic.notas}</div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Programação & Pendências */}
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-app-text-muted mb-2">
+                        Programação &amp; Pendências
+                      </div>
+                      {progPend.length === 0 ? (
+                        <p className="text-xs text-app-text-muted/60 italic m-0">
+                          Sem programação ou pendências abertas.
+                        </p>
+                      ) : (
+                        <div className="flex flex-col gap-1.5">
+                          {progPend.map((pd, i) => {
+                            const prog = pd.tipo === 'prog';
+                            return (
+                              <div
+                                key={i}
+                                className={`flex items-start gap-2.5 px-3 py-1.5 rounded-lg ${
+                                  prog ? 'bg-sky-500/10' : 'bg-amber-500/10'
+                                }`}
+                              >
+                                {prog ? (
+                                  <CalendarClock className="w-3.5 h-3.5 tx-info mt-0.5 shrink-0" />
+                                ) : (
+                                  <AlertTriangle className="w-3.5 h-3.5 tx-warn mt-0.5 shrink-0" />
+                                )}
+                                <div className="min-w-0 flex-1">
+                                  <span
+                                    className={`text-[9px] font-bold uppercase tracking-wider mr-1.5 ${
+                                      prog ? 'tx-info' : 'tx-warn'
+                                    }`}
+                                  >
+                                    {prog ? 'Programado' : 'Pendência'}
+                                  </span>
+                                  <span className="text-xs text-app-text-2">{pd.texto}</span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </FichaCard>

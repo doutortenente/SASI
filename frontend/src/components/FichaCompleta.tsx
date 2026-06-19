@@ -1200,7 +1200,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
               <div className="w-full sm:w-auto bg-lime-600 px-3 py-1.5 rounded-lg flex items-center justify-center gap-2 sm:ml-auto shadow-sm">
                 <span className="font-bold text-[10px] uppercase text-lime-100">Ef:</span>
                 <span className="font-black text-white">{formatDiureseEfetiva(renalDraft.diurese, paciente.peso, renalDraft.diureseHoras ?? 24)}</span>
-                <span className="text-[10px] font-bold text-lime-200">ml/kg/h</span>
+                <span className="text-[10px] font-bold text-lime-100">ml/kg/h</span>
               </div>
             </div>
             <NotasField sistemaNome="Renal" value={String(renalDraft.notas ?? '')} onChange={v => setDraft('renal', { notas: v })} />
