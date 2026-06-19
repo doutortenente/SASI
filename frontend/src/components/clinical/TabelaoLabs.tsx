@@ -24,12 +24,12 @@ export default function TabelaoLabs({ rows, compact = false }: Props) {
       <table className="w-full text-[11px] border-collapse">
         <thead>
           <tr className="bg-slate-900 text-slate-200">
-            <th className="text-left px-2 py-1.5 font-bold border-r border-slate-700 sticky left-0 bg-slate-900 z-10">Exame</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700 min-w-[52px]">Val 1</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700 min-w-[52px]">Val 2 →</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700">Unid</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700">Ref.</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700">Tend.</th>
+            <th className="text-left px-2 py-1.5 font-bold border-r border-app-border sticky left-0 bg-slate-900 z-10">Exame</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border min-w-[52px]">Val 1</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border min-w-[52px]">Val 2 →</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border">Unid</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border">Ref.</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border">Tend.</th>
             <th className="text-center px-2 py-1.5 font-bold">Alerta</th>
           </tr>
         </thead>

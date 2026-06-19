@@ -36,12 +36,12 @@ export default function PrescricaoTable({ items, editable = false, onChange }: P
       <table className="w-full text-[11px] border-collapse">
         <thead>
           <tr className="bg-slate-900 text-slate-200">
-            <th className="text-left px-2 py-1.5 font-bold border-r border-slate-700 w-28">Sistema</th>
-            <th className="text-left px-2 py-1.5 font-bold border-r border-slate-700">Medicamento</th>
-            <th className="text-left px-2 py-1.5 font-bold border-r border-slate-700 w-20">Dose</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700 w-14">Via</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700 w-20">Freq</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700 w-20">Horários</th>
+            <th className="text-left px-2 py-1.5 font-bold border-r border-app-border w-28">Sistema</th>
+            <th className="text-left px-2 py-1.5 font-bold border-r border-app-border">Medicamento</th>
+            <th className="text-left px-2 py-1.5 font-bold border-r border-app-border w-20">Dose</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border w-14">Via</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border w-20">Freq</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border w-20">Horários</th>
             <th className="text-left px-2 py-1.5 font-bold">Obs/Alertas</th>
           </tr>
         </thead>

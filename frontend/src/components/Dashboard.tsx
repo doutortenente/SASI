@@ -2,7 +2,7 @@
 // SASI · Dashboard — sala de guerra das 3 UTIs (33 leitos) · Plantão Board
 // Shell: Sidebar (rail navy) + TopBar + FiltersBar + conteúdo rolável
 // 3 view modes: plantao (Cards) / round (Split) / editor (Tabela)
-// 3 themes (via UIProvider): dark / clinical / light
+// 2 themes (via UIProvider): tactical (padrão) / clinical
 // Smart filters: Críticos | ↑SOFA | DVA | VM | Sem evolução | Busca
 // ============================================================================
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -41,7 +41,7 @@ export default function Dashboard({ session }: Props) {
   const { dashboard, loading, error } = useSupabasePatients();
   const { totalCriticos, totalWarnings } = useClinicalAlerts();
   const { addToast } = useToasts();
-  const { viewMode, setViewMode, cycleTheme } = useUI();
+  const { viewMode, setViewMode, toggleTheme } = useUI();
   const [activeView, setActiveView] = useState<SasiView>('overview');
   const [pacientePageId, setPacientePageId] = useState<string | null>(null);
   const [utiFilter, setUtiFilter] = useState<UtiFilter>('TODAS');
@@ -56,14 +56,14 @@ export default function Dashboard({ session }: Props) {
   const shortcuts = useCallback(() => ({
     'j': () => {},
     'k': () => {},
-    't': cycleTheme,
+    't': toggleTheme,
     'n': () => setShowNovoLeito(true),
     '?': () => setShowShortcuts(v => !v),
     'Escape': () => { setShowShortcuts(false); setSelectedId(null); setSearch(''); setPacientePageId(null); },
     'g p': () => setViewMode('plantao'),
     'g r': () => setViewMode('round'),
     'g e': () => setViewMode('editor'),
-  }), [cycleTheme, setViewMode]);
+  }), [toggleTheme, setViewMode]);
   useKeyboardShortcuts(shortcuts(), noModal);
 
   // Base: filtrado por UTI — base para contar os smart filter pills
@@ -294,7 +294,7 @@ export default function Dashboard({ session }: Props) {
             <div className="space-y-1.5 text-xs">
               {[
                 ['?', 'Abrir/fechar este painel'],
-                ['t', 'Ciclar tema (dark → clinical → light)'],
+                ['t', 'Alternar tema (Tático ⇄ Clínico)'],
                 ['n', 'Novo leito'],
                 ['Esc', 'Fechar modal / limpar busca'],
                 ['g p', 'Modo Plantão (Cards)'],

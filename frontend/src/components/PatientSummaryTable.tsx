@@ -130,7 +130,7 @@ export default function PatientSummaryTable({ summary, pacienteId, loading, onSa
         <table className="w-full text-[11px] border-collapse">
           <thead>
             <tr className="bg-slate-900 text-slate-200">
-              <th className="text-left px-2 py-1.5 font-bold w-52 border-r border-slate-700">Sistema</th>
+              <th className="text-left px-2 py-1.5 font-bold w-52 border-r border-app-border">Sistema</th>
               <th className="text-left px-2 py-1.5 font-bold">Resumo / Status Atual</th>
             </tr>
           </thead>

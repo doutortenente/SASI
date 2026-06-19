@@ -108,13 +108,13 @@ export default function PassagemTurno({ rows, loading, userEmail }: Props) {
         <table className="w-full text-[11px] border-collapse min-w-[900px]">
           <thead>
             <tr className="bg-slate-900 text-slate-200 sticky top-0 z-10">
-              <th className="px-2 py-2 text-left font-bold border-r border-slate-700 w-12">UTI</th>
-              <th className="px-2 py-2 text-center font-bold border-r border-slate-700 w-10">Lt</th>
-              <th className="px-2 py-2 text-left font-bold border-r border-slate-700 w-36">Nome</th>
-              <th className="px-2 py-2 text-center font-bold border-r border-slate-700 w-14">SOFA</th>
-              <th className="px-2 py-2 text-center font-bold border-r border-slate-700 w-16">Grav.</th>
-              <th className="px-2 py-2 text-center font-bold border-r border-slate-700 w-10">D</th>
-              <th className="px-2 py-2 text-left font-bold border-r border-slate-700">Muda-conduta (L2)</th>
+              <th className="px-2 py-2 text-left font-bold border-r border-app-border w-12">UTI</th>
+              <th className="px-2 py-2 text-center font-bold border-r border-app-border w-10">Lt</th>
+              <th className="px-2 py-2 text-left font-bold border-r border-app-border w-36">Nome</th>
+              <th className="px-2 py-2 text-center font-bold border-r border-app-border w-14">SOFA</th>
+              <th className="px-2 py-2 text-center font-bold border-r border-app-border w-16">Grav.</th>
+              <th className="px-2 py-2 text-center font-bold border-r border-app-border w-10">D</th>
+              <th className="px-2 py-2 text-left font-bold border-r border-app-border">Muda-conduta (L2)</th>
               <th className="px-2 py-2 text-left font-bold">Pendências / Riscos (L3)</th>
             </tr>
           </thead>

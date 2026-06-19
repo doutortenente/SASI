@@ -12,6 +12,8 @@
     "postinstall": "node scripts/postinstall.js"
   },
   "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
     "@supabase/supabase-js": "^2.45.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",

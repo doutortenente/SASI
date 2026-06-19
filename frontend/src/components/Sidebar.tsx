@@ -27,6 +27,7 @@ export default function Sidebar({
         <div className="sasi-rail__mark">
           <Activity className="w-5 h-5 text-white" />
         </div>
+        <b className="sasi-rail__wordmark">SASI</b>
       </div>
 
       <button

@@ -1,6 +1,6 @@
 // ============================================================================
 // SASI · Login.tsx — Magic-link login (Supabase Auth)
-// Tematizado pra responder aos 3 temas (dark/clinical/light) via tokens app-*.
+// Tematizado pra responder aos 2 temas (tactical/clinical) via tokens app-*.
 // ============================================================================
 import { useState, FormEvent } from 'react';
 import { supabase } from '../lib/supabaseClient';
@@ -33,7 +33,7 @@ export default function Login() {
             <ShieldCheck className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-app-text">SASI</h1>
+            <h1 className="text-xl font-bold text-app-text" style={{ letterSpacing: '.14em' }}>SASI</h1>
             <p className="text-xs text-app-text-muted">Comando UTI Alpha · 33 leitos</p>
           </div>
         </div>

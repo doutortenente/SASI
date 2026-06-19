@@ -107,7 +107,7 @@ export default function LeitoCard({ row, onSelect, compact = false }: Props) {
       <div className={`flex items-center justify-between gap-2 ${compact ? 'mb-1' : 'mb-1.5'}`}>
         <div className="flex items-baseline gap-2">
           <span className="text-[10px] font-bold uppercase text-app-text-muted tracking-wider">Leito</span>
-          <span className={`font-black tabular-nums text-app-text ${compact ? 'text-xl' : 'text-2xl'}`}>
+          <span className={`font-mono font-bold tabular-nums text-app-text leading-none ${compact ? 'text-xl' : 'text-2xl'}`}>
             {row.leito}
           </span>
           <span className="text-[10px] font-mono text-app-text-muted">{row.uti}</span>
@@ -121,11 +121,11 @@ export default function LeitoCard({ row, onSelect, compact = false }: Props) {
         >
           <Activity className="w-2.5 h-2.5" />
           <span>SOFA</span>
-          <span className={`${sofaColorClass(row.sofa_total)} font-black`}>
+          <span className={`${sofaColorClass(row.sofa_total)} font-mono font-bold tabular-nums`}>
             {row.sofa_total ?? '—'}
           </span>
           {delta != null && delta !== 0 && (
-            <span className={`ml-0.5 font-bold ${deltaIsBad ? 'text-red-400' : deltaIsGood ? 'text-emerald-400' : 'text-app-text-muted'}`}>
+            <span className={`ml-0.5 font-mono font-bold tabular-nums ${deltaIsBad ? 'text-red-400' : deltaIsGood ? 'text-emerald-400' : 'text-app-text-muted'}`}>
               {deltaIsBad && '↑'}
               {deltaIsGood && '↓'}
               {delta > 0 ? '+' : ''}{delta}

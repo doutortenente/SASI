@@ -1,6 +1,6 @@
 // ============================================================================
 // SASI — Comando UTI Alpha · App.tsx (Supabase-native, zero Firebase)
-// Wrapper com UIProvider pros 3 temas (dark/clinical/light) e 3 view modes.
+// Wrapper com UIProvider pros 2 temas (tactical/clinical) e 3 view modes.
 // ============================================================================
 // AUTH DESABILITADA TEMPORARIAMENTE — ver "Plano de ação login e autenticação SASI"
 // no Google Drive para instruções de reativação.

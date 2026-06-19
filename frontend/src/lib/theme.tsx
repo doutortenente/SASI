@@ -1,7 +1,8 @@
 // ============================================================================
 // SASI · theme.tsx
-// Estado global: 3 temas + 5 janelas de navegação.
+// Estado global: 2 temas (Tactical default ⇄ Clinical) + 5 janelas de navegação.
 // Persiste em localStorage. Aplica `body.theme-{tema}` pra CSS vars.
+// Novo design (Jun 2026): consolidação dos antigos 3 modos em 2 co-iguais.
 // ============================================================================
 import {
   createContext,
@@ -12,7 +13,8 @@ import {
   type ReactNode,
 } from 'react';
 
-export type Theme = 'dark' | 'clinical' | 'light';
+/** Tactical = war-room escuro/vermelho (padrão) · Clinical = claro/azul (rounds). */
+export type Theme = 'tactical' | 'clinical';
 
 /** 3 view modes do Plantão Board (Cards / Round / Tabela) */
 export type ViewMode = 'plantao' | 'round' | 'editor';
@@ -36,8 +38,8 @@ interface UIState {
   theme: Theme;
   viewMode: ViewMode;
   janela: Janela;
-  cycleTheme: () => void;
-  toggleTacticalClinical: () => void;
+  /** Alterna Tactical ⇄ Clinical (com 2 temas, ciclar = alternar). */
+  toggleTheme: () => void;
   setTheme: (t: Theme) => void;
   setViewMode: (v: ViewMode) => void;
   setJanela: (j: Janela) => void;
@@ -55,14 +57,26 @@ function readStored<T extends string>(key: string, fallback: T, allowed: readonl
   }
 }
 
-const THEMES: readonly Theme[] = ['dark', 'clinical', 'light'];
 const VIEW_MODES: readonly ViewMode[] = ['plantao', 'round', 'editor'];
 const JANELA_IDS: readonly Janela[] = ['leitos', 'tempo', 'estado', 'problema', 'passagem'];
 
+/** Migra valores legados (3 modos) pro novo modelo de 2 temas. */
+function readTheme(): Theme {
+  if (typeof window === 'undefined') return 'tactical';
+  try {
+    const v = window.localStorage.getItem(THEME_KEY);
+    if (v === 'clinical') return 'clinical';
+    if (v === 'tactical') return 'tactical';
+    // legado: 'dark' → tactical · 'light' → clinical
+    if (v === 'light') return 'clinical';
+    return 'tactical';
+  } catch {
+    return 'tactical';
+  }
+}
+
 export function UIProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() =>
-    readStored<Theme>(THEME_KEY, 'dark', THEMES)
-  );
+  const [theme, setThemeState] = useState<Theme>(readTheme);
   const [viewMode, setViewModeState] = useState<ViewMode>(() =>
     readStored<ViewMode>(VIEW_KEY, 'plantao', VIEW_MODES)
   );
@@ -72,8 +86,10 @@ export function UIProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const body = document.body;
-    body.classList.remove('theme-dark', 'theme-clinical', 'theme-light');
+    body.classList.remove('theme-dark', 'theme-clinical', 'theme-light', 'theme-tactical');
     body.classList.add(`theme-${theme}`);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'clinical' ? '#eef1f6' : '#0f172a');
     try {
       window.localStorage.setItem(THEME_KEY, theme);
     } catch { /* no-op */ }
@@ -99,14 +115,8 @@ export function UIProvider({ children }: { children: ReactNode }) {
       setTheme: setThemeState,
       setViewMode: setViewModeState,
       setJanela: setJanelaState,
-      cycleTheme: () => {
-        const idx = THEMES.indexOf(theme);
-        setThemeState(THEMES[(idx + 1) % THEMES.length]);
-      },
-      // Sidebar/topbar toggle: only flips Tactical (dark) ↔ Clinical (light/blue).
-      // Legacy 'light' theme is treated as Tactical-ish and goes to Clinical.
-      toggleTacticalClinical: () => {
-        setThemeState(theme === 'clinical' ? 'dark' : 'clinical');
+      toggleTheme: () => {
+        setThemeState(theme === 'clinical' ? 'tactical' : 'clinical');
       },
     }),
     [theme, viewMode, janela]

@@ -6,11 +6,11 @@ import { Moon, Sun } from 'lucide-react';
 import { useUI } from '../lib/theme';
 
 export default function ThemeToggleSimple() {
-  const { theme, toggleTacticalClinical } = useUI();
+  const { theme, toggleTheme } = useUI();
   const isClinical = theme === 'clinical';
   return (
     <button
-      onClick={toggleTacticalClinical}
+      onClick={toggleTheme}
       title={isClinical ? 'Tema tático (escuro/vermelho)' : 'Tema clínico (claro/azul)'}
       aria-label="Alternar tema"
       className="p-2 rounded-lg border border-app-border bg-app-card text-app-text-muted hover:bg-app-tertiary hover:text-app-text transition"
