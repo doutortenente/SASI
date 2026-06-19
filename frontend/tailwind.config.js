@@ -3,6 +3,10 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-sans)'],
+        mono: ['var(--font-mono)'],
+      },
       colors: {
         // Theme-aware tokens (backed by CSS vars in src/index.css)
         // Use as: bg-app, bg-app-card, text-app, border-app, etc.

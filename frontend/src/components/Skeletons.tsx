@@ -1,6 +1,6 @@
 // ============================================================================
 // SASI · Skeletons + EmptyState — loading placeholders e zero-data states.
-// Usam tokens app-* pra funcionar nos 3 temas (dark/clinical/light).
+// Usam tokens app-* pra funcionar nos 2 temas (tactical/clinical).
 // ============================================================================
 import type { ElementType } from 'react';
 import { Inbox } from 'lucide-react';

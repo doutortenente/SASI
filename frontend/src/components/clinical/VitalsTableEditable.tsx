@@ -21,11 +21,11 @@ export default function VitalsTableEditable({ rows, onChange }: Props) {
       <table className="w-full text-[11px] border-collapse">
         <thead>
           <tr className="bg-slate-900 text-slate-200">
-            <th className="text-left px-2 py-1.5 font-bold border-r border-slate-700 w-36 sticky left-0 bg-slate-900 z-10">Parâmetro</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700 min-w-[56px]">Máximo</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700 min-w-[56px]">Mínimo</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700 w-16">Unidade</th>
-            <th className="text-center px-2 py-1.5 font-bold border-r border-slate-700 w-20">Limite HITL</th>
+            <th className="text-left px-2 py-1.5 font-bold border-r border-app-border w-36 sticky left-0 bg-slate-900 z-10">Parâmetro</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border min-w-[56px]">Máximo</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border min-w-[56px]">Mínimo</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border w-16">Unidade</th>
+            <th className="text-center px-2 py-1.5 font-bold border-r border-app-border w-20">Limite HITL</th>
             <th className="text-left px-2 py-1.5 font-bold">Obs/Tag</th>
           </tr>
         </thead>

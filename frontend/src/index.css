@@ -3,72 +3,109 @@
 @tailwind utilities;
 
 /* ============================================================================
-   SASI — Theme tokens (3 modes: dark, clinical, light)
-   CSS vars are R G B triples so Tailwind can do `/<alpha>`.
+   SASI — Novo Design (Jun 2026)
+   2 temas co-iguais: Tactical (escuro/vermelho, PADRÃO) ⇄ Clinical (claro/azul).
+   Tokens do design-system: cores via --app-* (R G B triples p/ Tailwind /<alpha>),
+   escalares (tipografia/espaço/raio/sombra/motion) como vars diretas.
    ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   Escalares do DS (independentes de tema)
+   ---------------------------------------------------------------------------- */
+:root {
+  /* Tipografia */
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace;
+  --text-2xs: 0.625rem;   --text-xs:  0.6875rem; --text-sm:  0.8125rem;
+  --text-base:0.9375rem;  --text-md:  1.0625rem; --text-lg:  1.25rem;
+  --text-xl:  1.5rem;     --text-2xl: 2rem;      --text-3xl: 2.5rem;
+  --weight-regular: 400; --weight-medium: 500; --weight-semibold: 600; --weight-bold: 700;
+  --leading-tight: 1.15; --leading-snug: 1.35; --leading-normal: 1.55;
+  --tracking-eyebrow: 0.08em; --tracking-wide: 0.04em;
+
+  /* Espaçamento (grid 4px) */
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+  --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
+
+  /* Raios */
+  --radius-xs: 4px; --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
+  --radius-xl: 16px; --radius-2xl: 20px; --radius-pill: 9999px;
+  --gravity-bar: 6px;
+
+  /* Layout */
+  --sidebar-width: 232px;
+  --header-height: 60px;
+  --content-max: 1440px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 120ms; --dur-base: 220ms; --dur-slow: 360ms;
+}
+
+/* ----------------------------------------------------------------------------
+   TACTICAL (padrão) — war-room escuro, acento vermelho
+   ---------------------------------------------------------------------------- */
 :root,
-body.theme-dark {
-  --app-bg: 15 23 42;          /* slate-950 */
-  --app-card: 30 41 59;        /* slate-800 */
-  --app-tertiary: 51 65 85;    /* slate-700 */
-  --app-border: 71 85 105;     /* slate-600 */
-  --app-text: 248 250 252;     /* slate-50 */
-  --app-text-2: 203 213 225;   /* slate-300 */
-  --app-text-muted: 148 163 184; /* slate-400 */
-  --app-accent: 220 38 38;     /* red-600 */
+body.theme-tactical {
+  --app-bg: 15 23 42;            /* surface-app  #0f172a */
+  --app-card: 30 41 59;          /* surface-card #1e293b */
+  --app-tertiary: 51 65 85;      /* surface-raised #334155 */
+  --app-border: 71 85 105;       /* border-default #475569 */
+  --app-text: 248 250 252;       /* text-heading #f8fafc */
+  --app-text-2: 203 213 225;     /* text-body #cbd5e1 */
+  --app-text-muted: 148 163 184; /* text-muted #94a3b8 */
+  --app-accent: 220 38 38;       /* red-600 */
   --app-accent-hover: 185 28 28; /* red-700 */
-  --app-success: 16 185 129;   /* emerald-500 */
-  --app-warning: 245 158 11;   /* amber-500 */
-  --app-danger: 239 68 68;     /* red-500 */
+  --app-success: 16 185 129;     /* emerald-500 */
+  --app-warning: 245 158 11;     /* amber-500 */
+  --app-danger: 239 68 68;       /* red-500 */
+
+  --focus-ring: rgba(220, 38, 38, .4);
+  --shadow-card:   0 1px 2px rgba(0,0,0,.4), 0 1px 3px rgba(0,0,0,.3);
+  --shadow-raised: 0 8px 24px rgba(0,0,0,.45);
+  --shadow-pop:    0 16px 48px rgba(0,0,0,.55);
+  --shadow-focus:  0 0 0 3px var(--focus-ring);
+
+  /* Sidebar/command-rail (navy constante; tático = navy mais profundo) */
+  --chrome-bg:     linear-gradient(170deg, #0c1a30 0%, #060e1c 100%);
+  --chrome-text:   #e2e8f0;
+  --chrome-muted:  #7d93b0;
+  --chrome-border: rgba(255, 255, 255, .06);
 }
 
+/* ----------------------------------------------------------------------------
+   CLINICAL — rounds diurnos, canvas cinza-claro + cards brancos, acento azul
+   ---------------------------------------------------------------------------- */
 body.theme-clinical {
-  --app-bg: 255 255 255;
-  --app-card: 248 250 252;     /* slate-50 */
-  --app-tertiary: 226 232 240; /* slate-200 */
-  --app-border: 203 213 225;   /* slate-300 */
-  --app-text: 15 23 42;        /* slate-950 */
-  --app-text-2: 71 85 105;     /* slate-600 */
-  --app-text-muted: 100 116 139; /* slate-500 */
-  --app-accent: 37 99 235;     /* blue-600 — clinical accent */
+  --app-bg: 238 241 246;         /* surface-app  #eef1f6 */
+  --app-card: 255 255 255;       /* surface-card #ffffff */
+  --app-tertiary: 232 237 243;   /* surface-sunken #e8edf3 */
+  --app-border: 219 227 236;     /* border-default #dbe3ec */
+  --app-text: 15 23 42;          /* text-heading #0f172a */
+  --app-text-2: 51 85 105;       /* text-body #334155 */
+  --app-text-muted: 100 116 139; /* text-muted #64748b */
+  --app-accent: 37 99 235;       /* blue-600 */
   --app-accent-hover: 29 78 216; /* blue-700 */
-}
+  --app-success: 5 150 105;      /* emerald-600 */
+  --app-warning: 217 119 6;      /* amber-600 */
+  --app-danger: 220 38 38;       /* red-600 */
 
-body.theme-light {
-  --app-bg: 248 250 252;       /* slate-50 */
-  --app-card: 255 255 255;
-  --app-tertiary: 226 232 240; /* slate-200 */
-  --app-border: 203 213 225;   /* slate-300 */
-  --app-text: 15 23 42;        /* slate-950 */
-  --app-text-2: 71 85 105;     /* slate-600 */
-  --app-text-muted: 100 116 139; /* slate-500 */
-  --app-accent: 220 38 38;     /* red-600 — keep red */
-  --app-accent-hover: 185 28 28;
+  --focus-ring: rgba(37, 99, 235, .35);
+  --shadow-card:   0 1px 2px rgba(15, 23, 42, .04), 0 1px 3px rgba(15, 23, 42, .07);
+  --shadow-raised: 0 4px 16px rgba(15, 23, 42, .08), 0 1px 3px rgba(15, 23, 42, .05);
+  --shadow-pop:    0 16px 48px rgba(15, 23, 42, .16), 0 2px 8px rgba(15, 23, 42, .08);
+
+  /* Sidebar continua navy nos dois temas (chrome de marca constante) */
+  --chrome-bg:     linear-gradient(170deg, #13294a 0%, #0b1d35 100%);
+  --chrome-text:   #e6edf6;
+  --chrome-muted:  #8aa1bd;
+  --chrome-border: rgba(255, 255, 255, .08);
 }
 
 /* ============================================================================
-   Sidebar / command-rail chrome (Plantão Board layout)
-   Navy rail in every theme; the active-item accent tracks --app-accent so it
-   shifts red↔blue with dark↔clinical, same split as the design tokens.
+   Sidebar / command-rail chrome (Plantão Board)
    ============================================================================ */
-:root {
-  --sidebar-width: 232px;
-}
-
-:root, body.theme-clinical, body.theme-light {
-  --chrome-bg:         linear-gradient(170deg, #13294a 0%, #0b1d35 100%);
-  --chrome-text:       #e6edf6;
-  --chrome-muted:      #8aa1bd;
-  --chrome-border:     rgba(255, 255, 255, .08);
-}
-
-body.theme-dark {
-  --chrome-bg:         linear-gradient(170deg, #0c1a30 0%, #060e1c 100%);
-  --chrome-text:       #e2e8f0;
-  --chrome-muted:      #7d93b0;
-  --chrome-border:     rgba(255, 255, 255, .06);
-}
-
 .sasi-rail {
   width: var(--sidebar-width);
   flex-shrink: 0;
@@ -101,6 +138,12 @@ body.theme-dark {
   background: rgb(var(--app-accent));
   box-shadow: 0 4px 14px rgb(var(--app-accent) / .4);
 }
+.sasi-rail__wordmark {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: var(--chrome-text);
+}
 .sasi-rail__item {
   display: flex;
   align-items: center;
@@ -115,7 +158,7 @@ body.theme-dark {
   font-weight: 500;
   text-align: left;
   cursor: pointer;
-  transition: background 120ms ease-out, color 120ms ease-out;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 .sasi-rail__item:hover:not(:disabled) {
   background: rgba(255, 255, 255, .06);
@@ -143,11 +186,35 @@ body.theme-dark {
 
 html, body, #root { height: 100%; }
 body {
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
   background: rgb(var(--app-bg));
   color: rgb(var(--app-text-2));
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
+
+/* Eyebrow labels + numerais tabulares (instrumentos: vitais, SOFA, leito) */
+.sasi-eyebrow {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: rgb(var(--app-text-muted));
+}
+.sasi-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* DS: "números sempre tabular mono". O app já marca células numéricas com a
+   utilitária `tabular-nums` do Tailwind — promovemos todas à fonte de
+   instrumento (IBM Plex Mono) de uma vez. Como já são tabulares, o alinhamento
+   não muda; só o desenho do glifo. */
+.tabular-nums { font-family: var(--font-mono); }
 
 /* ============================================================================
    Animations
@@ -168,8 +235,8 @@ body {
   to { transform: rotate(360deg); }
 }
 
-.sasi-fade-in { animation: sasi-fade-in 0.3s ease-out; }
-.sasi-slide-in { animation: sasi-slide-in 0.4s ease-out; }
+.sasi-fade-in { animation: sasi-fade-in 0.3s var(--ease-out); }
+.sasi-slide-in { animation: sasi-slide-in 0.4s var(--ease-out); }
 .sasi-critical-pulse { animation: sasi-critical-pulse 2s ease-in-out infinite; }
 .sasi-spin { animation: sasi-spin 0.6s linear infinite; }
 
@@ -182,7 +249,7 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: rgb(var(--app-text-muted)); }
 
 /* ============================================================================
-   Gravidade badges (mantém intensidade clínica em todos os temas)
+   Gravidade badges (Tactical = default escuro; Clinical = override claro)
    ============================================================================ */
 .gravidade-estavel  { background:#064e3b; color:#6ee7b7; border:1px solid #10b981; }
 .gravidade-moderado { background:#78350f; color:#fcd34d; border:1px solid #f59e0b; }
@@ -190,27 +257,23 @@ body {
 .gravidade-critico  { background:#7f1d1d; color:#fca5a5; border:1px solid #dc2626; }
 .gravidade-obito    { background:#1e293b; color:#94a3b8; border:1px solid #475569; }
 
-body.theme-clinical .gravidade-estavel,
-body.theme-light    .gravidade-estavel  { background:#d1fae5; color:#065f46; border-color:#10b981; }
-body.theme-clinical .gravidade-moderado,
-body.theme-light    .gravidade-moderado { background:#fef3c7; color:#92400e; border-color:#f59e0b; }
-body.theme-clinical .gravidade-grave,
-body.theme-light    .gravidade-grave    { background:#fed7aa; color:#9a3412; border-color:#f97316; }
-body.theme-clinical .gravidade-critico,
-body.theme-light    .gravidade-critico  { background:#fecaca; color:#991b1b; border-color:#dc2626; }
+body.theme-clinical .gravidade-estavel  { background:#d1fae5; color:#065f46; border-color:#10b981; }
+body.theme-clinical .gravidade-moderado { background:#fef3c7; color:#92400e; border-color:#f59e0b; }
+body.theme-clinical .gravidade-grave    { background:#ffedd5; color:#9a3412; border-color:#f97316; }
+body.theme-clinical .gravidade-critico  { background:#fee2e2; color:#991b1b; border-color:#dc2626; }
 
 /* ============================================================================
    SOFA color thresholds
    ============================================================================ */
-.sofa-low      { color: #34d399; }  /* emerald-400 */
-.sofa-medium   { color: #fcd34d; }  /* amber-300 */
-.sofa-high     { color: #fb923c; }  /* orange-400 */
-.sofa-critical { color: #f87171; }  /* red-400 */
+.sofa-low      { color: #34d399; }
+.sofa-medium   { color: #fcd34d; }
+.sofa-high     { color: #fb923c; }
+.sofa-critical { color: #f87171; }
 
-body.theme-clinical .sofa-low, body.theme-light .sofa-low           { color: #059669; }
-body.theme-clinical .sofa-medium, body.theme-light .sofa-medium     { color: #d97706; }
-body.theme-clinical .sofa-high, body.theme-light .sofa-high         { color: #ea580c; }
-body.theme-clinical .sofa-critical, body.theme-light .sofa-critical { color: #dc2626; }
+body.theme-clinical .sofa-low      { color: #059669; }
+body.theme-clinical .sofa-medium   { color: #d97706; }
+body.theme-clinical .sofa-high     { color: #ea580c; }
+body.theme-clinical .sofa-critical { color: #dc2626; }
 
 /* ============================================================================
    Dose calculator pills
@@ -218,48 +281,43 @@ body.theme-clinical .sofa-critical, body.theme-light .sofa-critical { color: #dc
 .dose-ok      { background:#064e3b; color:#6ee7b7; }
 .dose-warning { background:#7f1d1d; color:#fca5a5; }
 
-body.theme-clinical .dose-ok, body.theme-light .dose-ok           { background:#d1fae5; color:#065f46; }
-body.theme-clinical .dose-warning, body.theme-light .dose-warning { background:#fecaca; color:#991b1b; }
+body.theme-clinical .dose-ok      { background:#d1fae5; color:#065f46; }
+body.theme-clinical .dose-warning { background:#fee2e2; color:#991b1b; }
 
 /* ============================================================================
-   System colors — light/clinical overrides (dark uses Tailwind utilities directly)
+   System colors — Clinical overrides (Tactical usa utilitários Tailwind direto)
    ============================================================================ */
-body.theme-clinical .sys-neuro,   body.theme-light .sys-neuro   { background:#faf5ff; border-left-color:#a855f7; }
-body.theme-clinical .sys-resp,    body.theme-light .sys-resp    { background:#f0f9ff; border-left-color:#0ea5e9; }
-body.theme-clinical .sys-hemo,    body.theme-light .sys-hemo    { background:#fff1f2; border-left-color:#f43f5e; }
-body.theme-clinical .sys-tgi,     body.theme-light .sys-tgi     { background:#fffbeb; border-left-color:#f59e0b; }
-body.theme-clinical .sys-renal,   body.theme-light .sys-renal   { background:#f7fee7; border-left-color:#84cc16; }
-body.theme-clinical .sys-hemato,  body.theme-light .sys-hemato  { background:#fdf2f8; border-left-color:#ec4899; }
-body.theme-clinical .sys-infecto, body.theme-light .sys-infecto { background:#f0fdfa; border-left-color:#14b8a6; }
+body.theme-clinical .sys-neuro   { background:#faf5ff; border-left-color:#a855f7; }
+body.theme-clinical .sys-resp    { background:#f0f9ff; border-left-color:#0ea5e9; }
+body.theme-clinical .sys-hemo    { background:#fff1f2; border-left-color:#f43f5e; }
+body.theme-clinical .sys-tgi     { background:#fffbeb; border-left-color:#f59e0b; }
+body.theme-clinical .sys-renal   { background:#f7fee7; border-left-color:#84cc16; }
+body.theme-clinical .sys-hemato  { background:#fdf2f8; border-left-color:#ec4899; }
+body.theme-clinical .sys-infecto { background:#f0fdfa; border-left-color:#14b8a6; }
 
-body.theme-clinical .sys-neuro .sys-title,   body.theme-light .sys-neuro .sys-title   { color:#7e22ce; }
-body.theme-clinical .sys-resp .sys-title,    body.theme-light .sys-resp .sys-title    { color:#0369a1; }
-body.theme-clinical .sys-hemo .sys-title,    body.theme-light .sys-hemo .sys-title    { color:#be123c; }
-body.theme-clinical .sys-tgi .sys-title,     body.theme-light .sys-tgi .sys-title     { color:#b45309; }
-body.theme-clinical .sys-renal .sys-title,   body.theme-light .sys-renal .sys-title   { color:#4d7c0f; }
-body.theme-clinical .sys-hemato .sys-title,  body.theme-light .sys-hemato .sys-title  { color:#be185d; }
-body.theme-clinical .sys-infecto .sys-title, body.theme-light .sys-infecto .sys-title { color:#0f766e; }
+body.theme-clinical .sys-neuro .sys-title   { color:#7e22ce; }
+body.theme-clinical .sys-resp .sys-title    { color:#0369a1; }
+body.theme-clinical .sys-hemo .sys-title    { color:#be123c; }
+body.theme-clinical .sys-tgi .sys-title     { color:#b45309; }
+body.theme-clinical .sys-renal .sys-title   { color:#4d7c0f; }
+body.theme-clinical .sys-hemato .sys-title  { color:#be185d; }
+body.theme-clinical .sys-infecto .sys-title { color:#0f766e; }
 
 /* Card gravity left-border accent */
-.card-grav-estavel  { border-left: 6px solid #10b981; background: rgba(16,185,129,.06); }
-.card-grav-moderado { border-left: 6px solid #f59e0b; background: rgba(245,158,11,.06); }
-.card-grav-grave    { border-left: 6px solid #f97316; background: rgba(249,115,22,.06); }
-.card-grav-critico  { border-left: 6px solid #dc2626; background: rgba(220,38,38,.08); }
-.card-grav-obito    { border-left: 6px solid #475569; background: rgba(71,85,105,.06); }
+.card-grav-estavel  { border-left: var(--gravity-bar) solid #10b981; background: rgba(16,185,129,.06); }
+.card-grav-moderado { border-left: var(--gravity-bar) solid #f59e0b; background: rgba(245,158,11,.06); }
+.card-grav-grave    { border-left: var(--gravity-bar) solid #f97316; background: rgba(249,115,22,.06); }
+.card-grav-critico  { border-left: var(--gravity-bar) solid #dc2626; background: rgba(220,38,38,.08); }
+.card-grav-obito    { border-left: var(--gravity-bar) solid #475569; background: rgba(71,85,105,.06); }
 
-body.theme-clinical .card-grav-estavel,
-body.theme-light    .card-grav-estavel  { background: rgba(16,185,129,.08); }
-body.theme-clinical .card-grav-moderado,
-body.theme-light    .card-grav-moderado { background: rgba(245,158,11,.08); }
-body.theme-clinical .card-grav-grave,
-body.theme-light    .card-grav-grave    { background: rgba(249,115,22,.08); }
-body.theme-clinical .card-grav-critico,
-body.theme-light    .card-grav-critico  { background: rgba(220,38,38,.10); }
-body.theme-clinical .card-grav-obito,
-body.theme-light    .card-grav-obito    { background: rgba(71,85,105,.08); }
+body.theme-clinical .card-grav-estavel  { background: rgba(16,185,129,.08); }
+body.theme-clinical .card-grav-moderado { background: rgba(245,158,11,.08); }
+body.theme-clinical .card-grav-grave    { background: rgba(249,115,22,.08); }
+body.theme-clinical .card-grav-critico  { background: rgba(220,38,38,.10); }
+body.theme-clinical .card-grav-obito    { background: rgba(71,85,105,.08); }
 
 /* ============================================================================
-   Clinical badge pills (theme-aware for light/clinical)
+   Clinical badge pills (Tactical default + Clinical override)
    ============================================================================ */
 .badge-dva     { background: rgba(136,19,55,.45); color: #fda4af; }
 .badge-sed     { background: rgba(88,28,135,.45); color: #d8b4fe; }
@@ -271,27 +329,17 @@ body.theme-light    .card-grav-obito    { background: rgba(71,85,105,.08); }
 .badge-sofa-lo { background: rgb(var(--app-tertiary)); color: rgb(var(--app-text-muted)); }
 .badge-sepsis  { background: #dc2626; color: white; }
 
-body.theme-clinical .badge-dva,
-body.theme-light    .badge-dva     { background: #ffe4e6; color: #9f1239; }
-body.theme-clinical .badge-sed,
-body.theme-light    .badge-sed     { background: #f3e8ff; color: #6b21a8; }
-body.theme-clinical .badge-vm,
-body.theme-light    .badge-vm      { background: #e0f2fe; color: #0c4a6e; }
-body.theme-clinical .badge-vni,
-body.theme-light    .badge-vni     { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
-body.theme-clinical .badge-atb,
-body.theme-light    .badge-atb     { background: #ccfbf1; color: #115e59; }
-body.theme-clinical .badge-pend,
-body.theme-light    .badge-pend    { background: #fef3c7; color: #92400e; }
-body.theme-clinical .badge-sofa-hi,
-body.theme-light    .badge-sofa-hi { background: #fff7ed; color: #9a3412; }
-body.theme-clinical .badge-sepsis,
-body.theme-light    .badge-sepsis  { background: #dc2626; color: white; }
+body.theme-clinical .badge-dva     { background: #ffe4e6; color: #9f1239; }
+body.theme-clinical .badge-sed     { background: #f3e8ff; color: #6b21a8; }
+body.theme-clinical .badge-vm      { background: #e0f2fe; color: #0c4a6e; }
+body.theme-clinical .badge-vni     { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
+body.theme-clinical .badge-atb     { background: #ccfbf1; color: #115e59; }
+body.theme-clinical .badge-pend    { background: #fef3c7; color: #92400e; }
+body.theme-clinical .badge-sofa-hi { background: #fff7ed; color: #9a3412; }
+body.theme-clinical .badge-sepsis  { background: #dc2626; color: white; }
 
 /* Drug name inline colors (theme-aware) */
 .drug-dva  { color: #fda4af; }
 .drug-sed  { color: #d8b4fe; }
-body.theme-clinical .drug-dva,
-body.theme-light    .drug-dva  { color: #be123c; }
-body.theme-clinical .drug-sed,
-body.theme-light    .drug-sed  { color: #7e22ce; }
+body.theme-clinical .drug-dva  { color: #be123c; }
+body.theme-clinical .drug-sed  { color: #7e22ce; }

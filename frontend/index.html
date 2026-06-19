@@ -7,7 +7,21 @@
     <meta name="theme-color" content="#0f172a" />
     <title>SASI — Comando UTI Alpha</title>
   </head>
-  <body class="theme-dark bg-app text-app-text">
+  <body class="theme-tactical bg-app text-app-text">
+    <script>
+      // Anti-FOUC: resolve o tema salvo ANTES da primeira pintura (espelha
+      // a migração de theme.tsx). Sem isso, quem salvou Clinical via um flash
+      // escuro até o React montar.
+      (function () {
+        try {
+          var v = localStorage.getItem('sasi.theme');
+          var t = (v === 'clinical' || v === 'light') ? 'clinical' : 'tactical';
+          document.body.className = 'theme-' + t + ' bg-app text-app-text';
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', t === 'clinical' ? '#eef1f6' : '#0f172a');
+        } catch (e) { /* mantém o default tactical do markup */ }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
