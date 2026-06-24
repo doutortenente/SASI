@@ -176,6 +176,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
       altura: pacDraft.altura ? Number(pacDraft.altura) : undefined,
       alergias: pacDraft.alergias ?? undefined,
       gravidade: pacDraft.gravidade,
+      data_adm: pacDraft.data_adm,
     };
     const { error: pacErr } = await supabase
       .from('pacientes').update(pacPatch).eq('id', paciente.id);
