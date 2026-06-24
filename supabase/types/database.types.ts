@@ -243,6 +243,7 @@ export type Database = {
       evolucoes: {
         Row: {
           conduta: string[]
+          condutas_sistemas: Json
           created_at: string
           data_evolucao: string
           dvas: Json
@@ -255,8 +256,10 @@ export type Database = {
           paciente_id: string
           plantao: string
           prescricao: Json | null
+          problemas_ativos: Json
           renal: Json
           resp: Json
+          riscos: Json
           sedativos: Json
           sofa_snapshot: Json | null
           sofa_total: number | null
@@ -266,6 +269,7 @@ export type Database = {
         }
         Insert: {
           conduta?: string[]
+          condutas_sistemas?: Json
           created_at?: string
           data_evolucao?: string
           dvas?: Json
@@ -278,8 +282,10 @@ export type Database = {
           paciente_id: string
           plantao?: string
           prescricao?: Json | null
+          problemas_ativos?: Json
           renal?: Json
           resp?: Json
+          riscos?: Json
           sedativos?: Json
           sofa_snapshot?: Json | null
           sofa_total?: number | null
@@ -289,6 +295,7 @@ export type Database = {
         }
         Update: {
           conduta?: string[]
+          condutas_sistemas?: Json
           created_at?: string
           data_evolucao?: string
           dvas?: Json
@@ -301,8 +308,10 @@ export type Database = {
           paciente_id?: string
           plantao?: string
           prescricao?: Json | null
+          problemas_ativos?: Json
           renal?: Json
           resp?: Json
+          riscos?: Json
           sedativos?: Json
           sofa_snapshot?: Json | null
           sofa_total?: number | null
