@@ -104,6 +104,18 @@ where e.requires_review = true or e.confidence < 0.7
 order by e.confidence nulls last, e.ts desc;
 
 
+-- 11b. SÍNTESE SASI v2 — colunas JSONB na evolução mais recente
+select p.uti, p.leito, p.nome,
+       jsonb_array_length(coalesce(e.problemas_ativos, '[]'::jsonb)) as n_problemas,
+       jsonb_array_length(coalesce(e.condutas_sistemas, '[]'::jsonb)) as n_condutas,
+       jsonb_array_length(coalesce(e.riscos, '[]'::jsonb)) as n_riscos,
+       e.updated_at
+from evolucoes e
+join pacientes p on p.id = e.paciente_id
+where p.status_leito = 'ativo'
+order by e.updated_at desc;
+
+
 -- 11. FRESCOR — quando foi o último plantão e quanto dado trouxe
 --     (responde "meus dados são de quando?" — fonte é 100% claude_ocr)
 select e.ts::date as plantao,

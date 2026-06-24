@@ -1,0 +1,1 @@
+export { sofaTier, sofaColorClass } from './sofaDisplay.js';

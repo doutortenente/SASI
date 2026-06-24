@@ -23,7 +23,7 @@
 | Deploy          | Netlify `sasi-uti` (CI em `main`)                | `netlify.toml` na raiz: `base = "frontend"` |
 | PDF             | jsPDF + jspdf-autotable (lazy)                   | Export de passagem de turno |
 | Ícones          | lucide-react                                     | — |
-| Ingest clínico  | Skill `sasi-ingest-export` → JSON → MCP (`deploy`) | Claude lê foto/PDF/texto; **sem** pipeline OCR automático |
+| Ingest clínico  | Skill `sasi-ingest-export` → JSON → MCP `sasi_deploy_ingest` | Claude lê foto/PDF/texto; **sem** pipeline OCR automático |
 | Edge Function   | `ocr-ingest` legado (não usar) | Ingest real: Claude → JSON → MCP |
 | Índice do repo  | `memory/scripts/build_sasi_index.py` → SQLite 244 arq | Ver `memory/MEMORY.md` |
 
@@ -166,7 +166,15 @@ Workspace irmão: `~/dev/` (Claude, JARVIS, `memory/MAPA-DEV.md`). `comando-uti`
 ## 6. Dívida Técnica e Backlog Priorizado
 
 ### Prioridade CRÍTICA
+- [x] MCP `sasi_deploy_ingest` — bulk ingest payload v1 (24-jun-2026)
+- [x] Colunas síntese `evolucoes` (problemas_ativos, condutas_sistemas, riscos) — migration `07`
 - [ ] Versionar migrations do schema atual (9 tabelas + views) no repositório
+
+### Definition of Done — plantão (smoke manual)
+- [ ] Ingest folha → `sasi_deploy_ingest` → eventos na timeline
+- [ ] Ficha → síntese → save → reload mostra JSONB
+- [ ] Passagem 3 linhas + PDF com dados do DB
+- [ ] `python3 scripts/audit_eventos.py` — fila review < 10 itens críticos
 
 ### Prioridade MÉDIA
 - [x] Consolidar cópias duplicadas (faxina 11/06/2026)

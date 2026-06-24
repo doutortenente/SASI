@@ -28,7 +28,7 @@ Toda documentação clínica é em **Português do Brasil**.
 1. **Conduta 1:1** com a Impressão, metas sempre numéricas.
 1. **Flags gritam, não consertam** — o sistema sinaliza o implausível; o médico decide.
 1. **Prosa limpa e juridicamente sólida** dentro dos blocos de prontuário. Comentário tático isolado em `// Comando Tático`.
-1. **Ingest = Claude → JSON → Supabase** — a skill `sasi-ingest-export` lê foto/PDF/texto, valida e entrega payload JSON. Gravação: comando **“deploy”** / **“salvar no Supabase”** → INSERT direto via **MCP** (`sasi-mcp-server`). Sem pipeline automático, sem AppSheet, sem atalho iOS.
+1. **Ingest = Claude → JSON → Supabase** — a skill `sasi-ingest-export` lê foto/PDF/texto, valida e entrega payload JSON. Gravação: **“deploy”** / **“salvar no Supabase”** → MCP tool **`sasi_deploy_ingest`**. Sem pipeline automático, sem AppSheet, sem atalho iOS.
 
 -----
 
@@ -97,7 +97,7 @@ Reativar auth só se o escopo mudar (outros usuários). Hoje: **não é backlog.
 
 ## 6. Status das fases
 
-- **FASE ALPHA** — ✅ Completa. Refactor modular `src/lib/` (26 arquivos), 40+ testes unitários (Vitest), camada de API retrocompatível.
+- **FASE ALPHA** — 🔄 Parcial. Frontend modular em `frontend/src/lib/`; testes Vitest em `packages/clinical-engine` (parseBR, SOFA display); extração completa do motor pendente.
 - **FASE BRAVO** — ✅ Entregue e deployada. Schema Supabase, `smoke.sql`, `useClinicalAlerts.ts`, views vivas.
 - **FASE CHARLIE** — 🔄 Em andamento. Timeseries (`eventos_clinicos` 93 linhas, ingest Claude→JSON) + stewardship (`atbs`/`culturas` vazios).
 - **FASE DELTA** — ⬜ Backlog. Automação clínica no app.

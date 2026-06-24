@@ -21,6 +21,7 @@ import { registerPendenciaTools } from "./tools/pendencias.js";
 import { registerAtbTools }       from "./tools/atbs.js";
 import { registerCulturaTools }   from "./tools/culturas.js";
 import { registerAlertTools }     from "./tools/alerts.js";
+import { registerIngestDeployTools } from "./tools/ingest-deploy.js";
 
 // ── Server ────────────────────────────────────────────────────────────────────
 const server = new McpServer({
@@ -37,6 +38,7 @@ registerPendenciaTools(server); // sasi_list_pendencias · sasi_create_pendencia
 registerAtbTools(server);       // sasi_list_atbs · sasi_start_atb · sasi_stop_atb
 registerCulturaTools(server);   // sasi_list_culturas · sasi_create_cultura · sasi_add_antibiograma · sasi_update_cultura
 registerAlertTools(server);     // sasi_list_alerts · sasi_ack_alert · sasi_ack_all_alerts
+registerIngestDeployTools(server); // sasi_deploy_ingest
 
 // ── Startup ───────────────────────────────────────────────────────────────────
 async function main(): Promise<void> {

@@ -4,7 +4,9 @@ MCP Server do **SASI — Sistema de Auditoria e Síntese Intensiva**
 Comando UTI Alpha | UTI2 (12) · UTI3 (13) · UTI4 (8 leitos)
 
 Conecta o Claude Desktop diretamente ao banco Supabase do SASI via stdio.
-Todas as 22 tools operam sobre o schema real (pacientes, evolucoes, eventos_clinicos,
+Inclui **`sasi_deploy_ingest`** — persiste payload `sasi-ocr-ingest/v1` completo (equivalente operacional ao Edge Function `ocr-ingest`).
+
+Todas as 23 tools operam sobre o schema real (pacientes, evolucoes, eventos_clinicos,
 pendencias, atbs, culturas, antibiograma, alerts_log).
 
 ---

@@ -36,4 +36,5 @@ design-system/uploads/
 # === Índice do repo (regenerável) ===
 memory/sasi_index.db
 memory/sasi_index.db.bak
-memory/MAPA-SASI.md
+memory/MAPA-SASI.md.worktrees/
+.worktrees/
