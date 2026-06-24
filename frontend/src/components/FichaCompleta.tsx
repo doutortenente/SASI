@@ -242,7 +242,8 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
     setTimeout(() => setSaveMsg(null), 2500);
   }, [paciente, evolucao, pacDraft, neuroDraft, respDraft, hemoDraft, tgiDraft,
       renalDraft, hematoDraft, infectoDraft, dvasDraft, sedDraft,
-      impressaoDraft, condutaDraft, pendenciasDraft, onSaved]);
+      impressaoDraft, condutaDraft, pendenciasDraft, problemasAtivosDraft,
+      condutasSistemasDraft, onSaved]);
 
   // ============================================================
   // SYNC REAL: Síntese Estruturada (SASI) → Patient Summary
