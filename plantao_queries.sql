@@ -1,9 +1,8 @@
 -- =====================================================================
--- SASI — Queries de plantão para DataGrip
--- Projeto Supabase: idswehsvvqczzkiatuzu (sa-east-1, Postgres 17)
--- Como usar: coloque o cursor DENTRO de uma query e tecle Ctrl+Enter
---            (Cmd+Enter no Mac) — o DataGrip roda só o statement do cursor.
--- Todas validadas via EXPLAIN em 24-jun-2026.
+-- SASI — Queries de plantão (Supabase Postgres)
+-- Projeto: idswehsvvqczzkiatuzu (sa-east-1, Postgres 17)
+-- Cursor dentro do statement + Execute (Ctrl+Enter).
+-- Validadas via EXPLAIN em 24-jun-2026.
 -- =====================================================================
 
 

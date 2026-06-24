@@ -53,7 +53,7 @@ Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persis
 | `eventos_clinicos` | 93 | 100% fonte `claude_ocr`; 24/93 `requires_review`; 18/93 `confidence<0.7` |
 | `atbs` / `culturas` / `pendencias` | 0 | Stewardship e tarefas ainda vazios |
 
-Último ingest OCR: **21-jun-2026**. Queries de plantão: `datagrip_queries.sql`.
+Último ingest OCR: **21-jun-2026**. Queries de plantão: `plantao_queries.sql`.
 
 ---
 

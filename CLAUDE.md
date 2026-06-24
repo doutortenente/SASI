@@ -1,7 +1,7 @@
 # CLAUDE.md — SASI (Sistema de Auditoria e Síntese Intensiva)
 
 > Briefing operacional do projeto. Lido pelo Claude Code ao abrir o repo.
-> **Última atualização:** 24-Jun-2026 — contagens de dados via auditoria 23-jun (DataGrip); schema via dump + migrations locais.
+> **Última atualização:** 24-Jun-2026 — contagens de dados via auditoria SQL 23-jun; schema via dump + migrations locais.
 > Este arquivo substitui qualquer `_HANDOFF_BRIEFING.md` (datado 23-Abr-2026, **STALE** — não é fonte da verdade).
 > **Memória persistente do projeto:** @memory/MEMORY.md
 
