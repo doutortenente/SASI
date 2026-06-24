@@ -3,46 +3,54 @@
 @tailwind utilities;
 
 /* ============================================================================
-   BAYES.OPS Integration — Tactical (default) e Clinical theme-aware
-   Tokens: surface-*, text-*, semânticas (bom/atencao/perigo/fraco/alerta/nerd)
-   Camadas: grid/scanlines/vignette estáticas (z-0, pointer-events-none)
+   SASI — Design System (Jun 2026)
+   Fusão: estética BAYES/HUD (OLED + grid/scanlines + Chakra/Lexend/JetBrains +
+   glow/foco teal) SOBRE o sistema clínico original (tokens --app-*, rail,
+   cores semânticas (tx / stat / gravidade). Cada cor é um sinal.
+   2 temas co-iguais: Tactical (escuro, PADRÃO) ⇄ Clinical (claro/azul).
+   Tokens de cor via --app-* (R G B triples p/ Tailwind /<alpha>);
+   escalares (tipografia/espaço/raio/motion) como vars diretas.
    ============================================================================ */
 
-/* --------------------------------------------------------------------------
-   Tipografia (importada via Google Fonts em index.html)
-   -------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------
+   Escalares do DS (independentes de tema)
+   ---------------------------------------------------------------------------- */
 :root {
+  /* Tipografia — BAYES/HUD (carregada via Google Fonts em index.html) */
   --font-display: 'Chakra Petch', 'Oswald', system-ui, sans-serif;
-  --font-body: 'Lexend', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-data: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', Menlo, monospace;
-}
+  --font-body: 'Lexend', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-data: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace;
+  /* Aliases de compat: componentes/utilitários antigos usam sans/mono */
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-data);
 
-body {
-  font-family: var(--font-body);
-  font-size: 0.9375rem;
-  line-height: 1.55;
-}
+  --text-2xs: 0.625rem;   --text-xs:  0.6875rem; --text-sm:  0.8125rem;
+  --text-base:0.9375rem;  --text-md:  1.0625rem; --text-lg:  1.25rem;
+  --text-xl:  1.5rem;     --text-2xl: 2rem;      --text-3xl: 2.5rem;
+  --weight-regular: 400; --weight-medium: 500; --weight-semibold: 600; --weight-bold: 700;
+  --leading-tight: 1.15; --leading-snug: 1.35; --leading-normal: 1.55;
+  --tracking-eyebrow: 0.08em; --tracking-wide: 0.04em;
 
-/* --------------------------------------------------------------------------
-   Tokens de cor — Tactical (default)
-   -------------------------------------------------------------------------- */
-:root {
-  /* Base e superfícies (OLED) */
-  --base: #000000;
-  --surface-1: rgba(255, 255, 255, 0.015);
-  --surface-2: rgba(255, 255, 255, 0.03);
-  --surface-panel: rgba(0, 0, 0, 0.4);
-  --linha: rgba(255, 255, 255, 0.10);
-  
-  /* Telemetria + Focus */
-  --accent-teal: #2DD4BF;
-  
-  /* Texto */
-  --text: #f8fafc;
-  --text-2: #cbd5e1;
-  --text-muted: #94a3b8;
-  
-  /* Semânticas (BAYES.OPS costuradas) */
+  /* Espaçamento (grid 4px) */
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+  --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
+
+  /* Raios */
+  --radius-xs: 4px; --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
+  --radius-xl: 16px; --radius-2xl: 20px; --radius-pill: 9999px;
+  --gravity-bar: 6px;
+
+  /* Layout */
+  --sidebar-width: 232px;
+  --header-height: 60px;
+  --content-max: 1440px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 120ms; --dur-base: 220ms; --dur-slow: 360ms;
+
+  /* Paleta semântica BAYES (acentos diretos, não-clínicos) */
   --sem-bom: #34C759;
   --sem-atencao: #FACC15;
   --sem-perigo: #FF375F;
@@ -51,9 +59,51 @@ body {
   --sem-nerd: #A855F7;
 }
 
-/* --------------------------------------------------------------------------
-   Tokens de cor — Clinical (light)
-   -------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------
+   TACTICAL (padrão) — war-room OLED, acento vermelho, telemetria teal
+   ---------------------------------------------------------------------------- */
+:root,
+[data-theme="tactical"] {
+  /* Base BAYES OLED + superfícies translúcidas (scanlines/scrollbar/glow) */
+  --base: #080B12;
+  --surface-1: rgba(255, 255, 255, 0.015);
+  --surface-2: rgba(255, 255, 255, 0.03);
+  --surface-panel: rgba(0, 0, 0, 0.4);
+  --linha: rgba(255, 255, 255, 0.10);
+  --accent-teal: #2DD4BF;
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+
+  /* Tokens --app-* (consumidos por TODOS os componentes via Tailwind app.*) */
+  --app-bg: 8 11 18;             /* #080B12 OLED */
+  --app-card: 20 30 45;          /* #141E2D painel HUD */
+  --app-tertiary: 30 41 59;      /* #1e293b raised */
+  --app-border: 36 46 61;        /* hairline sólido */
+  --app-text: 248 250 252;       /* #f8fafc */
+  --app-text-2: 203 213 225;     /* #cbd5e1 */
+  --app-text-muted: 148 163 184; /* #94a3b8 */
+  --app-accent: 220 38 38;       /* red-600 hazard */
+  --app-accent-hover: 185 28 28; /* red-700 */
+  --app-success: 16 185 129;     /* emerald-500 */
+  --app-warning: 245 158 11;     /* amber-500 */
+  --app-danger: 239 68 68;       /* red-500 */
+
+  --focus-ring: rgba(45, 212, 191, .4);
+  --shadow-card:   0 1px 2px rgba(0,0,0,.4), 0 1px 3px rgba(0,0,0,.3);
+  --shadow-raised: 0 8px 24px rgba(0,0,0,.45);
+  --shadow-pop:    0 16px 48px rgba(0,0,0,.55);
+  --shadow-focus:  0 0 0 3px var(--focus-ring);
+
+  /* Sidebar/command-rail (navy constante; tático = navy mais profundo) */
+  --chrome-bg:     linear-gradient(170deg, #0c1a30 0%, #060e1c 100%);
+  --chrome-text:   #e2e8f0;
+  --chrome-muted:  #7d93b0;
+  --chrome-border: rgba(255, 255, 255, .06);
+}
+
+/* ----------------------------------------------------------------------------
+   CLINICAL — rounds diurnos, canvas claro + cards brancos, acento azul
+   ---------------------------------------------------------------------------- */
 [data-theme="clinical"] {
   --base: #ffffff;
   --surface-1: rgba(0, 0, 0, 0.04);
@@ -62,24 +112,43 @@ body {
   --linha: rgba(0, 0, 0, 0.15);
   --accent-teal: #0D9488;
   --text: #0f172a;
-  --text-2: #334155;
   --text-muted: #64748b;
+
+  --app-bg: 238 241 246;         /* #eef1f6 */
+  --app-card: 255 255 255;       /* #ffffff */
+  --app-tertiary: 232 237 243;   /* #e8edf3 */
+  --app-border: 219 227 236;     /* #dbe3ec */
+  --app-text: 15 23 42;          /* #0f172a */
+  --app-text-2: 51 85 105;       /* #334155 */
+  --app-text-muted: 100 116 139; /* #64748b */
+  --app-accent: 37 99 235;       /* blue-600 */
+  --app-accent-hover: 29 78 216; /* blue-700 */
+  --app-success: 5 150 105;
+  --app-warning: 217 119 6;
+  --app-danger: 220 38 38;
+
+  --focus-ring: rgba(13, 148, 136, .35);
+  --shadow-card:   0 1px 2px rgba(15, 23, 42, .04), 0 1px 3px rgba(15, 23, 42, .07);
+  --shadow-raised: 0 4px 16px rgba(15, 23, 42, .08), 0 1px 3px rgba(15, 23, 42, .05);
+  --shadow-pop:    0 16px 48px rgba(15, 23, 42, .16), 0 2px 8px rgba(15, 23, 42, .08);
+
+  --chrome-bg:     linear-gradient(170deg, #13294a 0%, #0b1d35 100%);
+  --chrome-text:   #e6edf6;
+  --chrome-muted:  #8aa1bd;
+  --chrome-border: rgba(255, 255, 255, .08);
 }
 
-/* --------------------------------------------------------------------------
-   Camadas de ambiente (z-0, fixed, estáticas, pointer-events-none)
-   -------------------------------------------------------------------------- */
-html {
-  position: relative;
-}
+/* ============================================================================
+   Camadas de ambiente BAYES (grid + scanlines + vignette)
+   Apenas no Tactical — o tema Clinical (claro) não leva vinheta/scanline.
+   z-0, fixed, pointer-events-none; #root sobe pra z-10.
+   ============================================================================ */
+html { position: relative; }
 
-html::before {
+html:not([data-theme="clinical"])::before {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   background-image:
@@ -88,13 +157,10 @@ html::before {
   background-size: 46px 46px;
 }
 
-html::after {
+html:not([data-theme="clinical"])::after {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   background:
@@ -108,72 +174,152 @@ html::after {
     radial-gradient(120% 90% at 50% -10%, transparent 45%, rgba(0, 0, 0, 0.9) 100%);
 }
 
-/* Força conteúdo acima das camadas */
-#root {
-  position: relative;
-  z-index: 10;
-}
+#root { position: relative; z-index: 10; }
 
-/* --------------------------------------------------------------------------
-   Fundo base
-   -------------------------------------------------------------------------- */
+/* ============================================================================
+   Base
+   ============================================================================ */
+html, body, #root { height: 100%; }
 body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
   background: var(--base);
-  color: var(--text-2);
+  color: rgb(var(--app-text-2));
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* --------------------------------------------------------------------------
-   Tipografia semântica
-   -------------------------------------------------------------------------- */
-.font-display {
-  font-family: var(--font-display);
-  font-weight: 600;
-}
+/* Títulos em display tático (Chakra Petch) */
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); }
 
+/* Utilitárias de fonte (BAYES) */
+.font-display { font-family: var(--font-display); font-weight: 600; }
+.font-body { font-family: var(--font-body); }
 .font-data {
   font-family: var(--font-data);
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
 }
 
-.font-body {
-  font-family: var(--font-body);
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-display);
-}
-
+/* Eyebrow labels + numerais tabulares (instrumentos: vitais, SOFA, leito) */
+.sasi-eyebrow,
 .eyebrow {
-  font-family: var(--font-data);
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: rgb(var(--app-text-muted));
+  font-family: var(--font-data);
+}
+.sasi-num {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
 }
 
-/* --------------------------------------------------------------------------
-   Glow (cards críticos, seleção)
-   -------------------------------------------------------------------------- */
+/* DS: "números sempre tabular mono". O app marca células numéricas com a
+   utilitária `tabular-nums` do Tailwind — promovemos todas à fonte de
+   instrumento (JetBrains Mono) de uma vez. Como já são tabulares, o
+   alinhamento não muda; só o desenho do glifo. */
+.tabular-nums { font-family: var(--font-data); }
+
+/* ============================================================================
+   Sidebar / command-rail chrome (Plantão Board)
+   ============================================================================ */
+.sasi-rail {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: var(--chrome-bg);
+  color: var(--chrome-text);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 12px;
+}
+.sasi-rail__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px 14px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--chrome-border);
+}
+.sasi-rail__mark {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(var(--app-accent));
+  box-shadow: 0 4px 14px rgb(var(--app-accent) / .4);
+}
+.sasi-rail__wordmark {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: var(--chrome-text);
+}
+.sasi-rail__item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 11px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--chrome-muted);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.sasi-rail__item:hover:not(:disabled) {
+  background: rgba(255, 255, 255, .06);
+  color: var(--chrome-text);
+}
+.sasi-rail__item.on {
+  background: rgb(var(--app-accent) / .22);
+  color: #fff;
+  border-left: 3px solid rgb(var(--app-accent));
+  padding-left: 8px;
+}
+.sasi-rail__item:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+.sasi-rail__badge {
+  margin-left: auto;
+  font-family: var(--font-data);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: rgb(var(--app-accent));
+  color: #fff;
+}
+
+/* ============================================================================
+   Glow + foco teal (BAYES) — cards críticos, seleção
+   ============================================================================ */
 .glow {
   box-shadow:
     0 0 0 1px var(--accent-teal),
     0 0 26px -6px var(--accent-teal),
     inset 0 0 22px -14px var(--accent-teal);
 }
+.glow-soft { box-shadow: 0 0 22px -10px var(--accent-teal); }
 
-.glow-soft {
-  box-shadow: 0 0 22px -10px var(--accent-teal);
-}
-
-.card-accent {
-  position: relative;
-}
-
+.card-accent { position: relative; }
 .card-accent::before {
   content: "";
   position: absolute;
@@ -183,91 +329,206 @@ h1, h2, h3, h4, h5, h6 {
   width: 0;
   background: var(--accent-teal);
   transition: width 0.25s ease;
-  border-radius: 0;
 }
+.card-accent:hover::before { width: 3px; }
 
-.card-accent:hover::before {
-  width: 3px;
-}
-
-/* --------------------------------------------------------------------------
-   Focus + Selection
-   -------------------------------------------------------------------------- */
 *:focus-visible {
   outline: 2px solid var(--accent-teal);
   outline-offset: 2px;
   border-radius: 2px;
 }
-
 input[type="range"]:focus-visible {
   outline: 2px solid var(--accent-teal);
   outline-offset: 4px;
 }
-
 ::selection {
   background: var(--accent-teal);
   color: var(--base);
 }
 
-/* --------------------------------------------------------------------------
-   Animações (permitidas: fade-in one-shot, hover transitions)
-   -------------------------------------------------------------------------- */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ============================================================================
+   Animations
+   ============================================================================ */
+@keyframes sasi-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes sasi-slide-in {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
-.fade-in {
-  animation: fadeIn 0.4s ease both;
-}
+.sasi-fade-in, .fade-in { animation: sasi-fade-in 0.3s var(--ease-out); }
+.sasi-slide-in { animation: sasi-slide-in 0.4s var(--ease-out); }
 
 button, a, [role="button"] {
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
-/* --------------------------------------------------------------------------
-   Acessibilidade: prefers-reduced-motion
-   -------------------------------------------------------------------------- */
+/* DS: todo movimento respeita prefers-reduced-motion. Mantém o spinner de
+   loading (curto, funcional) mas desliga fade/slide/pulse e transições. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
 }
 
-/* --------------------------------------------------------------------------
-   Scrollbar (tema-aware)
-   -------------------------------------------------------------------------- */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+/* ============================================================================
+   Scrollbar
+   ============================================================================ */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--surface-1); }
+::-webkit-scrollbar-thumb { background: var(--linha); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-::-webkit-scrollbar-track {
-  background: var(--surface-1);
-}
+/* ============================================================================
+   Gravidade badges (Tactical = default escuro; Clinical = override claro)
+   ============================================================================ */
+.gravidade-estavel  { background:#064e3b; color:#6ee7b7; border:1px solid #10b981; }
+.gravidade-moderado { background:#78350f; color:#fcd34d; border:1px solid #f59e0b; }
+.gravidade-grave    { background:#7c2d12; color:#fdba74; border:1px solid #f97316; }
+.gravidade-critico  { background:#7f1d1d; color:#fca5a5; border:1px solid #dc2626; }
+.gravidade-obito    { background:#1e293b; color:#94a3b8; border:1px solid #475569; }
 
-::-webkit-scrollbar-thumb {
-  background: var(--linha);
-  border-radius: 4px;
-}
+[data-theme="clinical"] .gravidade-estavel  { background:#d1fae5; color:#065f46; border-color:#10b981; }
+[data-theme="clinical"] .gravidade-moderado { background:#fef3c7; color:#92400e; border-color:#f59e0b; }
+[data-theme="clinical"] .gravidade-grave    { background:#ffedd5; color:#9a3412; border-color:#f97316; }
+[data-theme="clinical"] .gravidade-critico  { background:#fee2e2; color:#991b1b; border-color:#dc2626; }
+[data-theme="clinical"] .gravidade-obito    { background:#e2e8f0; color:#334155; border-color:#475569; }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
+/* ============================================================================
+   SOFA color thresholds
+   ============================================================================ */
+.sofa-low      { color: #34d399; }
+.sofa-medium   { color: #fcd34d; }
+.sofa-high     { color: #fb923c; }
+.sofa-critical { color: #f87171; }
 
-/* --------------------------------------------------------------------------
-   Cores semânticas (uso nos componentes)
-   -------------------------------------------------------------------------- */
+[data-theme="clinical"] .sofa-low      { color: #059669; }
+[data-theme="clinical"] .sofa-medium   { color: #d97706; }
+[data-theme="clinical"] .sofa-high     { color: #ea580c; }
+[data-theme="clinical"] .sofa-critical { color: #dc2626; }
+
+/* ============================================================================
+   Dose calculator pills
+   ============================================================================ */
+.dose-ok      { background:#064e3b; color:#6ee7b7; }
+.dose-warning { background:#7f1d1d; color:#fca5a5; }
+
+[data-theme="clinical"] .dose-ok      { background:#d1fae5; color:#065f46; }
+[data-theme="clinical"] .dose-warning { background:#fee2e2; color:#991b1b; }
+
+/* ============================================================================
+   System colors — Clinical overrides (Tactical usa utilitários Tailwind direto)
+   ============================================================================ */
+[data-theme="clinical"] .sys-neuro   { background:#faf5ff; border-left-color:#a855f7; }
+[data-theme="clinical"] .sys-resp    { background:#f0f9ff; border-left-color:#0ea5e9; }
+[data-theme="clinical"] .sys-hemo    { background:#fff1f2; border-left-color:#f43f5e; }
+[data-theme="clinical"] .sys-tgi     { background:#fffbeb; border-left-color:#f59e0b; }
+[data-theme="clinical"] .sys-renal   { background:#f7fee7; border-left-color:#84cc16; }
+[data-theme="clinical"] .sys-hemato  { background:#fdf2f8; border-left-color:#ec4899; }
+[data-theme="clinical"] .sys-infecto { background:#f0fdfa; border-left-color:#14b8a6; }
+
+[data-theme="clinical"] .sys-neuro .sys-title   { color:#7e22ce; }
+[data-theme="clinical"] .sys-resp .sys-title    { color:#0369a1; }
+[data-theme="clinical"] .sys-hemo .sys-title    { color:#be123c; }
+[data-theme="clinical"] .sys-tgi .sys-title     { color:#b45309; }
+[data-theme="clinical"] .sys-renal .sys-title   { color:#4d7c0f; }
+[data-theme="clinical"] .sys-hemato .sys-title  { color:#be185d; }
+[data-theme="clinical"] .sys-infecto .sys-title { color:#0f766e; }
+
+/* Card gravity left-border accent */
+.card-grav-estavel  { border-left: var(--gravity-bar) solid #10b981; background: rgba(16,185,129,.06); }
+.card-grav-moderado { border-left: var(--gravity-bar) solid #f59e0b; background: rgba(245,158,11,.06); }
+.card-grav-grave    { border-left: var(--gravity-bar) solid #f97316; background: rgba(249,115,22,.06); }
+.card-grav-critico  { border-left: var(--gravity-bar) solid #dc2626; background: rgba(220,38,38,.08); }
+.card-grav-obito    { border-left: var(--gravity-bar) solid #475569; background: rgba(71,85,105,.06); }
+
+[data-theme="clinical"] .card-grav-estavel  { background: rgba(16,185,129,.08); }
+[data-theme="clinical"] .card-grav-moderado { background: rgba(245,158,11,.08); }
+[data-theme="clinical"] .card-grav-grave    { background: rgba(249,115,22,.08); }
+[data-theme="clinical"] .card-grav-critico  { background: rgba(220,38,38,.10); }
+[data-theme="clinical"] .card-grav-obito    { background: rgba(71,85,105,.08); }
+
+/* ============================================================================
+   Clinical badge pills (Tactical default + Clinical override)
+   ============================================================================ */
+.badge-dva     { background: rgba(136,19,55,.45); color: #fda4af; }
+.badge-sed     { background: rgba(88,28,135,.45); color: #d8b4fe; }
+.badge-vm      { background: rgba(12,74,110,.45); color: #7dd3fc; }
+.badge-vni     { background: rgba(12,74,110,.25); color: #38bdf8; border: 1px solid rgba(56,189,248,.25); }
+.badge-atb     { background: rgba(19,78,74,.45);  color: #5eead4; }
+.badge-pend    { background: rgba(120,53,15,.45); color: #fcd34d; }
+.badge-sofa-hi { background: rgba(124,45,18,.35); color: #fdba74; }
+.badge-sofa-lo { background: rgb(var(--app-tertiary)); color: rgb(var(--app-text-muted)); }
+.badge-sepsis  { background: #dc2626; color: white; }
+
+[data-theme="clinical"] .badge-dva     { background: #ffe4e6; color: #9f1239; }
+[data-theme="clinical"] .badge-sed     { background: #f3e8ff; color: #6b21a8; }
+[data-theme="clinical"] .badge-vm      { background: #e0f2fe; color: #0c4a6e; }
+[data-theme="clinical"] .badge-vni     { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
+[data-theme="clinical"] .badge-atb     { background: #ccfbf1; color: #115e59; }
+[data-theme="clinical"] .badge-pend    { background: #fef3c7; color: #92400e; }
+[data-theme="clinical"] .badge-sofa-hi { background: #fff7ed; color: #9a3412; }
+[data-theme="clinical"] .badge-sepsis  { background: #dc2626; color: white; }
+
+/* Drug name inline colors (theme-aware) */
+.drug-dva  { color: #fda4af; }
+.drug-sed  { color: #d8b4fe; }
+[data-theme="clinical"] .drug-dva  { color: #be123c; }
+[data-theme="clinical"] .drug-sed  { color: #7e22ce; }
+
+/* ============================================================================
+   Cor semântica theme-aware (.tx-* / .stat-*)
+   ----------------------------------------------------------------------------
+   Os shades Tailwind -400 funcionam no Tactical (escuro) mas lavam sobre o
+   card branco do Clinical (contraste < 3:1). Estas classes resolvem o tom
+   certo por tema: tom claro no Tactical, tom escuro (-600/-700) no Clinical.
+   REGRA: usar para TEXTO sólido de status/sistema.
+   ============================================================================ */
+
+/* Status de alerta (vitais, labs, tendência, delta) */
+.tx-danger { color: #f87171; }  /* high / piora / alerta */
+.tx-info   { color: #38bdf8; }  /* low / abaixo da faixa */
+.tx-warn   { color: #fcd34d; }  /* absurdo / implausível / BH+ */
+.tx-ok     { color: #34d399; }  /* normal / melhora */
+[data-theme="clinical"] .tx-danger { color: #dc2626; }
+[data-theme="clinical"] .tx-info   { color: #0284c7; }
+[data-theme="clinical"] .tx-warn   { color: #b45309; }
+[data-theme="clinical"] .tx-ok     { color: #059669; }
+
+/* Sistemas (labels/acentos inline — escurecem no Clinical, par dos .sys-title) */
+.tx-neuro   { color: #c084fc; }
+.tx-resp    { color: #38bdf8; }
+.tx-hemo    { color: #fb7185; }
+.tx-tgi     { color: #fbbf24; }
+.tx-renal   { color: #a3e635; }
+.tx-hemato  { color: #f472b6; }
+.tx-infecto { color: #2dd4bf; }
+[data-theme="clinical"] .tx-neuro   { color: #7e22ce; }
+[data-theme="clinical"] .tx-resp    { color: #0369a1; }
+[data-theme="clinical"] .tx-hemo    { color: #be123c; }
+[data-theme="clinical"] .tx-tgi     { color: #b45309; }
+[data-theme="clinical"] .tx-renal   { color: #4d7c0f; }
+[data-theme="clinical"] .tx-hemato  { color: #be185d; }
+[data-theme="clinical"] .tx-infecto { color: #0f766e; }
+
+/* Chips de status de vital (texto + fundo) — VitalsLabsPanel */
+.stat-high   { color: #f87171; background: rgba(127,29,29,.30); }
+.stat-low    { color: #38bdf8; background: rgba(8,47,73,.30); }
+.stat-absurd { color: #fcd34d; background: rgba(120,53,15,.40); box-shadow: inset 0 0 0 1px rgba(245,158,11,.50); }
+.stat-ok     { color: #34d399; background: rgba(6,78,59,.20); }
+[data-theme="clinical"] .stat-high   { color: #b91c1c; background: #fee2e2; }
+[data-theme="clinical"] .stat-low    { color: #0369a1; background: #e0f2fe; }
+[data-theme="clinical"] .stat-absurd { color: #92400e; background: #fef3c7; box-shadow: inset 0 0 0 1px #f59e0b; }
+[data-theme="clinical"] .stat-ok     { color: #047857; background: #d1fae5; }
+
+/* ============================================================================
+   Semânticas BAYES (acentos diretos — disponíveis p/ telas novas)
+   ============================================================================ */
 .text-bom { color: var(--sem-bom); }
 .text-atencao { color: var(--sem-atencao); }
 .text-perigo { color: var(--sem-perigo); }
@@ -281,29 +542,3 @@ button, a, [role="button"] {
 .bg-fraco { background-color: rgba(255, 149, 0, 0.15); }
 .bg-alerta { background-color: rgba(255, 59, 48, 0.15); }
 .bg-nerd { background-color: rgba(168, 85, 247, 0.15); }
-
-/* --------------------------------------------------------------------------
-   Herança de componentes antigos (compatibilidade)
-   -------------------------------------------------------------------------- */
-.sasi-rail {
-  background: linear-gradient(170deg, #0c1a30 0%, #060e1c 100%);
-  color: var(--text);
-}
-
-[data-theme="clinical"] .sasi-rail {
-  background: linear-gradient(170deg, #13294a 0%, #0b1d35 100%);
-}
-
-.sasi-eyebrow {
-  font-family: var(--font-data);
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.sasi-num {
-  font-family: var(--font-data);
-  font-variant-numeric: tabular-nums;
-}
