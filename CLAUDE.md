@@ -1,7 +1,7 @@
 # CLAUDE.md — SASI (Sistema de Auditoria e Síntese Intensiva)
 
 > Briefing operacional do projeto. Lido pelo Claude Code ao abrir o repo.
-> **Última atualização:** 11-Jun-2026 — sincronizado com o estado VIVO do Supabase (catálogo Postgres) e do workspace Notion.
+> **Última atualização:** 24-Jun-2026 — contagens de dados via auditoria 23-jun (DataGrip); schema via dump + migrations locais.
 > Este arquivo substitui qualquer `_HANDOFF_BRIEFING.md` (datado 23-Abr-2026, **STALE** — não é fonte da verdade).
 > **Memória persistente do projeto:** @memory/MEMORY.md
 
@@ -54,28 +54,28 @@ Direção ASPIRACIONAL para telas novas — **“Monitor de UTI Tático / HUD”
 
 -----
 
-## 4. Schema do banco (estado VIVO — 11-Jun-2026)
+## 4. Schema do banco (estado VIVO — 24-Jun-2026)
 
-Fonte fiel: `SASI_schema_LIVE_10JUN26.sql` (dump do catálogo via `pg_get_*`). 9 tabelas, todas com RLS habilitado.
+Fonte fiel: `supabase/schema-live-dump.sql` + migrations `01–06`. 9 tabelas clínicas + RAG (`protocolos`, `protocolo_chunks` na migration `06`, **DDL versionado, aplicar manualmente**). RLS habilitado.
 
-|Tabela            |Função                                                             |Linhas (atual)|
-|------------------|-------------------------------------------------------------------|--------------|
-|`pacientes`       |Cadastro + status do leito + severidade visual                     |13            |
-|`evolucoes`       |Snapshot por sistema (JSONB) + SOFA + conduta                      |13            |
-|`eventos_clinicos`|**Timeseries** — coração do Meta-Vision (ΔSOFA, BH, tendências 72h)|0 ⚠️           |
-|`atbs`            |Antibiotic stewardship (D-ATB)                                     |0             |
-|`culturas`        |Microbiologia                                                      |0             |
-|`antibiograma`    |S/I/R por cultura                                                  |0             |
-|`pendencias`      |Tarefas por paciente                                               |0             |
-|`alerts_log`      |Alertas com dedupe SHA-256 (anti alarm-fatigue)                    |0             |
-|`ingest_audit_log`|Auditoria de ingest                                                |0             |
+|Tabela            |Função                                                             |Linhas (23-jun-2026)|
+|------------------|-------------------------------------------------------------------|--------------------:|
+|`pacientes`       |Cadastro + status do leito + severidade visual                     |9                    |
+|`evolucoes`       |Snapshot por sistema (JSONB) + SOFA + conduta                      |9                    |
+|`eventos_clinicos`|**Timeseries** — coração do Meta-Vision (ΔSOFA, BH, tendências 72h)|93                   |
+|`atbs`            |Antibiotic stewardship (D-ATB)                                     |0                    |
+|`culturas`        |Microbiologia                                                      |0                    |
+|`antibiograma`    |S/I/R por cultura                                                  |0                    |
+|`pendencias`      |Tarefas por paciente                                               |0                    |
+|`alerts_log`      |Alertas com dedupe SHA-256 (anti alarm-fatigue)                    |0                    |
+|`ingest_audit_log`|Auditoria de ingest                                                |ver Supabase         |
 
 **Views (5):** `vw_dashboard_uti`, `vw_sofa_trend_72h`, `vw_bh_acumulado`, `vw_dias_atb_ativo`, `vw_alertas_abertos`.
-**Funções:** `fn_updated_at`, `fn_invalidate_sofa_cache`, `sync_severidade_visual`, `fn_alert_hash`, `set_updated_at`.
-**Triggers:** updated_at + invalidação de cache SOFA (evolucoes) + sync severidade visual (pacientes).
-**Extensões:** `pgcrypto` (gen_random_uuid, digest sha256), `pg_trgm` (busca por nome).
+**Funções:** `fn_updated_at`, `fn_invalidate_sofa_cache`, `sync_severidade_visual`, `fn_alert_hash`, `match_protocolos` (RAG, migration 06).
+**Edge Functions (sasi):** `ocr-ingest` (ingest clínico + audit), `grok-synthesis` (síntese xAI). **`ingest-patient` NÃO está neste repo** — legado em `comando-uti/supabase/functions/`.
+**Extensões:** `pgcrypto`, `pg_trgm`, `vector` (pgvector 0.8).
 
-> ⚠️ **`eventos_clinicos` está VAZIA.** A timeseries nunca foi populada — o Meta-Vision está “cego” (sem ΔSOFA real, sem BH acumulado, sem tendências). Prioridade de FASE CHARLIE/DELTA.
+> ⚠️ **`eventos_clinicos` populada (93) mas com débito de qualidade:** fonte 100% `claude_ocr`; 24/93 `requires_review`, 18/93 `confidence<0.7`; último ingest 21-jun-2026. Meta-Vision parcialmente alimentado — validar antes de confiar em tendências.
 
 > 📌 **Onde vivem Interconsultas / Programação / Pendências (View 2):** NÃO são tabelas próprias. `interconsultas[]` e `programacao[]` ficam no JSONB **`pacientes.patient_summary`** (lido via `from('pacientes').select('*')` → `paciente.patient_summary`). **Pendências** é a tabela própria **`pendencias`** (RLS `pendencias_all_own` por `EXISTS` no paciente dono) — **fonte única** que alimenta tanto a View 2 quanto a linha de Pendências da Passagem de Turno (View 5). Logo, a View 2 do CORRECTION **não exige DDL novo**: a arquitetura jsonb já a comporta (o CORRECTION oferecia “tabelas OU jsonb”; o app já escolheu jsonb). RLS `_own` correta em ambas — mas **anulada pelo `dev_bypass`** (ver §5).
 
@@ -85,7 +85,7 @@ Fonte fiel: `SASI_schema_LIVE_10JUN26.sql` (dump do catálogo via `pg_get_*`). 9
 
 Cada uma das 9 tabelas carrega uma policy **`dev_bypass`**: `PERMISSIVE`, role `public`, `USING(true) / CHECK(true)`.
 
-No Postgres, policies permissivas **combinam por OR** — isso **anula** todas as policies `_own` (que filtram por `auth.uid()`). Resultado: **PHI dos 13 pacientes exposto via anon key**.
+No Postgres, policies permissivas **combinam por OR** — isso **anula** todas as policies `_own` (que filtram por `auth.uid()`). Resultado: **PHI exposto via anon key** (9 pacientes ativos em 23-jun-2026).
 
 **Correção** (rodar SÓ após confirmar que o frontend autentica via Supabase Auth — dropar às cegas quebra o dashboard se o app roda no anon key):
 
@@ -103,7 +103,7 @@ Status: **FLAGGED, não corrigido.** Decisão pendente do Dr. Nicolas.
 
 - **FASE ALPHA** — ✅ Completa. Refactor modular `src/lib/` (26 arquivos), 40+ testes unitários (Vitest), camada de API retrocompatível.
 - **FASE BRAVO** — ✅ Entregue e deployada. `schema.sql`, `smoke.sql`, `useClinicalAlerts.ts`, `firebase-to-supabase.ts`, views vivas. (`README-FASE-BRAVO.md`.)
-- **FASE CHARLIE** — 🔄 Em andamento. Migração Firebase→Supabase via dual-write. **Dados cadastrais migrados, mas `eventos_clinicos` (timeseries) nunca populada.**
+- **FASE CHARLIE** — 🔄 Em andamento. Migração Firebase→Supabase. **`eventos_clinicos` com 93 linhas (OCR Claude)** — falta qualidade + stewardship (`atbs`/`culturas` vazios).
 - **FASE DELTA** — ⬜ Backlog. Edge Functions de automação clínica.
 
 ### Backlog FASE DELTA (prioridades)
@@ -128,10 +128,11 @@ War Room · toggle de visão compacta · SmartPaste · abas por UTI · chips de 
 
 Fonte da verdade: **`_SASI_TEMPLATE_BASE_v2.md`** (Ramo C) — anatomia idêntica nas duas skills; alterou em uma, replica na outra no mesmo commit (divergência = bug clínico-legal).
 
-**Skills** (em `/mnt/skills/user/` — read-only para o Claude; edições vão para `/home/claude/skills/` e backup):
+**Skills** (fonte única: `~/dev/claude/skills/` · symlink `~/.claude/skills` · commit `582f117`):
 
 - `sasi-ingest-export` — extrai dados de fotos/PDFs/laudos → payload JSON validado; gera “Exportar Evolução” e “Exportar Turno”.
 - `admissao-uti` — nota de admissão (modo D1).
+- `controles-vitais-janela` — folha de enfermagem → sumário 24h/12h + flags.
 
 **References:** `01-schema-eventos-clinicos`, `02-extraction-dictionary`, `03-clinical-sanity-checks`, `04-export-evolucao-template_v2` (+ v1 legado), `05-export-passagem-turno`, `06-api-automation-prompts`.
 

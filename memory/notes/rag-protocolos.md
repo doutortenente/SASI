@@ -14,11 +14,10 @@ Objetivo: "colocar os protocolos pra jogo" = RAG que devolve trecho de protocolo
 - `pg_net` instalado; `pg_cron`/`http` disponíveis, não instalados.
 - Tabela de protocolos NÃO existe. `memorias` existe mas vazia (0 linhas) — fica fora.
 
-**Plano travado (aguardava APROVAR):**
-1. Migration: `protocolos` + `protocolo_chunks` (embedding vector(384), índice HNSW, RLS ON, 4 policies).
-2. Embedding: `gte-small` nativo do Edge (384d, custo zero, sem nova assinatura). NÃO puxa OpenAI/Gemini.
-3. RPC `match_protocolos(query_embedding, threshold, k)` → trecho + fonte; sem match → `null` + `[SEM_FONTE]`.
-4. Edge `protocolo-ingest`: PDF → camada de texto (OCR só fallback) → chunk por seção (~350 tok, overlap 50) → embed → insert com audit.
-5. Plugar a consulta na seção Conduta das skills.
+**Estado (24-jun-2026):**
+1. ✅ Migration versionada: `supabase/migrations/06_protocolos_rag.sql` (`protocolos`, `protocolo_chunks`, HNSW, RLS, `match_protocolos`).
+2. ⬜ **Aplicar** migration no Supabase (SQL Editor ou `supabase db push`).
+3. ⬜ Edge `protocolo-ingest`: PDF → texto → chunk (~350 tok, overlap 50) → embed `gte-small` (384d).
+4. ⬜ Plugar RPC na seção Conduta das skills (`admissao-uti`, `sasi-ingest-export`).
 
 **Fonte dos protocolos (decidido pelo operador):** PDFs / documentos.

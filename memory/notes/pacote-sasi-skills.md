@@ -1,6 +1,6 @@
 ---
 name: pacote-sasi-skills
-description: 3 skills clínicas do SASI versionadas em ~/dev/claude/skills (débito fechado 24-jun-2026); falta commit+push
+description: 3 skills clínicas do SASI versionadas em ~/dev/claude/skills — pushado claude 582f117 (24-jun-2026)
 metadata:
   type: project
 ---
@@ -15,6 +15,6 @@ Pacote `sasi-skills` (extraído do ambiente em 2026-06-21) — as 3 skills agora
 
 **Por que importa:** essas skills são as bocas de saída de conduta do SASI. `admissao-uti` e `sasi-ingest-export` montam dose/meta/profilaxia do conhecimento do modelo → alvo natural do [[rag-protocolos]].
 
-**Estado (24-jun-2026):** as 3 instaladas no working tree do repo `claude` (loader já reconhece). PENDENTE: commit+push do repo `claude` (aguarda OK). Versões antigas/redundantes → `~/dev/_quarentena/inbox-24jun-2026/`.
+**Estado (24-jun-2026):** pushado `claude` commit `582f117` origin/main. Loader via symlink `~/.claude/skills`. Versões antigas/redundantes → `~/dev/_quarentena/inbox-24jun-2026/`.
 
 Fora do pacote por design: `intensivao-catp` (não é SASI) e skills do plugin Obsidian "Comando UTI".

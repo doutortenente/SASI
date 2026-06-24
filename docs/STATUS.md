@@ -1,7 +1,7 @@
 # STATUS — SASI (Sistema de Auditoria e Síntese Intensiva)
 **Comando UTI Alpha — 33 leitos (UTI 2/3/4)**
 
-**Data desta revisão:** 11/06/2026
+**Data desta revisão:** 24/06/2026
 **Produção:** https://sasi-uti.netlify.app  
 **Operador:** Dr. Nicolas Tenente (dr.tenente@nagaitaltda.com)  
 **Supabase:** idswehsvvqczzkiatuzu (Postgres 17.6)
@@ -23,7 +23,8 @@
 | Deploy          | Netlify (CI automático a partir de main)         | Base directory aponta para a pasta ativa do SASI |
 | PDF             | jsPDF + jspdf-autotable (lazy)                   | Export de passagem de turno |
 | Ícones          | lucide-react                                     | — |
-| Edge Function   | `ocr-ingest` (já deployada, verify_jwt: true) · `grok-synthesis` (síntese SASI via xAI Grok) | Entrada obrigatória de evoluções via skill ou foto |
+| Edge Function   | `ocr-ingest` (deployada, verify_jwt: true) · `grok-synthesis` (síntese xAI Grok) | Entrada de evoluções via skill/foto. **`ingest-patient` é legado do repo `comando-uti`, não do sasi.** |
+| Índice do repo  | `memory/scripts/build_sasi_index.py` → SQLite 244 arq | Ver `memory/MEMORY.md` |
 
 **Princípio arquitetural:**  
 Escrita de evoluções **sempre via edge function ou skill** (`sasi-ingest-export`) com audit log obrigatório (`ingest_audit_log`). Edição manual no frontend é read-only ou limitada.
@@ -40,6 +41,19 @@ Escrita de evoluções **sempre via edge function ou skill** (`sasi-ingest-expor
 | 5 | Passagem | `5` | Lista 3-linhas por paciente + copiar/PDF |
 
 Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persistida em `localStorage`.
+
+---
+
+## 1b. Estado dos dados em produção (auditoria 23-jun-2026)
+
+| Tabela | Linhas | Nota |
+|--------|-------:|------|
+| `pacientes` | 9 | Cadastro ativo |
+| `evolucoes` | 9 | 1 snapshot por paciente |
+| `eventos_clinicos` | 93 | 100% fonte `claude_ocr`; 24/93 `requires_review`; 18/93 `confidence<0.7` |
+| `atbs` / `culturas` / `pendencias` | 0 | Stewardship e tarefas ainda vazios |
+
+Último ingest OCR: **21-jun-2026**. Queries de plantão: `datagrip_queries.sql`.
 
 ---
 
@@ -107,10 +121,11 @@ Documento completo no Google Drive: **"Plano de ação login e autenticação SA
 - Constraint forte: `pacientes.uti IN ('UTI2','UTI3','UTI4')`.
 
 **Migrations locais no repo (`supabase/migrations/`):**
-- Contêm apenas o schema antigo de 4 tabelas (`patients`, `clinical_parameters`, `prescriptions`, `lab_results`) — **obsoleto**.
-- Existe migration `03_dev_bypass_rls.sql` (usada no bypass de maio).
+- `01` — schema legado (4 tabelas antigas, referência histórica).
+- `02–05` — triggers, dev_bypass, hardening, `patient_summary`.
+- `06_protocolos_rag.sql` — RAG pgvector (`protocolos`, `protocolo_chunks`, `match_protocolos`). **Versionado 24-jun; aplicar manualmente no Supabase.**
 
-**Dívida:** As migrations do schema atual não estão versionadas no repositório. Risco de drift.
+**Dívida:** schema vivo completo ainda depende de `schema-live-dump.sql` + migrations incrementais.
 
 **Tipos TypeScript oficiais:** `src/lib/supabaseClient.ts` (da pasta ativa) — fonte da verdade para o frontend.
 
@@ -174,6 +189,10 @@ AGENTS.md                           ← regras + env vars (sem JWTs)
 
 ### Prioridade MÉDIA
 - [x] Consolidar cópias duplicadas (faxina 11/06/2026)
+- [x] Atualizar contagens reais em `STATUS.md` + `CLAUDE.md` (24-jun-2026)
+- [x] Versionar migration RAG protocolos (`06_protocolos_rag.sql`)
+- [ ] Aplicar migration 06 no Supabase + Edge `protocolo-ingest`
+- [ ] Revisar qualidade dos 93 `eventos_clinicos` (requires_review / confidence)
 - [ ] Modal "Novo Leito" completo no frontend (atualmente depende de skill/edge)
 - [ ] Drawer detalhado com timeline SOFA + eventos (já existe esqueleto)
 - [ ] Error tracking (Sentry ou similar)

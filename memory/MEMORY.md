@@ -50,5 +50,5 @@ python3 memory/scripts/push_repo_index_to_postgres.py   # SUPABASE_DB_URL no .en
 ## Débitos
 
 1. **plantao-board** — migração fantasma no `comando.md`
-2. **skills** — commit+push pendente no repo `claude`
-3. **rag-protocolos** — migration aguardando APROVAR
+2. **rag-protocolos** — migration `06` versionada; falta aplicar no Supabase + Edge `protocolo-ingest`
+3. **eventos_clinicos** — 93 linhas com 24 requires_review / 18 low confidence (revisar)
