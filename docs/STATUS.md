@@ -20,7 +20,7 @@
 | Frontend        | React 18.3 + TypeScript + Vite 5                 | Código ativo em subpasta (ver seção 5) |
 | Estilo          | Tailwind 3.4 + CSS vars (3 temas)                | Tokens `bg-app-*`, nunca `bg-slate-*` hardcoded |
 | Backend         | Supabase (Postgres + Auth + Realtime + Edge Functions) | Única fonte de dados |
-| Deploy          | Netlify (CI automático a partir de main)         | Base directory aponta para a pasta ativa do SASI |
+| Deploy          | Netlify `sasi-uti` (CI em `main`)                | `netlify.toml` na raiz: `base = "frontend"` |
 | PDF             | jsPDF + jspdf-autotable (lazy)                   | Export de passagem de turno |
 | Ícones          | lucide-react                                     | — |
 | Edge Function   | `ocr-ingest` (deployada, verify_jwt: true) · `grok-synthesis` (síntese xAI Grok) | Entrada de evoluções via skill/foto. **`ingest-patient` é legado** — arquivada em `supabase/functions/_legacy/ingest-patient/`. |
@@ -257,31 +257,21 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 
 ---
 
-## Ações Manuais Recomendadas
+## Infra (pós-split 24-Jun-2026)
 
-### 1. Rotacionar keys (se ainda não fez)
+| Item | Status |
+|---|---|
+| Netlify `sasi-uti` | Repo `doutortenente/SASI`; `netlify.toml` na raiz com `base = "frontend"` |
+| VPS Hermes | `/opt/data/projects/jarvis` + `sasi`; `comando-uti` arquivado |
+| JARVIS CI | Secret `VPS_SSH_PRIVATE_KEY` configurado |
+
+### Rotacionar keys (se ainda não fez)
 JWTs antigos vazaram no histórico do git via `AGENTS.md`. Rotacione no Supabase e atualize `.env` local.
-
-### 2. Configuração do Netlify (importante para deploy continuar funcionando)
-Acesse https://app.netlify.com/projects/sasi-uti/configuration/general
-
-- **Base directory**: **`frontend`** (repo `doutortenente/SASI`, não mais `comando-uti`)
-- **Build command**: `npm run build`
-- **Publish directory**: `dist`
-
-Depois disso, faça um "Clear cache and deploy site" para testar.
-
-### 4. Commit e Push
-```bash
-git add -A
-git commit -m "chore: faxina final - remoção de lixo remanescente"
-git push
-```
 
 ---
 
 *Referências rápidas (atualizado após faxina):*  
 - Código ativo: `frontend/`  
-- Deploy: Netlify `sasi-uti` (Base directory = `frontend`, publish = `dist`)
+- Deploy: Netlify `sasi-uti` — https://sasi-uti.netlify.app
 - Supabase: projeto `idswehsvvqczzkiatuzu`  
 - Plano de auth: Google Drive (documento "Plano de ação login e autenticação SASI")
