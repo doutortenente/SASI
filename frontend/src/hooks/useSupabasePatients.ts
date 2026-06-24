@@ -87,7 +87,7 @@ export function useSupabasePatients(): UseSupabasePatientsReturn {
   }, []);
 
   // ============================================================
-  // REALTIME: ouve mudanças na tabela pacientes e evolucoes
+  // REALTIME: pacientes, evolucoes e pendencias → dashboard atualiza
   // ============================================================
   const setupRealtime = useCallback(() => {
     // Limpa canal anterior
@@ -106,6 +106,9 @@ export function useSupabasePatients(): UseSupabasePatientsReturn {
         loadDashboard();
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'evolucoes' }, () => {
+        loadDashboard();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pendencias' }, () => {
         loadDashboard();
       })
       .subscribe((status) => {
