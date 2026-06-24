@@ -1,12 +1,8 @@
-// ============================================================================
-// SasiSynthesis — Componente dedicado à Síntese Clínica de alta qualidade
-// Foco: Impressão com vetor + Conduta por sistemas com metas (SASI v2.0)
-// ============================================================================
+// SasiSynthesis — Problemas ativos + condutas por sistema (edição manual SASI v2.0)
 
 import { useState } from 'react';
 import { SasiProblemaAtivo, SasiCondutaSistema, Vetor, SystemKey } from '../lib/supabaseClient';
-import { Plus, Trash2, Sparkles } from 'lucide-react';
-import { generateStructuredSynthesis, getReadyToPastePrompt, SASISynthesisRequest, type SASISynthesisOutput } from '../lib/sasiAI';
+import { Plus, Trash2 } from 'lucide-react';
 
 const SISTEMAS: SystemKey[] = ['neuro', 'resp', 'hemo', 'tgi', 'renal', 'hemato', 'infecto'];
 const VETORES: Vetor[] = ['↑', '↓', '='];
@@ -15,16 +11,11 @@ interface Props {
   problemasAtivos: SasiProblemaAtivo[];
   condutasSistemas: SasiCondutaSistema[];
   onChange: (problemas: SasiProblemaAtivo[], condutas: SasiCondutaSistema[]) => void;
-  patientContext?: string;
 }
 
-export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onChange, patientContext }: Props) {
+export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onChange }: Props) {
   const [problemas, setProblemas] = useState<SasiProblemaAtivo[]>(problemasAtivos);
   const [condutas, setCondutas] = useState<SasiCondutaSistema[]>(condutasSistemas);
-  const [rawText, setRawText] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [lastSource, setLastSource] = useState<'grok' | 'local' | null>(null);
-  const [lastError, setLastError] = useState<string | null>(null);
 
   const updateProblemas = (newProblemas: SasiProblemaAtivo[]) => {
     setProblemas(newProblemas);
@@ -36,105 +27,20 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
     onChange(problemas, newCondutas);
   };
 
-  const buildRequest = (): SASISynthesisRequest => ({
-    patientContext: patientContext?.trim() || 'Paciente em evolução pontual — contexto clínico limitado.',
-    rawData: {
-      previousEvolution: rawText,
-      ocrNursingNotes: rawText,
-    },
-  });
-
-  const applySynthesisResult = (result: SASISynthesisOutput) => {
-    const newProblemas: SasiProblemaAtivo[] = result.problemasAtivos.map(p => ({
-      texto: p.texto,
-      vetor: p.vetor as Vetor,
-      sistema: p.sistema as SystemKey | undefined,
-    }));
-
-    const newCondutas: SasiCondutaSistema[] = result.condutasSistemas.map(c => ({
-      sistema: c.sistema as SystemKey | 'geral',
-      texto: c.texto,
-      meta: c.meta,
-      prazo: c.prazo,
-    }));
-
-    updateProblemas(newProblemas);
-    updateCondutas(newCondutas);
-  };
-
-  const handleGenerateWithGrok = async () => {
-    if (!rawText.trim()) {
-      alert('Cole o texto bruto (evolução anterior + OCR do folhão/prescrição) no campo acima.');
-      return;
-    }
-
-    setIsGenerating(true);
-    setLastError(null);
-
-    try {
-      const { output, source } = await generateStructuredSynthesis(buildRequest(), { preferGrok: true });
-      applySynthesisResult(output);
-      setLastSource(source);
-      if (source === 'grok') {
-        alert('Síntese gerada com Grok! Revise e ajuste conforme necessário.');
-      } else {
-        alert('Grok indisponível — síntese gerada com simulação local. Revise os dados.');
-      }
-    } catch (error) {
-      console.error(error);
-      const message = error instanceof Error ? error.message : 'Erro desconhecido';
-      setLastError(message);
-      alert(`Erro ao gerar síntese: ${message}`);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleGenerateLocal = async () => {
-    if (!rawText.trim()) {
-      alert('Cole o texto bruto (evolução anterior + OCR do folhão/prescrição) no campo acima.');
-      return;
-    }
-
-    setIsGenerating(true);
-    setLastError(null);
-
-    try {
-      const { output, source } = await generateStructuredSynthesis(buildRequest(), { preferGrok: false });
-      applySynthesisResult(output);
-      setLastSource(source);
-      alert('Síntese gerada com simulação local. Revise e ajuste conforme necessário.');
-    } catch (error) {
-      console.error(error);
-      alert('Erro ao gerar síntese local.');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const copyPromptForExternalAI = () => {
-    const prompt = getReadyToPastePrompt(buildRequest());
-    navigator.clipboard.writeText(prompt);
-    alert('Prompt SASI v2.0 copiado! Cole no Grok (recomendado), Claude ou Gemini.');
-  };
-
-  // Sugestões comuns de metas (baseado em exemplos reais do usuário)
   const metaSuggestions = [
-    "PAM ≥ 65 mmHg",
-    "Diurese > 0.5 ml/kg/h",
-    "BH negativo nas próximas 24h",
-    "Lactato em queda",
-    "SvO2 venosa ≥ 65%",
-    "SpO2 ≥ 94%",
+    'PAM ≥ 65 mmHg',
+    'Diurese > 0.5 ml/kg/h',
+    'BH negativo nas próximas 24h',
+    'Lactato em queda',
+    'SvO2 venosa ≥ 65%',
+    'SpO2 ≥ 94%',
   ];
 
-  // === Problemas Ativos ===
   const addProblema = () => {
-    const novo: SasiProblemaAtivo = { texto: '', vetor: null };
-    updateProblemas([...problemas, novo]);
+    updateProblemas([...problemas, { texto: '', vetor: null }]);
   };
 
-  const updateProblema = (index: number, field: keyof SasiProblemaAtivo, value: any) => {
+  const updateProblema = (index: number, field: keyof SasiProblemaAtivo, value: SasiProblemaAtivo[keyof SasiProblemaAtivo]) => {
     const copy = [...problemas];
     copy[index] = { ...copy[index], [field]: value };
     updateProblemas(copy);
@@ -144,7 +50,6 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
     updateProblemas(problemas.filter((_, i) => i !== index));
   };
 
-  // Auto-sugestão de vetor baseada em palavras (rápida)
   const suggestVetor = (texto: string): Vetor | null => {
     const t = texto.toLowerCase();
     if (t.includes('piora') || t.includes('descompens') || t.includes('choque') || t.includes('crítica')) return '↑';
@@ -152,13 +57,11 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
     return '=';
   };
 
-  // === Condutas por Sistema ===
   const addConduta = () => {
-    const novo: SasiCondutaSistema = { sistema: 'geral', texto: '', meta: '' };
-    updateCondutas([...condutas, novo]);
+    updateCondutas([...condutas, { sistema: 'geral', texto: '', meta: '' }]);
   };
 
-  const updateConduta = (index: number, field: keyof SasiCondutaSistema, value: any) => {
+  const updateConduta = (index: number, field: keyof SasiCondutaSistema, value: SasiCondutaSistema[keyof SasiCondutaSistema]) => {
     const copy = [...condutas];
     copy[index] = { ...copy[index], [field]: value };
     updateCondutas(copy);
@@ -170,71 +73,17 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
 
   return (
     <div className="space-y-8">
-      {/* ====================== ÁREA DE IA ====================== */}
-      <div className="border border-app-border bg-app-tertiary/30 rounded-2xl p-4">
-        <div className="flex items-center gap-2 mb-2">
-          <Sparkles className="w-4 h-4 tx-neuro" />
-          <span className="font-bold text-sm">Gerar Síntese com IA</span>
-          <span className="text-[10px] bg-purple-500/10 tx-neuro px-2 py-0.5 rounded">Grok API · Local · Manual</span>
-        </div>
+      <p className="text-xs text-app-text-muted">
+        Síntese estruturada — edite manualmente ou traga do Claude (skill sasi-ingest-export) e cole nos campos.
+      </p>
 
-        <textarea
-          value={rawText}
-          onChange={(e) => setRawText(e.target.value)}
-          placeholder="Cole aqui o texto bruto: evolução do dia anterior + OCR do folhão de enfermagem + prescrição..."
-          className="w-full h-24 bg-app-card border border-app-border rounded-xl p-3 text-sm resize-y"
-        />
-
-        <div className="flex flex-wrap gap-2 mt-2">
-          <button
-            onClick={handleGenerateWithGrok}
-            disabled={isGenerating || !rawText.trim()}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-sm font-bold rounded-xl transition"
-          >
-            {isGenerating ? 'Gerando...' : 'Gerar com Grok'}
-          </button>
-
-          <button
-            onClick={handleGenerateLocal}
-            disabled={isGenerating || !rawText.trim()}
-            className="flex items-center gap-2 px-4 py-2 bg-app-card border border-app-border hover:bg-app-tertiary disabled:opacity-50 text-sm font-medium rounded-xl transition"
-          >
-            Simulação Local
-          </button>
-
-          <button
-            onClick={copyPromptForExternalAI}
-            disabled={!rawText.trim()}
-            className="flex items-center gap-2 px-4 py-2 border border-app-border hover:bg-app-card text-sm font-medium rounded-xl transition"
-          >
-            Copiar Prompt Manual
-          </button>
-        </div>
-
-        <p className="text-[10px] text-app-text-muted mt-2">
-          Cole evolução anterior + OCR do folhão + prescrição. Grok roda via Edge Function (chave xAI no servidor).
-        </p>
-
-        {lastSource && (
-          <p className="text-[10px] text-app-text-muted mt-1">
-            Última geração: {lastSource === 'grok' ? 'Grok API' : 'simulação local'}.
-          </p>
-        )}
-
-        {lastError && (
-          <p className="text-[10px] tx-danger mt-1">
-            Erro Grok: {lastError}
-          </p>
-        )}
-      </div>
-      {/* === PROBLEMAS ATIVOS COM VETOR === */}
       <div>
         <div className="flex justify-between items-center mb-3">
           <div>
             <h4 className="font-bold tx-danger text-sm tracking-widest">PROBLEMAS ATIVOS</h4>
             <p className="text-[10px] text-app-text-muted">Com vetor (↑ piora / ↓ melhora / = estável)</p>
           </div>
-          <button 
+          <button
             onClick={addProblema}
             className="flex items-center gap-1 px-3 py-1 text-xs bg-red-500/10 hover:bg-red-500/20 tx-danger rounded-lg transition"
           >
@@ -247,10 +96,7 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
             <div key={i} className="flex gap-2 items-center bg-app-card border border-app-border hover:border-red-500/30 rounded-xl p-2 transition">
               <select
                 value={p.vetor ?? ''}
-                onChange={(e) => {
-                  const newV = e.target.value as Vetor || null;
-                  updateProblema(i, 'vetor', newV);
-                }}
+                onChange={(e) => updateProblema(i, 'vetor', (e.target.value as Vetor) || null)}
                 className="w-11 h-9 text-center text-xl font-black bg-app-tertiary border border-app-border rounded-lg focus:outline-none"
               >
                 <option value="">·</option>
@@ -263,7 +109,6 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
                 onChange={(e) => {
                   const newText = e.target.value;
                   updateProblema(i, 'texto', newText);
-                  // Sugestão automática de vetor
                   if (!p.vetor && newText.length > 8) {
                     const suggested = suggestVetor(newText);
                     if (suggested) updateProblema(i, 'vetor', suggested);
@@ -291,14 +136,13 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
         {problemas.length === 0 && <div className="text-xs text-app-text-muted italic pl-1">Nenhum problema ativo ainda.</div>}
       </div>
 
-      {/* === CONDUTAS POR SISTEMA COM METAS === */}
       <div>
         <div className="flex justify-between items-center mb-3">
           <div>
             <h4 className="font-bold tx-ok text-sm tracking-widest">CONDUTA POR SISTEMAS</h4>
             <p className="text-[10px] text-app-text-muted">Com meta numérica clara + prazo</p>
           </div>
-          <button 
+          <button
             onClick={addConduta}
             className="flex items-center gap-1 px-3 py-1 text-xs bg-emerald-500/10 hover:bg-emerald-500/20 tx-ok rounded-lg transition"
           >

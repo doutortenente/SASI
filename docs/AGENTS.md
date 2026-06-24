@@ -1,4 +1,4 @@
-# SASI UTI - Grok Build + Supabase Integration
+# SASI UTI — Supabase Integration
 
 ## Project Info
 - Project: doutortemente's Project (NAGAITA LTDA)

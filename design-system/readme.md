@@ -19,7 +19,7 @@ a slide, a printable handoff — can be built on-brand in minutes.
   gravity/SOFA/system/badge classes), `LeitoCard.tsx`, `Dashboard.tsx`,
   `SplitView.tsx`, `TableView.tsx`, `PatientSummary.tsx`, `SasiSynthesis.tsx`,
   `Login.tsx`, `ViewSwitcher.tsx`, `lib/theme.tsx`, `lib/drugs.ts`.
-- A **Grok concept mockup** (light "executive dashboard" with the numbered 1–5
+- Concept mockup (light "executive dashboard" with the numbered 1–5
   workflow) supplied by the user informed the *clinical* theme's layout
   direction. The user clarified it is **not mandatory** — used as inspiration.
 

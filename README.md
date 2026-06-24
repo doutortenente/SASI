@@ -14,7 +14,7 @@ Documentação clínica + suporte à decisão; ingest via **Claude → JSON → 
 SASI/
 ├── frontend/      React + Vite + TypeScript + Tailwind  → deploy Netlify
 ├── mcp-server/    MCP server (Node + TS) — ferramentas IA p/ Supabase
-├── supabase/      Backend — migrations + Edge Functions (grok-synthesis; ocr-ingest legado)
+├── supabase/      Backend — migrations (ocr-ingest legado, não usar)
 ├── doctrine/      Doutrina clínica (Ramo C): templates + skills
 ├── docs/          STATUS.md · AGENTS.md · SETUP.md
 ├── CLAUDE.md      Briefing operacional para IA
@@ -26,7 +26,7 @@ SASI/
 - **Frontend:** React + TypeScript + Tailwind + Vite — deploy **Netlify** (base `frontend/`).
 - **Backend:** Supabase (PostgreSQL 17, projeto `idswehsvvqczzkiatuzu`, `sa-east-1`).
 - **Ingest:** skill `sasi-ingest-export` → JSON → MCP (`deploy`).
-- **Edge Functions:** `grok-synthesis` (Deno/TS). `ocr-ingest` legado — não usar no fluxo diário.
+- **Edge Functions:** `ocr-ingest` legado — não usar no fluxo diário.
 
 ## Comandos
 

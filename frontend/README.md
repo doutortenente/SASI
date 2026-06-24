@@ -42,11 +42,6 @@ npm run dev                  # http://localhost:5173 — entra direto no Dashboa
 2. Revisar → **"salvar no Supabase"** → MCP grava
 3. Dashboard atualiza sozinho (Realtime)
 
-## Edge Functions
-
-- `grok-synthesis` — síntese xAI no componente `SasiSynthesis` (opcional)
-- `ocr-ingest` — legado no repo; **não** é o caminho operacional
-
 ## Comandos
 
 ```bash

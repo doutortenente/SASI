@@ -37,7 +37,7 @@ Toda documentação clínica é em **Português do Brasil**.
 - **Frontend:** React + TypeScript + Tailwind + Vite → **Netlify** `sasi-uti.netlify.app`.
 - **Backend:** Supabase (PostgreSQL 17, projeto `idswehsvvqczzkiatuzu`, região `sa-east-1`).
 - **Ingest clínico:** Claude (skill `sasi-ingest-export`) → JSON → MCP ou frontend.
-- **Edge Functions (opcionais):** `grok-synthesis` (síntese xAI no app). `ocr-ingest` existe no repo mas **não é o fluxo operacional** — legado/experimento.
+- **Edge Functions:** `ocr-ingest` legado no repo — **não** é fluxo operacional.
 - **Operador:** uso **pessoal e solo** (Dr. Nicolas). Não é produto multi-usuário nem deploy hospitalar.
 - **Ferramentas de IA:** Claude Code (refactor), Claude.ai (plantão), MCP local (`mcp-server/`).
 
@@ -73,7 +73,7 @@ Fonte fiel: `supabase/schema-live-dump.sql` + migrations `01–06`. 9 tabelas cl
 
 **Views (5):** `vw_dashboard_uti`, `vw_sofa_trend_72h`, `vw_bh_acumulado`, `vw_dias_atb_ativo`, `vw_alertas_abertos`.
 **Funções:** `fn_updated_at`, `fn_invalidate_sofa_cache`, `sync_severidade_visual`, `fn_alert_hash`, `match_protocolos` (RAG, migration 06).
-**Edge Functions (sasi):** `grok-synthesis` (síntese xAI). `ocr-ingest` e `ingest-patient` — **legado**, não usar no fluxo diário.
+**Edge Functions (sasi):** `ocr-ingest` e `ingest-patient` — **legado**, não usar no fluxo diário.
 **Extensões:** `pgcrypto`, `pg_trgm`, `vector` (pgvector 0.8).
 
 > ⚠️ **`eventos_clinicos` populada (93) com débito de qualidade:** ingest manual via Claude; 24/93 `requires_review`, 18/93 `confidence<0.7`; último ingest 21-jun-2026. Validar antes de confiar em tendências.

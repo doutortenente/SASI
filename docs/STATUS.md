@@ -24,7 +24,7 @@
 | PDF             | jsPDF + jspdf-autotable (lazy)                   | Export de passagem de turno |
 | Ícones          | lucide-react                                     | — |
 | Ingest clínico  | Skill `sasi-ingest-export` → JSON → MCP (`deploy`) | Claude lê foto/PDF/texto; **sem** pipeline OCR automático |
-| Edge Function   | `grok-synthesis` (síntese xAI) · `ocr-ingest` legado | `ocr-ingest`/`ingest-patient` **não** são fluxo operacional |
+| Edge Function   | `ocr-ingest` legado (não usar) | Ingest real: Claude → JSON → MCP |
 | Índice do repo  | `memory/scripts/build_sasi_index.py` → SQLite 244 arq | Ver `memory/MEMORY.md` |
 
 **Princípio arquitetural:**  
@@ -131,7 +131,7 @@ frontend/                           ← React+Vite (deploy Netlify)
 
 mcp-server/                         ← MCP local (.mcp.json)
 supabase/                           ← migrations + Edge Functions
-├── functions/ocr-ingest, grok-synthesis
+├── functions/ocr-ingest (legado)
 └── types/database.types.ts
 
 doctrine/                           ← doutrina clínica

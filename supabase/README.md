@@ -8,7 +8,6 @@
 | `migrations/01`–`06` | Histórico incremental versionado |
 | `types/database.types.ts` | Tipos TS gerados do schema (web + mobile) |
 | `functions/ocr-ingest` | **Legado** — ingest real é Claude→JSON→MCP |
-| `functions/grok-synthesis` | Síntese xAI Grok |
 | `functions/_legacy/ingest-patient` | **Legado** — app mobile antigo; não deployar |
 
 ## Regenerar tipos
