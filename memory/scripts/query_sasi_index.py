@@ -7,6 +7,7 @@ Uso (da raiz do repo):
   python3 memory/scripts/query_sasi_index.py find <termo>
   python3 memory/scripts/query_sasi_index.py cat <categoria>
   python3 memory/scripts/query_sasi_index.py dir <caminho-parcial>
+  python3 memory/scripts/query_sasi_index.py search <termo>   # FTS5 full-text
 """
 import argparse
 import os
@@ -24,9 +25,9 @@ def connect():
 
 
 def cmd_categorias(c):
-    print(f"{'categoria':<18}{'arq':>5}{'linhas':>9}")
-    for cat, n, _b, l in c.execute("select * from categorias"):
-        print(f"{cat:<18}{n:>5}{l or 0:>9}")
+    print(f"{'categoria':<18}{'arq':>5}{'linhas':>9}{'tokens':>10}")
+    for cat, n, _b, l, t in c.execute("select * from categorias"):
+        print(f"{cat:<18}{n:>5}{l or 0:>9}{t or 0:>10}")
 
 
 def cmd_top(c, n):
@@ -60,6 +61,19 @@ def cmd_cat(c, category):
         print(f"{(lines or 0):>6}  {path}")
 
 
+def cmd_search(c, term):
+    rows = c.execute(
+        "select path, snippet(files_fts, 1, '>>', '<<', '…', 48) "
+        "from files_fts where files_fts match ? limit 25",
+        (term,),
+    ).fetchall()
+    if not rows:
+        print(f"(FTS: nenhum match para '{term}')")
+        return
+    for path, snip in rows:
+        print(f"{path}\n  {snip}\n")
+
+
 def cmd_dir(c, term):
     like = f"%{term}%"
     rows = c.execute(
@@ -90,6 +104,9 @@ def main():
     d = sub.add_parser("dir", help="agregado por diretório")
     d.add_argument("term")
 
+    sr = sub.add_parser("search", help="busca full-text FTS5 no conteúdo")
+    sr.add_argument("term")
+
     args = p.parse_args()
     con = connect()
     c = con.cursor()
@@ -104,6 +121,8 @@ def main():
         cmd_cat(c, args.category)
     elif args.cmd == "dir":
         cmd_dir(c, args.term)
+    elif args.cmd == "search":
+        cmd_search(c, args.term)
 
     con.close()
 

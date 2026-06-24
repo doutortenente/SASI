@@ -23,7 +23,7 @@
 | Deploy          | Netlify (CI automático a partir de main)         | Base directory aponta para a pasta ativa do SASI |
 | PDF             | jsPDF + jspdf-autotable (lazy)                   | Export de passagem de turno |
 | Ícones          | lucide-react                                     | — |
-| Edge Function   | `ocr-ingest` (deployada, verify_jwt: true) · `grok-synthesis` (síntese xAI Grok) | Entrada de evoluções via skill/foto. **`ingest-patient` é legado do repo `comando-uti`, não do sasi.** |
+| Edge Function   | `ocr-ingest` (deployada, verify_jwt: true) · `grok-synthesis` (síntese xAI Grok) | Entrada de evoluções via skill/foto. **`ingest-patient` é legado** — arquivada em `supabase/functions/_legacy/ingest-patient/`. |
 | Índice do repo  | `memory/scripts/build_sasi_index.py` → SQLite 244 arq | Ver `memory/MEMORY.md` |
 
 **Princípio arquitetural:**  

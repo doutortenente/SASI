@@ -72,7 +72,7 @@ Fonte fiel: `supabase/schema-live-dump.sql` + migrations `01–06`. 9 tabelas cl
 
 **Views (5):** `vw_dashboard_uti`, `vw_sofa_trend_72h`, `vw_bh_acumulado`, `vw_dias_atb_ativo`, `vw_alertas_abertos`.
 **Funções:** `fn_updated_at`, `fn_invalidate_sofa_cache`, `sync_severidade_visual`, `fn_alert_hash`, `match_protocolos` (RAG, migration 06).
-**Edge Functions (sasi):** `ocr-ingest` (ingest clínico + audit), `grok-synthesis` (síntese xAI). **`ingest-patient` NÃO está neste repo** — legado em `comando-uti/supabase/functions/`.
+**Edge Functions (sasi):** `ocr-ingest` (ingest clínico + audit), `grok-synthesis` (síntese xAI). **`ingest-patient`** — legado em `supabase/functions/_legacy/ingest-patient/` (não deployar).
 **Extensões:** `pgcrypto`, `pg_trgm`, `vector` (pgvector 0.8).
 
 > ⚠️ **`eventos_clinicos` populada (93) mas com débito de qualidade:** fonte 100% `claude_ocr`; 24/93 `requires_review`, 18/93 `confidence<0.7`; último ingest 21-jun-2026. Meta-Vision parcialmente alimentado — validar antes de confiar em tendências.

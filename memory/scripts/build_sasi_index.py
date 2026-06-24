@@ -7,6 +7,7 @@ Ao final, regenera MAPA-SASI.md a partir da base (evita drift manual).
 Uso (da raiz do repo): python3 memory/scripts/build_sasi_index.py
 """
 import datetime
+import hashlib
 import os
 import re
 import sqlite3
@@ -88,16 +89,29 @@ def is_text(path, ext):
         return False
 
 
-def count_lines(path):
+def read_text_metrics(path, max_bytes=5_000_000):
+    """Lê arquivo texto inteiro: linhas, chars, tokens (split whitespace), sha256."""
     try:
         with open(path, "rb") as f:
-            return sum(1 for _ in f)
+            raw = f.read(max_bytes + 1)
+        if len(raw) > max_bytes:
+            return None, None, None, None, None
+        digest = hashlib.sha256(raw).hexdigest()
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            text = raw.decode("utf-8", errors="replace")
+        lines = text.count("\n") + (1 if text and not text.endswith("\n") else 0)
+        chars = len(text)
+        tokens = len(text.split())
+        return lines, chars, tokens, digest, text
     except OSError:
-        return None
+        return None, None, None, None, None
 
 
 def scan_files():
     rows = []
+    fts_rows = []
     for dirpath, dirnames, filenames in os.walk(ROOT):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
         for fn in filenames:
@@ -114,45 +128,60 @@ def scan_files():
             ext = os.path.splitext(fn)[1].lower() or (fn.lower() if fn.startswith(".") else "")
             cat = categorize(rel)
             txt = is_text(full, ext)
-            lines = count_lines(full) if (txt and st.st_size < 5_000_000) else None
+            lines = chars = tokens = digest = None
+            content = None
+            if txt and st.st_size < 5_000_000:
+                lines, chars, tokens, digest, content = read_text_metrics(full)
             reldir = os.path.dirname(rel) or "."
             rows.append((
-                rel, reldir, fn, ext, st.st_size, lines, int(txt),
+                rel, reldir, fn, ext, st.st_size, lines, chars, tokens, digest, int(txt),
                 datetime.datetime.fromtimestamp(st.st_mtime).isoformat(timespec="seconds"), cat,
             ))
-    return rows
+            if content is not None:
+                fts_rows.append((rel, content))
+    return rows, fts_rows
 
 
-def build_db(rows):
+def build_db(rows, fts_rows):
     os.makedirs(os.path.dirname(DB), exist_ok=True)
+    bak = DB + ".bak"
     if os.path.exists(DB):
-        os.rename(DB, DB + ".bak")
+        os.rename(DB, bak)
     con = sqlite3.connect(DB)
     c = con.cursor()
     c.execute("""create table files(
       id integer primary key, path text unique, dir text, name text, ext text,
-      size_bytes integer, lines integer, is_text integer, mtime text, category text)""")
+      size_bytes integer, lines integer, chars integer, tokens integer,
+      sha256 text, is_text integer, mtime text, category text)""")
     c.executemany(
-        "insert into files(path,dir,name,ext,size_bytes,lines,is_text,mtime,category) values(?,?,?,?,?,?,?,?,?)",
+        "insert into files(path,dir,name,ext,size_bytes,lines,chars,tokens,sha256,is_text,mtime,category) "
+        "values(?,?,?,?,?,?,?,?,?,?,?,?)",
         rows,
     )
     c.execute("""create table dirs as
-      select dir, count(*) file_count, sum(size_bytes) total_bytes, sum(coalesce(lines,0)) total_lines
+      select dir, count(*) file_count, sum(size_bytes) total_bytes,
+             sum(coalesce(lines,0)) total_lines, sum(coalesce(tokens,0)) total_tokens
       from files group by dir""")
     c.execute(
         "create view categorias as select category, count(*) arquivos, sum(size_bytes) bytes, "
-        "sum(coalesce(lines,0)) linhas from files group by category order by linhas desc"
+        "sum(coalesce(lines,0)) linhas, sum(coalesce(tokens,0)) tokens "
+        "from files group by category order by sum(coalesce(tokens,0)) desc"
     )
     c.execute("create index idx_files_cat on files(category)")
     c.execute("create index idx_files_ext on files(ext)")
     c.execute("create index idx_files_path on files(path)")
+    c.execute("create index idx_files_tokens on files(tokens)")
+    c.execute("create virtual table files_fts using fts5(path, content, tokenize='unicode61')")
+    c.executemany("insert into files_fts(path, content) values(?,?)", fts_rows)
+    if os.path.exists(bak):
+        os.remove(bak)
     con.commit()
     return con, c
 
 
 def write_mapa(c, today):
-    tot_files, tot_bytes, tot_lines = c.execute(
-        "select count(*), sum(size_bytes), sum(coalesce(lines,0)) from files"
+    tot_files, tot_bytes, tot_lines, tot_tokens = c.execute(
+        "select count(*), sum(size_bytes), sum(coalesce(lines,0)), sum(coalesce(tokens,0)) from files"
     ).fetchone()
     cats = c.execute("select * from categorias").fetchall()
     top_code = c.execute(
@@ -176,17 +205,17 @@ def write_mapa(c, today):
         "> Fonte de verdade: `sasi_index.db` (SQLite). Doutrina ZERO ALUCINAÇÃO: só fato lido do disco.",
         "> Regenerar: `python3 memory/scripts/build_sasi_index.py` (a partir da raiz do repo).",
         "",
-        f"**Total:** {tot_files} arquivos · {tot_bytes / 1024 / 1024:.1f} MB · {tot_lines:,} linhas "
-        "(excluídos `.git`, `node_modules`, `sasi_index.db`).",
+        f"**Total:** {tot_files} arquivos · {tot_bytes / 1024 / 1024:.1f} MB · {tot_lines:,} linhas · "
+        f"{tot_tokens:,} tokens (excluídos `.git`, `node_modules`, `sasi_index.db`).",
         "",
         "## Por categoria",
         "",
-        "| Categoria | Arq | Linhas | O que é |",
-        "|---|---:|---:|---|",
+        "| Categoria | Arq | Linhas | Tokens | O que é |",
+        "|---|---:|---:|---:|---|",
     ]
-    for cat, n, _b, l in cats:
+    for cat, n, _b, l, t in cats:
         label = CAT_LABELS.get(cat, cat)
-        lines.append(f"| `{cat}` | {n} | {l or 0:,} | {label} |")
+        lines.append(f"| `{cat}` | {n} | {l or 0:,} | {t or 0:,} | {label} |")
 
     lines += [
         "",
@@ -232,9 +261,12 @@ def write_mapa(c, today):
         "",
         "# Buscar path",
         "python3 memory/scripts/query_sasi_index.py find FichaCompleta",
+        "",
+        "# Busca full-text (FTS5, token a token indexado)",
+        "python3 memory/scripts/query_sasi_index.py search eventos_clinicos",
         "```",
         "",
-        "Tabelas SQLite: `files`, `dirs`, view `categorias`.",
+        "Tabelas SQLite: `files` (sha256, tokens), `dirs`, `files_fts` (FTS5), view `categorias`.",
         "Sync remoto (opcional): `python3 memory/scripts/push_repo_index_to_postgres.py` → schema `repo_index` no Supabase.",
     ]
     if other:
@@ -248,18 +280,20 @@ def write_mapa(c, today):
 
 def main():
     today = datetime.date.today().strftime("%d-%b-%Y").lower()
-    rows = scan_files()
-    con, c = build_db(rows)
+    rows, fts_rows = scan_files()
+    con, c = build_db(rows, fts_rows)
 
-    tot_files, tot_bytes, tot_lines = c.execute(
-        "select count(*), sum(size_bytes), sum(coalesce(lines,0)) from files"
+    tot_files, tot_bytes, tot_lines, tot_tokens = c.execute(
+        "select count(*), sum(size_bytes), sum(coalesce(lines,0)), sum(coalesce(tokens,0)) from files"
     ).fetchone()
+    fts_count = c.execute("select count(*) from files_fts").fetchone()[0]
     print(f"DB: {DB}")
-    print(f"TOTAL: {tot_files} arquivos | {tot_bytes / 1024:.0f} KB | {tot_lines} linhas\n")
+    print(f"TOTAL: {tot_files} arquivos | {tot_bytes / 1024:.0f} KB | {tot_lines} linhas | {tot_tokens} tokens")
+    print(f"FTS: {fts_count} documentos indexados token a token\n")
     print("=== POR CATEGORIA ===")
-    print(f"{'categoria':<18}{'arq':>5}{'KB':>8}{'linhas':>9}")
-    for cat, n, b, l in c.execute("select * from categorias"):
-        print(f"{cat:<18}{n:>5}{(b or 0) / 1024:>8.0f}{l or 0:>9}")
+    print(f"{'categoria':<18}{'arq':>5}{'KB':>8}{'linhas':>9}{'tokens':>10}")
+    for cat, n, b, l, t in c.execute("select * from categorias"):
+        print(f"{cat:<18}{n:>5}{(b or 0) / 1024:>8.0f}{l or 0:>9}{t or 0:>10}")
 
     write_mapa(c, today)
     print(f"\nMAPA: {MAPA}")

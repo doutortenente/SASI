@@ -48,4 +48,4 @@ Copie `.env.example` → `frontend/.env` e `mcp-server/.env`, preencha as chaves
 
 ---
 
-Parte da família de repositórios do Dr. Tenente. Projeto-índice: **comando-uti** (GERAL).
+Parte da família de repos em `~/dev/`. Índice do workspace: `~/dev/CLAUDE.md` e `memory/MAPA-DEV.md`.
