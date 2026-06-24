@@ -788,7 +788,7 @@ export default function PatientModal({ pacienteId, onClose, onOpenProntuario }: 
                     <EmptyState
                       icon={FileText}
                       title="Nenhuma evolução registrada"
-                      description="Use a skill sasi-ingest-export ou a edge function /ocr-ingest pra registrar a primeira evolução."
+                      description="Use a skill sasi-ingest-export (Claude → JSON → deploy no Supabase) pra registrar a primeira evolução."
                     />
                   )}
                 </div>

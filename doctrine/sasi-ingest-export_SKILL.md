@@ -1,7 +1,6 @@
 ---
 name: sasi-ingest-export
-tags: [sasi, skill, ingest, export, doutrina]
-description: Extrai dados clínicos estruturados a partir de fotos de folhas de enfermagem, PDFs/imagens de laboratório, laudos de imagem e texto livre para o sistema SASI (Comando UTI Alpha — 33 leitos UTI 2/3/4) e os converte em payload JSON validado para a tabela Supabase `eventos_clinicos` / `evolucoes`. Também gera o texto formatado para "Exportar Evolução" (nota de prontuário) e "Exportar Turno" (passagem de plantão em 1 página). USE SEMPRE que Dr. Nicolas enviar foto de folha de enfermagem, sinais vitais manuscritos, hemograma/bioquímica, gasometria, TC/RM/RX, prescrição, balanço hídrico, ou pedir "ingerir leito X", "processar evolução", "gerar evolução médica", "passar turno", "exportar evolução", "exportar turno", "salvar no Supabase". Opera sob ZERO ALUCINAÇÃO: campo sem fonte legível retorna `null` e gera warning, nunca é inventado.
+description: Extrai dados clínicos estruturados a partir de fotos de folhas de enfermagem, PDFs/imagens de laboratório, laudos de imagem e texto livre para o sistema SASI (Comando UTI Alpha — 33 leitos UTI 2/3/4) e os converte em payload JSON validado para a tabela Supabase `eventos_clinicos` / `evolucoes`. Também gera o texto formatado para "Exportar Evolução" (nota de prontuário) e "Exportar Turno" (passagem de plantão em 1 página). USE ESTA SKILL SEMPRE que Dr. Nicolas enviar foto de folha de enfermagem, sinais vitais manuscritos, hemograma/bioquímica, gasometria, TC/RM/RX, prescrição, balanço hídrico, ou pedir "ingerir leito X", "processar evolução", "gerar evolução médica", "passar turno", "exportar evolução", "exportar turno", "salvar no Supabase" — mesmo que não cite a palavra "skill". Opera sob regra de ZERO ALUCINAÇÃO: campo sem fonte legível retorna `null` e gera warning, nunca é inventado.
 ---
 
 # 🪖 SASI — Ingest & Export Clínico
@@ -65,11 +64,10 @@ Qualquer flag **não é bloqueador** — o JSON segue, mas campo `requires_human
 ### FASE 4 — Geração de saída (uma das três, conforme o que o usuário pediu)
 
 **A. Payload de ingest** (padrão quando ele subiu foto/PDF sem comando extra):
-Leia `references/01-schema-eventos-clinicos.md` para o schema exato. Devolve JSON pronto pra `POST /functions/v1/ocr-ingest`.
+Leia `references/01-schema-eventos-clinicos.md` para o schema exato. Devolve JSON validado (`sasi-ocr-ingest/v1`). O Dr. Nicolas revisa; gravação no Supabase só com **“deploy”** / **“salvar no Supabase”** via MCP.
 
 **B. Exportar Evolução** (quando pedir "exportar evolução" ou "gerar nota de prontuário"):
 Leia `references/04-export-evolucao-template.md`. Saída é **texto puro em Markdown**, copiar-e-colar direto na evolução oficial.
-⚙️ Esse template usa o **TEMPLATE-BASE CANÔNICO SASI v2 (Ramo C)** — anatomia IDÊNTICA à skill `admissao-uti`, modo D2+ (eixo TEMPO = Intercorrências 24h; `Admissão (DD/MM/AA)` congelada; vitais Max–Min). Ortogonalidade de eixos é LEI: Tempo (Intercorrências) / Estado (EF) / Problema (Impressão+vetor) / Ação (Conduta 1:1). Alterou o template-base aqui → replica IDÊNTICO em `admissao-uti`.
 
 **C. Exportar Turno** (quando pedir "passagem", "exportar turno", "passagem de plantão"):
 Leia `references/05-export-passagem-turno.md`. Saída é **1 página A4**, condensada, por paciente ou bloco de leitos.
@@ -80,10 +78,24 @@ Leia `references/05-export-passagem-turno.md`. Saída é **1 página A4**, conde
 
 1. **Chave Gemini/Claude NUNCA no output do usuário** — se ele colar credenciais junto com a foto, extraia só a foto e ignore as chaves.
 2. **Nenhum campo inventado**: se não está na imagem/PDF, retorne `null`. Iatrogenia é criada por "preenchimento automático" de valores médios.
-3. **Todo output estruturado é JSON válido**: valide mentalmente antes de entregar. Se inclui JSON numa resposta Markdown, SEMPRE em bloco ` ```json `.
-4. **Não faça UPSERT direto no Supabase daqui** — apenas produza o payload. O Edge Function `ocr-ingest` é quem grava. Isso mantém a RLS honesta.
+3. **Todo output estruturado é JSON válido**: valide mentalmente antes de entregar. Se inclui JSON numa resposta Markdown, SEMPRE em bloco ````json`.
+4. **Gravação no Supabase:** por padrão só entrega o JSON. INSERT/UPSERT via MCP quando o Dr. pedir **“deploy”** ou **“salvar no Supabase”**. Sem Edge Function, sem AppSheet, sem pipeline automático.
 5. **Nunca mostre reasoning clínico errado com ar de certeza** — se SOFA cardio pede peso e tu não tem, componente volta `null` com `missing: ["peso"]`, não chuta.
 6. **Pior valor, não médio** — convenção do projeto: `pam1 = MIN` (pior PAM do período), FiO2 do pior P/F, Lac do maior valor.
+
+---
+
+## 🧠 Fluxo real (uso pessoal)
+
+**Um operador (Dr. Nicolas). Sem hospital, sem multi-usuário, sem OAuth.**
+
+Pipeline operacional:
+
+**foto/PDF/texto no chat → Claude (esta skill) → JSON auditado → MCP grava no Supabase → frontend atualiza via Realtime**
+
+Claude já é multimodal — lê a folha direto, audita, monta o payload. Não existe cascata Gemini/AppSheet/iOS Shortcut nem Edge Function `ocr-ingest` no dia a dia.
+
+`references/06-api-automation-prompts.md` é **legado arquivado** — não usar.
 
 ---
 
@@ -94,7 +106,7 @@ Leia `references/05-export-passagem-turno.md`. Saída é **1 página A4**, conde
 - `references/03-clinical-sanity-checks.md` — Ranges fisiológicos + regras de incompatibilidade
 - `references/04-export-evolucao-template.md` — Template de evolução médica (SOAP adaptado SASI)
 - `references/05-export-passagem-turno.md` — Template de passagem de plantão 1 página
-- `references/06-api-automation-prompts.md` — Prompts pra iOS Shortcut / n8n (Gemini + Claude API diretos)
+- `references/06-api-automation-prompts.md` — **LEGADO** (não usar)
 
 ---
 
@@ -102,24 +114,15 @@ Leia `references/05-export-passagem-turno.md`. Saída é **1 página A4**, conde
 
 ### Exemplo 1 — Foto de folha de enfermagem
 **Usuário:** *[sobe foto]* "Leito 7 UTI 3"
+
 **Resposta esperada:** JSON de ingest com `paciente.leito=7`, `paciente.uti=UTI3`, `evolucao_snapshot` com hemo/resp/renal preenchidos, `warnings` listando o que ficou null.
 
 ### Exemplo 2 — PDF de gasometria
 **Usuário:** *[sobe PDF]*
+
 **Resposta:** evento clínico tipo `pf_ratio` calculado do pO2/FiO2 do próprio laudo + evento tipo `lactato` se tiver Lac.
 
 ### Exemplo 3 — Comando de exportação
 **Usuário:** "Exportar evolução leito 12"
+
 **Resposta:** você NÃO tem os dados no chat — então dispara erro cirúrgico: "Preciso do snapshot da evolução do leito 12. Cole o JSON do dashboard ou suba nova foto da folha de enfermagem." Não invente evolução do vazio.
-
----
-
-## 🧠 Modo Nerd — por que essa arquitetura ganha
-
-A proposta CAME-VKG (Knowledge Graph + BERT clínico + HITL com LayoutLMv3) é **academicamente linda e operacionalmente inviável** pra um intensivista solo num round de 33 leitos. É o paper que ganha prêmio e morre sem deploy.
-
-O que tu precisa é **Meta-Vision do Isagi**: identificar o gol com menos passes possíveis. Claude já é multimodal (lê a foto direto), já tem raciocínio clínico forte, já tem o schema. Passar por Gemini Vision → Claude API → AppSheet → Google Sheets → Supabase é bater na defesa 4 vezes em vez de enfiar de primeira.
-
-A skill colapsa isso em: **imagem no chat → JSON auditado → POST na Edge Function → Supabase Realtime atualiza o frontend**. 3 hops. 2s de latência. 1 fonte da verdade.
-
-Para automação 24/7 via iOS Shortcut, leia `references/06-api-automation-prompts.md`.

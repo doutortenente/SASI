@@ -23,11 +23,12 @@
 | Deploy          | Netlify `sasi-uti` (CI em `main`)                | `netlify.toml` na raiz: `base = "frontend"` |
 | PDF             | jsPDF + jspdf-autotable (lazy)                   | Export de passagem de turno |
 | Ícones          | lucide-react                                     | — |
-| Edge Function   | `ocr-ingest` (deployada, verify_jwt: true) · `grok-synthesis` (síntese xAI Grok) | Entrada de evoluções via skill/foto. **`ingest-patient` é legado** — arquivada em `supabase/functions/_legacy/ingest-patient/`. |
+| Ingest clínico  | Skill `sasi-ingest-export` → JSON → MCP (`deploy`) | Claude lê foto/PDF/texto; **sem** pipeline OCR automático |
+| Edge Function   | `grok-synthesis` (síntese xAI) · `ocr-ingest` legado | `ocr-ingest`/`ingest-patient` **não** são fluxo operacional |
 | Índice do repo  | `memory/scripts/build_sasi_index.py` → SQLite 244 arq | Ver `memory/MEMORY.md` |
 
 **Princípio arquitetural:**  
-Escrita de evoluções **sempre via edge function ou skill** (`sasi-ingest-export`) com audit log obrigatório (`ingest_audit_log`). Edição manual no frontend é read-only ou limitada.
+Ingest = **Claude extrai → JSON validado → grava no Supabase** (MCP com `deploy`, ou edição no frontend). Uso **pessoal solo** — um operador, sem OAuth.
 
 **3 Temas:** `dark` (padrão), `clinical` (âmbar alta luminância UTI), `light`.  
 **5 Janelas (redesign 11/06/2026):**
@@ -53,33 +54,21 @@ Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persis
 | `eventos_clinicos` | 93 | 100% fonte `claude_ocr`; 24/93 `requires_review`; 18/93 `confidence<0.7` |
 | `atbs` / `culturas` / `pendencias` | 0 | Stewardship e tarefas ainda vazios |
 
-Último ingest OCR: **21-jun-2026**. Queries de plantão: `plantao_queries.sql`.
+Último ingest (Claude→JSON): **21-jun-2026**. Queries de plantão: `plantao_queries.sql`.
 
 ---
 
-## 2. Estado da Autenticação (CRÍTICO)
+## 2. Acesso (uso pessoal — sem auth)
 
-**Situação atual (desde commit `fc8cd75` — 06/05/2026):**  
-**Autenticação DESABILITADA temporariamente** para uso no hospital.
+**Operador único:** Dr. Nicolas. Ferramenta pessoal de plantão, não produto hospitalar.
 
-- App carrega direto no Dashboard usando `MOCK_SESSION` (user.id = `00000000-...`, email = `dev@sasi-uti.local`).
-- Header mostra claramente **"Modo dev — sem auth"**.
-- Botão de Logout oculto.
-- Componente `Login.tsx` existe mas **não é renderizado**.
-- 9 políticas RLS `dev_bypass` com `USING (true)` estão ativas em produção (ver migration `03_dev_bypass_rls.sql`).
+**Configuração atual (intencional, desde `fc8cd75`):**
+- App carrega direto no Dashboard (`MOCK_SESSION`, `dev@sasi-uti.local`).
+- Header: **"Modo dev — sem auth"**.
+- `Login.tsx` existe mas **não é renderizado**.
+- `dev_bypass` RLS ativo (migration `03_dev_bypass_rls.sql`) — acesso solo simplificado.
 
-**Motivo:** Hospital bloqueia Gmail → magic link não funciona para os médicos.
-
-**Plano de reativação:**  
-Documento completo no Google Drive: **"Plano de ação login e autenticação SASI"** (email+senha + MFA TOTP).
-
-**Como reativar (resumo):**
-1. Reverter `App.tsx` e `Dashboard.tsx` para fluxo real com `session`.
-2. Dropar as 9 políticas `dev_bypass`.
-3. Configurar provedor de email ou senha no Supabase Auth.
-4. Atualizar allowlist de URLs (já inclui `sasi-uti.netlify.app/**` e `localhost:5173/**`).
-
-**Risco LGPD:** Magic link sozinho é frágil para dado clínico sensível. MFA é prioridade Fase B.
+**Sem OAuth, MFA, magic link nem multi-usuário.** Não é dívida técnica para o escopo atual.
 
 ---
 
@@ -99,7 +88,7 @@ Documento completo no Google Drive: **"Plano de ação login e autenticação SA
 |10 | Export PDF Passagem de Turno (lazy)         | 0cb1a2a    | ✅ Ativo   | `exportPDF.ts` |
 |11 | tsconfig strict                             | ffb6523    | ✅ Ativo   | `noUnusedLocals/Params` |
 |12 | Trigger `updated_at` no Postgres            | ffb6523    | ✅ Ativo   | — |
-|13 | Auth bypass (mock + dev_bypass RLS)         | fc8cd75    | ✅ Ativo (temp) | — |
+|13 | Acesso solo (mock + dev_bypass RLS)         | fc8cd75    | ✅ Ativo   | Uso pessoal — sem auth |
 |14 | Redesign Gemini-style + FichaCompleta       | d8a648c + 760b52d | ✅ Ativo | Replica exata do protótipo Gemini (edição inline 7 sistemas) |
 |15 | Sinais vitais + labs estruturados           | b3c82eb    | ✅ Ativo   | Import de planilhas Excel |
 |16 | LeitoCard com border-l por gravidade        | c780f71    | ✅ Ativo   | — |
@@ -176,8 +165,7 @@ Workspace irmão: `~/dev/` (Claude, JARVIS, `memory/MAPA-DEV.md`). `comando-uti`
 
 ## 6. Dívida Técnica e Backlog Priorizado
 
-### Prioridade CRÍTICA (bloqueiam uso pleno no hospital)
-- [ ] Reativar autenticação real (email+senha + MFA TOTP) — plano no Google Drive
+### Prioridade CRÍTICA
 - [ ] Versionar migrations do schema atual (9 tabelas + views) no repositório
 
 ### Prioridade MÉDIA
@@ -237,7 +225,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 | 27-Abr     | Setup inicial Vite + React + Supabase        | Stack definida |
 | 30-Abr     | Deploy CI no Netlify + renomeio para sasi-uti.netlify.app | Fase A faxina |
 | 30-Abr     | Implementação do bundle de design (3 temas + 3 views + calculadora) | 6020c0e |
-| 06-Mai     | **Auth bypass temporário** (mock + dev_bypass RLS) | fc8cd75 — hospital bloqueia Gmail |
+| 06-Mai     | **Acesso solo** (mock + dev_bypass RLS) | fc8cd75 — uso pessoal sem auth |
 | 06-09-Mai  | Port de features do protótipo Gemini (FichaCompleta, LeitoCard, labs estruturados) | d8a648c, 760b52d, b3c82eb |
 | 11-Jun     | **Faxina final do repo** — scaffold raiz, skills IA, docs duplicados, Supabase unificado | chore/faxina-11jun |
 | 11-Jun     | **Redesign 5 Janelas** — severity/Watcher, clinicalExtract, Passagem 3-linhas | feat/5-janelas |
@@ -248,7 +236,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 
 1. **Rotacionar JWTs** expostos historicamente em `AGENTS.md` (Supabase Dashboard → Settings → API).
 2. **Versionar schema real** (9 tabelas + views) — migrations locais ainda parcialmente obsoletas.
-3. **Reativar auth** após plano email+senha+MFA.
+3. **Qualidade do ingest** Claude→JSON nos `eventos_clinicos`.
 
 ---
 

@@ -18,13 +18,13 @@ criado: 2026-06-11
 
 ## References (módulos de apoio)
 
-- [[01-schema-eventos-clinicos]] — DDL `eventos_clinicos` + payload `ocr-ingest`.
+- [[01-schema-eventos-clinicos]] — DDL `eventos_clinicos` + payload ingest (Claude→JSON→MCP).
 - [[02-extraction-dictionary]] — o que extrair de cada tipo de documento.
 - [[03-clinical-sanity-checks]] — ranges fisiológicos + flags de absurdo (zero-hallucination).
 - [[04-export-evolucao-template_v2]] — template de evolução D2+ (CANÔNICO).
 - [[04-export-evolucao-template_v1_LEGADO]] — versão antiga (histórico).
 - [[05-export-passagem-turno]] — passagem de plantão 1 página (individual + painel 33 leitos).
-- [[06-api-automation-prompts]] — prompts iOS Shortcut (Gemini Vision + Claude API).
+- [[06-api-automation-prompts]] — **LEGADO** (não usar).
 
 ## Princípios invioláveis (resumo)
 

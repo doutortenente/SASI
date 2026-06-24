@@ -2,7 +2,7 @@
 
 > ⚠️ **Este código NÃO compila como está e NÃO está no caminho de build.**
 > É staging deliberado em `docs/` — não em `src/lib/` — pra não quebrar o
-> deploy (merge na main = produção hospitalar via Netlify).
+> deploy (merge na main = Netlify pessoal via Netlify).
 
 ## Origem
 Extraído via `pdftotext -layout` de 4 PDFs entregues em 24-jun-2026

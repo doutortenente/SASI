@@ -1,8 +1,8 @@
 # SASI — Sistema de Auditoria e Síntese Intensiva
 
-Sistema de gestão clínica para a operação solo de UTI do Dr. Nicolas Nagaita
-(33 leitos — UTI 2/3/4). Documentação clínica de alta qualidade + suporte à
-decisão em plantão noturno.
+Ferramenta **pessoal** de gestão clínica para o Dr. Nicolas Nagaita
+(33 leitos — UTI 2/3/4). Uso solo em plantão — não é produto hospitalar multi-usuário.
+Documentação clínica + suporte à decisão; ingest via **Claude → JSON → Supabase**.
 
 > Toda documentação clínica é em **Português do Brasil**. Doutrina inviolável
 > (zero alucinação, ortogonalidade de eixos, sinais vitais Max–Min, conduta 1:1):
@@ -14,7 +14,7 @@ decisão em plantão noturno.
 SASI/
 ├── frontend/      React + Vite + TypeScript + Tailwind  → deploy Netlify
 ├── mcp-server/    MCP server (Node + TS) — ferramentas IA p/ Supabase
-├── supabase/      Backend — migrations + Edge Functions (ocr-ingest, grok-synthesis)
+├── supabase/      Backend — migrations + Edge Functions (grok-synthesis; ocr-ingest legado)
 ├── doctrine/      Doutrina clínica (Ramo C): templates + skills
 ├── docs/          STATUS.md · AGENTS.md · SETUP.md
 ├── CLAUDE.md      Briefing operacional para IA
@@ -25,7 +25,8 @@ SASI/
 
 - **Frontend:** React + TypeScript + Tailwind + Vite — deploy **Netlify** (base `frontend/`).
 - **Backend:** Supabase (PostgreSQL 17, projeto `idswehsvvqczzkiatuzu`, `sa-east-1`).
-- **Edge Functions:** `ocr-ingest`, `grok-synthesis` (Deno/TS).
+- **Ingest:** skill `sasi-ingest-export` → JSON → MCP (`deploy`).
+- **Edge Functions:** `grok-synthesis` (Deno/TS). `ocr-ingest` legado — não usar no fluxo diário.
 
 ## Comandos
 

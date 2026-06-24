@@ -28,17 +28,18 @@ Toda documentação clínica é em **Português do Brasil**.
 1. **Conduta 1:1** com a Impressão, metas sempre numéricas.
 1. **Flags gritam, não consertam** — o sistema sinaliza o implausível; o médico decide.
 1. **Prosa limpa e juridicamente sólida** dentro dos blocos de prontuário. Comentário tático isolado em `// Comando Tático`.
-1. **Sem UPSERT clínico direto a partir das skills** — as skills produzem payload; o Edge Function `ocr-ingest` grava (mantém a RLS honesta). Exceção: comando explícito “deploy” autoriza INSERT direto via MCP.
+1. **Ingest = Claude → JSON → Supabase** — a skill `sasi-ingest-export` lê foto/PDF/texto, valida e entrega payload JSON. Gravação: comando **“deploy”** / **“salvar no Supabase”** → INSERT direto via **MCP** (`sasi-mcp-server`). Sem pipeline automático, sem AppSheet, sem atalho iOS.
 
 -----
 
 ## 3. Stack
 
-- **Frontend:** React + TypeScript + Tailwind + Vite.
+- **Frontend:** React + TypeScript + Tailwind + Vite → **Netlify** `sasi-uti.netlify.app`.
 - **Backend:** Supabase (PostgreSQL 17, projeto `idswehsvvqczzkiatuzu`, região `sa-east-1`).
-- **Edge Function:** `ocr-ingest` (ativo).
-- **Deploy:** Cloud Run — `comando-uti-alpha-190641874300.us-west1.run.app`.
-- **Ferramentas de IA:** Claude Code (refactor multi-arquivo), Claude.ai web (componentes isolados, planejamento), cascata Gemini Vision → Claude API (OCR de folha de enfermagem via iOS Shortcut).
+- **Ingest clínico:** Claude (skill `sasi-ingest-export`) → JSON → MCP ou frontend.
+- **Edge Functions (opcionais):** `grok-synthesis` (síntese xAI no app). `ocr-ingest` existe no repo mas **não é o fluxo operacional** — legado/experimento.
+- **Operador:** uso **pessoal e solo** (Dr. Nicolas). Não é produto multi-usuário nem deploy hospitalar.
+- **Ferramentas de IA:** Claude Code (refactor), Claude.ai (plantão), MCP local (`mcp-server/`).
 
 ### Direção estética do frontend (doutrina de design)
 
@@ -72,30 +73,25 @@ Fonte fiel: `supabase/schema-live-dump.sql` + migrations `01–06`. 9 tabelas cl
 
 **Views (5):** `vw_dashboard_uti`, `vw_sofa_trend_72h`, `vw_bh_acumulado`, `vw_dias_atb_ativo`, `vw_alertas_abertos`.
 **Funções:** `fn_updated_at`, `fn_invalidate_sofa_cache`, `sync_severidade_visual`, `fn_alert_hash`, `match_protocolos` (RAG, migration 06).
-**Edge Functions (sasi):** `ocr-ingest` (ingest clínico + audit), `grok-synthesis` (síntese xAI). **`ingest-patient`** — legado em `supabase/functions/_legacy/ingest-patient/` (não deployar).
+**Edge Functions (sasi):** `grok-synthesis` (síntese xAI). `ocr-ingest` e `ingest-patient` — **legado**, não usar no fluxo diário.
 **Extensões:** `pgcrypto`, `pg_trgm`, `vector` (pgvector 0.8).
 
-> ⚠️ **`eventos_clinicos` populada (93) mas com débito de qualidade:** fonte 100% `claude_ocr`; 24/93 `requires_review`, 18/93 `confidence<0.7`; último ingest 21-jun-2026. Meta-Vision parcialmente alimentado — validar antes de confiar em tendências.
+> ⚠️ **`eventos_clinicos` populada (93) com débito de qualidade:** ingest manual via Claude; 24/93 `requires_review`, 18/93 `confidence<0.7`; último ingest 21-jun-2026. Validar antes de confiar em tendências.
 
-> 📌 **Onde vivem Interconsultas / Programação / Pendências (View 2):** NÃO são tabelas próprias. `interconsultas[]` e `programacao[]` ficam no JSONB **`pacientes.patient_summary`** (lido via `from('pacientes').select('*')` → `paciente.patient_summary`). **Pendências** é a tabela própria **`pendencias`** (RLS `pendencias_all_own` por `EXISTS` no paciente dono) — **fonte única** que alimenta tanto a View 2 quanto a linha de Pendências da Passagem de Turno (View 5). Logo, a View 2 do CORRECTION **não exige DDL novo**: a arquitetura jsonb já a comporta (o CORRECTION oferecia “tabelas OU jsonb”; o app já escolheu jsonb). RLS `_own` correta em ambas — mas **anulada pelo `dev_bypass`** (ver §5).
+> 📌 **Onde vivem Interconsultas / Programação / Pendências (View 2):** `interconsultas[]` e `programacao[]` no JSONB **`pacientes.patient_summary`**. **Pendências** na tabela **`pendencias`**.
 
 -----
 
-## 5. 🔴 ACHADO DE SEGURANÇA P0 — Buraco LGPD (NÃO RESOLVIDO)
+## 5. Auth e acesso (uso pessoal — decisão fechada)
 
-Cada uma das 9 tabelas carrega uma policy **`dev_bypass`**: `PERMISSIVE`, role `public`, `USING(true) / CHECK(true)`.
+**Operador único:** Dr. Nicolas. Ferramenta pessoal de plantão, **não** app hospitalar multi-usuário.
 
-No Postgres, policies permissivas **combinam por OR** — isso **anula** todas as policies `_own` (que filtram por `auth.uid()`). Resultado: **PHI exposto via anon key** (9 pacientes ativos em 23-jun-2026).
+**Configuração atual (intencional):**
+- Frontend entra direto no Dashboard (`MOCK_SESSION`, sem login).
+- Policies `dev_bypass` ativas — simplifica acesso solo com anon key.
+- **Sem plano de OAuth, magic link, MFA ou multi-tenant.** `Login.tsx` existe mas não é usado.
 
-**Correção** (rodar SÓ após confirmar que o frontend autentica via Supabase Auth — dropar às cegas quebra o dashboard se o app roda no anon key):
-
-```sql
-drop policy if exists dev_bypass on public.pacientes;
--- repetir nas 9 tabelas: evolucoes, eventos_clinicos, atbs, culturas,
--- antibiograma, pendencias, alerts_log, ingest_audit_log
-```
-
-Status: **FLAGGED, não corrigido.** Decisão pendente do Dr. Nicolas.
+Reativar auth só se o escopo mudar (outros usuários). Hoje: **não é backlog.**
 
 -----
 
@@ -103,15 +99,14 @@ Status: **FLAGGED, não corrigido.** Decisão pendente do Dr. Nicolas.
 
 - **FASE ALPHA** — ✅ Completa. Refactor modular `src/lib/` (26 arquivos), 40+ testes unitários (Vitest), camada de API retrocompatível.
 - **FASE BRAVO** — ✅ Entregue e deployada. Schema Supabase, `smoke.sql`, `useClinicalAlerts.ts`, views vivas.
-- **FASE CHARLIE** — 🔄 Em andamento. Timeseries (`eventos_clinicos` 93 linhas, OCR Claude) + stewardship (`atbs`/`culturas` vazios) + qualidade do ingest.
-- **FASE DELTA** — ⬜ Backlog. Edge Functions de automação clínica.
+- **FASE CHARLIE** — 🔄 Em andamento. Timeseries (`eventos_clinicos` 93 linhas, ingest Claude→JSON) + stewardship (`atbs`/`culturas` vazios).
+- **FASE DELTA** — ⬜ Backlog. Automação clínica no app.
 
 ### Backlog FASE DELTA (prioridades)
 
 1. Cálculo automático de day-of-therapy (D-ATB).
 1. Balanço hídrico cumulativo.
 1. Handoff PDF em um clique.
-1. Pipeline webhook AppSheet.
 
 ### Frontend (Planos Alpha/Bravo)
 
