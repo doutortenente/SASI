@@ -75,18 +75,6 @@
   --text-muted: #94a3b8;
 
   /* Tokens --app-* (consumidos por TODOS os componentes via Tailwind app.*) */
-  --app-bg: 8 11 18;             /* #080B12 OLED */
-  --app-card: 20 30 45;          /* #141E2D painel HUD */
-  --app-tertiary: 30 41 59;      /* #1e293b raised */
-  --app-border: 36 46 61;        /* hairline sólido */
-  --app-text: 248 250 252;       /* #f8fafc */
-  --app-text-2: 203 213 225;     /* #cbd5e1 */
-  --app-text-muted: 148 163 184; /* #94a3b8 */
-  --app-accent: 220 38 38;       /* red-600 hazard */
-  --app-accent-hover: 185 28 28; /* red-700 */
-  --app-success: 16 185 129;     /* emerald-500 */
-  --app-warning: 245 158 11;     /* amber-500 */
-  --app-danger: 239 68 68;       /* red-500 */
 
   --focus-ring: rgba(45, 212, 191, .4);
   --shadow-card:   0 1px 2px rgba(0,0,0,.4), 0 1px 3px rgba(0,0,0,.3);
@@ -114,18 +102,6 @@
   --text: #0f172a;
   --text-muted: #64748b;
 
-  --app-bg: 238 241 246;         /* #eef1f6 */
-  --app-card: 255 255 255;       /* #ffffff */
-  --app-tertiary: 232 237 243;   /* #e8edf3 */
-  --app-border: 219 227 236;     /* #dbe3ec */
-  --app-text: 15 23 42;          /* #0f172a */
-  --app-text-2: 51 85 105;       /* #334155 */
-  --app-text-muted: 100 116 139; /* #64748b */
-  --app-accent: 37 99 235;       /* blue-600 */
-  --app-accent-hover: 29 78 216; /* blue-700 */
-  --app-success: 5 150 105;
-  --app-warning: 217 119 6;
-  --app-danger: 220 38 38;
 
   --focus-ring: rgba(13, 148, 136, .35);
   --shadow-card:   0 1px 2px rgba(15, 23, 42, .04), 0 1px 3px rgba(15, 23, 42, .07);
@@ -360,6 +336,8 @@ input[type="range"]:focus-visible {
 
 .sasi-fade-in, .fade-in { animation: sasi-fade-in 0.3s var(--ease-out); }
 .sasi-slide-in { animation: sasi-slide-in 0.4s var(--ease-out); }
+.sasi-critical-pulse { animation: sasi-critical-pulse 2s ease-in-out infinite; }
+.sasi-spin { animation: sasi-spin 0.6s linear infinite; }
 
 button, a, [role="button"] {
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
