@@ -1,7 +1,7 @@
 // SasiSynthesis — Síntese SASI v2.0: Grok API + prompt manual + edição
 
 import { useState } from 'react';
-import { SasiProblemaAtivo, SasiCondutaSistema, SystemKey } from '../lib/supabaseClient';
+import { SasiProblemaAtivo, SasiCondutaSistema, SasiRisco, SystemKey } from '../lib/supabaseClient';
 import { Plus, Trash2, Sparkles } from 'lucide-react';
 import {
   generateStructuredSynthesis,
@@ -16,13 +16,15 @@ const SISTEMAS: SystemKey[] = ['neuro', 'resp', 'hemo', 'tgi', 'renal', 'hemato'
 interface Props {
   problemasAtivos: SasiProblemaAtivo[];
   condutasSistemas: SasiCondutaSistema[];
-  onChange: (problemas: SasiProblemaAtivo[], condutas: SasiCondutaSistema[]) => void;
+  riscos: SasiRisco[];
+  onChange: (problemas: SasiProblemaAtivo[], condutas: SasiCondutaSistema[], riscos: SasiRisco[]) => void;
   patientContext?: string;
 }
 
-export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onChange, patientContext }: Props) {
+export default function SasiSynthesis({ problemasAtivos, condutasSistemas, riscos: riscosProp, onChange, patientContext }: Props) {
   const [problemas, setProblemas] = useState<SasiProblemaAtivo[]>(problemasAtivos);
   const [condutas, setCondutas] = useState<SasiCondutaSistema[]>(condutasSistemas);
+  const [riscos, setRiscos] = useState<SasiRisco[]>(riscosProp);
   const [rawText, setRawText] = useState('');
   const [jsonPaste, setJsonPaste] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -31,12 +33,17 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
 
   const updateProblemas = (newProblemas: SasiProblemaAtivo[]) => {
     setProblemas(newProblemas);
-    onChange(newProblemas, condutas);
+    onChange(newProblemas, condutas, riscos);
   };
 
   const updateCondutas = (newCondutas: SasiCondutaSistema[]) => {
     setCondutas(newCondutas);
-    onChange(problemas, newCondutas);
+    onChange(problemas, newCondutas, riscos);
+  };
+
+  const updateRiscos = (newRiscos: SasiRisco[]) => {
+    setRiscos(newRiscos);
+    onChange(problemas, condutas, newRiscos);
   };
 
   const buildRequest = (): SASISynthesisRequest => ({
@@ -60,8 +67,12 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
       prazo: c.prazo,
     }));
 
-    updateProblemas(newProblemas);
-    updateCondutas(newCondutas);
+    const newRiscos: SasiRisco[] = (result.riscos ?? []).map(r => ({ texto: r }));
+
+    setProblemas(newProblemas);
+    setCondutas(newCondutas);
+    setRiscos(newRiscos);
+    onChange(newProblemas, newCondutas, newRiscos);
   };
 
   const requireRawText = (): boolean => {
@@ -166,6 +177,16 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
   };
 
   const removeConduta = (index: number) => updateCondutas(condutas.filter((_, i) => i !== index));
+
+  const addRisco = () => updateRiscos([...riscos, { texto: '' }]);
+
+  const updateRisco = (index: number, texto: string) => {
+    const copy = [...riscos];
+    copy[index] = { ...copy[index], texto };
+    updateRiscos(copy);
+  };
+
+  const removeRisco = (index: number) => updateRiscos(riscos.filter((_, i) => i !== index));
 
   return (
     <div className="space-y-8">
@@ -338,6 +359,36 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
           ))}
         </div>
         {condutas.length === 0 && <div className="text-xs text-app-text-muted italic pl-1">Nenhuma conduta estruturada ainda.</div>}
+      </div>
+
+      <div>
+        <div className="flex justify-between items-center mb-3">
+          <h4 className="font-bold tx-warn text-sm tracking-widest">RISCOS</h4>
+          <button
+            onClick={addRisco}
+            className="flex items-center gap-1 px-3 py-1 text-xs bg-amber-500/10 hover:bg-amber-500/20 tx-warn rounded-lg transition"
+          >
+            <Plus className="w-3.5 h-3.5" /> Novo Risco
+          </button>
+        </div>
+
+        <div className="space-y-2">
+          {riscos.map((r, i) => (
+            <div key={i} className="flex gap-2 items-center bg-app-card border border-app-border hover:border-amber-500/30 rounded-xl p-2 transition">
+              <input
+                type="text"
+                value={r.texto}
+                onChange={(e) => updateRisco(i, e.target.value)}
+                placeholder="Ex: Piora hemodinâmica, sepse sobreposta"
+                className="flex-1 bg-transparent text-sm focus:outline-none"
+              />
+              <button onClick={() => removeRisco(i)} className="text-red-400/70 hover:text-red-500 p-1">
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+        {riscos.length === 0 && <div className="text-xs text-app-text-muted italic pl-1">Nenhum risco identificado ainda.</div>}
       </div>
     </div>
   );

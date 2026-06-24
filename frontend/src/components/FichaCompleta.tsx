@@ -10,7 +10,7 @@ import {
   Microscope, AlertCircle, ListChecks, ClipboardList, Trash2, Plus,
   Save, Loader2, Calculator, Flame, ShieldAlert,
 } from 'lucide-react';
-import type { Paciente, Evolucao, Pendencia, SasiProblemaAtivo, SasiCondutaSistema } from '../lib/supabaseClient';
+import type { Paciente, Evolucao, Pendencia, SasiProblemaAtivo, SasiCondutaSistema, SasiRisco } from '../lib/supabaseClient';
 import { supabase, type PatientSummary } from '../lib/supabaseClient';
 import { useSupabasePatients } from '../hooks/useSupabasePatients';
 import SasiSynthesis from './SasiSynthesis';
@@ -75,6 +75,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
   // === NOVOS DRAFTS PARA SÍNTESE ESTRUTURADA (Opção B) ===
   const [problemasAtivosDraft, setProblemasAtivosDraft] = useState<SasiProblemaAtivo[]>([]);
   const [condutasSistemasDraft, setCondutasSistemasDraft] = useState<SasiCondutaSistema[]>([]);
+  const [riscosDraft, setRiscosDraft] = useState<SasiRisco[]>([]);
 
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -121,6 +122,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
       setRenalDraft({}); setHematoDraft({}); setInfectoDraft({});
       setDvasDraft([]); setSedDraft([]);
       setImpressaoDraft(['', '', '', '']); setCondutaDraft(['', '', '', '']);
+      setProblemasAtivosDraft([]); setCondutasSistemasDraft([]); setRiscosDraft([]);
       return;
     }
     setNeuroDraft({ ...(evolucao.neuro ?? {}) });
@@ -140,6 +142,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
     // Carrega síntese estruturada se existir
     setProblemasAtivosDraft((evolucao.problemas_ativos as SasiProblemaAtivo[]) || []);
     setCondutasSistemasDraft((evolucao.condutas_sistemas as SasiCondutaSistema[]) || []);
+    setRiscosDraft((evolucao.riscos as SasiRisco[]) || []);
   }, [evolucao]);
 
   useEffect(() => {
@@ -198,6 +201,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
       // Nova síntese estruturada (SASI v2.0)
       problemas_ativos: problemasAtivosDraft,
       condutas_sistemas: condutasSistemasDraft,
+      riscos: riscosDraft,
     };
     if (evolucao) {
       const { error } = await supabase.from('evolucoes').update(evolPatch).eq('id', evolucao.id);
@@ -244,7 +248,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
   }, [paciente, evolucao, pacDraft, neuroDraft, respDraft, hemoDraft, tgiDraft,
       renalDraft, hematoDraft, infectoDraft, dvasDraft, sedDraft,
       impressaoDraft, condutaDraft, pendenciasDraft, problemasAtivosDraft,
-      condutasSistemasDraft, onSaved]);
+      condutasSistemasDraft, riscosDraft, onSaved]);
 
   // ============================================================
   // SYNC REAL: Síntese Estruturada (SASI) → Patient Summary
@@ -1659,6 +1663,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
           <SasiSynthesis
             problemasAtivos={problemasAtivosDraft}
             condutasSistemas={condutasSistemasDraft}
+            riscos={riscosDraft}
             patientContext={buildPatientContext({
               nome: pacDraft.nome ?? paciente.nome,
               idade: pacDraft.idade ?? paciente.idade,
@@ -1677,9 +1682,10 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   ].filter(Boolean).join(' · ')
                 : undefined,
             })}
-            onChange={(probs, conds) => {
+            onChange={(probs, conds, riscos) => {
               setProblemasAtivosDraft(probs);
               setCondutasSistemasDraft(conds);
+              setRiscosDraft(riscos);
             }}
           />
 
