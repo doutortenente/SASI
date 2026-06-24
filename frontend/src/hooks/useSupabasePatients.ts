@@ -1,6 +1,6 @@
 // ============================================================================
 // src/hooks/useSupabasePatients.ts
-// Hook principal — substitui toda lógica Firebase do App.tsx
+// Hook principal de pacientes (Supabase Realtime)
 // Gerencia: CRUD de pacientes, evolucoes, realtime, dashboard view
 // ============================================================================
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -8,7 +8,7 @@ import { supabase, type Paciente, type Evolucao, type DashboardRow, type Patient
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 // ============================================================================
-// ESTADO LOCAL (espelho do que estava no Firebase)
+// Estado local do hook
 // ============================================================================
 export interface UseSupabasePatientsReturn {
   // Dados

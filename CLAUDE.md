@@ -102,8 +102,8 @@ Status: **FLAGGED, não corrigido.** Decisão pendente do Dr. Nicolas.
 ## 6. Status das fases
 
 - **FASE ALPHA** — ✅ Completa. Refactor modular `src/lib/` (26 arquivos), 40+ testes unitários (Vitest), camada de API retrocompatível.
-- **FASE BRAVO** — ✅ Entregue e deployada. `schema.sql`, `smoke.sql`, `useClinicalAlerts.ts`, `firebase-to-supabase.ts`, views vivas. (`README-FASE-BRAVO.md`.)
-- **FASE CHARLIE** — 🔄 Em andamento. Migração Firebase→Supabase. **`eventos_clinicos` com 93 linhas (OCR Claude)** — falta qualidade + stewardship (`atbs`/`culturas` vazios).
+- **FASE BRAVO** — ✅ Entregue e deployada. Schema Supabase, `smoke.sql`, `useClinicalAlerts.ts`, views vivas.
+- **FASE CHARLIE** — 🔄 Em andamento. Timeseries (`eventos_clinicos` 93 linhas, OCR Claude) + stewardship (`atbs`/`culturas` vazios) + qualidade do ingest.
 - **FASE DELTA** — ⬜ Backlog. Edge Functions de automação clínica.
 
 ### Backlog FASE DELTA (prioridades)

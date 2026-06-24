@@ -1,7 +1,7 @@
 # 🪖 SASI — Comando UTI Alpha
 
 **Sistema de Auditoria e Síntese Intensiva** · 33 leitos · UTI 2/3/4
-Stack 100% Supabase-native. Firebase morto e enterrado.
+Stack 100% Supabase-native.
 
 ---
 

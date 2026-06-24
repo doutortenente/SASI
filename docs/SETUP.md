@@ -17,7 +17,6 @@ para desenvolver o Comando UTI.
 |---|---|
 | **Claude Code** (CLI ou desktop) | Assistente de código direto no repo. <https://claude.ai/code> |
 | **Supabase CLI** | Banco local, migrations, emulação do Postgres: `npm i -g supabase` |
-| **Firebase CLI** | Só se ainda mexer em hosting/functions Firebase: `npm i -g firebase-tools` |
 | **Chrome ou Edge** + extensão **React Developer Tools** | DevTools para depurar o frontend |
 
 ## Qualidade de vida (opcionais)

@@ -1,6 +1,6 @@
 // ============================================================================
 // src/lib/supabaseClient.ts
-// Cliente Supabase singleton — substitui firebase/firestore
+// Cliente Supabase singleton
 // ============================================================================
 import { createClient } from '@supabase/supabase-js';
 

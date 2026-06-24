@@ -19,7 +19,7 @@
 |-----------------|--------------------------------------------------|-------------|
 | Frontend        | React 18.3 + TypeScript + Vite 5                 | Código ativo em subpasta (ver seção 5) |
 | Estilo          | Tailwind 3.4 + CSS vars (3 temas)                | Tokens `bg-app-*`, nunca `bg-slate-*` hardcoded |
-| Backend         | Supabase (Postgres + Auth + Realtime + Edge Functions) | Zero Firebase em produção |
+| Backend         | Supabase (Postgres + Auth + Realtime + Edge Functions) | Única fonte de dados |
 | Deploy          | Netlify (CI automático a partir de main)         | Base directory aponta para a pasta ativa do SASI |
 | PDF             | jsPDF + jspdf-autotable (lazy)                   | Export de passagem de turno |
 | Ícones          | lucide-react                                     | — |
@@ -172,7 +172,7 @@ AGENTS.md                           ← regras + env vars (sem JWTs)
 - Removido VSIX Tailwind + pasta extraída.
 - Removidos `MEMORY.md`, `sasi/MEMORY.md`, `sasi/CLAUDE_CODE_GUIDE.md` (consolidados em `STATUS.md` + `CLAUDE.md`).
 - Removidas skills IA duplicadas (`.agents/`, `.claude/skills/` — 78 arquivos).
-- Removido `skills-lock.json` (Firebase/Genkit, irrelevante).
+- Removido `skills-lock.json` (legado irrelevante).
 - Unificado Supabase: `sasi/supabase/` fundido em `supabase/` na raiz (`ocr-ingest` + migration `05_add_patient_summary.sql`).
 - Sanitizado `AGENTS.md`: JWTs substituídos por env vars (`SASI_SERVICE_ROLE_KEY`, `SASI_SUPABASE_ANON_KEY`).
 
@@ -241,7 +241,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 
 | Data       | Decisão                                      | Commit / Motivo |
 |------------|----------------------------------------------|-----------------|
-| 27-Abr     | Setup inicial Vite + React + Supabase        | Migração de Firebase |
+| 27-Abr     | Setup inicial Vite + React + Supabase        | Stack definida |
 | 30-Abr     | Deploy CI no Netlify + renomeio para sasi-uti.netlify.app | Fase A faxina |
 | 30-Abr     | Implementação do bundle de design (3 temas + 3 views + calculadora) | 6020c0e |
 | 06-Mai     | **Auth bypass temporário** (mock + dev_bypass RLS) | fc8cd75 — hospital bloqueia Gmail |
