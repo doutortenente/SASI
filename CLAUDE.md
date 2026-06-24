@@ -57,7 +57,7 @@ Direção ASPIRACIONAL para telas novas — **“Monitor de UTI Tático / HUD”
 
 ## 4. Schema do banco (estado VIVO — 24-Jun-2026)
 
-Fonte fiel: `supabase/schema-live-dump.sql` + migrations `01–06`. 9 tabelas clínicas + RAG (`protocolos`, `protocolo_chunks` na migration `06`, **DDL versionado, aplicar manualmente**). RLS habilitado.
+Fonte fiel: `supabase/schema-live-dump.sql` + migrations `01–07`. 9 tabelas clínicas + RAG (`protocolos`, `protocolo_chunks` na migration `06`, **DDL versionado, aplicar manualmente**). Migration `07` adiciona síntese JSONB em `evolucoes` (aplicada remoto 24-jun). RLS habilitado.
 
 |Tabela            |Função                                                             |Linhas (23-jun-2026)|
 |------------------|-------------------------------------------------------------------|--------------------:|

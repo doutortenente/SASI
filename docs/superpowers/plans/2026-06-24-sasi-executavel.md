@@ -17,17 +17,17 @@
 - Promovido: amostras PDF, VANESSA, legado abr/2026, grafo, scaffold clinical-engine
 - **Canônico vence:** `claude/skills/sasi-ingest-export` > Fase Delta / bundle (MCP deploy, não Edge Function)
 
-### Gaps que impedem execução
-| # | Gap | Evidência |
-|---|-----|-----------|
-| G1 | Skill diz `deploy` bulk MCP — **tool não existe** | `mcp-server/src/` sem `deploy` |
-| G2 | `clinical-engine` scaffold quebrado | `index.ts` importa módulos inexistentes |
-| G3 | Motor vivo = monólito `drugs.ts` | Bundle `dictionaries/` incompleto (4 arquivos, imports quebrados) |
-| G4 | Template evolução v2 só em `sasi/doctrine/` | Skill carrega v1 SOAP |
-| G5 | `CLAUDE.md` diz "40+ testes Vitest" | **0** arquivos `*.test.*` no repo |
-| G6 | `eventos_clinicos` 26% requires_review | STATUS.md auditoria 23-jun |
-| G7 | `atbs`/`culturas`/`pendencias` vazios | D-ATB e passagem incompletos |
-| G8 | Schema drift | `schema-live-dump.sql` desatualizado vs migration `07` |
+### Gaps que impedem execução (atualizado 24-jun tarde)
+| # | Gap | Status |
+|---|-----|--------|
+| G1 | Skill diz `deploy` bulk MCP | ✅ `sasi_deploy_ingest` (`779741a`) |
+| G2 | `clinical-engine` scaffold quebrado | 🔄 Parcial — parseBR/sofaDisplay + 7 testes |
+| G3 | Motor vivo = monólito `drugs.ts` | ⬜ SOFA completo não extraído |
+| G4 | Template evolução v2 só em doctrine | ✅ Promovido skill `claude` `35df460` |
+| G5 | Docs mentem sobre testes | ✅ Corrigido — 7 testes reais |
+| G6 | `eventos_clinicos` 26% requires_review | 🔄 Script `audit_eventos.py`; fila aberta |
+| G7 | `atbs`/`culturas`/`pendencias` vazios | ⬜ Sem mudança em prod |
+| G8 | Schema drift | 🔄 Migration `07` aplicada; dump SQL pendente |
 
 ### O que JÁ executa (não reabrir)
 - Frontend deploy Netlify + build CI
@@ -48,11 +48,11 @@
 - Modify: `claude/skills/sasi-ingest-export/references/01-schema-eventos-clinicos.md`
 - Modify: `claude/skills/sasi-ingest-export/assets/payload-example.json`
 
-- [ ] **Step 1:** Definir schema Zod `sasi-ocr-ingest/v1` (reusar `ocr-ingest` Edge Function como referência)
-- [ ] **Step 2:** Implementar `sasi_deploy_ingest` — upsert paciente, insert evolucao snapshot, batch eventos, audit log
-- [ ] **Step 3:** Test manual com `payload-example.json`
-- [ ] **Step 4:** Atualizar skill + references (remover ambiguidade Edge Function)
-- [ ] **Step 5:** Commit `feat(mcp): sasi_deploy_ingest bulk ingest`
+- [x] **Step 1:** Definir schema Zod `sasi-ocr-ingest/v1` (reusar `ocr-ingest` Edge Function como referência)
+- [x] **Step 2:** Implementar `sasi_deploy_ingest` — upsert paciente, insert evolucao snapshot, batch eventos, audit log
+- [ ] **Step 3:** Test manual com `payload-example.json` em plantão real
+- [x] **Step 4:** Atualizar skill + references (remover ambiguidade Edge Function) — `claude` `35df460`
+- [x] **Step 5:** Commit `feat(mcp): sasi_deploy_ingest bulk ingest` — `779741a`
 
 ### Task A2: Sincronizar template evolução v2
 
@@ -60,10 +60,10 @@
 - Copy: `sasi/doctrine/references/04-export-evolucao-template_v2.md` → `claude/skills/sasi-ingest-export/references/04-export-evolucao-template.md`
 - Rename legado: `04-export-evolucao-template_v1_LEGADO.md` em doctrine
 
-- [ ] **Step 1:** Diff v1 vs v2; confirmar D2+ é o formato de plantão atual
-- [ ] **Step 2:** Promover v2 para skill loader
-- [ ] **Step 3:** Atualizar SKILL.md referências
-- [ ] **Step 4:** Commit em `claude` + nota em `sasi/doctrine/DECISOES` ou symlink policy
+- [x] **Step 1:** Diff v1 vs v2; confirmar D2+ é o formato de plantão atual
+- [x] **Step 2:** Promover v2 para skill loader
+- [x] **Step 3:** Atualizar SKILL.md referências
+- [x] **Step 4:** Commit em `claude` `35df460` + nota em `docs/import/DECISOES.md`
 
 ### Task A3: Schema como código
 
@@ -73,8 +73,8 @@
 - Modify: `sasi/CLAUDE.md`, `docs/STATUS.md`
 
 - [ ] **Step 1:** Dump remoto pós-migration 07
-- [ ] **Step 2:** Corrigir mentiras documentais (testes, contagens)
-- [ ] **Step 3:** Commit `docs: schema dump + STATUS sync`
+- [x] **Step 2:** Corrigir mentiras documentais (testes, contagens) — `STATUS.md`, `CLAUDE.md`, `779741a`
+- [ ] **Step 3:** Commit `docs: schema dump + STATUS sync` (dump pendente)
 
 ---
 
@@ -89,18 +89,18 @@
 - Create: `packages/clinical-engine/src/types.ts`, `clinical-logic-compat.ts`
 - Modify: `frontend/src/lib/drugs.ts` — reexport from package
 
-- [ ] **Step 1:** `npm install` em clinical-engine; vitest setup
-- [ ] **Step 2:** Copiar SOFA + testes golden (casos VANESSA fixtures)
-- [ ] **Step 3:** Wire frontend import
-- [ ] **Step 4:** `npm run ci` no pacote verde
-- [ ] **Step 5:** Commit incremental por módulo
+- [x] **Step 1:** `npm install` em clinical-engine; vitest setup
+- [ ] **Step 2:** Copiar SOFA + testes golden (casos VANESSA fixtures) — só `sofaDisplay` parcial
+- [ ] **Step 3:** Wire frontend import (ainda usa `drugs.ts` monolítico)
+- [x] **Step 4:** `npm run ci` no pacote verde — 7 testes passando
+- [x] **Step 5:** Commit incremental — `779741a`
 
 ### Task B2: CI ampliado
 
 **Files:**
 - Modify: `.github/workflows/ci.yml`
 
-- [ ] **Step 1:** Job `mcp-server build`
+- [ ] **Step 1:** Job `mcp-server build` — **bloqueado** (OAuth sem scope `workflow`)
 - [ ] **Step 2:** Job `clinical-engine test` quando B1 verde
 - [ ] **Step 3:** Commit `ci: mcp + clinical-engine`
 
@@ -114,9 +114,9 @@
 - Create: `plantao_queries.sql` seção review queue
 - Optional: script `scripts/audit_eventos.py`
 
-- [ ] **Step 1:** Query 24 `requires_review=true` — classificar fix/delete
+- [x] **Step 1:** Query fila review — `scripts/audit_eventos.py` + `plantao_queries.sql` §11b
 - [ ] **Step 2:** Re-ingest ou patch manual dos 18 low-confidence
-- [ ] **Step 3:** Documentar em `docs/STATUS.md`
+- [x] **Step 3:** Documentar em `docs/STATUS.md` + `SECRETARIA-2026-06-24.md`
 
 ### Task C2: Stewardship mínimo
 

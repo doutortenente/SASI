@@ -57,3 +57,16 @@ Também há: planilhas de status (abr/2026), grafo PNG do motor, scaffold `sasi-
 ```bash
 python3 ~/dev/sasi/scripts/ingest_downloads_bundle.py
 ```
+
+## Execução pós-decisão (24-jun-2026)
+
+| Decisão | Status | Evidência |
+|---------|--------|-----------|
+| Canônico vence (MCP deploy, não Edge Function) | ✅ Feito | `sasi_deploy_ingest` em `mcp-server/` (`779741a`); skill `claude` `35df460` |
+| Template evolução D2+ v2 na skill | ✅ Feito | `claude/skills/sasi-ingest-export/references/04-export-evolucao-template.md` |
+| Scaffold `clinical-engine` populado (parcial) | 🔄 Parcial | 7 testes Vitest; SOFA completo ainda em `drugs.ts` |
+| Staging integral preservado | ✅ Feito | `docs/import/bundle-claudecode/` |
+| Fase Delta / backup_temp | ⬜ Só consulta | Não promovido (correto) |
+| Schema síntese `evolucoes` | ✅ Feito | Migration `07` aplicada remoto + types TS |
+
+Handoff completo da sessão: [`docs/SECRETARIA-2026-06-24.md`](../SECRETARIA-2026-06-24.md).

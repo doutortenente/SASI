@@ -94,6 +94,11 @@ Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persis
 |16 | LeitoCard com border-l por gravidade        | c780f71    | ✅ Ativo   | — |
 |17 | Plantão Board: shell Sidebar/TopBar/FiltersBar | e526bad | ✅ Ativo   | PR #12 |
 |18 | View Pacientes (índice + página-prontuário) | 12/06/2026 | ✅ Ativo   | `PacientesIndex` + `PacientePage` (reusa FichaCompleta/TimelineDrawer); botão "Prontuário" no modal |
+|19 | Ficha ↔ Supabase síntese (problemas/condutas/riscos) | 24/06/2026 | ✅ Ativo   | Migration `07` + fixes `FichaCompleta`/`SasiSynthesis` |
+|20 | MCP `sasi_deploy_ingest` (bulk payload v1) | 24/06/2026 | ✅ Ativo   | `mcp-server/src/tools/ingest-deploy.ts` |
+|21 | Realtime dashboard em `pendencias` | 24/06/2026 | ✅ Ativo   | `useSupabasePatients.ts` |
+|22 | `clinical-engine` — 7 testes Vitest (parseBR, SOFA display) | 24/06/2026 | ✅ Ativo   | `packages/clinical-engine/` |
+|23 | Auditoria `eventos_clinicos` (script + query plantão) | 24/06/2026 | ✅ Ativo   | `scripts/audit_eventos.py`, `plantao_queries.sql` §11b |
 
 **Funcionalidades em destaque recentes (maio/2026):**  
 - `FichaCompleta.tsx` — edição completa de todos os sistemas (neuro, resp, hemo, tgi, renal, hemato, infecto) + DVA/sedativos + impressão/conduta/pendências.  
@@ -113,8 +118,9 @@ Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persis
 - `01` — schema legado (4 tabelas antigas, referência histórica).
 - `02–05` — triggers, dev_bypass, hardening, `patient_summary`.
 - `06_protocolos_rag.sql` — RAG pgvector (`protocolos`, `protocolo_chunks`, `match_protocolos`). **Versionado 24-jun; aplicar manualmente no Supabase.**
+- `07_evolucoes_synthesis_columns.sql` — `problemas_ativos`, `condutas_sistemas`, `riscos` (JSONB). **Aplicada no Postgres remoto 24-jun** (`dc45f4f`).
 
-**Dívida:** schema vivo completo ainda depende de `schema-live-dump.sql` + migrations incrementais.
+**Dívida:** `schema-live-dump.sql` ainda **não** reflete migration `07` — regenerar via dump remoto.
 
 **Tipos TypeScript oficiais:** `src/lib/supabaseClient.ts` (da pasta ativa) — fonte da verdade para o frontend.
 
@@ -237,14 +243,18 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 | 06-09-Mai  | Port de features do protótipo Gemini (FichaCompleta, LeitoCard, labs estruturados) | d8a648c, 760b52d, b3c82eb |
 | 11-Jun     | **Faxina final do repo** — scaffold raiz, skills IA, docs duplicados, Supabase unificado | chore/faxina-11jun |
 | 11-Jun     | **Redesign 5 Janelas** — severity/Watcher, clinicalExtract, Passagem 3-linhas | feat/5-janelas |
+| 24-Jun     | **SASI executável (sessão agentes)** — Ficha↔Supabase, MCP deploy, clinical-engine, bundle ingest | `779741a`…`19586a8`; handoff `docs/SECRETARIA-2026-06-24.md` |
+| 24-Jun     | **Skill template evolução D2+ v2** promovido no repo `claude` | `35df460` |
 
 ---
 
 ## 10. Próximos passos
 
-1. **Rotacionar JWTs** expostos historicamente em `AGENTS.md` (Supabase Dashboard → Settings → API).
-2. **Versionar schema real** (9 tabelas + views) — migrations locais ainda parcialmente obsoletas.
-3. **Qualidade do ingest** Claude→JSON nos `eventos_clinicos`.
+1. **Regenerar `schema-live-dump.sql`** pós-migration `07`.
+2. **CI ampliado** — jobs mcp-server + clinical-engine (bloqueado: scope `workflow` no token GitHub).
+3. **Smoke plantão** — checklist Definition of Done (§6).
+4. **Qualidade ingest** — 24 `eventos_clinicos` em fila review (`scripts/audit_eventos.py`).
+5. **Rotacionar JWTs** se ainda não fez (histórico `AGENTS.md`).
 
 ---
 
