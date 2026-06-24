@@ -1,11 +1,10 @@
 // SasiSynthesis — Problemas ativos + condutas por sistema (edição manual SASI v2.0)
 
 import { useState } from 'react';
-import { SasiProblemaAtivo, SasiCondutaSistema, Vetor, SystemKey } from '../lib/supabaseClient';
+import { SasiProblemaAtivo, SasiCondutaSistema, SystemKey } from '../lib/supabaseClient';
 import { Plus, Trash2 } from 'lucide-react';
 
 const SISTEMAS: SystemKey[] = ['neuro', 'resp', 'hemo', 'tgi', 'renal', 'hemato', 'infecto'];
-const VETORES: Vetor[] = ['↑', '↓', '='];
 
 interface Props {
   problemasAtivos: SasiProblemaAtivo[];
@@ -37,7 +36,7 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
   ];
 
   const addProblema = () => {
-    updateProblemas([...problemas, { texto: '', vetor: null }]);
+    updateProblemas([...problemas, { texto: '' }]);
   };
 
   const updateProblema = (index: number, field: keyof SasiProblemaAtivo, value: SasiProblemaAtivo[keyof SasiProblemaAtivo]) => {
@@ -48,13 +47,6 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
 
   const removeProblema = (index: number) => {
     updateProblemas(problemas.filter((_, i) => i !== index));
-  };
-
-  const suggestVetor = (texto: string): Vetor | null => {
-    const t = texto.toLowerCase();
-    if (t.includes('piora') || t.includes('descompens') || t.includes('choque') || t.includes('crítica')) return '↑';
-    if (t.includes('melhora') || t.includes('estável') || t.includes('resolução')) return '↓';
-    return '=';
   };
 
   const addConduta = () => {
@@ -81,7 +73,6 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
         <div className="flex justify-between items-center mb-3">
           <div>
             <h4 className="font-bold tx-danger text-sm tracking-widest">PROBLEMAS ATIVOS</h4>
-            <p className="text-[10px] text-app-text-muted">Com vetor (↑ piora / ↓ melhora / = estável)</p>
           </div>
           <button
             onClick={addProblema}
@@ -94,27 +85,11 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
         <div className="space-y-2">
           {problemas.map((p, i) => (
             <div key={i} className="flex gap-2 items-center bg-app-card border border-app-border hover:border-red-500/30 rounded-xl p-2 transition">
-              <select
-                value={p.vetor ?? ''}
-                onChange={(e) => updateProblema(i, 'vetor', (e.target.value as Vetor) || null)}
-                className="w-11 h-9 text-center text-xl font-black bg-app-tertiary border border-app-border rounded-lg focus:outline-none"
-              >
-                <option value="">·</option>
-                {VETORES.map(v => <option key={v} value={v}>{v}</option>)}
-              </select>
-
               <input
                 type="text"
                 value={p.texto}
-                onChange={(e) => {
-                  const newText = e.target.value;
-                  updateProblema(i, 'texto', newText);
-                  if (!p.vetor && newText.length > 8) {
-                    const suggested = suggestVetor(newText);
-                    if (suggested) updateProblema(i, 'vetor', suggested);
-                  }
-                }}
-                placeholder="Ex: Choque cardiogênico SCAI C em piora"
+                onChange={(e) => updateProblema(i, 'texto', e.target.value)}
+                placeholder="Ex: Choque cardiogênico SCAI C"
                 className="flex-1 bg-transparent text-sm focus:outline-none"
               />
 

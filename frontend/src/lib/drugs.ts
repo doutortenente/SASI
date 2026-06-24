@@ -393,7 +393,7 @@ export function gerarTextoPlantao(patients: DashboardRow[], utiFilter?: string):
 
   const lines = patients.map((p) => {
     const delta = p.delta_sofa_24h ?? 0;
-    const deltaStr = delta > 0 ? `(↑${delta})` : delta < 0 ? `(↓${Math.abs(delta)})` : '';
+    const deltaStr = delta > 0 ? `(+${delta})` : delta < 0 ? `(${delta})` : '';
     const dvaCount = Array.isArray(p.dvas) ? p.dvas.length : 0;
     const sedCount = Array.isArray(p.sedativos) ? p.sedativos.length : 0;
 

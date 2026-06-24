@@ -139,7 +139,7 @@ export default function PassagemTurno({ rows, loading, userEmail }: Props) {
                     {row.sofa_total ?? '—'}
                     {delta != null && delta !== 0 && (
                       <span className={`block text-[9px] ${delta > 0 ? 'tx-danger' : 'tx-ok'}`}>
-                        {delta > 0 ? '↑' : '↓'}{Math.abs(delta)}
+                        {delta > 0 ? '+' : ''}{delta}
                       </span>
                     )}
                   </td>

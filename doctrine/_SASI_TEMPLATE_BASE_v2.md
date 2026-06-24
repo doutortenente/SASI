@@ -33,7 +33,7 @@ A nota de admissão e a nota de evolução compartilham **a mesma anatomia**. A 
 | -------------------------------- | ------------------ | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | HPMA / Intercorrências 24h       | **TEMPO (Δ)**      | O que *mudou*: gatilho, eventos, picos, procedimentos, suspensões, reações | Descrever estado estável; repetir achado do EF; emitir impressão                |
 | Exame físico por sistemas        | **ESTADO**         | Achado objetivo atual por órgão, sinais vitais Max–Min                     | Narrar evento temporal; opinar/concluir                                         |
-| Impressão                        | **PROBLEMA ATIVO** | Lista numerada de problemas + vetor (↑piora / ↓melhora / =estável)         | Prosa corrida; repetir dado bruto já no EF                                      |
+| Impressão                        | **PROBLEMA ATIVO** | Lista numerada de problemas ativos                                         | Prosa corrida; repetir dado bruto já no EF                                      |
 | Conduta estruturada por sistemas | **AÇÃO**           | Plano 1:1 com cada problema ativo, dose + meta numérica                    | "Ajustar conforme resposta" sem número; ação órfã (sem problema correspondente) |
 
 **Teste de auditoria antes de entregar:** cada problema da Impressão tem uma linha de Conduta? Cada Conduta nasce de um problema? Se não, há ação órfã ou problema sem plano — corrige.
@@ -73,7 +73,7 @@ SNE/SNG - {Não / Sim, posição, data}.
 Outros - {DLE, dreno, traqueostomia, MP, etc. — listar se houver}.
 
 Uso:
-Drogas Vasoativas: {Não / Nora X mcg/kg/min (vetor ↑↓), etc}.
+Drogas Vasoativas: {Não / Nora X mcg/kg/min, etc}.
 Sedação: {Não / agentes + doses contínuas + meta RASS}.
 Antibióticos: {Não / nome + dose + intervalo + D[n] + foco}.
 NPT: {Não / Sim}.
@@ -96,7 +96,7 @@ Scores:
 SOFA {total} ({Resp R}, {Coag C}, {Hep L}, {Cardio CV}, {Neuro N}, {Renal RN}). ΔSOFA 24h: {Δ}. {qSOFA se aplicável}.
 
 Impressão:
-1. {Problema ativo} [{↑ / ↓ / =}] — {leitura clínica de 1 linha}.
+1. {Problema ativo} — {leitura clínica de 1 linha}.
 2. {...}
 3. {...}
 
@@ -130,9 +130,6 @@ Cada problema com **qualificador de gravidade/disfunção**, não diagnóstico n
 - ✅ `Choque séptico de foco pulmonar com IRpA hipoxêmica, em IOT/VM e DVA`
 - 💀 `Pneumonia` (não identifica a disfunção que justifica a UTI)
 
-### Impressão — vetor obrigatório
-Cada problema ativo carrega o **vetor de trajetória**: `↑` piora, `↓` melhora, `=` estável. É o Δ comprimido em um símbolo — o entrante lê a direção do paciente sem ler o texto.
-
 ### Conduta — mapeamento 1:1
 Cada linha de conduta corresponde a um problema da Impressão. Metas SEMPRE numéricas: PAM ≥ 65, SpO2 92-96%, glicemia 140-180, lactato em queda, diurese ≥ 0,5 mL/kg/h. Proibido "ajustar conforme evolução" solto.
 
@@ -147,4 +144,4 @@ A estrutura por sistemas (não cronológica) é o padrão UTI-BR porque deixa o 
 
 O conflito que o Dr. Nicolas detectou (3 blocos contando a mesma coisa) era **falha de eixo**, não de conteúdo. A correção não é apagar blocos — é dar a cada um um eixo exclusivo: Tempo (o que mudou), Estado (como está), Problema (o que importa), Ação (o que faço). Quatro vetores ortogonais cobrem o paciente inteiro sem sobreposição. SBAR-UTI com geometria.
 
-ΔSOFA obrigatório porque Sepsis-3 (JAMA 2016) exige ΔSOFA ≥ 2 — "SOFA 7" sem baseline é ruído. O vetor na Impressão é o mesmo princípio aplicado a cada problema: direção > valor absoluto.
+ΔSOFA obrigatório porque Sepsis-3 (JAMA 2016) exige ΔSOFA ≥ 2 — "SOFA 7" sem baseline é ruído.

@@ -23,7 +23,7 @@ Toda documentação clínica é em **Português do Brasil**.
 ## 2. Doutrina inviolável (regras de ouro)
 
 1. **ZERO ALUCINAÇÃO** — campo sem fonte legível → `null` + warning. Nunca um valor “razoável”. Componentes de SOFA ficam sem calcular quando falta dado, jamais estimados. Inventar dado em prontuário é falsificação documental.
-1. **Ortogonalidade de eixos (Ramo C)** — cada bloco governa UM eixo: Tempo (Intercorrências) / Estado (EF) / Problema (Impressão + vetor) / Ação (Conduta 1:1). Nenhum fato cabe em dois blocos.
+1. **Ortogonalidade de eixos (Ramo C)** — cada bloco governa UM eixo: Tempo (Intercorrências) / Estado (EF) / Problema (Impressão) / Ação (Conduta 1:1). Nenhum fato cabe em dois blocos.
 1. **Sinais vitais Max–Min** — `[MÁXIMO]–[MÍNIMO]` em todos os parâmetros, **SpO2 incluso** (`98–89%`, nunca `89–98`).
 1. **Conduta 1:1** com a Impressão, metas sempre numéricas.
 1. **Flags gritam, não consertam** — o sistema sinaliza o implausível; o médico decide.

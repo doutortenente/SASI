@@ -449,12 +449,16 @@ export function extractExameFisico(evol: Evolucao | null): Array<{ sistema: stri
 export function extractProblemas(evol: Evolucao | null): SasiProblemaAtivo[] {
   if (!evol) return [];
   if (Array.isArray(evol.problemas_ativos) && evol.problemas_ativos.length > 0) {
-    return evol.problemas_ativos;
+    return evol.problemas_ativos.map(p => ({
+      id: p.id,
+      texto: p.texto,
+      sistema: p.sistema,
+      gravidade: p.gravidade,
+    }));
   }
   return (evol.impressao ?? []).filter(Boolean).map((texto, i) => ({
     id: `legacy-${i}`,
     texto,
-    vetor: null,
   }));
 }
 
@@ -479,17 +483,14 @@ export function buildPassagem3Linhas(
   const grav = severityLabel(row.gravidade);
   const delta = row.delta_sofa_24h;
   const deltaStr = delta != null && delta !== 0
-    ? ` SOFA ${delta > 0 ? '↑' : '↓'}${Math.abs(delta)}`
+    ? ` SOFA ${delta > 0 ? '+' : ''}${delta}`
     : '';
 
   const linha1 = `${row.uti} · L${row.leito} — ${row.nome} | ${grav} | SOFA ${row.sofa_total ?? '—'}${deltaStr} | D${row.dias_internacao}`;
 
   const problemas = extractProblemas(evol);
   const condutas = extractCondutas(evol);
-  const probStr = problemas.slice(0, 3).map(p => {
-    const v = p.vetor ? `${p.vetor} ` : '';
-    return `${v}${p.texto}`;
-  }).join('; ') || extractDiagnosticoPrincipal(row);
+  const probStr = problemas.slice(0, 3).map(p => p.texto).join('; ') || extractDiagnosticoPrincipal(row);
 
   const condStr = condutas.slice(0, 3).map(c => {
     const meta = c.meta ? ` [meta: ${c.meta}]` : '';

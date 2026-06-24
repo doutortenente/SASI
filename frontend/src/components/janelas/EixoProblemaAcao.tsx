@@ -12,12 +12,6 @@ interface Props {
   onOpenFicha?: () => void;
 }
 
-const VETOR_CLASS: Record<string, string> = {
-  '↑': 'tx-danger',
-  '↓': 'tx-ok',
-  '=': 'text-app-text-muted',
-};
-
 export default function EixoProblemaAcao({ evolucao, loading, onOpenFicha }: Props) {
   if (loading) {
     return <div className="text-center text-app-text-muted py-12 animate-pulse">Carregando problema→ação…</div>;
@@ -76,14 +70,7 @@ export default function EixoProblemaAcao({ evolucao, loading, onOpenFicha }: Pro
                   {/* Problema */}
                   <div>
                     <div className="text-[10px] font-bold uppercase text-app-text-muted mb-1">Problema</div>
-                    <div className="flex items-start gap-2">
-                      {prob.vetor && (
-                        <span className={`text-2xl font-black leading-none ${VETOR_CLASS[prob.vetor] ?? ''}`}>
-                          {prob.vetor}
-                        </span>
-                      )}
-                      <p className="text-sm font-medium text-app-text">{prob.texto}</p>
-                    </div>
+                    <p className="text-sm font-medium text-app-text">{prob.texto}</p>
                     {prob.sistema && (
                       <span className="text-[10px] text-app-text-muted mt-1 inline-block uppercase">
                         {prob.sistema}

@@ -234,7 +234,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
 
   // ============================================================
   // SYNC REAL: Síntese Estruturada (SASI) → Patient Summary
-  // Pega os problemas com vetor + as metas das condutas e atualiza o plano terapêutico vivo
+  // Pega problemas + metas das condutas e atualiza o plano terapêutico vivo
   // ============================================================
   const handleSyncToPatientSummary = useCallback(async () => {
     if (!paciente?.id) return;
@@ -247,7 +247,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
       // Monta um bloco bonito com os problemas + metas principais
       const problemasTxt = problemasAtivosDraft
         .slice(0, 4)
-        .map(p => `${p.vetor ?? ''} ${p.texto}${p.sistema ? ` [${p.sistema}]` : ''}`)
+        .map(p => `${p.texto}${p.sistema ? ` [${p.sistema}]` : ''}`)
         .join('  •  ');
 
       const metasTxt = condutasSistemasDraft

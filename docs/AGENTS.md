@@ -22,7 +22,7 @@ anon_key: ${SASI_SUPABASE_ANON_KEY}
 
 ## SASI Rules (Sempre seguir)
 - Use o template SASI v2.0 (Ramo C) com ortogonalidade de eixos
-- Toda nota deve ter: Impressão com vetor (↑ / ↓ / =) + Conduta 1:1 com metas numéricas
+- Toda nota deve ter: Impressão (problemas ativos) + Conduta 1:1 com metas numéricas
 - Ao gerar nota SASI, insira automaticamente na tabela `evolucoes`
 - Mantenha Max–Min em todos os sinais vitais (incluindo SpO2)
 - Nunca invente dados (zero alucinação)

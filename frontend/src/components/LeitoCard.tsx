@@ -1,6 +1,6 @@
 // ============================================================================
 // SASI · LeitoCard — card para uso pontual (visita de consultor)
-// Hero: Problemas Ativos com Vetor ↑/↓/= | border-l gravidade | SOFA badge
+// Hero: problema ativo | border-l gravidade | SOFA badge
 // ============================================================================
 import {
   Activity, AlertTriangle, Droplets, Flame, Heart,
@@ -17,7 +17,6 @@ interface Props {
 
 type ProblemaDisplay = {
   texto: string;
-  vetor: '↑' | '↓' | '=' | null;
 };
 
 function detectSupport(resp: Record<string, unknown> | null | undefined): { vm: boolean; vni: boolean } {
@@ -37,40 +36,29 @@ function detectATB(infecto: Record<string, unknown> | null | undefined): boolean
 function getProblemas(row: DashboardRow): ProblemaDisplay[] {
   const snapshot = row.sofa_snapshot as Record<string, unknown> | undefined;
 
-  // Prioridade 1: problemas_ativos estruturados — SASI v2.0 (com vetor)
   const problemasAtivos = snapshot?.problemas_ativos;
   if (Array.isArray(problemasAtivos) && problemasAtivos.length > 0) {
-    return (problemasAtivos as Array<{ texto: string; vetor?: string }>)
+    return (problemasAtivos as Array<{ texto: string }>)
       .slice(0, 4)
-      .map(p => ({ texto: p.texto, vetor: (p.vetor as '↑' | '↓' | '=' | null) ?? null }));
+      .map(p => ({ texto: p.texto }));
   }
 
-  // Prioridade 2: problemas_principais legado (string[], sem vetor)
   const principais = snapshot?.problemas_principais;
   if (Array.isArray(principais) && principais.length > 0) {
-    return (principais as string[]).slice(0, 3).map(texto => ({ texto, vetor: null }));
+    return (principais as string[]).slice(0, 3).map(texto => ({ texto }));
   }
 
-  // Prioridade 3: HD como fallback
-  if (row.hd) return [{ texto: row.hd, vetor: null }];
+  if (row.hd) return [{ texto: row.hd }];
 
   return [];
 }
 
-// Rótulos PT-BR de gravidade ("Watcher" = jargão de round para o moderado
-// que merece vigilância) — o valor cru do banco fica só nas classes CSS.
 const GRAVIDADE_LABEL: Record<string, string> = {
   estavel: 'Estável',
   moderado: 'Watcher',
   grave: 'Instável',
   critico: 'Crítico',
   obito: 'Óbito',
-};
-
-const VETOR_STYLE: Record<string, { badge: string; row: string }> = {
-  '↑': { badge: 'tx-danger font-black text-base leading-none', row: 'text-app-text font-medium' },
-  '↓': { badge: 'tx-ok font-black text-base leading-none', row: 'text-app-text-2' },
-  '=': { badge: 'text-app-text-muted font-bold text-sm leading-none', row: 'text-app-text-muted' },
 };
 
 export default function LeitoCard({ row, onSelect, compact = false }: Props) {
@@ -90,10 +78,7 @@ export default function LeitoCard({ row, onSelect, compact = false }: Props) {
 
   const problemas = getProblemas(row);
   const maxProblemas = compact ? 2 : 3;
-
-  // Hero: primeiro problema com vetor grande (decisão em 3-5 segundos)
   const mainProblema = problemas[0];
-  const mainStyle = mainProblema?.vetor ? VETOR_STYLE[mainProblema.vetor] : null;
   const outrosProblemas = problemas.slice(1, maxProblemas);
 
   return (
@@ -103,7 +88,6 @@ export default function LeitoCard({ row, onSelect, compact = false }: Props) {
         compact ? 'p-3' : 'p-4'
       } ${isSeptic || row.gravidade === 'critico' ? 'sasi-critical-pulse' : ''} hover:shadow-xl hover:-translate-y-[1px] cursor-pointer active:scale-[0.992]`}
     >
-      {/* HEADER — Leito + UTI + SOFA + Delta (ultra-visível) */}
       <div className={`flex items-center justify-between gap-2 ${compact ? 'mb-1' : 'mb-1.5'}`}>
         <div className="flex items-baseline gap-2">
           <span className="text-[10px] font-bold uppercase text-app-text-muted tracking-wider">Leito</span>
@@ -126,15 +110,12 @@ export default function LeitoCard({ row, onSelect, compact = false }: Props) {
           </span>
           {delta != null && delta !== 0 && (
             <span className={`ml-0.5 font-mono font-bold tabular-nums ${deltaIsBad ? 'tx-danger' : deltaIsGood ? 'tx-ok' : 'text-app-text-muted'}`}>
-              {deltaIsBad && '↑'}
-              {deltaIsGood && '↓'}
               {delta > 0 ? '+' : ''}{delta}
             </span>
           )}
         </div>
       </div>
 
-      {/* NOME */}
       <h3
         className={`font-bold text-app-text leading-tight truncate ${compact ? 'text-sm mb-1.5' : 'text-base mb-1.5'}`}
         title={row.nome}
@@ -142,19 +123,11 @@ export default function LeitoCard({ row, onSelect, compact = false }: Props) {
         {row.nome || 'Não identificado'}
       </h3>
 
-      {/* HERO: PROBLEMA PRINCIPAL COM VETOR GIGANTE (decisão pontual) */}
       {mainProblema ? (
         <div className={`${compact ? 'mb-2' : 'mb-3'} -mx-1 px-2 py-1.5 rounded-xl bg-app-tertiary/60 border border-app-border/60`}>
-          <div className="flex items-start gap-2">
-            <span className={`shrink-0 font-black tabular-nums leading-none pt-0.5 ${mainStyle?.badge ?? 'text-app-text-muted'} ${compact ? 'text-xl' : 'text-3xl'}`}>
-              {mainProblema.vetor ?? '·'}
-            </span>
-            <div className="flex-1 min-w-0">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-app-text-muted mb-px">PROBLEMA ATIVO</div>
-              <div className={`font-semibold leading-tight text-app-text ${compact ? 'text-sm line-clamp-2' : 'text-[13px] line-clamp-3'}`}>
-                {mainProblema.texto}
-              </div>
-            </div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-app-text-muted mb-px">PROBLEMA ATIVO</div>
+          <div className={`font-semibold leading-tight text-app-text ${compact ? 'text-sm line-clamp-2' : 'text-[13px] line-clamp-3'}`}>
+            {mainProblema.texto}
           </div>
         </div>
       ) : (
@@ -163,31 +136,23 @@ export default function LeitoCard({ row, onSelect, compact = false }: Props) {
         )
       )}
 
-      {/* Outros problemas (compactos) */}
       {outrosProblemas.length > 0 && (
         <div className="space-y-0.5 mb-2 text-[11px] text-app-text-2">
           {outrosProblemas.map((p, i) => (
-            <div key={i} className="flex gap-1.5 items-start">
-              <span className={`shrink-0 w-3 text-center font-bold ${p.vetor ? VETOR_STYLE[p.vetor].badge : 'text-app-text-muted/50'}`}>
-                {p.vetor ?? '·'}
-              </span>
-              <span className="line-clamp-1">{p.texto}</span>
-            </div>
+            <div key={i} className="line-clamp-1">{p.texto}</div>
           ))}
           {problemas.length > maxProblemas && (
-            <div className="text-[10px] text-app-text-muted pl-4">+{problemas.length - maxProblemas} mais</div>
+            <div className="text-[10px] text-app-text-muted">+{problemas.length - maxProblemas} mais</div>
           )}
         </div>
       )}
 
-      {/* SEPSIS-3 ALERT */}
       {isSeptic && !compact && (
         <div className="mt-1 mb-2 badge-sepsis text-[10px] font-black uppercase tracking-wider py-1 px-2 rounded flex items-center justify-center gap-1 animate-pulse">
           <Flame className="w-3 h-3" /> Alerta Sepse-3
         </div>
       )}
 
-      {/* BADGE STRIP */}
       <div className={`${compact ? 'mt-0.5' : 'pt-1.5 border-t border-app-border/30'} flex flex-wrap items-center gap-1.5`}>
         <span className={`text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded gravidade-${row.gravidade}`}>
           {GRAVIDADE_LABEL[row.gravidade] ?? row.gravidade}

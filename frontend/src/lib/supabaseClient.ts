@@ -87,12 +87,9 @@ export interface Evolucao {
 
 // ==================== TIPOS DE SÍNTESE CLÍNICA (Foco Opção B) ====================
 
-export type Vetor = '↑' | '↓' | '=';
-
 export interface SasiProblemaAtivo {
   id?: string;
   texto: string;
-  vetor: Vetor | null;                    // Obrigatório no método SASI
   sistema?: SystemKey;
   gravidade?: 'leve' | 'moderada' | 'grave' | 'critica';
 }

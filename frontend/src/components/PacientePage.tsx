@@ -42,12 +42,6 @@ const SYSTEM_LABELS: Record<SystemKey, string> = {
   renal: 'Renal', hemato: 'Hemato', infecto: 'Infecto',
 };
 
-const VETOR_CLASS: Record<string, string> = {
-  '↑': 'tx-danger',
-  '↓': 'tx-ok',
-  '=': 'text-app-text-muted',
-};
-
 /**
  * Mapa de status de interconsulta → rótulo + classe semântica do tema (sem hex).
  * Aceita o vocabulário do app (pendente/agendada/realizada/cancelada) e o do
@@ -164,17 +158,8 @@ function SystemPanelRO({
   );
 }
 
-function ProblemaLinha({ texto, vetor }: { texto: string; vetor: string | null }) {
-  return (
-    <div className="flex items-start gap-2">
-      {vetor && (
-        <span className={`text-lg font-black leading-none ${VETOR_CLASS[vetor] ?? ''}`}>
-          {vetor}
-        </span>
-      )}
-      <p className="text-xs font-medium text-app-text leading-snug m-0">{texto}</p>
-    </div>
-  );
+function ProblemaLinha({ texto }: { texto: string }) {
+  return <p className="text-xs font-medium text-app-text leading-snug m-0">{texto}</p>;
 }
 
 // ── Página ───────────────────────────────────────────────────────────────────
@@ -341,7 +326,7 @@ export default function PacientePage({ pacienteId, onBack }: Props) {
                     SOFA {sofaAtual}
                     {deltaSofa != null && deltaSofa !== 0 && (
                       <span className="ml-1 text-xs">
-                        {deltaSofa > 0 ? '↑' : '↓'}{deltaSofa > 0 ? '+' : ''}{deltaSofa}
+                        {deltaSofa > 0 ? '+' : ''}{deltaSofa}
                       </span>
                     )}
                   </span>
@@ -492,7 +477,7 @@ export default function PacientePage({ pacienteId, onBack }: Props) {
                   <div className="flex flex-col gap-2">
                     {problemas.map((p, i) => (
                       <SystemPanelRO key={p.id ?? i} sys={p.sistema}>
-                        <ProblemaLinha texto={p.texto} vetor={p.vetor} />
+                        <ProblemaLinha texto={p.texto} />
                       </SystemPanelRO>
                     ))}
                   </div>
@@ -541,7 +526,7 @@ export default function PacientePage({ pacienteId, onBack }: Props) {
                           className="grid md:grid-cols-[1fr_24px_1.2fr] gap-2.5 items-center py-2.5 border-t border-app-border/40"
                         >
                           <div>
-                            <ProblemaLinha texto={prob.texto} vetor={prob.vetor} />
+                            <ProblemaLinha texto={prob.texto} />
                             {prob.sistema && (
                               <span className="text-[9px] font-bold uppercase tracking-wider text-app-text-muted mt-1 inline-block">
                                 {SYSTEM_LABELS[prob.sistema]}

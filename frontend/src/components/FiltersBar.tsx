@@ -63,9 +63,9 @@ export default function FiltersBar({
               className={`transition hover:opacity-80 rounded px-1 ${
                 smartFilter === 'sofa_up' ? 'tx-danger underline underline-offset-2' : 'tx-danger'
               }`}
-              title="Filtrar ↑SOFA"
+              title="Filtrar SOFA em alta"
             >
-              ↑SOFA: <b>{stats.piorando}</b>
+              +SOFA: <b>{stats.piorando}</b>
             </button>
           )}
         </div>

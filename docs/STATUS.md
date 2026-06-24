@@ -211,7 +211,7 @@ SELECT count(*) FROM pg_views WHERE schemaname='public' AND viewname LIKE 'vw_%'
 Ver arquivo completo: [AGENTS.md](AGENTS.md)
 
 - Usar sempre o template SASI v2.0 (Ramo C) com ortogonalidade de eixos.
-- Toda nota deve ter: **Impressão com vetor (↑ / ↓ / =)** + **Conduta 1:1 com metas numéricas**.
+- Toda nota deve ter: **Impressão (problemas ativos)** + **Conduta 1:1 com metas numéricas**.
 - Ao gerar nota SASI via skill/IA → inserir automaticamente na tabela `evolucoes`.
 - Manter Max–Min em todos os sinais vitais (incluindo SpO2).
 - **Nunca inventar dados** (zero alucinação).

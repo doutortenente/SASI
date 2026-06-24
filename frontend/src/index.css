@@ -367,11 +367,11 @@ body {
    (ex.: bg a 10%, border a 30%) já são theme-neutros — deixar como Tailwind.
    ============================================================================ */
 
-/* Status de alerta (vitais, labs, tendência, delta, vetor de problema) */
-.tx-danger { color: #f87171; }  /* high / piora / ↑ / alerta */
+/* Status de alerta (vitais, labs, tendência, delta) */
+.tx-danger { color: #f87171; }  /* high / piora / alerta */
 .tx-info   { color: #38bdf8; }  /* low / abaixo da faixa */
 .tx-warn   { color: #fcd34d; }  /* absurdo / implausível / BH+ */
-.tx-ok     { color: #34d399; }  /* normal / melhora / ↓ */
+.tx-ok     { color: #34d399; }  /* normal / melhora */
 [data-theme="clinical"] .tx-danger { color: #dc2626; }
 [data-theme="clinical"] .tx-info   { color: #0284c7; }
 [data-theme="clinical"] .tx-warn   { color: #b45309; }
