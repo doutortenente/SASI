@@ -1,12 +1,12 @@
-// SasiSynthesis — Síntese SASI v2.0: prompt Claude + edição manual
+// SasiSynthesis — Síntese SASI v2.0: Grok API + prompt manual + edição
 
 import { useState } from 'react';
 import { SasiProblemaAtivo, SasiCondutaSistema, SystemKey } from '../lib/supabaseClient';
 import { Plus, Trash2, Sparkles } from 'lucide-react';
 import {
+  generateStructuredSynthesis,
   getReadyToPastePrompt,
   parseSynthesisJson,
-  simulateSASISynthesis,
   type SASISynthesisRequest,
   type SASISynthesisOutput,
 } from '../lib/sasiAI';
@@ -26,6 +26,8 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
   const [rawText, setRawText] = useState('');
   const [jsonPaste, setJsonPaste] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [lastSource, setLastSource] = useState<'grok' | 'local' | null>(null);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   const updateProblemas = (newProblemas: SasiProblemaAtivo[]) => {
     setProblemas(newProblemas);
@@ -62,41 +64,77 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
     updateCondutas(newCondutas);
   };
 
-  const copyPromptForClaude = () => {
+  const requireRawText = (): boolean => {
     if (!rawText.trim()) {
-      alert('Cole o texto bruto (evolução + folha + prescrição) no campo acima.');
-      return;
+      alert('Cole o texto bruto (evolução anterior + folha + prescrição) no campo acima.');
+      return false;
     }
+    return true;
+  };
+
+  const handleGenerateWithGrok = async () => {
+    if (!requireRawText()) return;
+
+    setIsGenerating(true);
+    setLastError(null);
+
+    try {
+      const { output, source } = await generateStructuredSynthesis(buildRequest(), { preferGrok: true });
+      applySynthesisResult(output);
+      setLastSource(source);
+      if (source === 'grok') {
+        alert('Síntese gerada com Grok! Revise e ajuste conforme necessário.');
+      } else {
+        alert('Grok indisponível — síntese gerada com simulação local. Revise os dados.');
+      }
+    } catch (error) {
+      console.error(error);
+      const message = error instanceof Error ? error.message : 'Erro desconhecido';
+      setLastError(message);
+      alert(`Erro ao gerar síntese: ${message}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleGenerateLocal = async () => {
+    if (!requireRawText()) return;
+
+    setIsGenerating(true);
+    setLastError(null);
+
+    try {
+      const { output, source } = await generateStructuredSynthesis(buildRequest(), { preferGrok: false });
+      applySynthesisResult(output);
+      setLastSource(source);
+      alert('Síntese gerada com simulação local. Revise e ajuste conforme necessário.');
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao gerar síntese local.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const copyPromptForExternalAI = () => {
+    if (!requireRawText()) return;
     const prompt = getReadyToPastePrompt(buildRequest());
     navigator.clipboard.writeText(prompt);
-    alert('Prompt SASI v2.0 copiado. Cole no Claude, pegue o JSON da resposta e use "Aplicar JSON".');
+    alert('Prompt SASI v2.0 copiado! Cole no Grok (recomendado), Claude ou Gemini.');
   };
 
   const handleApplyJson = () => {
     if (!jsonPaste.trim()) {
-      alert('Cole o JSON que o Claude devolveu.');
+      alert('Cole o JSON que a IA devolveu.');
       return;
     }
     try {
       applySynthesisResult(parseSynthesisJson(jsonPaste));
+      setLastSource(null);
       alert('JSON aplicado. Revise problemas e condutas.');
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'JSON inválido';
       alert(`Erro ao ler JSON: ${msg}`);
-    }
-  };
-
-  const handleGenerateLocal = () => {
-    if (!rawText.trim()) {
-      alert('Cole o texto bruto no campo acima.');
-      return;
-    }
-    setIsGenerating(true);
-    try {
-      applySynthesisResult(simulateSASISynthesis(buildRequest()));
-      alert('Síntese local gerada. Revise antes de salvar.');
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -134,7 +172,8 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
       <div className="border border-app-border bg-app-tertiary/30 rounded-2xl p-4 space-y-3">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 tx-neuro" />
-          <span className="font-bold text-sm">Síntese com Claude</span>
+          <span className="font-bold text-sm">Gerar Síntese com IA</span>
+          <span className="text-[10px] bg-purple-500/10 tx-neuro px-2 py-0.5 rounded">Grok API · Local · Manual</span>
         </div>
 
         <textarea
@@ -146,25 +185,32 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
 
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={copyPromptForClaude}
-            disabled={!rawText.trim()}
-            className="flex items-center gap-2 px-4 py-2 bg-app-accent hover:opacity-90 disabled:opacity-50 text-white text-sm font-bold rounded-xl transition"
+            onClick={handleGenerateWithGrok}
+            disabled={isGenerating || !rawText.trim()}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-sm font-bold rounded-xl transition"
           >
-            Copiar Prompt p/ Claude
+            {isGenerating ? 'Gerando...' : 'Gerar com Grok'}
           </button>
           <button
             onClick={handleGenerateLocal}
             disabled={isGenerating || !rawText.trim()}
             className="flex items-center gap-2 px-4 py-2 bg-app-card border border-app-border hover:bg-app-tertiary disabled:opacity-50 text-sm font-medium rounded-xl transition"
           >
-            {isGenerating ? 'Gerando...' : 'Simulação local'}
+            Simulação local
+          </button>
+          <button
+            onClick={copyPromptForExternalAI}
+            disabled={!rawText.trim()}
+            className="flex items-center gap-2 px-4 py-2 border border-app-border hover:bg-app-card disabled:opacity-50 text-sm font-medium rounded-xl transition"
+          >
+            Copiar Prompt Manual
           </button>
         </div>
 
         <textarea
           value={jsonPaste}
           onChange={(e) => setJsonPaste(e.target.value)}
-          placeholder='Cole aqui o JSON que o Claude devolveu (bloco ```json ou puro)'
+          placeholder='Opcional: cole JSON da resposta (```json ou puro) e aplique'
           className="w-full h-20 bg-app-card border border-app-border rounded-xl p-3 text-xs font-mono resize-y"
         />
         <button
@@ -172,12 +218,21 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, onCha
           disabled={!jsonPaste.trim()}
           className="px-4 py-2 border border-app-border hover:bg-app-card disabled:opacity-50 text-sm font-medium rounded-xl transition"
         >
-          Aplicar JSON do Claude
+          Aplicar JSON
         </button>
 
         <p className="text-[10px] text-app-text-muted">
-          Fluxo: copiar prompt → Claude no chat → colar JSON acima → aplicar. Sem Grok, sem Edge Function.
+          Grok via xAI API direto (VITE_XAI_API_KEY). Edge Function grok-synthesis removida.
         </p>
+
+        {lastSource && (
+          <p className="text-[10px] text-app-text-muted">
+            Última geração: {lastSource === 'grok' ? 'Grok API' : 'simulação local'}.
+          </p>
+        )}
+        {lastError && (
+          <p className="text-[10px] text-red-400">Erro: {lastError}</p>
+        )}
       </div>
 
       <div>

@@ -1,4 +1,5 @@
-// sasiAI.ts — Prompt SASI v2.0 + simulação local (Claude no chat é o fluxo principal)
+// sasiAI.ts — Prompt SASI v2.0 + Grok (xAI API direto) + simulação local
+// grok-synthesis (Edge Function) foi removida — chave via VITE_XAI_API_KEY
 
 export interface RawClinicalInput {
   previousEvolution?: string;
@@ -185,6 +186,89 @@ export function buildPatientContext(input: PatientContextInput): string {
 
 export function getReadyToPastePrompt(request: SASISynthesisRequest): string {
   return buildStrongSASIPrompt(request);
+}
+
+const XAI_CHAT_URL = 'https://api.x.ai/v1/chat/completions';
+
+function getXaiApiKey(): string | undefined {
+  const key = import.meta.env.VITE_XAI_API_KEY;
+  return typeof key === 'string' && key.trim() ? key.trim() : undefined;
+}
+
+function getXaiModel(): string {
+  const model = import.meta.env.VITE_XAI_MODEL;
+  return typeof model === 'string' && model.trim() ? model.trim() : 'grok-3-mini';
+}
+
+export async function generateStructuredSynthesisViaGrok(
+  request: SASISynthesisRequest,
+): Promise<SASISynthesisOutput> {
+  const apiKey = getXaiApiKey();
+  if (!apiKey) {
+    throw new Error('VITE_XAI_API_KEY não configurada (frontend/.env ou Netlify)');
+  }
+
+  const prompt = buildStrongSASIPrompt(request);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 120_000);
+
+  try {
+    const res = await fetch(XAI_CHAT_URL, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: getXaiModel(),
+        temperature: 0.2,
+        max_tokens: 4096,
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content:
+              'Você gera sínteses clínicas SASI v2.0 em JSON estrito. Nunca invente dados clínicos. Responda somente com JSON válido.',
+          },
+          { role: 'user', content: prompt },
+        ],
+      }),
+    });
+
+    if (!res.ok) {
+      const detail = await res.text();
+      throw new Error(`xAI HTTP ${res.status}: ${detail.slice(0, 300)}`);
+    }
+
+    const data = await res.json() as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content || typeof content !== 'string') {
+      throw new Error('xAI resposta vazia');
+    }
+
+    return parseSynthesisJson(content);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export async function generateStructuredSynthesis(
+  request: SASISynthesisRequest,
+  options?: { preferGrok?: boolean },
+): Promise<{ output: SASISynthesisOutput; source: 'grok' | 'local' }> {
+  if (options?.preferGrok !== false) {
+    try {
+      const output = await generateStructuredSynthesisViaGrok(request);
+      return { output, source: 'grok' };
+    } catch (err) {
+      console.warn('[SASI] Grok indisponível, usando simulação local:', err);
+    }
+  }
+
+  return { output: simulateSASISynthesis(request), source: 'local' };
 }
 
 export function parseSynthesisJson(raw: string): SASISynthesisOutput {
