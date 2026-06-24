@@ -4,13 +4,35 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)'],
-        mono: ['var(--font-mono)'],
+        display: ['var(--font-display)'],
+        body: ['var(--font-body)'],
+        data: ['var(--font-data)'],
+        sans: ['var(--font-body)'],
+        mono: ['var(--font-data)'],
       },
       colors: {
-        // Theme-aware tokens (backed by CSS vars in src/index.css)
-        // Use as: bg-app, bg-app-card, text-app, border-app, etc.
-        // Slash-alpha works: bg-app-card/70
+        surface: {
+          DEFAULT: 'rgba(255, 255, 255, 0.03)',
+          1: 'rgba(255, 255, 255, 0.015)',
+          2: 'rgba(255, 255, 255, 0.03)',
+          panel: 'rgba(0, 0, 0, 0.4)',
+        },
+        text: {
+          DEFAULT: 'rgb(248, 250, 252)',
+          base: 'rgb(203, 213, 225)',
+          muted: 'rgb(148, 163, 184)',
+        },
+        accent: {
+          teal: 'var(--accent-teal)',
+        },
+        semantic: {
+          bom: 'var(--sem-bom)',
+          atencao: 'var(--sem-atencao)',
+          perigo: 'var(--sem-perigo)',
+          fraco: 'var(--sem-fraco)',
+          alerta: 'var(--sem-alerta)',
+          nerd: 'var(--sem-nerd)',
+        },
         app: {
           DEFAULT: 'rgb(var(--app-bg) / <alpha-value>)',
           card: 'rgb(var(--app-card) / <alpha-value>)',
@@ -20,18 +42,6 @@ export default {
           'text-2': 'rgb(var(--app-text-2) / <alpha-value>)',
           'text-muted': 'rgb(var(--app-text-muted) / <alpha-value>)',
           accent: 'rgb(var(--app-accent) / <alpha-value>)',
-          'accent-hover': 'rgb(var(--app-accent-hover) / <alpha-value>)',
-          success: 'rgb(var(--app-success, 16 185 129) / <alpha-value>)',
-          warning: 'rgb(var(--app-warning, 245 158 11) / <alpha-value>)',
-          danger: 'rgb(var(--app-danger, 239 68 68) / <alpha-value>)',
-        },
-        // Legacy palette (mantida por compat com code não-migrado)
-        sasi: {
-          critical: '#dc2626',
-          warning: '#f59e0b',
-          ok: '#16a34a',
-          bg: '#0f172a',
-          panel: '#1e293b',
         },
       },
     },
