@@ -201,7 +201,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
       // Nova síntese estruturada (SASI v2.0)
       problemas_ativos: problemasAtivosDraft,
       condutas_sistemas: condutasSistemasDraft,
-      riscos: riscosDraft,
+      riscos: riscosDraft.filter(r => r.texto.trim()),
     };
     if (evolucao) {
       const { error } = await supabase.from('evolucoes').update(evolPatch).eq('id', evolucao.id);

@@ -1,6 +1,6 @@
 // SasiSynthesis — Síntese SASI v2.0: Grok API + prompt manual + edição
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SasiProblemaAtivo, SasiCondutaSistema, SasiRisco, SystemKey } from '../lib/supabaseClient';
 import { Plus, Trash2, Sparkles } from 'lucide-react';
 import {
@@ -30,6 +30,18 @@ export default function SasiSynthesis({ problemasAtivos, condutasSistemas, risco
   const [isGenerating, setIsGenerating] = useState(false);
   const [lastSource, setLastSource] = useState<'grok' | 'local' | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setProblemas(problemasAtivos);
+  }, [problemasAtivos]);
+
+  useEffect(() => {
+    setCondutas(condutasSistemas);
+  }, [condutasSistemas]);
+
+  useEffect(() => {
+    setRiscos(riscosProp);
+  }, [riscosProp]);
 
   const updateProblemas = (newProblemas: SasiProblemaAtivo[]) => {
     setProblemas(newProblemas);
