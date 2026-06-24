@@ -6,7 +6,7 @@
     },
     "sasi": {
       "command": "node",
-      "args": ["./sasi-mcp-server/dist/index.js"],
+      "args": ["./mcp-server/dist/index.js"],
       "env": {
         "SUPABASE_URL": "https://idswehsvvqczzkiatuzu.supabase.co",
         "SUPABASE_SERVICE_ROLE_KEY": "${SASI_SERVICE_ROLE_KEY}"
