@@ -17,6 +17,4 @@ Pacote `sasi-skills` (extraído do ambiente em 2026-06-21) — as 3 skills agora
 
 **Estado (24-jun-2026):** pushado `claude` commit `582f117` origin/main. Loader via symlink `~/.claude/skills`. Versões antigas/redundantes → `~/dev/_quarentena/inbox-24jun-2026/`.
 
-**Import `Files_to_claudecode` (24-jun-2026):** bundle convertido em `sasi/docs/import/claudecode-2026-06-24/`. Canônicos em `claude/skills/` **não** sobrescritos (bundle mais antigo). Adicionados: fixtures PDF→md em `controles-vitais-janela/references/fixtures/`, caso VANESSA em `sasi/doctrine/examples/`, archive handoff redigido, pipeline xlsx→md. Ver `sasi/docs/import/INDEX.md`.
-
 Fora do pacote por design: `intensivao-catp` (não é SASI) e skills do plugin Obsidian "Comando UTI".
