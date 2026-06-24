@@ -54,7 +54,7 @@ SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
 ### 2. Build
 
 ```bash
-cd sasi-mcp-server
+cd mcp-server
 npm install
 npm run build
 ```
@@ -66,7 +66,7 @@ npm run build
   "mcpServers": {
     "sasi": {
       "command": "node",
-      "args": ["C:/caminho/absoluto/sasi-mcp-server/dist/index.js"],
+      "args": ["C:/caminho/absoluto/SASI/mcp-server/dist/index.js"],
       "env": {
         "SUPABASE_URL": "https://idswehsvvqczzkiatuzu.supabase.co",
         "SUPABASE_SERVICE_ROLE_KEY": "sua_service_role_key_aqui"

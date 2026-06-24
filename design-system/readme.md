@@ -12,11 +12,10 @@ components, and a full UI-kit recreation so any new SASI surface — a screen,
 a slide, a printable handoff — can be built on-brand in minutes.
 
 ## Sources (explore for deeper fidelity)
-- **GitHub — deployed app:** `doutortenente/comando-uti`
-  (live: `https://sasi-uti.netlify.app`). Active code lives in `sasi/`
-  (Vite + React 18 + Tailwind v4 + lucide-react + Supabase). The legacy root
-  `src/App.jsx` is deprecated.
-- Key files read to build this system: `sasi/src/index.css` (theme tokens,
+- **GitHub — deployed app:** `doutortenente/SASI`
+  (live: `https://sasi-uti.netlify.app`). Código em `frontend/`
+  (Vite + React 18 + Tailwind v4 + lucide-react + Supabase).
+- Key files read to build this system: `frontend/src/index.css` (theme tokens,
   gravity/SOFA/system/badge classes), `LeitoCard.tsx`, `Dashboard.tsx`,
   `SplitView.tsx`, `TableView.tsx`, `PatientSummary.tsx`, `SasiSynthesis.tsx`,
   `Login.tsx`, `ViewSwitcher.tsx`, `lib/theme.tsx`, `lib/drugs.ts`.

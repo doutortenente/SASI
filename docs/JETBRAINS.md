@@ -35,6 +35,12 @@ Dropdown superior direito:
 
 Equivalem a `npm run <script>` em `frontend/` ou `mcp-server/`.
 
+Configs versionadas (copiar para `.idea/runConfigurations/` se o IDE não carregar):
+
+```bash
+cp docs/idea-runConfigurations/*.xml .idea/runConfigurations/
+```
+
 ## Tailwind
 
 Suporte nativo no WebStorm/IDEA Ultimate (`frontend/tailwind.config.js`).

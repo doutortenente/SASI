@@ -133,36 +133,29 @@ Documento completo no Google Drive: **"Plano de ação login e autenticação SA
 
 ## 5. Mapa do Repositório (Jun 2026)
 
-**Código ATIVO (fonte da verdade — usar este):**
+**Código ATIVO (repo `doutortenente/SASI`):**
 ```
-sasi/                               ← frontend canônico
+frontend/                           ← React+Vite (deploy Netlify)
 ├── src/
-│   ├── App.tsx
-│   ├── components/                 (FichaCompleta, Dashboard, LeitoCard, etc.)
-│   ├── lib/                        (supabaseClient.ts, drugs.ts, theme.tsx...)
-│   └── hooks/
 ├── netlify.toml
-├── package.json
-└── tsconfig.json (strict)
+└── package.json
 
-supabase/                           ← backend canônico (única árvore)
-├── config.toml
-├── migrations/                     (01–05)
-└── functions/
-    ├── ocr-ingest/
-    ├── grok-synthesis/
-    └── _shared/
+mcp-server/                         ← MCP local (.mcp.json)
+supabase/                           ← migrations + Edge Functions
+├── functions/ocr-ingest, grok-synthesis
+└── types/database.types.ts
 
-sasi-mcp-server/                    ← MCP local (referenciado em .mcp.json)
-docs/                               ← SETUP.md, JETBRAINS.md, MAPA-REPOSITORIO.md
-templates/                          ← espelho templates Padrão (Obsidian CELEBRO)
-CLAUDE.md                           ← briefing IA
-STATUS.md                           ← este arquivo (estado vivo)
-AGENTS.md                           ← regras + env vars (sem JWTs)
+doctrine/                           ← doutrina clínica
+memory/                             ← sasi_index.db + scripts
+docs/                               ← SETUP, JETBRAINS, STATUS, AGENTS
+design-system/                      ← tokens + UI kit
+CLAUDE.md · .mcp.json
 ```
+
+Workspace irmão: `~/dev/` (Claude, JARVIS, `memory/MAPA-DEV.md`). `comando-uti` **arquivado**.
 
 **Faxina 16/06/2026 (organização):**
-- Criado `docs/MAPA-REPOSITORIO.md` + `templates/` (espelho Obsidian CELEBRO perfil Padrão).
+- Mapa do workspace: `~/dev/memory/MAPA-DEV.md` (pós-split; `comando-uti` descontinuado).
 - Fundido `CONFIGURAÇÕES_CLAUDE_JB.idea/` → `.idea/` canônico; removida run config `raiz: lint` (sem package.json raiz).
 - Removido `node_modules/` órfão na raiz (423 MB, sem `package.json`).
 - `.sasi-session-backup/` movido para gitignore (scratch de sessão IA).
@@ -260,7 +253,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 ---
 
 **Status resumido (11/06/2026):**  
-**Produção estável** com bypass de auth. Frontend redesenhado com **5 janelas** (`severity.ts`, `clinicalExtract.ts`, `JanelaNav`). Repo limpo: `sasi/` + `supabase/` + `sasi-mcp-server/`. Maior risco residual = drift de schema + dependência do bypass de autenticação.
+**Produção estável** com bypass de auth. Frontend com **5 janelas** (`severity.ts`, `clinicalExtract.ts`, `JanelaNav`). Repo: `frontend/` + `supabase/` + `mcp-server/`. Maior risco residual = drift de schema + bypass de autenticação.
 
 ---
 
@@ -272,9 +265,9 @@ JWTs antigos vazaram no histórico do git via `AGENTS.md`. Rotacione no Supabase
 ### 2. Configuração do Netlify (importante para deploy continuar funcionando)
 Acesse https://app.netlify.com/projects/sasi-uti/configuration/general
 
-- **Base directory**: mude de (vazio ou caminho antigo longo) para **`sasi`**
-- **Build command**: `npm run build` (já deve estar correto)
-- **Publish directory**: `sasi/dist`
+- **Base directory**: **`frontend`** (repo `doutortenente/SASI`, não mais `comando-uti`)
+- **Build command**: `npm run build`
+- **Publish directory**: `dist`
 
 Depois disso, faça um "Clear cache and deploy site" para testar.
 
@@ -288,7 +281,7 @@ git push
 ---
 
 *Referências rápidas (atualizado após faxina):*  
-- Código ativo: `sasi/`  
-- Deploy: Netlify `sasi-uti` (Base directory = `sasi` após ajuste manual)  
+- Código ativo: `frontend/`  
+- Deploy: Netlify `sasi-uti` (Base directory = `frontend`, publish = `dist`)
 - Supabase: projeto `idswehsvvqczzkiatuzu`  
 - Plano de auth: Google Drive (documento "Plano de ação login e autenticação SASI")
