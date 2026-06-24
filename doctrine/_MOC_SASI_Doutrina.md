@@ -16,6 +16,10 @@ criado: 2026-06-11
 - [[admissao-uti_SKILL]] — nota de admissão (modo D1, eixo TEMPO = HPMA).
 - [[sasi-ingest-export_SKILL]] — ingest de fotos/PDFs → JSON auditado + export de evolução e passagem de turno.
 
+## Exemplos (prova de template)
+
+- [[examples/VANESSA_refatorada_v2_PROVA]] — caso real refatorado com TEMPLATE-BASE v2.0 (uso local/PHI).
+
 ## References (módulos de apoio)
 
 - [[01-schema-eventos-clinicos]] — DDL `eventos_clinicos` + payload ingest (Claude→JSON→MCP).
