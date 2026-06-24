@@ -14,6 +14,7 @@ vendor/
 dist/
 build/
 *.tsbuildinfo
+*.map
 
 # === Supabase local ===
 supabase/.temp/
@@ -22,11 +23,17 @@ supabase/.branches/
 # === Logs / temporários do SO ===
 *.log
 .DS_Store
+*.bak
+
+# === Design system — cache de ferramenta ===
+.thumbnail
+design-system/uploads/
 
 # === Config local de IA (scratch) ===
 **/.claude/settings.local.json
 .github/workflows/ci.yml  # habilitar com: gh auth refresh -s workflow
 
-# índice gerado do repo (regenerável via memory/build_sasi_index.py)
+# === Índice do repo (regenerável) ===
 memory/sasi_index.db
 memory/sasi_index.db.bak
+memory/MAPA-SASI.md
