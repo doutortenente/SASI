@@ -3,6 +3,7 @@
 > Briefing operacional do projeto. Lido pelo Claude Code ao abrir o repo.
 > **Última atualização:** 11-Jun-2026 — sincronizado com o estado VIVO do Supabase (catálogo Postgres) e do workspace Notion.
 > Este arquivo substitui qualquer `_HANDOFF_BRIEFING.md` (datado 23-Abr-2026, **STALE** — não é fonte da verdade).
+> **Memória persistente do projeto:** @memory/MEMORY.md
 
 -----
 
