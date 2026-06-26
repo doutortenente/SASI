@@ -882,6 +882,17 @@ export type Database = {
           similarity: number
         }[]
       }
+      save_ficha: {
+        Args: {
+          p_evol: Json
+          p_evolucao_id: string
+          p_pac: Json
+          p_paciente_id: string
+          p_pendencias?: Json
+          p_plantao: string
+        }
+        Returns: string
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }

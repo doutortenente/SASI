@@ -169,76 +169,45 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
     setSaving(true);
     setSaveMsg(null);
 
-    // 1) Paciente
-    const pacPatch: Partial<Paciente> = {
-      nome: pacDraft.nome,
-      leito: pacDraft.leito,
-      hd: pacDraft.hd ?? undefined,
-      idade: pacDraft.idade ? Number(pacDraft.idade) : undefined,
-      peso: pacDraft.peso ? Number(pacDraft.peso) : undefined,
-      altura: pacDraft.altura ? Number(pacDraft.altura) : undefined,
-      alergias: pacDraft.alergias ?? undefined,
-      gravidade: pacDraft.gravidade,
-      data_adm: pacDraft.data_adm,
-    };
-    const { error: pacErr } = await supabase
-      .from('pacientes').update(pacPatch).eq('id', paciente.id);
-    if (pacErr) {
-      setSaveMsg({ ok: false, text: `Erro paciente: ${pacErr.message}` });
+    const h = new Date().getHours();
+    // valores conforme evolucoes_plantao_check: manha|tarde|noite|plantao_24h (minusculo, sem acento)
+    const plantao = h >= 7 && h < 13 ? 'manha' : h >= 13 && h < 19 ? 'tarde' : 'noite';
+
+    // Escrita ATÔMICA: paciente + evolução + pendências numa só transação (RPC save_ficha).
+    // Antes eram 3 chamadas soltas — falha no meio deixava estado parcial.
+    const { error } = await supabase.rpc('save_ficha', {
+      p_paciente_id: paciente.id,
+      p_pac: {
+        nome: pacDraft.nome,
+        leito: pacDraft.leito,
+        hd: pacDraft.hd ?? null,
+        idade: pacDraft.idade ?? null,
+        peso: pacDraft.peso ?? null,
+        altura: pacDraft.altura ?? null,
+        alergias: pacDraft.alergias ?? null,
+        gravidade: pacDraft.gravidade,
+        data_adm: pacDraft.data_adm ?? null,
+      },
+      p_evol: {
+        neuro: neuroDraft, resp: respDraft, hemo: hemoDraft, tgi: tgiDraft,
+        renal: renalDraft, hemato: hematoDraft, infecto: infectoDraft,
+        dvas: dvasDraft, sedativos: sedDraft,
+        impressao: impressaoDraft.filter(s => s.trim() !== ''),
+        conduta: condutaDraft.filter(s => s.trim() !== ''),
+        problemas_ativos: problemasAtivosDraft,
+        condutas_sistemas: condutasSistemasDraft,
+        riscos: riscosDraft.filter(r => r.texto.trim()),
+      },
+      p_evolucao_id: evolucao?.id ?? null,
+      p_plantao: plantao,
+      p_pendencias: pendenciasDraft
+        .filter(p => p.tarefa.trim() || p.id)
+        .map(p => ({ id: p.id ?? null, tarefa: p.tarefa, concluida: p.concluida })),
+    });
+
+    if (error) {
+      setSaveMsg({ ok: false, text: `Erro ao salvar: ${error.message}` });
       setSaving(false); return;
-    }
-
-    // 2) Evolução (cria se não existe)
-    const evolPatch = {
-      neuro: neuroDraft, resp: respDraft, hemo: hemoDraft, tgi: tgiDraft,
-      renal: renalDraft, hemato: hematoDraft, infecto: infectoDraft,
-      dvas: dvasDraft, sedativos: sedDraft,
-
-      // Legacy (compatibilidade)
-      impressao: impressaoDraft.filter(s => s.trim() !== ''),
-      conduta: condutaDraft.filter(s => s.trim() !== ''),
-
-      // Nova síntese estruturada (SASI v2.0)
-      problemas_ativos: problemasAtivosDraft,
-      condutas_sistemas: condutasSistemasDraft,
-      riscos: riscosDraft.filter(r => r.texto.trim()),
-    };
-    if (evolucao) {
-      const { error } = await supabase.from('evolucoes').update(evolPatch).eq('id', evolucao.id);
-      if (error) {
-        setSaveMsg({ ok: false, text: `Erro evolução: ${error.message}` });
-        setSaving(false); return;
-      }
-    } else {
-      const h = new Date().getHours();
-      const plantao = h >= 7 && h < 13 ? 'MANHÃ' : h >= 13 && h < 19 ? 'TARDE' : 'NOITE';
-      const { error } = await supabase.from('evolucoes').insert({
-        paciente_id: paciente.id,
-        data_evolucao: new Date().toISOString(),
-        plantao,
-        ...evolPatch,
-        sofa_snapshot: {},
-      });
-      if (error) {
-        setSaveMsg({ ok: false, text: `Erro nova evolução: ${error.message}` });
-        setSaving(false); return;
-      }
-    }
-
-    // 3) Pendências (upsert)
-    for (const p of pendenciasDraft) {
-      if (!p.tarefa.trim() && !p.id) continue;
-      if (p.id) {
-        await supabase.from('pendencias').update({
-          tarefa: p.tarefa, concluida: p.concluida,
-          concluida_at: p.concluida ? new Date().toISOString() : null,
-        }).eq('id', p.id);
-      } else if (p.tarefa.trim()) {
-        await supabase.from('pendencias').insert({
-          paciente_id: paciente.id,
-          tarefa: p.tarefa, prioridade: 2, concluida: p.concluida,
-        });
-      }
     }
 
     setSaveMsg({ ok: true, text: 'Salvo!' });
