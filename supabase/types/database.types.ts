@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_rules: {
+        Row: {
+          ativo: boolean
+          comparador: string
+          created_at: string
+          fonte: string | null
+          id: string
+          limiar: number
+          mensagem: string
+          ordem: number
+          rotulo: string
+          severidade: string
+          tipo_evento: string
+        }
+        Insert: {
+          ativo?: boolean
+          comparador: string
+          created_at?: string
+          fonte?: string | null
+          id?: string
+          limiar: number
+          mensagem: string
+          ordem?: number
+          rotulo: string
+          severidade: string
+          tipo_evento: string
+        }
+        Update: {
+          ativo?: boolean
+          comparador?: string
+          created_at?: string
+          fonte?: string | null
+          id?: string
+          limiar?: number
+          mensagem?: string
+          ordem?: number
+          rotulo?: string
+          severidade?: string
+          tipo_evento?: string
+        }
+        Relationships: []
+      }
       alerts_log: {
         Row: {
           acked: boolean
