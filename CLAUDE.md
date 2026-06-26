@@ -1,7 +1,7 @@
 # CLAUDE.md — SASI (Sistema de Auditoria e Síntese Intensiva)
 
 > Briefing operacional do projeto. Lido pelo Claude Code ao abrir o repo.
-> **Última atualização:** 24-Jun-2026 — contagens de dados via auditoria SQL 23-jun; schema via dump + migrations locais.
+> **Última atualização:** 26-Jun-2026 — baseline-squash do schema; alertas/tendência/save_ficha aplicados (migrations `2026062600000*`).
 > Este arquivo substitui qualquer `_HANDOFF_BRIEFING.md` (datado 23-Abr-2026, **STALE** — não é fonte da verdade).
 > **Memória persistente do projeto:** @memory/MEMORY.md
 
@@ -55,28 +55,32 @@ Direção ASPIRACIONAL para telas novas — **“Monitor de UTI Tático / HUD”
 
 -----
 
-## 4. Schema do banco (estado VIVO — 24-Jun-2026)
+## 4. Schema do banco (estado VIVO — 26-Jun-2026)
 
-Fonte fiel: `supabase/schema-live-dump.sql` + migrations `01–07`. 9 tabelas clínicas + RAG (`protocolos`, `protocolo_chunks` na migration `06`, **DDL versionado, aplicar manualmente**). Migration `07` adiciona síntese JSONB em `evolucoes` (aplicada remoto 24-jun). RLS habilitado.
+Fonte fiel: **migration baseline** `20260626000000_baseline.sql` (substitui `schema-live-dump.sql`; migrations `01–07` arquivadas em `migrations/_archive/`). 10 tabelas clínicas + 2 de config de alerta (`alert_rules`, `trend_rules`). RAG (`protocolos`/`protocolo_chunks`, migration `06`) **congelado, não aplicado**. RLS habilitado (`dev_bypass`, débito aceito solo).
 
 |Tabela            |Função                                                             |Linhas (23-jun-2026)|
 |------------------|-------------------------------------------------------------------|--------------------:|
-|`pacientes`       |Cadastro + status do leito + severidade visual                     |9                    |
-|`evolucoes`       |Snapshot por sistema (JSONB) + SOFA + conduta                      |9                    |
-|`eventos_clinicos`|**Timeseries** — coração do Meta-Vision (ΔSOFA, BH, tendências 72h)|93                   |
-|`atbs`            |Antibiotic stewardship (D-ATB)                                     |0                    |
-|`culturas`        |Microbiologia                                                      |0                    |
-|`antibiograma`    |S/I/R por cultura                                                  |0                    |
-|`pendencias`      |Tarefas por paciente                                               |0                    |
-|`alerts_log`      |Alertas com dedupe SHA-256 (anti alarm-fatigue)                    |0                    |
-|`ingest_audit_log`|Auditoria de ingest                                                |ver Supabase         |
+|`pacientes`       |Cadastro + status do leito + severidade visual + `riscos_flags`    |16                   |
+|`evolucoes`       |Snapshot por sistema (JSONB) + SOFA + conduta                      |16                   |
+|`eventos_clinicos`|**Timeseries** — núcleo de tendências/alertas                      |130                  |
+|`atbs`            |Antibiotic stewardship (D-ATB + `duracao_planejada_dias`)          |12                   |
+|`culturas`        |Microbiologia                                                      |3                    |
+|`antibiograma`    |S/I/R por cultura                                                  |2                    |
+|`pendencias`      |Tarefas por paciente                                               |7                    |
+|`alerts_log`      |Alertas (produtor VIVO: trigger + dedupe SHA-256)                  |0 (dispara no ingest)|
+|`ingest_audit_log`|Auditoria de ingest                                                |0                    |
+|`alert_rules`     |Config alertas por valor (25 regras; `fonte`=DOI Vera)             |25                   |
+|`trend_rules`     |Config alertas de tendência/Δ (AKI creatinina, GCS)                |3                    |
 
-**Views (5):** `vw_dashboard_uti`, `vw_sofa_trend_72h`, `vw_bh_acumulado`, `vw_dias_atb_ativo`, `vw_alertas_abertos`.
-**Funções:** `fn_updated_at`, `fn_invalidate_sofa_cache`, `sync_severidade_visual`, `fn_alert_hash`, `match_protocolos` (RAG, migration 06).
+**Views (7):** `vw_dashboard_uti`, `vw_sofa_trend_72h`, `vw_bh_acumulado`, `vw_dias_atb_ativo`, `vw_alertas_abertos`, `vw_eventos_pendentes_revisao`, `vw_eventos_tendencia`.
+**Funções:** `fn_updated_at`, `fn_invalidate_sofa_cache`, `sync_severidade_visual`, `fn_alert_hash`, `fn_eval_alert` (produtor de alerta), `fn_eval_trend` (tendência/Δ), `fn_autoflag_lowconf`, `save_ficha` (RPC escrita atômica ficha). `match_protocolos` só na migration 06 (não aplicada).
 **Edge Functions (sasi):** `ocr-ingest` e `ingest-patient` — **legado**, não usar no fluxo diário.
 **Extensões:** `pgcrypto`, `pg_trgm`, `vector` (pgvector 0.8).
 
-> ⚠️ **`eventos_clinicos` populada (93) com débito de qualidade:** ingest manual via Claude; 24/93 `requires_review`, 18/93 `confidence<0.7`; último ingest 21-jun-2026. Validar antes de confiar em tendências.
+> ⚠️ **`eventos_clinicos` (130) com débito de qualidade:** ingest manual via Claude; ~27 na fila `vw_eventos_pendentes_revisao`. O trigger `trg_autoflag_lowconf` força `requires_review` em `confidence<0.7`.
+>
+> ⛔ **SOFA bloqueado por DADO:** 0/16 evoluções têm os 6 componentes (bilirrubina e PaO2/FiO2 **nunca** capturadas). Calcular SOFA hoje = null pra todos. Fix é a montante (skill capturar os componentes).
 
 > 📌 **Onde vivem Interconsultas / Programação / Pendências (View 2):** `interconsultas[]` e `programacao[]` no JSONB **`pacientes.patient_summary`**. **Pendências** na tabela **`pendencias`**.
 
@@ -115,7 +119,7 @@ War Room · toggle de visão compacta · SmartPaste · abas por UTI · chips de 
 ### Outras frentes
 
 - Integração Figma: auditoria UX com screenshots anotados, design tokens SASI → Tailwind, master components com variantes.
-- Verificar wiring do hook de alertas clínicos ao entrypoint (`alerts_log` vazia sugere que pode não estar conectado).
+- ✅ (resolvido 26-jun) Alertas: hook estava OK, faltava **produtor** — criados `fn_eval_alert` (valor) + `fn_eval_trend` (tendência/Δ), config em `alert_rules`/`trend_rules` (mesa do médico em `docs/DECISOES-CLINICAS.md`).
 
 -----
 

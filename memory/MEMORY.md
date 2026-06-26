@@ -52,4 +52,11 @@ python3 memory/scripts/push_repo_index_to_postgres.py   # SUPABASE_DB_URL no .en
 
 1. **plantao-board** — migração fantasma no `comando.md`
 2. **rag-protocolos** — migration `06` versionada; falta aplicar no Supabase + Edge `protocolo-ingest`
-3. **eventos_clinicos** — 93 linhas com 24 requires_review / 18 low confidence (revisar)
+3. **eventos_clinicos** — 130 linhas; ~27 na fila `vw_eventos_pendentes_revisao` (revisar)
+4. **SOFA bloqueado por dado** — 0/16 evoluções têm os 6 componentes (bilirrubina/PaO2 nunca capturados); fix = skill `sasi-ingest-export` capturar a montante
+5. **evolucoes JSONB 2 schemas** — ingest usa `pa_sys_max`/`cr1`, ficha grava `pas1`
+6. **regras eng-default** (glicemia/K/Na/temp) em `alert_rules` sem evidência — pendente Vera; oligúria precisa de tipo `diurese`
+7. ~~alerts_log vazia~~ **resolvido 26-jun**: produtor criado (`fn_eval_alert`/`fn_eval_trend`, config `alert_rules`/`trend_rules`)
+
+## Schema (26-jun-2026)
+Baseline em `supabase/migrations/20260626000000_baseline.sql` (01–07 em `_archive/`). Tabelas de config: `alert_rules` (25), `trend_rules` (3). Alertas vivos via trigger. Roadmap do banco: `docs/ROADMAP-BANCO.md`; limiares clínicos: `docs/DECISOES-CLINICAS.md`.
