@@ -703,6 +703,51 @@ export type Database = {
           },
         ]
       }
+      trend_rules: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          fonte: string | null
+          id: string
+          janela_max_horas: number | null
+          limiar: number
+          mensagem: string
+          modo: string
+          ordem: number
+          rotulo: string
+          severidade: string
+          tipo_evento: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          fonte?: string | null
+          id?: string
+          janela_max_horas?: number | null
+          limiar: number
+          mensagem: string
+          modo: string
+          ordem?: number
+          rotulo: string
+          severidade: string
+          tipo_evento: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          fonte?: string | null
+          id?: string
+          janela_max_horas?: number | null
+          limiar?: number
+          mensagem?: string
+          modo?: string
+          ordem?: number
+          rotulo?: string
+          severidade?: string
+          tipo_evento?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       vw_alertas_abertos: {
@@ -908,6 +953,34 @@ export type Database = {
             referencedRelation: "vw_dashboard_uti"
             referencedColumns: ["evolucao_id"]
           },
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
+      }
+      vw_eventos_tendencia: {
+        Row: {
+          delta: number | null
+          gap_horas: number | null
+          paciente_id: string | null
+          tipo: string | null
+          ts: string | null
+          unidade: string | null
+          valor_anterior: number | null
+          valor_num: number | null
+        }
+        Relationships: [
           {
             foreignKeyName: "eventos_clinicos_paciente_id_fkey"
             columns: ["paciente_id"]
