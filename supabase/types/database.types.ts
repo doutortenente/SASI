@@ -1,11 +1,3 @@
-// ============================================================================
-// database.types.ts — Tipos TypeScript CANÔNICOS do schema Supabase real.
-// Gerados em 2026-06-14 via Supabase MCP (generate_typescript_types) do projeto
-// idswehsvvqczzkiatuzu. Fonte única de verdade para AMBOS os apps (sasi web e
-// uti-tracker mobile). NÃO editar à mão — regenerar quando o schema mudar:
-//   supabase gen types typescript --project-id idswehsvvqczzkiatuzu
-// ============================================================================
-
 export type Json =
   | string
   | number
@@ -15,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
@@ -66,6 +60,29 @@ export type Database = {
           tipo?: string
           user_id?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_log_evento_id_fkey"
+            columns: ["evento_id"]
+            isOneToOne: false
+            referencedRelation: "eventos_clinicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_log_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_log_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
       }
       antibiograma: {
         Row: {
@@ -92,6 +109,15 @@ export type Database = {
           id?: string
           resultado?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "antibiograma_cultura_id_fkey"
+            columns: ["cultura_id"]
+            isOneToOne: false
+            referencedRelation: "culturas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       atbs: {
         Row: {
@@ -145,6 +171,22 @@ export type Database = {
           user_id?: string | null
           via?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "atbs_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "atbs_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
       }
       culturas: {
         Row: {
@@ -189,6 +231,22 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "culturas_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "culturas_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
       }
       eventos_clinicos: {
         Row: {
@@ -239,6 +297,36 @@ export type Database = {
           valor_json?: Json | null
           valor_num?: number | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_clinicos_evolucao_id_fkey"
+            columns: ["evolucao_id"]
+            isOneToOne: false
+            referencedRelation: "evolucoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_clinicos_evolucao_id_fkey"
+            columns: ["evolucao_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["evolucao_id"]
+          },
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
       }
       evolucoes: {
         Row: {
@@ -319,6 +407,22 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "evolucoes_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evolucoes_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
       }
       ingest_audit_log: {
         Row: {
@@ -363,6 +467,46 @@ export type Database = {
           user_id?: string | null
           warnings?: string[] | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "ingest_audit_log_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ingest_audit_log_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
+      }
+      memorias: {
+        Row: {
+          conteudo: string
+          created_at: string | null
+          embedding: string | null
+          id: number
+          metadata: Json | null
+        }
+        Insert: {
+          conteudo: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: never
+          metadata?: Json | null
+        }
+        Update: {
+          conteudo?: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: never
+          metadata?: Json | null
+        }
+        Relationships: []
       }
       pacientes: {
         Row: {
@@ -375,6 +519,7 @@ export type Database = {
           hd: string | null
           id: string
           idade: number | null
+          imc: number | null
           isolation: string
           leito: string
           nome: string
@@ -398,6 +543,7 @@ export type Database = {
           hd?: string | null
           id?: string
           idade?: number | null
+          imc?: number | null
           isolation?: string
           leito: string
           nome: string
@@ -421,6 +567,7 @@ export type Database = {
           hd?: string | null
           id?: string
           idade?: number | null
+          imc?: number | null
           isolation?: string
           leito?: string
           nome?: string
@@ -434,6 +581,7 @@ export type Database = {
           user_id?: string | null
           uti?: string
         }
+        Relationships: []
       }
       pendencias: {
         Row: {
@@ -469,9 +617,92 @@ export type Database = {
           tarefa?: string
           user_id?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "pendencias_evolucao_id_fkey"
+            columns: ["evolucao_id"]
+            isOneToOne: false
+            referencedRelation: "evolucoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pendencias_evolucao_id_fkey"
+            columns: ["evolucao_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["evolucao_id"]
+          },
+          {
+            foreignKeyName: "pendencias_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pendencias_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
       }
     }
     Views: {
+      vw_alertas_abertos: {
+        Row: {
+          criticos: number | null
+          infos: number | null
+          leito: string | null
+          nome: string | null
+          paciente_id: string | null
+          total: number | null
+          uti: string | null
+          warnings: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_log_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_log_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
+      }
+      vw_bh_acumulado: {
+        Row: {
+          bh_24h: number | null
+          bh_48h: number | null
+          bh_72h: number | null
+          eventos_24h: number | null
+          paciente_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
+      }
       vw_dashboard_uti: {
         Row: {
           data_adm: string | null
@@ -499,22 +730,7 @@ export type Database = {
           user_id: string | null
           uti: string | null
         }
-      }
-      vw_sofa_trend_72h: {
-        Row: {
-          paciente_id: string | null
-          sofa_total: number | null
-          ts: string | null
-        }
-      }
-      vw_bh_acumulado: {
-        Row: {
-          bh_24h: number | null
-          bh_48h: number | null
-          bh_72h: number | null
-          eventos_24h: number | null
-          paciente_id: string | null
-        }
+        Relationships: []
       }
       vw_dias_atb_ativo: {
         Row: {
@@ -530,26 +746,229 @@ export type Database = {
           stewardship_flag: string | null
           via: string | null
         }
-      }
-      vw_alertas_abertos: {
-        Row: {
-          criticos: number | null
-          infos: number | null
-          leito: string | null
-          nome: string | null
-          paciente_id: string | null
-          total: number | null
-          uti: string | null
-          warnings: number | null
+        Insert: {
+          agente_alvo?: string | null
+          atb_id?: string | null
+          data_inicio?: string | null
+          dias_terapia?: never
+          droga?: string | null
+          foco?: string | null
+          frequencia?: string | null
+          intencao?: string | null
+          paciente_id?: string | null
+          stewardship_flag?: never
+          via?: string | null
         }
+        Update: {
+          agente_alvo?: string | null
+          atb_id?: string | null
+          data_inicio?: string | null
+          dias_terapia?: never
+          droga?: string | null
+          foco?: string | null
+          frequencia?: string | null
+          intencao?: string | null
+          paciente_id?: string | null
+          stewardship_flag?: never
+          via?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "atbs_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "atbs_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
       }
+      vw_sofa_trend_72h: {
+        Row: {
+          paciente_id: string | null
+          sofa_total: number | null
+          ts: string | null
+        }
+        Insert: {
+          paciente_id?: string | null
+          sofa_total?: number | null
+          ts?: string | null
+        }
+        Update: {
+          paciente_id?: string | null
+          sofa_total?: number | null
+          ts?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
+      }
+    }
+    Functions: {
+      fn_alert_hash: {
+        Args: { p_paciente_id: string; p_payload: Json; p_tipo: string }
+        Returns: string
+      }
+      match_memorias: {
+        Args: {
+          match_count: number
+          match_threshold: number
+          query_embedding: string
+        }
+        Returns: {
+          conteudo: string
+          id: number
+          similarity: number
+        }[]
+      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       gravidade_enum: "estavel" | "moderado" | "grave" | "critico" | "obito"
       status_leito_enum: "ativo" | "alta" | "obito" | "transferencia"
     }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
 }
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {
