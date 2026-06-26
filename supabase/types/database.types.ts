@@ -111,6 +111,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "alerts_log_evento_id_fkey"
+            columns: ["evento_id"]
+            isOneToOne: false
+            referencedRelation: "vw_eventos_pendentes_revisao"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "alerts_log_paciente_id_fkey"
             columns: ["paciente_id"]
             isOneToOne: false
@@ -169,6 +176,7 @@ export type Database = {
           data_inicio: string
           dose: string | null
           droga: string
+          duracao_planejada_dias: number | null
           foco: string | null
           frequencia: string | null
           id: string
@@ -186,6 +194,7 @@ export type Database = {
           data_inicio?: string
           dose?: string | null
           droga: string
+          duracao_planejada_dias?: number | null
           foco?: string | null
           frequencia?: string | null
           id?: string
@@ -203,6 +212,7 @@ export type Database = {
           data_inicio?: string
           dose?: string | null
           droga?: string
+          duracao_planejada_dias?: number | null
           foco?: string | null
           frequencia?: string | null
           id?: string
@@ -568,6 +578,7 @@ export type Database = {
           out_of_range_count: number
           patient_summary: Json | null
           peso: number | null
+          riscos_flags: Json
           severidade_visual: string
           sofa_baseline: number | null
           status_leito: string
@@ -592,6 +603,7 @@ export type Database = {
           out_of_range_count?: number
           patient_summary?: Json | null
           peso?: number | null
+          riscos_flags?: Json
           severidade_visual?: string
           sofa_baseline?: number | null
           status_leito?: string
@@ -616,6 +628,7 @@ export type Database = {
           out_of_range_count?: number
           patient_summary?: Json | null
           peso?: number | null
+          riscos_flags?: Json
           severidade_visual?: string
           sofa_baseline?: number | null
           status_leito?: string
@@ -824,6 +837,86 @@ export type Database = {
           },
           {
             foreignKeyName: "atbs_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
+      }
+      vw_eventos_pendentes_revisao: {
+        Row: {
+          confidence: number | null
+          created_at: string | null
+          evolucao_id: string | null
+          fonte: string | null
+          id: string | null
+          paciente_id: string | null
+          requires_review: boolean | null
+          source_text: string | null
+          tipo: string | null
+          ts: string | null
+          unidade: string | null
+          user_id: string | null
+          valor_json: Json | null
+          valor_num: number | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string | null
+          evolucao_id?: string | null
+          fonte?: string | null
+          id?: string | null
+          paciente_id?: string | null
+          requires_review?: boolean | null
+          source_text?: string | null
+          tipo?: string | null
+          ts?: string | null
+          unidade?: string | null
+          user_id?: string | null
+          valor_json?: Json | null
+          valor_num?: number | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string | null
+          evolucao_id?: string | null
+          fonte?: string | null
+          id?: string | null
+          paciente_id?: string | null
+          requires_review?: boolean | null
+          source_text?: string | null
+          tipo?: string | null
+          ts?: string | null
+          unidade?: string | null
+          user_id?: string | null
+          valor_json?: Json | null
+          valor_num?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_clinicos_evolucao_id_fkey"
+            columns: ["evolucao_id"]
+            isOneToOne: false
+            referencedRelation: "evolucoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_clinicos_evolucao_id_fkey"
+            columns: ["evolucao_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["evolucao_id"]
+          },
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
             columns: ["paciente_id"]
             isOneToOne: false
             referencedRelation: "vw_dashboard_uti"
