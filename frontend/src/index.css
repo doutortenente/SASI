@@ -349,10 +349,33 @@ input[type="range"]:focus-visible {
 /* Estado crítico/séptico = GLOW ESTÁTICO vermelho (era pulso infinito).
    Quietude é identidade BAYES.OPS; a cor grita, não o movimento. */
 .sasi-critical-pulse {
+  position: relative;
   box-shadow:
     0 0 0 1px var(--sem-alerta),
     0 0 24px -6px var(--sem-alerta),
     inset 0 0 26px -16px var(--sem-alerta);
+}
+
+/* Reticle de mira (corner brackets HUD) — ASSINATURA BAYES.OPS, concentrada
+   só no alvo crítico: 4 colchetes em "L" nos cantos do card. Estático. */
+.sasi-critical-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 3;
+  --reticle: rgba(255, 59, 48, .8);
+  --arm: 13px;   /* comprimento do braço do colchete */
+  --thk: 1.5px;  /* espessura do traço */
+  background:
+    linear-gradient(var(--reticle), var(--reticle)) top left     / var(--arm) var(--thk) no-repeat,
+    linear-gradient(var(--reticle), var(--reticle)) top left     / var(--thk) var(--arm) no-repeat,
+    linear-gradient(var(--reticle), var(--reticle)) top right    / var(--arm) var(--thk) no-repeat,
+    linear-gradient(var(--reticle), var(--reticle)) top right    / var(--thk) var(--arm) no-repeat,
+    linear-gradient(var(--reticle), var(--reticle)) bottom left  / var(--arm) var(--thk) no-repeat,
+    linear-gradient(var(--reticle), var(--reticle)) bottom left  / var(--thk) var(--arm) no-repeat,
+    linear-gradient(var(--reticle), var(--reticle)) bottom right / var(--arm) var(--thk) no-repeat,
+    linear-gradient(var(--reticle), var(--reticle)) bottom right / var(--thk) var(--arm) no-repeat;
 }
 
 button, a, [role="button"] {
