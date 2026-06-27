@@ -61,7 +61,7 @@ function vitalCellClass(key: string, value: number | null): string {
   switch (status) {
     case 'high': return 'tx-danger font-bold';
     case 'low': return 'tx-info font-bold';
-    case 'absurd': return 'tx-warn font-black animate-pulse';
+    case 'absurd': return 'tx-warn font-black underline decoration-2 underline-offset-2';
     default: return 'text-app-text-2';
   }
 }

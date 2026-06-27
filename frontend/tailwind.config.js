@@ -43,6 +43,7 @@ export default {
           'text-2': 'var(--text-2)',
           'text-muted': 'var(--text-muted)',
           accent: 'var(--accent-teal)',
+          'accent-hover': 'var(--accent-hover)',
         },
       },
     },

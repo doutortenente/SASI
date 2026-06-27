@@ -165,7 +165,7 @@ export default function Dashboard({ session }: Props) {
     : 'Admita um paciente usando a skill sasi-ingest-export ou o botão Novo Leito.';
 
   return (
-    <div className="flex h-screen overflow-hidden bg-app text-app-text">
+    <div className="flex h-screen overflow-hidden bg-transparent text-app-text">
       <Sidebar
         activeView={activeView}
         onNavigate={handleNavigate}

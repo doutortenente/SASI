@@ -90,11 +90,11 @@ export default function LeitoCard({ row, onSelect, compact = false }: Props) {
     >
       <div className={`flex items-center justify-between gap-2 ${compact ? 'mb-1' : 'mb-1.5'}`}>
         <div className="flex items-baseline gap-2">
-          <span className="text-[10px] font-bold uppercase text-app-text-muted tracking-wider">Leito</span>
+          <span className="text-[10px] font-bold uppercase text-app-text-muted font-data tracking-wider">Leito</span>
           <span className={`font-mono font-bold tabular-nums text-app-text leading-none ${compact ? 'text-xl' : 'text-2xl'}`}>
             {row.leito}
           </span>
-          <span className="text-[10px] font-mono text-app-text-muted">{row.uti}</span>
+          <span className="text-[10px] font-data text-app-text-muted">{row.uti}</span>
         </div>
 
         <div
@@ -148,7 +148,7 @@ export default function LeitoCard({ row, onSelect, compact = false }: Props) {
       )}
 
       {isSeptic && !compact && (
-        <div className="mt-1 mb-2 badge-sepsis text-[10px] font-black uppercase tracking-wider py-1 px-2 rounded flex items-center justify-center gap-1 animate-pulse">
+        <div className="mt-1 mb-2 badge-sepsis text-[10px] font-black uppercase tracking-wider py-1 px-2 rounded flex items-center justify-center gap-1">
           <Flame className="w-3 h-3" /> Alerta Sepse-3
         </div>
       )}

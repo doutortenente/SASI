@@ -31,6 +31,7 @@ export default function TopBar({
             <ShieldCheck className="w-5 h-5 text-white" />
           </div>
           <div>
+            <div className="bo-classified mb-0.5">UTI Alpha // 33 Leitos · Plantão Tático</div>
             <div className="text-base font-bold">SASI · Comando UTI Alpha</div>
             <div className="text-[11px] text-app-text-muted">
               {sessionEmail === 'dev@sasi-uti.local' ? 'Modo dev · sem auth' : sessionEmail}
