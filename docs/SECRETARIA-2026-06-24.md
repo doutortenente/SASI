@@ -107,4 +107,47 @@ dc45f4f feat(db): add evolucoes synthesis JSONB columns
 
 ---
 
-*Gerado 24-jun-2026. Atualizar `STATUS.md` e `~/.claude/memory/comando.md` em mudanças futuras — este arquivo é snapshot de sessão.*
+## Sessão Grok — Google Drive (24-jun-2026, tarde)
+
+> Operador pediu acesso ao Drive. Sessão Grok falhou em UX; handoff para Claude/operador.
+
+### O que ficou no disco (estado real)
+
+| Item | Caminho | Status |
+|------|---------|--------|
+| rclone binário | `~/.local/bin/rclone` v1.74.3 | Instalado (sem apt/sudo) |
+| Token OAuth rclone | `~/.config/rclone/rclone.conf` remote `gdrive` | **Autenticado** (OAuth built-in rclone, 24-jun ~10:22) |
+| Credenciais MCP (custom) | `~/.config/google-drive-mcp/gcp-oauth.keys.json` | Criado; **sem** `tokens.json` |
+| MCP config | `~/dev/.mcp.json` → `google-drive` | Restaurado (`@piotr-agier/google-drive-mcp`) |
+| Script mount | `~/dev/scripts/mount-google-drive.sh` | **Restaurado** |
+| Ponto de montagem | `~/GoogleDrive` | Pasta existe; **não montado** no fim da sessão |
+
+### Comandos úteis
+
+```bash
+# Montar Drive como pasta local (FUSE — não é sync completo, mas aparece no filesystem)
+~/dev/scripts/mount-google-drive.sh
+
+# Listar na nuvem sem montar
+~/.local/bin/rclone lsd gdrive:
+
+# Desmontar
+fusermount3 -u ~/GoogleDrive
+```
+
+### Erros do agente Grok (não repetir)
+
+1. Usou OAuth **custom** (`GOOGLE_OAUTH_CLIENT_*` do `.env`) sem redirects cadastrados no GCP → `redirect_uri_mismatch` no MCP.
+2. Abriu **dois** fluxos OAuth em paralelo (MCP + rclone) → porta `53682` em conflito.
+3. Removeu `mount-google-drive.sh` após operador dizer “não baixar Drive” — interpretação errada (operador queria sem sync/espelhamento, não apagar infra).
+4. MCP `google-drive` nunca autenticou; só rclone com OAuth **nativo** funcionou.
+
+### Pendência Drive (próximo agente)
+
+1. **MCP:** rodar `npx -y @piotr-agier/google-drive-mcp auth` **ou** cadastrar no GCP redirects `http://localhost:3000/oauth2callback` + `http://127.0.0.1:53682/` no client Web existente **ou** criar OAuth Desktop app.
+2. **Alternativa já usada no passado:** conector `claude.ai Google Drive` (consta em `~/.claude.json` `claudeAiMcpEverConnected`) — funciona no Claude.ai, não no Grok IDE.
+3. Confirmar com operador se quer **mount FUSE** (`~/GoogleDrive`) ou só **API sob demanda** (`rclone ls/cat`).
+
+---
+
+*Gerado 24-jun-2026. Atualizado 24-jun-2026 (tarde) — sessão Grok Drive. Atualizar `STATUS.md` e `~/.claude/memory/comando.md` em mudanças futuras — este arquivo é snapshot de sessão.*

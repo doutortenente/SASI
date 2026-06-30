@@ -1,7 +1,7 @@
 # STATUS — SASI (Sistema de Auditoria e Síntese Intensiva)
 **Comando UTI Alpha — 33 leitos (UTI 2/3/4)**
 
-**Data desta revisão:** 24/06/2026
+**Data desta revisão:** 27/06/2026
 **Produção:** https://sasi-uti.netlify.app  
 **Operador:** Dr. Nicolas Tenente (dr.tenente@nagaitaltda.com)  
 **Supabase:** idswehsvvqczzkiatuzu (Postgres 17.6)
@@ -18,7 +18,7 @@
 | Camada          | Tecnologia                                      | Observações |
 |-----------------|--------------------------------------------------|-------------|
 | Frontend        | React 18.3 + TypeScript + Vite 5                 | Código ativo em subpasta (ver seção 5) |
-| Estilo          | Tailwind 3.4 + CSS vars (3 temas)                | Tokens `bg-app-*`, nunca `bg-slate-*` hardcoded |
+| Estilo          | Tailwind 3.4 + CSS vars — **BAYES.OPS 2 temas** | Tactical (escuro OLED) ⇄ Clinical (claro); toggle `lib/theme.tsx`; tokens `--app-*`; nunca hex hardcoded |
 | Backend         | Supabase (Postgres + Auth + Realtime + Edge Functions) | Única fonte de dados |
 | Deploy          | Netlify `sasi-uti` (CI em `main`)                | `netlify.toml` na raiz: `base = "frontend"` |
 | PDF             | jsPDF + jspdf-autotable (lazy)                   | Export de passagem de turno |
@@ -30,7 +30,7 @@
 **Princípio arquitetural:**  
 Ingest = **Claude extrai → JSON validado → grava no Supabase** (MCP com `deploy`, ou edição no frontend). Uso **pessoal solo** — um operador, sem OAuth.
 
-**3 Temas:** `dark` (padrão), `clinical` (âmbar alta luminância UTI), `light`.  
+**2 Temas BAYES.OPS (27/06/2026):** `tactical` (OLED `#000`, glow teal, camadas blueprint/scanlines/vinheta, reticle HUD em crítico/séptico — padrão) ⇄ `clinical` (claro `#F4F6F9`, sem camadas, legível 12h). Toggle em `lib/theme.tsx`, persistido em `localStorage sasi.theme`. Tri-tipografia: Chakra Petch (display) · Lexend (corpo) · JetBrains Mono (dados). Lei: zero animação `infinite` decorativa.  
 **5 Janelas (redesign 11/06/2026):**
 
 | # | Janela | Atalho | Conteúdo |
@@ -99,6 +99,7 @@ Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persis
 |21 | Realtime dashboard em `pendencias` | 24/06/2026 | ✅ Ativo   | `useSupabasePatients.ts` |
 |22 | `clinical-engine` — 7 testes Vitest (parseBR, SOFA display) | 24/06/2026 | ✅ Ativo   | `packages/clinical-engine/` |
 |23 | Auditoria `eventos_clinicos` (script + query plantão) | 24/06/2026 | ✅ Ativo   | `scripts/audit_eventos.py`, `plantao_queries.sql` §11b |
+|24 | Design BAYES.OPS — 2 temas Tactical/Clinical        | 27/06/2026 | ✅ Ativo   | `src/index.css` + `tailwind.config.js` + LeitoCard/TopBar/Dashboard; commits `acce2c7`+`f185ab8`; Netlify `6a3fc8f0` READY |
 
 **Funcionalidades em destaque recentes (maio/2026):**  
 - `FichaCompleta.tsx` — edição completa de todos os sistemas (neuro, resp, hemo, tgi, renal, hemato, infecto) + DVA/sedativos + impressão/conduta/pendências.  
@@ -245,6 +246,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 | 11-Jun     | **Redesign 5 Janelas** — severity/Watcher, clinicalExtract, Passagem 3-linhas | feat/5-janelas |
 | 24-Jun     | **SASI executável (sessão agentes)** — Ficha↔Supabase, MCP deploy, clinical-engine, bundle ingest | `779741a`…`19586a8`; handoff `docs/SECRETARIA-2026-06-24.md` |
 | 24-Jun     | **Skill template evolução D2+ v2** promovido no repo `claude` | `35df460` |
+| 27-Jun     | **Design BAYES.OPS deployado** — 2 temas Tactical/Clinical; reticle HUD; bugs de token corrigidos; 2 animações `infinite` removidas | `f185ab8`; Netlify `6a3fc8f0` READY |
 
 ---
 
