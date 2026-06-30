@@ -9,36 +9,21 @@
 > dose ou conduta sem fonte rastreável entra "no escuro".
 
 ## Legenda
-🔴 não existe · 🟡 parcial · 🟢 feito (sai daqui quando concluir)
+🔴 não existe · 🟡 parcial / em andamento · 🟢 feito (sai daqui quando concluir)
 
 ---
 
-## 🔴 1. Ordenador de prescrição por sistema
-**Fonte:** planilha Fase 2.
-**O que é:** prescrição organizada e numerada por aparelho — Cardiovascular/Hemodinâmica · SNC/Psiquiatria · GI/Endócrino · Infeccioso/Respiratório · Sintomáticos/SN · Profilaxias.
-**Por que importa:** leitura rápida na passagem; nada de droga perdida no meio de uma lista corrida.
-**O que falta:**
-- modelo de dado: prescrição com campo `sistema` (enum dos 6 grupos) + dose/via/frequência/horários.
-- a skill `sasi-ingest-export` já lê `prescricao` → falta classificar cada item por sistema e agrupar na saída.
-- exibição: bloco por sistema na evolução / passagem.
+## 🟡 1. Ordenador de prescrição por sistema — EM ANDAMENTO (30-jun)
+**Fonte:** planilha Fase 2 + "Comando 2 — Ordenador de Prescrições" (prompt do operador, 30-jun).
+**O que é:** prescrição organizada e numerada por aparelho, com normalização de droga/dose/via/frequência e leitura de anotações à mão (suspender/modificar).
+**Feito:** spec incorporada na skill `sasi-ingest-export` como modo de saída **D. Exportar Prescrição Ordenada** (`references/07-export-prescricao-ordenada.md`); 7 blocos canônicos por sistema.
+**Falta:** persistir prescrição estruturada no banco (campo `sistema`); exibir o bloco por sistema no frontend.
 
-## 🔴 2. Alerta de via — SNE / trituração
-**Fonte:** planilha Fase 2 ("ALERTA SNE").
-**O que é:** sinalizar fármaco que **não pode ser triturado** pra sonda (comprimido revestido, liberação prolongada/LP, cápsula com microgrânulos).
-**Por que importa:** erro de medicação clássico e perigoso — triturar LP vira pico de dose; revestido entérico perde proteção.
-**O que falta:**
-- lista de fármacos/formas que não trituram (precisa **fonte** — bulário/guia de trituração; não inventar).
-- gatilho: na ingestão de prescrição, se via = SNE/SNG e forma = revestido/LP/cápsula → alerta.
-- liga no motor de `alert_rules`? Não — é regra de forma farmacêutica, não de limiar numérico. Provável tabela própria `regras_via`.
-
-## 🔴 3. Safety Check do intensivista
-**Fonte:** planilha Fase 3 ("SAFETY CHECK").
-**O que é:** camada que cruza a prescrição + quadro buscando interação medicamentosa, antagonismo farmacológico, iatrogenia e coerência de manejo de fluidos/DVA.
-**Por que importa:** é o "olho do sênior" — o maior valor clínico da planilha.
-**O que falta / cuidado:**
-- **CRÍTICO:** interação/antagonismo só pode ser afirmado **com fonte** (base de interações, ex. bulário/Micromedex/Lexicomp ou guideline). Sem fonte → não afirmar. É o item mais sujeito a alucinação — tratar com a mesma doutrina dos alertas (coluna `fonte`).
-- candidato natural a usar o **RAG de protocolos** (quando ligado) + uma base de interações.
-- começo realista: checagens determinísticas de poucas duplas de alto risco com fonte (ex: dupla bloqueio de QT, AINE + IRA, BB + verapamil), não um motor genérico.
+## 🟡 2. Safety Check do intensivista — BASE CRIADA (30-jun)
+**Fonte:** planilha Fase 3 + Comando 2 (seção "Análise do Intensivista Sênior").
+**O que é:** varredura da prescrição × diagnóstico buscando interação, antagonismo, iatrogenia.
+**Feito:** embutido no modo D da skill, em modo **CONSERVADOR** — só aponta contraindicação clássica e rastreável; sem achado → "nenhum risco imediato detectado". NUNCA inventa interação.
+**Falta / cuidado:** base de interações com fonte (bulário/guideline) ou via RAG de protocolos. Hoje cobre só duplas clássicas de alto risco (ex: β-bloqueador em choque cardiogênico, laxante em obstrução, dupla de QT longo). É o item mais sujeito a alucinação — manter a trava da fonte.
 
 ---
 
@@ -49,6 +34,13 @@
 | Patient Summary por aparelho | Fase 3 | tabela `patient_summary` existe, **vazia** | produtor que preencha a síntese sistêmica integrada |
 | Laboratório serial ("Folhão") | aba Folhão | tendência existe (`trend_rules`, `vw_eventos_tendencia`) | visão lado a lado dia-a-dia (régua temporal) no frontend |
 | Referências normais por exame | Fase 1 | parcial em `alert_rules`/sanity-checks | faixa de normalidade por exame pra flag out-of-range consistente |
+
+---
+
+## 🟢 Já estava pronto (não era gema)
+- **Alerta de via SNE / trituração** — já implementado na skill como sanity-check
+  (`references/03-clinical-sanity-checks.md`, "Droga VO com SNE": flag `clinical_incompatibility`
+  + lista do que pode/não pode triturar). Removido do backlog em 30-jun (não era débito).
 
 ---
 
