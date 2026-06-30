@@ -39,9 +39,8 @@
 
 ## 🟡 3. SOFA automático — motor v1 (FASE B)
 **Spec congelada:** `docs/SOFA-RULESET.md` (`SOFA1_v1.0_2026-06-30`) — cutoffs SOFA-1 + imputação determinística rastreável (GCS/diurese) + audit trail + versionamento.
-**Feito (v0):** view `vw_sofa_diario` provisória (pior valor/dia, faltante=`null`, sem suporte vent. no resp, cardio só PAM+nor, sem audit trail).
-**Falta (v1):** imputação (LOCF/carry-forward) + audit trail por componente + tabela materializada `sofa_janela` (view não persiste).
-**Pré-requisitos de captura (skill, à montante):** (1) suporte ventilatório; (2) vasopressores por droga+dose; (3) RASS + GCS pré-sedação; (4) diurese mL/24h. Sem os 4, o v1 não roda fielmente — por isso atrás da captura.
+**Feito (30-jun):** view `vw_sofa_diario` **v0.2** (resp checa suporte ventilatório; cardio multi-droga nor/adr/dopa/dobuta); **captura dos 4 pré-requisitos operacional na skill** (suporte_vent, vasopressor por droga+dose, RASS+GCS pré-sedação, diurese) via `valor_json`, sem novo tipo no banco.
+**Falta (v1):** imputação determinística + LOCF/carry-forward + audit trail por componente (tabela materializada `sofa_janela`); filtro vaso ≥60min; gatilho de alerta sobre ΔSOFA ≥2. Atrás de **volume de dados** (captura só começou) — não de cutoff.
 
 ---
 

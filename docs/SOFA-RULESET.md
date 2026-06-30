@@ -70,18 +70,22 @@ ventilatório · tempo mínimo de vasopressor · regras de imputação · conver
 
 ## 6. Status de implementação
 
-**Hoje (`v0`, view `vw_sofa_diario`):** janela por dia · pior valor · soma · faltante=`null`
-(sem imputar) · sem suporte ventilatório no resp · cardio só PAM+nor · sem audit trail.
-É **provisória** — não usar como `v1`.
+**`v0.2` (atual, view `vw_sofa_diario`, migration `20260630190000`):** janela por dia · pior valor ·
+soma · **resp checa suporte ventilatório** (valor_json) · **cardio multi-droga** (nor/adr/dopa/dobuta) ·
+faltante=`null` (sem imputar) · sem audit trail. Determinística, sem imputação.
 
-**Motor `v1` (FASE B)** — precisa, além do código:
-- tabela materializada `sofa_janela` (persistir audit trail + imputação; view não persiste).
-- lógica de imputação/LOCF/carry-forward (melhor função PG ou serviço, não view pura).
+**Captura dos pré-requisitos — FEITA (30-jun, skill `sasi-ingest-export`)**, modelada via `valor_json`
+sem novo tipo no banco:
+1. Suporte ventilatório → `pf_ratio.valor_json.suporte_vent`.
+2. Vasopressores por droga+dose → `nor_dose`/`adr_dose`/`dopa_dose`/`dobuta_dose` + `valor_json.duracao_min`.
+3. RASS + GCS pré-sedação → evento `rass` + `gcs.valor_json.{pre_sedacao,confounded_by_sedation}`.
+4. Diurese → `diurese_h` (mL/h; `from_24h_total` se vier do total).
 
-**Pré-requisitos de CAPTURA (à montante, na skill `sasi-ingest-export`):**
-1. **Suporte ventilatório** como dado consultável junto do `pf_ratio` (VM/NIV/HFNC).
-2. **Vasopressores por droga + dose** (`dopa_dose`/`dobuta_dose`/`adr_dose`/`nor_dose`) + duração.
-3. **RASS/sedação + GCS pré-sedação** (para imputação CNS).
-4. **Diurese diária (mL/24h)** explícita (hoje só `diurese_h`/mL/h).
+**Motor `v1` (FASE B, ainda falta):**
+- imputação determinística + LOCF/carry-forward + audit trail por componente → tabela materializada
+  `sofa_janela` (view não persiste).
+- filtro vasopressor ≥60 min; `sofa_total_observed_only` vs `_with_imputation`; `alert_confidence`.
+- gatilho de alerta sobre ΔSOFA ≥2.
 
-Sem esses 4, o motor `v1` não roda fielmente — por isso é fase B, atrás da captura.
+Fica fase B porque depende de **volume de dados** (a captura só começou hoje) e de
+**persistência/auditoria** — não de cutoff.
