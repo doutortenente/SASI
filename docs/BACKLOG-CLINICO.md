@@ -37,6 +37,14 @@
 
 ---
 
+## 🟡 3. SOFA automático — motor v1 (FASE B)
+**Spec congelada:** `docs/SOFA-RULESET.md` (`SOFA1_v1.0_2026-06-30`) — cutoffs SOFA-1 + imputação determinística rastreável (GCS/diurese) + audit trail + versionamento.
+**Feito (v0):** view `vw_sofa_diario` provisória (pior valor/dia, faltante=`null`, sem suporte vent. no resp, cardio só PAM+nor, sem audit trail).
+**Falta (v1):** imputação (LOCF/carry-forward) + audit trail por componente + tabela materializada `sofa_janela` (view não persiste).
+**Pré-requisitos de captura (skill, à montante):** (1) suporte ventilatório; (2) vasopressores por droga+dose; (3) RASS + GCS pré-sedação; (4) diurese mL/24h. Sem os 4, o v1 não roda fielmente — por isso atrás da captura.
+
+---
+
 ## 🟢 Já estava pronto (não era gema)
 - **Alerta de via SNE / trituração** — já implementado na skill como sanity-check
   (`references/03-clinical-sanity-checks.md`, "Droga VO com SNE": flag `clinical_incompatibility`
