@@ -23,7 +23,7 @@ export default function InlineInput({
       placeholder={ph}
       value={val == null ? '' : String(val)}
       onChange={(e) => onChange(e.target.value)}
-      className={`border-b-2 border-app-border focus:border-app-accent focus:outline-none focus:ring-2 focus:ring-app-accent/30 text-center bg-app-card/60 rounded-t px-1 font-medium text-app-text ${w} transition-colors print:border-none print:bg-transparent print:p-0 ${className}`}
+      className={`border-b-2 border-app-border focus:border-app-accent focus:outline-none focus:ring-2 focus:ring-app-accent/30 text-center bg-app-tertiary rounded-t px-1 font-medium text-app-text ${w} transition-colors print:border-none print:bg-transparent print:p-0 ${className}`}
     />
   );
 }

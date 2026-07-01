@@ -1,10 +1,34 @@
 // ============================================================================
 // SASI · exportPDF — gera PDF "Passagem de Turno" (A4 paisagem).
-// Usa jspdf + jspdf-autotable pra tabela densa com todos os leitos ativos.
+// Usa jspdf + jspdf-autotable. Identidade BAYES.OPS adaptada a papel:
+// faixa de marca INK + accent âmbar, tabela zebrada sem grade, badge de
+// gravidade colorido, números em fonte mono, cabeçalho/rodapé em toda página.
 // ============================================================================
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { DashboardRow } from './supabaseClient';
+import { severityLabel } from './severity';
+
+// ── Paleta (RGB, calibrada para leitura em papel — não é a paleta OLED crua) ──
+const INK: [number, number, number] = [17, 24, 37];        // faixa/cabeçalho + texto
+const PANEL: [number, number, number] = [243, 246, 250];   // zebra clara
+const HAIRLINE: [number, number, number] = [214, 222, 231];
+const AMBER: [number, number, number] = [245, 158, 11];    // accent (produção/ação)
+const TEAL: [number, number, number] = [13, 148, 136];     // melhora (Δ negativo)
+const RED: [number, number, number] = [220, 38, 38];       // crítico/piora
+const MUTED: [number, number, number] = [126, 140, 158];
+
+// gravidade db → cor de badge (fundo + texto)
+const SEV_BADGE: Record<string, { fill: [number, number, number]; text: [number, number, number] }> = {
+  critico: { fill: [220, 38, 38], text: [255, 255, 255] },
+  grave: { fill: [249, 115, 22], text: [255, 255, 255] },
+  moderado: { fill: [245, 158, 11], text: INK },
+  estavel: { fill: [16, 150, 110], text: [255, 255, 255] },
+  obito: { fill: [71, 85, 105], text: [255, 255, 255] },
+};
+
+const M = 10; // margem lateral (mm)
+const HEADER_H = 18; // altura da faixa de marca (mm)
 
 function getPlantao(): string {
   const h = new Date().getHours();
@@ -18,151 +42,211 @@ function truncate(s: string | null | undefined, max: number): string {
   return s.length > max ? s.slice(0, max) + '…' : s;
 }
 
-export function exportPassagemTurno(
-  patients: DashboardRow[],
-  userEmail?: string
-) {
-  const now = new Date();
-  const plantao = getPlantao();
-  const dateStr = now.toLocaleDateString('pt-BR');
-  const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+/**
+ * As fontes nativas do jsPDF (helvetica/courier) só cobrem WinAnsi/Latin-1.
+ * Glifos clínicos comuns (▸ ⚑ → ≥ Δ …) viram lixo se não forem substituídos.
+ * Acentos pt-BR (á é ç ã õ) ficam intactos (estão em Latin-1).
+ */
+function pdfText(s: string | null | undefined): string {
+  if (!s) return '';
+  return s
+    .replace(/[▸►‣▹]\s?/g, '') // marcador de linha (a coluna já rotula)
+    .replace(/[⚑⚐]\s?/g, '')
+    .replace(/→/g, '->')
+    .replace(/←/g, '<-')
+    .replace(/↑/g, '^')
+    .replace(/↓/g, 'v')
+    .replace(/≥/g, '>=')
+    .replace(/≤/g, '<=')
+    .replace(/[≈∼]/g, '~')
+    .replace(/Δ/g, 'd')
+    .replace(/[^\x00-\xFF]/g, '') // remove qualquer glifo fora do Latin-1 restante
+    .trim();
+}
 
-  // A4 landscape
+interface HeaderMeta {
+  linhaDireita1: string; // data · hora · plantão
+  linhaDireita2: string; // N pacientes · N críticos · responsável
+}
+
+/** Faixa de marca no topo — desenhada em TODA página (via didDrawPage). */
+function drawBrandHeader(doc: jsPDF, meta: HeaderMeta) {
+  const pageW = doc.internal.pageSize.getWidth();
+  // faixa escura
+  doc.setFillColor(...INK);
+  doc.rect(0, 0, pageW, HEADER_H, 'F');
+  // barra accent âmbar (produção/ação)
+  doc.setFillColor(...AMBER);
+  doc.rect(0, HEADER_H, pageW, 1.2, 'F');
+  // reticle de canto (assinatura HUD) — discreto, âmbar
+  doc.setDrawColor(...AMBER);
+  doc.setLineWidth(0.5);
+  doc.line(M - 4, 4, M - 4, 9); // canto esq. vertical
+  doc.line(M - 4, 4, M + 1, 4); // canto esq. horizontal
+  // título
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.text('SASI // PASSAGEM DE TURNO', M, 9, { charSpace: 0.6 });
+  // metadados à direita (branco apagado)
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(184, 194, 208);
+  doc.text(meta.linhaDireita1, pageW - M, 6.5, { align: 'right' });
+  doc.text(meta.linhaDireita2, pageW - M, 12.5, { align: 'right' });
+}
+
+/** Rodapé em TODA página. */
+function drawFooter(doc: jsPDF, pageNumber: number, version: string, n: number) {
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  doc.setDrawColor(...HAIRLINE);
+  doc.setLineWidth(0.2);
+  doc.line(M, pageH - 9, pageW - M, pageH - 9);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(...MUTED);
+  doc.text(`SASI ${version} · ${n} pacientes · LGPD art. 46 · Documento interno`, M, pageH - 5);
+  doc.text(`Pág ${pageNumber}`, pageW - M, pageH - 5, { align: 'right' });
+}
+
+function nowMeta() {
+  const now = new Date();
+  return {
+    now,
+    plantao: getPlantao(),
+    dateStr: now.toLocaleDateString('pt-BR'),
+    timeStr: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    ts: now.toISOString().replace(/[:.]/g, '').slice(0, 13),
+  };
+}
+
+function countCriticos(patients: DashboardRow[]): number {
+  return patients.filter((p) => p.gravidade === 'critico' || p.gravidade === 'obito').length;
+}
+
+// ── v1: tabela densa 11 colunas (botão PDF do Dashboard/TopBar) ──────────────
+export function buildPassagemTurnoDoc(
+  patients: DashboardRow[],
+  userEmail?: string,
+): { doc: jsPDF; filename: string } {
+  const { plantao, dateStr, timeStr, ts } = nowMeta();
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-  // ── Header ──────────────────────────────────────────────────────────────
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text('SASI — Passagem de Turno', 14, 14);
+  const meta: HeaderMeta = {
+    linhaDireita1: `${dateStr} · ${timeStr} · PLANTÃO ${plantao}`,
+    linhaDireita2: `${patients.length} pacientes · ${countCriticos(patients)} críticos${userEmail ? ` · ${userEmail}` : ''}`,
+  };
 
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${dateStr}  ${timeStr}  ·  Plantão ${plantao}`, 14, 20);
-  if (userEmail) {
-    doc.text(`Responsável: ${userEmail}`, 14, 25);
-  }
-
-  // ── Tabela ──────────────────────────────────────────────────────────────
-  const head = [['UTI', 'Leito', 'Nome', 'SOFA', 'Δ', 'Grav.', 'DVA', 'Sed', 'Pend', 'Dias', 'HD']];
-
+  const head = [['UTI', 'Leito', 'Nome', 'SOFA', '24h', 'Gravidade', 'DVA', 'Sed', 'Pend', 'Dias', 'HD']];
   const body = patients.map((p) => {
     const delta = p.delta_sofa_24h ?? 0;
-    const deltaStr = delta > 0 ? `+${delta}` : String(delta);
+    const deltaStr = delta > 0 ? `+${delta}` : delta < 0 ? String(delta) : '—';
     const dvaCount = Array.isArray(p.dvas) ? p.dvas.length : 0;
     const sedCount = Array.isArray(p.sedativos) ? p.sedativos.length : 0;
     return [
       p.uti,
       p.leito,
-      truncate(p.nome, 30),
+      pdfText(truncate(p.nome, 30)),
       p.sofa_total ?? '—',
       deltaStr,
-      p.gravidade,
+      p.gravidade, // convertido em badge no didParseCell
       dvaCount > 0 ? `${dvaCount}` : '—',
       sedCount > 0 ? `${sedCount}` : '—',
       p.pendencias_abertas > 0 ? String(p.pendencias_abertas) : '—',
       `D${p.dias_internacao}`,
-      truncate(p.hd, 80),
+      pdfText(truncate(p.hd, 80)),
     ];
   });
 
   autoTable(doc, {
-    startY: userEmail ? 29 : 24,
+    startY: HEADER_H + 5,
+    margin: { top: HEADER_H + 5, left: M, right: M, bottom: 13 },
     head,
     body,
-    theme: 'grid',
+    theme: 'striped',
     styles: {
-      fontSize: 7,
-      cellPadding: 1.5,
-      lineWidth: 0.1,
+      font: 'helvetica',
+      fontSize: 8,
+      cellPadding: 2.2,
+      textColor: INK,
+      lineWidth: 0,
+      valign: 'middle',
     },
     headStyles: {
-      fillColor: [15, 23, 42], // slate-900
-      textColor: 255,
+      fillColor: INK,
+      textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 7,
+      fontSize: 8,
+      cellPadding: 2.4,
     },
+    alternateRowStyles: { fillColor: PANEL },
     columnStyles: {
-      0: { cellWidth: 12 },  // UTI
-      1: { cellWidth: 12 },  // Leito
-      2: { cellWidth: 35 },  // Nome
-      3: { cellWidth: 10, halign: 'center' },  // SOFA
-      4: { cellWidth: 8, halign: 'center' },   // Δ
-      5: { cellWidth: 16 },  // Gravidade
-      6: { cellWidth: 8, halign: 'center' },   // DVA
-      7: { cellWidth: 8, halign: 'center' },   // Sed
-      8: { cellWidth: 10, halign: 'center' },  // Pend
-      9: { cellWidth: 12 },  // Dias
-      10: { cellWidth: 'auto' }, // HD
+      0: { cellWidth: 13 },
+      1: { cellWidth: 13 },
+      2: { cellWidth: 36 },
+      3: { cellWidth: 13, halign: 'center', font: 'courier', fontStyle: 'bold' },
+      4: { cellWidth: 10, halign: 'center', font: 'courier' },
+      5: { cellWidth: 20, halign: 'center' },
+      6: { cellWidth: 12, halign: 'center', font: 'courier' },
+      7: { cellWidth: 11, halign: 'center', font: 'courier' },
+      8: { cellWidth: 13, halign: 'center', font: 'courier' },
+      9: { cellWidth: 13, halign: 'center', font: 'courier' },
+      10: { cellWidth: 'auto' },
     },
     didParseCell(data) {
-      // Colore gravidade
-      if (data.section === 'body' && data.column.index === 5) {
-        const val = String(data.cell.raw);
-        if (val === 'critico') {
-          data.cell.styles.textColor = [239, 68, 68]; // red-500
-          data.cell.styles.fontStyle = 'bold';
-        } else if (val === 'grave') {
-          data.cell.styles.textColor = [249, 115, 22]; // orange-500
-        }
+      if (data.section !== 'body') return;
+      const col = data.column.index;
+      // Badge de gravidade
+      if (col === 5) {
+        const raw = String(data.cell.raw);
+        const badge = SEV_BADGE[raw] ?? SEV_BADGE.estavel;
+        data.cell.styles.fillColor = badge.fill;
+        data.cell.styles.textColor = badge.text;
+        data.cell.styles.fontStyle = 'bold';
+        data.cell.text = [severityLabel(raw).toUpperCase()];
       }
-      // Colore SOFA alto
-      if (data.section === 'body' && data.column.index === 3) {
-        const val = Number(data.cell.raw);
-        if (val >= 11) {
-          data.cell.styles.textColor = [239, 68, 68];
-          data.cell.styles.fontStyle = 'bold';
-        } else if (val >= 7) {
-          data.cell.styles.textColor = [249, 115, 22];
-        }
+      // SOFA alto
+      if (col === 3) {
+        const v = Number(data.cell.raw);
+        if (v >= 11) data.cell.styles.textColor = RED;
+        else if (v >= 7) data.cell.styles.textColor = AMBER;
       }
-      // Colore delta positivo
-      if (data.section === 'body' && data.column.index === 4) {
+      // Δ SOFA — piora vermelho, melhora teal
+      if (col === 4) {
         const raw = String(data.cell.raw);
         if (raw.startsWith('+')) {
-          data.cell.styles.textColor = [239, 68, 68];
+          data.cell.styles.textColor = RED;
+          data.cell.styles.fontStyle = 'bold';
+        } else if (raw.startsWith('-')) {
+          data.cell.styles.textColor = TEAL;
         }
       }
+    },
+    didDrawPage(data) {
+      drawBrandHeader(doc, meta);
+      drawFooter(doc, data.pageNumber, 'v1.1', patients.length);
     },
   });
 
-  // ── Footer ──────────────────────────────────────────────────────────────
-  const pageHeight = doc.internal.pageSize.getHeight();
-  doc.setFontSize(7);
-  doc.setTextColor(150);
-  doc.text(
-    `SASI v1.0 · Gerado em ${dateStr} ${timeStr} · LGPD art. 46 · Documento interno`,
-    14,
-    pageHeight - 6
-  );
-
-  // ── Save ────────────────────────────────────────────────────────────────
-  const ts = now.toISOString().replace(/[:.]/g, '').slice(0, 13);
-  doc.save(`SASI_passagem_${ts}.pdf`);
+  return { doc, filename: `SASI_passagem_${ts}.pdf` };
 }
 
-/** Passagem 3-linhas — A4 paisagem com autoTable (paginação automática) */
-export function exportPassagemTurno3Linhas(
+// ── v2: passagem 3-linhas com L2 (muda-conduta) e L3 (pendências) ────────────
+export function buildPassagemTurno3LinhasDoc(
   patients: DashboardRow[],
   blocks: Array<{ linha1: string; linha2: string; linha3: string }>,
   userEmail?: string,
-) {
-  const now = new Date();
-  const plantao = getPlantao();
-  const dateStr = now.toLocaleDateString('pt-BR');
-  const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
+): { doc: jsPDF; filename: string } {
+  const { plantao, dateStr, timeStr, ts } = nowMeta();
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-  doc.setFontSize(13);
-  doc.setFont('helvetica', 'bold');
-  doc.text('SASI — Passagem de Turno', 10, 12);
+  const meta: HeaderMeta = {
+    linhaDireita1: `${dateStr} · ${timeStr} · PLANTÃO ${plantao}`,
+    linhaDireita2: `${patients.length} pacientes · ${countCriticos(patients)} críticos${userEmail ? ` · ${userEmail}` : ''}`,
+  };
 
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${dateStr} ${timeStr} · Plantão ${plantao}${userEmail ? ` · ${userEmail}` : ''}`, 10, 17);
-
-  const head = [['UTI', 'Lt', 'Nome', 'SOFA', 'Δ', 'Grav', 'D', 'Muda-conduta (L2)', 'Pendências/Riscos (L3)']];
-
+  const head = [['UTI', 'Lt', 'Nome', 'SOFA', '24h', 'Gravidade', 'D', 'Muda-conduta (L2)', 'Pendências / Riscos (L3)']];
   const body = patients.map((p, i) => {
     const block = blocks[i];
     const delta = p.delta_sofa_24h ?? 0;
@@ -170,58 +254,96 @@ export function exportPassagemTurno3Linhas(
     return [
       p.uti,
       p.leito,
-      truncate(p.nome, 28),
+      pdfText(truncate(p.nome, 26)),
       p.sofa_total ?? '—',
       deltaStr,
       p.gravidade,
       `D${p.dias_internacao}`,
-      truncate(block?.linha2 ?? '', 120),
-      truncate(block?.linha3 ?? '', 120),
+      pdfText(block?.linha2 ?? ''),
+      pdfText(block?.linha3 ?? ''),
     ];
   });
 
   autoTable(doc, {
-    startY: 22,
+    startY: HEADER_H + 5,
+    margin: { top: HEADER_H + 5, left: M, right: M, bottom: 13 },
     head,
     body,
-    theme: 'grid',
+    theme: 'striped',
     styles: {
-      fontSize: 6.5,
-      cellPadding: 1.8,
-      lineWidth: 0.1,
+      font: 'helvetica',
+      fontSize: 7.5,
+      cellPadding: 2,
+      textColor: INK,
+      lineWidth: 0,
       overflow: 'linebreak',
-      cellWidth: 'wrap',
+      valign: 'top',
     },
     headStyles: {
-      fillColor: [15, 23, 42],
-      textColor: 255,
+      fillColor: INK,
+      textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 6.5,
+      fontSize: 7.5,
+      cellPadding: 2.2,
     },
+    alternateRowStyles: { fillColor: PANEL },
     columnStyles: {
       0: { cellWidth: 11 },
-      1: { cellWidth: 9, halign: 'center' },
+      1: { cellWidth: 8, halign: 'center' },
       2: { cellWidth: 32 },
-      3: { cellWidth: 9, halign: 'center' },
-      4: { cellWidth: 8, halign: 'center' },
-      5: { cellWidth: 14 },
-      6: { cellWidth: 9, halign: 'center' },
-      7: { cellWidth: 85 },
+      3: { cellWidth: 13, halign: 'center', font: 'courier', fontStyle: 'bold' },
+      4: { cellWidth: 10, halign: 'center', font: 'courier' },
+      5: { cellWidth: 19, halign: 'center' },
+      6: { cellWidth: 9, halign: 'center', font: 'courier' },
+      7: { cellWidth: 86 },
       8: { cellWidth: 'auto' },
     },
-    margin: { left: 10, right: 10, bottom: 12 },
+    didParseCell(data) {
+      if (data.section !== 'body') return;
+      const col = data.column.index;
+      if (col === 5) {
+        const raw = String(data.cell.raw);
+        const badge = SEV_BADGE[raw] ?? SEV_BADGE.estavel;
+        data.cell.styles.fillColor = badge.fill;
+        data.cell.styles.textColor = badge.text;
+        data.cell.styles.fontStyle = 'bold';
+        data.cell.text = [severityLabel(raw).toUpperCase()];
+      }
+      if (col === 3) {
+        const v = Number(data.cell.raw);
+        if (v >= 11) data.cell.styles.textColor = RED;
+        else if (v >= 7) data.cell.styles.textColor = AMBER;
+      }
+      if (col === 4) {
+        const raw = String(data.cell.raw);
+        if (raw.startsWith('+')) {
+          data.cell.styles.textColor = RED;
+          data.cell.styles.fontStyle = 'bold';
+        } else if (raw.startsWith('-')) {
+          data.cell.styles.textColor = TEAL;
+        }
+      }
+    },
     didDrawPage(data) {
-      const pageH = doc.internal.pageSize.getHeight();
-      doc.setFontSize(6);
-      doc.setTextColor(150);
-      doc.text(
-        `SASI v2.0 · ${patients.length} pacientes · LGPD art. 46 · Pág ${data.pageNumber}`,
-        10,
-        pageH - 5,
-      );
+      drawBrandHeader(doc, meta);
+      drawFooter(doc, data.pageNumber, 'v2.1', patients.length);
     },
   });
 
-  const ts = now.toISOString().replace(/[:.]/g, '').slice(0, 13);
-  doc.save(`SASI_passagem_${ts}.pdf`);
+  return { doc, filename: `SASI_passagem_${ts}.pdf` };
+}
+
+// ── APIs públicas (assinaturas inalteradas — usadas por Dashboard e PassagemTurno) ──
+export function exportPassagemTurno(patients: DashboardRow[], userEmail?: string) {
+  const { doc, filename } = buildPassagemTurnoDoc(patients, userEmail);
+  doc.save(filename);
+}
+
+export function exportPassagemTurno3Linhas(
+  patients: DashboardRow[],
+  blocks: Array<{ linha1: string; linha2: string; linha3: string }>,
+  userEmail?: string,
+) {
+  const { doc, filename } = buildPassagemTurno3LinhasDoc(patients, blocks, userEmail);
+  doc.save(filename);
 }

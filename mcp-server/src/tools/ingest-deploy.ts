@@ -16,7 +16,14 @@ const EventoSchema = z.object({
   requires_review: z.boolean().optional(),
 });
 
-const PayloadSchema = z.object({
+// Pendência = tarefa acionável estruturada (fonte única — NÃO repetir na conduta).
+// prioridade: 1 = alta/tempo-sensível, 2 = rotina do dia (default), 3 = pode esperar.
+const PendenciaSchema = z.object({
+  tarefa: z.string().min(1).max(500),
+  prioridade: z.union([z.literal(1), z.literal(2), z.literal(3)]).default(2),
+});
+
+export const PayloadSchema = z.object({
   $schema: z.literal("sasi-ocr-ingest/v1"),
   extracted_at: z.string(),
   source: z.object({
@@ -33,6 +40,7 @@ const PayloadSchema = z.object({
   paciente_upsert: z.record(z.unknown()).nullable().optional(),
   evolucao_snapshot: z.record(z.unknown()).nullable().optional(),
   eventos_clinicos: z.array(EventoSchema).optional(),
+  pendencias: z.array(PendenciaSchema).optional(),
 }).strict();
 
 type PayloadV1 = z.infer<typeof PayloadSchema>;
@@ -83,6 +91,7 @@ Retorna: paciente_id, evolucao_id, eventos_inseridos, warnings.`,
       const warnings: string[] = [...(payload.source?.warnings ?? [])];
       const eventos_ids: string[] = [];
       const user_id = process.env.SASI_OPERATOR_USER_ID ?? null;
+      let pendencias_inseridas = 0;
 
       try {
         let paciente_id: string | null = payload.target.paciente_id ?? null;
@@ -175,6 +184,29 @@ Retorna: paciente_id, evolucao_id, eventos_inseridos, warnings.`,
           evolucao_id = evol.id;
         }
 
+        // Pendências → linhas próprias na tabela `pendencias` (fonte única).
+        // Fica DEPOIS da evolução para o evolucao_id já estar resolvido (null se só lab/imagem).
+        if (payload.pendencias?.length) {
+          const pendBody = payload.pendencias.map((p) => ({
+            paciente_id,
+            evolucao_id,
+            user_id,
+            tarefa: p.tarefa,
+            prioridade: p.prioridade ?? 2,
+          }));
+
+          const { data: pend, error: pendErr } = await getDB()
+            .from("pendencias")
+            .insert(pendBody)
+            .select("id");
+
+          if (pendErr) {
+            await audit(paciente_id, payload, null, eventos_ids, warnings, false, `pendencias_insert: ${pendErr.message}`);
+            return { content: [{ type: "text", text: handleDBError(pendErr) }] };
+          }
+          pendencias_inseridas = pend?.length ?? 0;
+        }
+
         if (payload.eventos_clinicos?.length) {
           const fonte = payload.source.fonte === "claude_ocr" ? "claude_ocr"
             : payload.source.fonte === "gemini_ocr" ? "gemini_ocr"
@@ -213,6 +245,7 @@ Retorna: paciente_id, evolucao_id, eventos_inseridos, warnings.`,
           evolucao_id,
           eventos_inseridos: eventos_ids.length,
           eventos_ids,
+          pendencias_inseridas,
           requires_review_count: (payload.eventos_clinicos ?? []).filter((e) => e.requires_review).length,
           warnings,
         };
@@ -227,6 +260,7 @@ Retorna: paciente_id, evolucao_id, eventos_inseridos, warnings.`,
               `paciente_id: ${paciente_id}`,
               `evolucao_id: ${evolucao_id ?? "—"}`,
               `eventos: ${eventos_ids.length}`,
+              `pendencias: ${pendencias_inseridas}`,
               `requires_review: ${response.requires_review_count}`,
               warnings.length ? `warnings: ${warnings.join(" | ")}` : "",
             ].filter(Boolean).join("\n"),
