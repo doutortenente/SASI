@@ -309,7 +309,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
   return (
     <div className="space-y-4">
       {/* SAVE BAR (sticky) */}
-      <div className="flex items-center gap-3 p-3 rounded-xl bg-app-tertiary/60 border border-app-border sticky top-0 z-20 backdrop-blur">
+      <div className="flex items-center gap-3 p-3 rounded-xl bg-app-tertiary border border-app-border sticky top-0 z-20 backdrop-blur">
         <button
           onClick={handleSave}
           disabled={saving}
@@ -330,7 +330,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
 
       {/* INTELIGÊNCIA SOFA / SEPSE */}
       <div className={`p-3 rounded-xl border-l-4 shadow-sm ${
-        isSeptic ? 'bg-red-500/10 border-red-500' : 'bg-app-tertiary/40 border-app-border'
+        isSeptic ? 'bg-red-500/10 border-red-500' : 'bg-app-tertiary border-app-border'
       }`}>
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
@@ -402,7 +402,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 flex-wrap bg-app-tertiary/30 p-2 rounded-lg border border-app-border">
+        <div className="flex flex-col sm:flex-row gap-4 flex-wrap bg-app-tertiary p-2 rounded-lg border border-app-border">
           <div className="flex items-center gap-2">
             <label className="font-bold text-app-text-muted uppercase text-xs tracking-wider">Idade:</label>
             <input
@@ -1219,10 +1219,12 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   value={String(hematoDraft.profilaxiaTvp ?? '')}
                   onChange={e => setDraft('hemato', { profilaxiaTvp: e.target.value })}
                 >
-                  <option value="">TVP (Nenhuma selecionada)</option>
-                  <option value="Enoxaparina 40mg">Enoxaparina 40mg</option>
-                  <option value="Heparina SC 5000UI">Heparina SC 5000UI</option>
-                  <option value="Compressão Mecânica">Compressão Mecânica</option>
+                  <option value="">Profilaxia TVP/TEV (selecionar)</option>
+                  <option value="Clexane 40 mg">Clexane 40 mg</option>
+                  <option value="Clexane 20 mg">Clexane 20 mg</option>
+                  <option value="Hemofol 5.000 UI 12/12h">Hemofol 5.000 UI 12/12h</option>
+                  <option value="Hemofol 5.000 UI 8/8h">Hemofol 5.000 UI 8/8h</option>
+                  <option value="Sem indicação de profilaxia TEV (especificar motivo)">Sem indicação de profilaxia TEV (especificar)</option>
                 </select>
               </div>
               <div className="flex items-center gap-3 bg-app-card p-1.5 rounded-lg border border-pink-500/15 shadow-sm">
@@ -1232,10 +1234,11 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   value={String(hematoDraft.profilaxiaUlcera ?? '')}
                   onChange={e => setDraft('hemato', { profilaxiaUlcera: e.target.value })}
                 >
-                  <option value="">Úlcera (Nenhuma selecionada)</option>
-                  <option value="Omeprazol 40mg">Omeprazol 40mg</option>
-                  <option value="Pantoprazol 40mg">Pantoprazol 40mg</option>
-                  <option value="Ranitidina">Ranitidina</option>
+                  <option value="">Profilaxia LAMG / úlcera de estresse (selecionar)</option>
+                  <option value="Pantoprazol 40 mg VO">Pantoprazol 40 mg VO</option>
+                  <option value="Pantoprazol 40 mg EV">Pantoprazol 40 mg EV</option>
+                  <option value="Pantoprazol 40 mg EV 12/12h">Pantoprazol 40 mg EV 12/12h</option>
+                  <option value="Contraindicação">Contraindicação</option>
                 </select>
               </div>
             </div>
@@ -1479,7 +1482,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                 <span className="text-app-text-muted/60 font-bold">{i + 1}.</span>
                 <input
                   type="text"
-                  className="flex-1 bg-app-tertiary/40 border-b border-app-border focus:border-red-500 focus:bg-red-500/5 focus:outline-none py-1 px-2 rounded text-sm font-medium text-app-text-2"
+                  className="flex-1 bg-app-tertiary border-b border-app-border focus:border-red-500 focus:bg-red-500/5 focus:outline-none py-1 px-2 rounded text-sm font-medium text-app-text-2"
                   value={linha}
                   onChange={e => {
                     const copy = [...impressaoDraft];
@@ -1502,7 +1505,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                 <span className="text-app-text-muted/60 font-bold">{i + 1}.</span>
                 <input
                   type="text"
-                  className="flex-1 bg-app-tertiary/40 border-b border-app-border focus:border-emerald-500 focus:bg-emerald-500/5 focus:outline-none py-1 px-2 rounded text-sm font-medium text-app-text-2"
+                  className="flex-1 bg-app-tertiary border-b border-app-border focus:border-emerald-500 focus:bg-emerald-500/5 focus:outline-none py-1 px-2 rounded text-sm font-medium text-app-text-2"
                   value={linha}
                   onChange={e => {
                     const copy = [...condutaDraft];
@@ -1594,7 +1597,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   <span className="text-app-text-muted/60 font-bold text-xs w-4">{i + 1}.</span>
                   <input
                     type="text"
-                    className="flex-1 bg-app-tertiary/40 border-b border-app-border text-sm py-0.5 px-1"
+                    className="flex-1 bg-app-tertiary border-b border-app-border text-sm py-0.5 px-1"
                     value={linha}
                     onChange={e => {
                       const copy = [...impressaoDraft]; copy[i] = e.target.value; setImpressaoDraft(copy);
@@ -1612,7 +1615,7 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
                   <span className="text-app-text-muted/60 font-bold text-xs w-4">{i + 1}.</span>
                   <input
                     type="text"
-                    className="flex-1 bg-app-tertiary/40 border-b border-app-border text-sm py-0.5 px-1"
+                    className="flex-1 bg-app-tertiary border-b border-app-border text-sm py-0.5 px-1"
                     value={linha}
                     onChange={e => {
                       const copy = [...condutaDraft]; copy[i] = e.target.value; setCondutaDraft(copy);

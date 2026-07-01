@@ -66,10 +66,29 @@
 }
 
 /* ----------------------------------------------------------------------------
+   Controles de formulário — fundo do TEMA, não o "field" branco do navegador.
+   Cobre <input>/<select>/<textarea> que não têm classe de bg válida (inclui as
+   classes bg-app-*/N que não compilam). Utilitárias reais (bg-transparent,
+   bg-app-card, bg-teal-500/10…) vencem esta base por estarem em @layer utilities.
+   O `color-scheme` de cada tema escurece o popup nativo de <option>.
+   ---------------------------------------------------------------------------- */
+@layer base {
+  input, select, textarea {
+    background-color: var(--surface-panel);
+    color: var(--text);
+  }
+  option {
+    background-color: var(--base);
+    color: var(--text);
+  }
+}
+
+/* ----------------------------------------------------------------------------
    TACTICAL (padrão) — war-room OLED #000, telemetria teal, split cromático
    ---------------------------------------------------------------------------- */
 :root,
 [data-theme="tactical"] {
+  color-scheme: dark;
   --base: #000000;
   --surface-1: rgba(255, 255, 255, 0.015);
   --surface-2: rgba(255, 255, 255, 0.03);
@@ -98,6 +117,7 @@
    CLINICAL — rounds diurnos, papel claro + cards, acento teal escuro, sério
    ---------------------------------------------------------------------------- */
 [data-theme="clinical"] {
+  color-scheme: light;
   --base: #F4F6F9;
   --surface-1: rgba(15, 23, 42, 0.025);
   --surface-2: rgba(255, 255, 255, 0.92);

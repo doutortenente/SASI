@@ -108,7 +108,7 @@ export default function PatientSummaryTable({ summary, pacienteId, loading, onSa
               { label: 'DVA / Fluidos', key: 'dva_fluidos' as const, rows: 2 },
             ].map(row => (
               <tr key={row.key} className="border-b border-app-border/50">
-                <td className="w-44 px-2 py-1.5 font-bold text-app-text-muted bg-app-tertiary/40 align-top">
+                <td className="w-44 px-2 py-1.5 font-bold text-app-text-muted bg-app-tertiary align-top">
                   {row.label}
                 </td>
                 <td className="px-2 py-1">
@@ -116,7 +116,7 @@ export default function PatientSummaryTable({ summary, pacienteId, loading, onSa
                     value={meta[row.key]}
                     onChange={e => setMeta(m => ({ ...m, [row.key]: e.target.value }))}
                     rows={row.rows}
-                    className="w-full bg-app-tertiary/30 border border-app-border/40 rounded px-2 py-1 text-xs text-app-text resize-y focus:outline-none focus:border-app-accent"
+                    className="w-full bg-app-tertiary border border-app-border/40 rounded px-2 py-1 text-xs text-app-text resize-y focus:outline-none focus:border-app-accent"
                   />
                 </td>
               </tr>
@@ -136,7 +136,7 @@ export default function PatientSummaryTable({ summary, pacienteId, loading, onSa
           </thead>
           <tbody>
             {rows.map((row, i) => (
-              <tr key={row.id} className={`border-b border-app-border/50 ${i % 2 ? 'bg-app-tertiary/10' : 'bg-app-card'}`}>
+              <tr key={row.id} className={`border-b border-app-border/50 ${i % 2 ? 'bg-app-tertiary' : 'bg-app-card'}`}>
                 <td className="px-2 py-1.5 font-semibold text-app-text border-r border-app-border/30 whitespace-nowrap">
                   {row.emoji} {row.label}
                 </td>
@@ -149,7 +149,7 @@ export default function PatientSummaryTable({ summary, pacienteId, loading, onSa
                       setRows(next);
                     }}
                     rows={2}
-                    className="w-full bg-app-tertiary/30 border border-app-border/40 rounded px-2 py-1 text-xs text-app-text resize-y focus:outline-none focus:border-app-accent"
+                    className="w-full bg-app-tertiary border border-app-border/40 rounded px-2 py-1 text-xs text-app-text resize-y focus:outline-none focus:border-app-accent"
                     placeholder={`Resumo ${row.label}…`}
                   />
                 </td>

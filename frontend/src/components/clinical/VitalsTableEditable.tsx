@@ -33,7 +33,7 @@ export default function VitalsTableEditable({ rows, onChange }: Props) {
           {rows.map((row, i) => (
             <tr
               key={row.key}
-              className={`border-b border-app-border/50 ${i % 2 ? 'bg-app-tertiary/10' : 'bg-app-card'}`}
+              className={`border-b border-app-border/50 ${i % 2 ? 'bg-app-tertiary' : 'bg-app-card'}`}
             >
               <td className="px-2 py-1 font-bold text-app-text border-r border-app-border/30 sticky left-0 bg-inherit z-10">
                 {row.label}
@@ -44,7 +44,7 @@ export default function VitalsTableEditable({ rows, onChange }: Props) {
                     type="text"
                     value={row[field]}
                     onChange={e => update(i, field, e.target.value)}
-                    className="w-full bg-app-tertiary/50 border border-app-border/40 rounded px-1 py-0.5 text-[11px] text-app-text text-center focus:outline-none focus:border-app-accent tabular-nums"
+                    className="w-full bg-app-tertiary border border-app-border/40 rounded px-1 py-0.5 text-[11px] text-app-text text-center focus:outline-none focus:border-app-accent tabular-nums"
                     placeholder="—"
                   />
                 </td>
@@ -60,7 +60,7 @@ export default function VitalsTableEditable({ rows, onChange }: Props) {
                   type="text"
                   value={row.obs}
                   onChange={e => update(i, 'obs', e.target.value)}
-                  className="w-full bg-app-tertiary/50 border border-app-border/40 rounded px-1 py-0.5 text-[11px] text-app-text focus:outline-none focus:border-app-accent"
+                  className="w-full bg-app-tertiary border border-app-border/40 rounded px-1 py-0.5 text-[11px] text-app-text focus:outline-none focus:border-app-accent"
                   placeholder="—"
                 />
               </td>

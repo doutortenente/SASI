@@ -53,7 +53,7 @@ export default function PrescricaoTable({ items, editable = false, onChange }: P
               <tr
                 key={`${item.sistema}-${i}`}
                 className={`border-b border-app-border/50 ${
-                  item.medicamento ? 'bg-app-card' : 'bg-app-tertiary/15 opacity-70'
+                  item.medicamento ? 'bg-app-card' : 'bg-app-tertiary opacity-70'
                 } ${isNewSistema && i > 0 ? 'border-t-2 border-app-border' : ''}`}
               >
                 <td className="px-2 py-1 font-semibold text-app-text-2 border-r border-app-border/30 whitespace-nowrap">
@@ -71,7 +71,7 @@ export default function PrescricaoTable({ items, editable = false, onChange }: P
                         type="text"
                         value={item[field]}
                         onChange={e => update(realIdx, field, e.target.value)}
-                        className="w-full bg-app-tertiary/50 border border-app-border/40 rounded px-1 py-0.5 text-[11px] text-app-text focus:outline-none focus:border-app-accent"
+                        className="w-full bg-app-tertiary border border-app-border/40 rounded px-1 py-0.5 text-[11px] text-app-text focus:outline-none focus:border-app-accent"
                         placeholder="—"
                       />
                     ) : (
