@@ -6,8 +6,11 @@
 
 ## Origem
 Extraído via `pdftotext -layout` de 4 PDFs entregues em 24-jun-2026
-(`Files_to_claudecode/MOTOR_SASI_SCRIPTS/`). PDFs originais preservados ao lado
-em `_pdf-fonte/`. **Conferir a extração linha a linha antes de integrar** —
+(`Files_to_claudecode/MOTOR_SASI_SCRIPTS/`). PDFs originais arquivados no
+OneDrive (camada documentos do mapa de 6 camadas), integridade conferida por
+hash em 03-jul-2026:
+`OneDrive:/Google Drive/Dev e IA/2026-06-24_dev_sasi-motor-clinico-v2_{sofa,sepsis,engine,clinical-logic-compat}.pdf`
+**Conferir a extração linha a linha antes de integrar** —
 PDF→texto pode ter comido indentação ou quebrado linhas longas.
 
 ## Arquivos
