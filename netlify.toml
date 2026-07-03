@@ -5,7 +5,8 @@
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "20"
+  # 24 = LTS ate abr/2028 (20 morreu abr/2026); = nvm default local e MCP sasi
+  NODE_VERSION = "24"
 
 [[redirects]]
   from   = "/*"
