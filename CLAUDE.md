@@ -193,3 +193,4 @@ Regras:
 - Pergunta sobre o código? Rode primeiro `graphify query "<pergunta>"` (existindo `graphify-out/graph.json`). Relações entre dois pontos: `graphify path "<A>" "<B>"`. Conceito focado: `graphify explain "<conceito>"`. Devolvem um subgrafo pequeno — muito mais barato que GRAPH_REPORT.md ou grep cru.
 - Ler `graphify-out/GRAPH_REPORT.md` só pra revisão ampla de arquitetura ou quando query/path/explain não bastarem.
 - Depois de modificar código, rode `graphify update .` pra manter o grafo atual (só AST, custo zero de API).
+- Automático desde 03-jul-2026: existe um hook local `.git/hooks/post-commit` (não versionado — recriar se o repo for clonado do zero) que roda `graphify update .` em segundo plano após cada commit. O mesmo hook existe no vault celebro.
