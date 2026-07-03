@@ -1,19 +1,19 @@
 # MAPA DO SASI — inventário do repositório
 
-> Gerado automaticamente em 01-jul-2026 por `memory/scripts/build_sasi_index.py`.
+> Gerado automaticamente em 03-jul-2026 por `memory/scripts/build_sasi_index.py`.
 > Fonte de verdade: `sasi_index.db` (SQLite). Doutrina ZERO ALUCINAÇÃO: só fato lido do disco.
 > Regenerar: `python3 memory/scripts/build_sasi_index.py` (a partir da raiz do repo).
 
-**Total:** 423 arquivos · 6.2 MB · 61,134 linhas · 281,594 tokens (excluídos `.git`, `node_modules`, `sasi_index.db`).
+**Total:** 357 arquivos · 5.5 MB · 47,909 linhas · 213,540 tokens (excluídos `.git`, `node_modules`, `sasi_index.db`).
 
 ## Por categoria
 
 | Categoria | Arq | Linhas | Tokens | O que é |
 |---|---:|---:|---:|---|
-| `docs` | 96 | 16,604 | 88,098 | Documentação — `docs/` |
 | `frontend_src` | 66 | 13,286 | 50,072 | App React+Vite+TS — `frontend/src/` |
 | `build_artifact` | 41 | 2,539 | 42,226 | **Ruído gerado** — `dist/` de front e mcp |
 | `design_system` | 77 | 7,376 | 32,843 | Tokens, componentes, guidelines — `design-system/` |
+| `docs` | 30 | 3,355 | 19,960 | Documentação — `docs/` |
 | `doctrine` | 12 | 1,597 | 10,773 | Doutrina clínica/arquitetura — `doctrine/` |
 | `frontend_config` | 19 | 5,289 | 10,116 | Configs do front (package-lock, vite, tsconfig) |
 | `db_migration` | 15 | 2,168 | 9,783 | Migrations SQL — `supabase/migrations/` |
@@ -21,7 +21,7 @@
 | `supabase_config` | 14 | 2,022 | 7,334 | Config Supabase (config.toml, seed) |
 | `other` | 20 | 3,111 | 6,874 | Sem categoria (revisar regras) |
 | `mcp_config` | 8 | 3,223 | 6,227 | Config do MCP server |
-| `project_memory` | 8 | 699 | 3,205 | Esta pasta `memory/` |
+| `project_memory` | 8 | 723 | 3,289 | Esta pasta `memory/` |
 | `root_config` | 9 | 641 | 3,201 | CLAUDE.md, README, .env.example, .mcp.json |
 | `edge_function` | 3 | 325 | 1,510 | Edge Functions Deno — `supabase/functions/` |
 | `ide_config` | 19 | 298 | 689 | `.idea/` (WebStorm) |
@@ -47,11 +47,11 @@
 - `design-system/_ds_bundle.js` — 2,916 linhas (`design_system`)
 - `packages/clinical-engine/package-lock.json` — 2,465 linhas (`other`)
 - `frontend/src/components/FichaCompleta.tsx` — 1,687 linhas (`frontend_src`)
-- `docs/import/bundle-claudecode/from-pdf/prescri-oes-uti-2-21-06-26.md` — 1,419 linhas (`docs`)
 - `supabase/migrations/20260626000000_baseline.sql` — 1,200 linhas (`db_migration`)
 - `supabase/types/database.types.ts` — 1,199 linhas (`supabase_config`)
-- `docs/import/bundle-claudecode/raw-data/SASI_codigo_fonte/sasi_backup_temp/schema.sql` — 871 linhas (`docs`)
-- `docs/import/bundle-claudecode/from-pdf/sinais-21-06-26.md` — 864 linhas (`docs`)
+- `frontend/src/components/PatientModal.tsx` — 829 linhas (`frontend_src`)
+- `frontend/src/components/PacientePage.tsx` — 800 linhas (`frontend_src`)
+- `frontend/src/lib/drugs.ts` — 686 linhas (`frontend_src`)
 
 ### Outros núcleos
 
@@ -62,7 +62,7 @@
 
 ## Memória do projeto (`memory/`)
 
-- `memory/MAPA-SASI.md` — 87 linhas
+- `memory/MAPA-SASI.md` — 111 linhas
 - `memory/MEMORY.md` — 62 linhas
 - `memory/notes/debito-plantao-board-fantasma.md` — 12 linhas
 - `memory/notes/pacote-sasi-skills.md` — 22 linhas
