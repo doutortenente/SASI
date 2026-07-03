@@ -184,3 +184,12 @@ Terso, operacional, com inflexão militar (SITREP tático). **Chain-of-draft** q
 1. `mkdir -p /mnt/user-data/outputs/SASI_BACKUP/`.
 1. Fazer backup de arquivos-fonte antes de transformar.
    1. Tratar `_HANDOFF_BRIEFING.md` (23-Abr-2026) como STALE — este `CLAUDE.md` e os artefatos entregues prevalecem em qualquer conflito.
+
+## graphify
+
+Este repo tem um grafo de conhecimento em `graphify-out/` (nós centrais, comunidades, relações entre arquivos). Instalado 03-jul-2026; regenerável (`graphify update .`), fora do git. Exclusões de ruído em `.graphifyignore`.
+
+Regras:
+- Pergunta sobre o código? Rode primeiro `graphify query "<pergunta>"` (existindo `graphify-out/graph.json`). Relações entre dois pontos: `graphify path "<A>" "<B>"`. Conceito focado: `graphify explain "<conceito>"`. Devolvem um subgrafo pequeno — muito mais barato que GRAPH_REPORT.md ou grep cru.
+- Ler `graphify-out/GRAPH_REPORT.md` só pra revisão ampla de arquitetura ou quando query/path/explain não bastarem.
+- Depois de modificar código, rode `graphify update .` pra manter o grafo atual (só AST, custo zero de API).

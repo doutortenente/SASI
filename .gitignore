@@ -38,3 +38,6 @@ memory/sasi_index.db
 memory/sasi_index.db.bak
 memory/MAPA-SASI.md.worktrees/
 .worktrees/
+
+# === Grafo graphify (regenerável: graphify update .) ===
+graphify-out/
