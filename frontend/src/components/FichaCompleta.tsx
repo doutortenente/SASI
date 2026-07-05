@@ -15,6 +15,7 @@ import { supabase, type PatientSummary } from '../lib/supabaseClient';
 import { useSupabasePatients } from '../hooks/useSupabasePatients';
 import SasiSynthesis from './SasiSynthesis';
 import { buildPatientContext } from '../lib/sasiAI';
+import { canonicalToFicha, fichaToCanonical } from '../lib/fichaSchema';
 import {
   DVA_DICT, SEDACAO_DICT, calculateDose, ESCALAS_NEURO,
   isHigh, isLow, formatDiureseEfetiva,
@@ -125,13 +126,15 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
       setProblemasAtivosDraft([]); setCondutasSistemasDraft([]); setRiscosDraft([]);
       return;
     }
-    setNeuroDraft({ ...(evolucao.neuro ?? {}) });
-    setRespDraft({ ...(evolucao.resp ?? {}) });
-    setHemoDraft({ ...(evolucao.hemo ?? {}) });
-    setTgiDraft({ ...(evolucao.tgi ?? {}) });
-    setRenalDraft({ ...(evolucao.renal ?? {}) });
-    setHematoDraft({ ...(evolucao.hemato ?? {}) });
-    setInfectoDraft({ ...(evolucao.infecto ?? {}) });
+    // Adapter: banco guarda o esquema canônico (ingest); a ficha lê o dela.
+    const f = canonicalToFicha(evolucao as unknown as Record<string, unknown>);
+    setNeuroDraft(f.neuro);
+    setRespDraft(f.resp);
+    setHemoDraft(f.hemo);
+    setTgiDraft(f.tgi);
+    setRenalDraft(f.renal);
+    setHematoDraft(f.hemato);
+    setInfectoDraft(f.infecto);
     setDvasDraft((evolucao.dvas ?? []) as Infusao[]);
     setSedDraft((evolucao.sedativos ?? []) as Infusao[]);
     const imp = (evolucao.impressao ?? []) as string[];
@@ -189,8 +192,11 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
         data_adm: pacDraft.data_adm ?? null,
       },
       p_evol: {
-        neuro: neuroDraft, resp: respDraft, hemo: hemoDraft, tgi: tgiDraft,
-        renal: renalDraft, hemato: hematoDraft, infecto: infectoDraft,
+        // Adapter: converte os drafts da ficha p/ o esquema canônico (ingest) antes de gravar.
+        ...fichaToCanonical({
+          neuro: neuroDraft, resp: respDraft, hemo: hemoDraft, tgi: tgiDraft,
+          renal: renalDraft, hemato: hematoDraft, infecto: infectoDraft,
+        }),
         dvas: dvasDraft, sedativos: sedDraft,
         impressao: impressaoDraft.filter(s => s.trim() !== ''),
         conduta: condutaDraft.filter(s => s.trim() !== ''),
