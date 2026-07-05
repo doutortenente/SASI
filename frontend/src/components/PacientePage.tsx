@@ -24,7 +24,7 @@ import {
   extractPlanilhaoVitais, extractProblemas, extractTabelaoLabs,
   buildPassagem3Linhas,
 } from '../lib/clinicalExtract';
-import { clinicalNum } from '../lib/clinicalFormat';
+import { clinicalNum, fmtDateBR } from '../lib/clinicalFormat';
 import { severityLabel } from '../lib/severity';
 import { useToasts } from '../lib/useToasts';
 import { usePacienteFicha } from '../hooks/usePacienteFicha';
@@ -208,7 +208,7 @@ export default function PacientePage({ pacienteId, onBack }: Props) {
 
   // ── Dados derivados (ZERO ALUCINAÇÃO: seção sem fonte não renderiza) ──────
   const planilhao = extractPlanilhaoVitais(evolucao);
-  const vitais = ['pam', 'fc', 'spo2', 'tax', 'fr']
+  const vitais = ['pas', 'pad', 'pam', 'fc', 'fr', 'spo2', 'tax', 'dx']
     .map((k) => planilhao.find((r) => r.key === k))
     .filter((r): r is NonNullable<typeof r> => r != null && (r.max !== '' || r.min !== ''))
     .map((r) => {
@@ -333,7 +333,7 @@ export default function PacientePage({ pacienteId, onBack }: Props) {
                 )}
                 <span className="text-xs text-app-text-muted flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  adm {new Date(paciente.data_adm).toLocaleDateString('pt-BR')}
+                  adm {fmtDateBR(paciente.data_adm)}
                 </span>
                 <button
                   onClick={() => setShowTimeline(true)}

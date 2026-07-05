@@ -103,3 +103,16 @@ export function hasClinicalContent(val: unknown): boolean {
   if (typeof val === 'object') return clinicalText(val) !== '';
   return true;
 }
+
+/**
+ * Formata uma data em pt-BR (DD/MM/AAAA) SEM shift de fuso.
+ * `new Date('2026-06-21')` é interpretado como UTC e, no fuso BRT (-3), volta 1
+ * dia (mostra 20/06). Aqui lemos os componentes AAAA-MM-DD direto da string.
+ */
+export function fmtDateBR(v: string | null | undefined): string {
+  if (!v) return '—';
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(v);
+  if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString('pt-BR');
+}

@@ -262,21 +262,33 @@ export function extractTabelaoLabs(evolucoes: Evolucao[]): TabelaoRow[] {
   });
 }
 
-function vitalFieldMap(key: string): { sys: SystemKey; maxKey: string; minKey: string } | null {
-  const map: Record<string, { sys: SystemKey; maxKey: string; minKey: string }> = {
-    pas: { sys: 'hemo', maxKey: 'pas_max', minKey: 'pas_min' },
-    pad: { sys: 'hemo', maxKey: 'pad_max', minKey: 'pad_min' },
-    pam: { sys: 'hemo', maxKey: 'pam_max', minKey: 'pam_min' },
-    fc: { sys: 'hemo', maxKey: 'fc_max', minKey: 'fc_min' },
-    fr: { sys: 'resp', maxKey: 'fr_max', minKey: 'fr_min' },
-    spo2: { sys: 'resp', maxKey: 'spo2_max', minKey: 'spo2_min' },
-    tax: { sys: 'infecto', maxKey: 'tmax', minKey: 'tmin' },
-    dx: { sys: 'tgi', maxKey: 'dx_max', minKey: 'dx_min' },
-    bh: { sys: 'renal', maxKey: 'bh_ml', minKey: 'bh_ml' },
-    diurese: { sys: 'renal', maxKey: 'diurese_total_ml', minKey: 'diurese_total_ml' },
-    dieta: { sys: 'tgi', maxKey: 'dieta_vazao', minKey: 'dieta_vazao' },
-  };
-  return map[key] ?? null;
+// Aliases de nome por vital — cobre os DOIS esquemas que convivem no JSONB:
+// ingest (pas_max · pam1/pam2 · temp_max · glic_max) e ficha antiga (pa_sys_max · tmax · dx_max).
+// A busca varre QUALQUER sistema do snapshot, pois temperatura e glicemia às vezes
+// são gravadas no hemo, às vezes em infecto/tgi.
+const VITAL_ALIASES: Record<string, { max: string[]; min: string[] }> = {
+  pas:  { max: ['pas_max', 'pa_sys_max'], min: ['pas_min', 'pa_sys_min'] },
+  pad:  { max: ['pad_max', 'pa_dia_max'], min: ['pad_min', 'pa_dia_min'] },
+  pam:  { max: ['pam_max', 'pam2'],       min: ['pam_min', 'pam1'] },
+  fc:   { max: ['fc_max'],                min: ['fc_min'] },
+  fr:   { max: ['fr_max'],                min: ['fr_min'] },
+  spo2: { max: ['spo2_max'],              min: ['spo2_min'] },
+  tax:  { max: ['tmax', 'temp_max', 'tax_max'], min: ['tmin', 'temp_min', 'tax_min'] },
+  dx:   { max: ['dx_max', 'glic_max'],    min: ['dx_min', 'glic_min'] },
+  bh:   { max: ['bh_ml', 'bh'],           min: ['bh_ml', 'bh'] },
+  diurese: { max: ['diurese_total_ml', 'diurese'], min: ['diurese_total_ml', 'diurese'] },
+  dieta:   { max: ['dieta_vazao'],        min: ['dieta_vazao'] },
+};
+
+/** Procura o 1º campo com conteúdo (por nome) em qualquer sistema do snapshot. */
+function findInAnySystem(evol: Evolucao, names: string[]): unknown {
+  for (const sys of SYSTEM_KEYS) {
+    const data = getSystemData(evol, sys);
+    for (const n of names) {
+      if (hasClinicalContent(data[n])) return data[n];
+    }
+  }
+  return undefined;
 }
 
 /** Planilhão FASE 1 — sinais vitais editáveis (snapshot ou evolução) */
@@ -289,13 +301,13 @@ export function extractPlanilhaoVitais(evol: Evolucao | null): PlanilhaoVitalRow
   if (!evol) return base;
 
   return base.map(row => {
-    const field = vitalFieldMap(row.key);
-    if (!field) return row;
-    const data = getSystemData(evol, field.sys);
-    const range = clinicalRange(data[row.key] ?? data[field.maxKey]);
-    const maxVal = clinicalText(data[field.maxKey] ?? (range?.max != null ? range.max : ''));
-    const minVal = clinicalText(data[field.minKey] ?? (range?.min != null ? range.min : ''));
-    const obs = clinicalText(data[`${row.key}_obs`] ?? data.obs);
+    const alias = VITAL_ALIASES[row.key];
+    if (!alias) return row;
+    // campo combinado num só valor (ex.: "138-111") tem prioridade se existir
+    const range = clinicalRange(findInAnySystem(evol, [row.key]) ?? findInAnySystem(evol, alias.max));
+    const maxVal = clinicalText(findInAnySystem(evol, alias.max) ?? (range?.max != null ? range.max : ''));
+    const minVal = clinicalText(findInAnySystem(evol, alias.min) ?? (range?.min != null ? range.min : ''));
+    const obs = clinicalText(findInAnySystem(evol, [`${row.key}_obs`]) ?? '');
     return {
       ...row,
       max: maxVal === '—' ? '' : maxVal,
@@ -435,11 +447,16 @@ export function extractExameFisico(evol: Evolucao | null): Array<{ sistema: stri
     const data = getSystemData(evol, sys);
     const notas = clinicalText(data.notas ?? data.obs ?? data.notas_neuro ?? data.notas_resp
       ?? data.notas_hemo ?? data.notas_tgi ?? data.notas_renal);
-    const extras = Object.entries(data)
-      .filter(([k, v]) => !k.startsWith('notas') && k !== 'obs' && hasClinicalContent(v)
-        && !['pas', 'pad', 'pam', 'fc', 'fr', 'spo2', 'hb', 'ht'].includes(k))
-      .slice(0, 3)
-      .map(([k, v]) => `${k}: ${clinicalText(v)}`)
+    // Só campos DESCRITIVOS (texto de exame físico). Os numéricos (pam1, fr_max,
+    // cr1, plaq1, leuco…) NUNCA entram aqui — vão nos cards de vitais e na tabela de labs.
+    const TEXT_FIELDS: Record<string, string> = {
+      suporte: 'suporte', ausculta: 'ausculta', secrecao: 'secreção',
+      sedacao: 'sedação', pupilas: 'pupilas', rass: 'RASS', gcs: 'GCS',
+      perfusao: 'perfusão', pulso: 'pulso', atb: 'ATB', dieta: 'dieta', abdome: 'abdome',
+    };
+    const extras = Object.entries(TEXT_FIELDS)
+      .filter(([k]) => hasClinicalContent(data[k]))
+      .map(([k, lbl]) => `${lbl}: ${clinicalText(data[k])}`)
       .join(' · ');
     const text = [notas, extras].filter(Boolean).join(' · ');
     return text ? { sistema: labels[sys], notas: text } : null;
