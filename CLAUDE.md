@@ -7,7 +7,7 @@
 - Proibido: sigla crua sem expandir, jargão solto, "é só rodar X" sem dizer em palavras o que X faz e por quê.
 
 > Briefing operacional do projeto. Lido pelo Claude Code ao abrir o repo.
-> **Última atualização:** 26-Jun-2026 — baseline-squash do schema; alertas/tendência/save_ficha aplicados (migrations `2026062600000*`).
+> **Última atualização:** 06-Jul-2026 — adapter da ficha (fichaSchema) mesclado na main; graphify integrado ao repo; endurecimento RLS/índices aplicado em prod.
 > Este arquivo substitui qualquer `_HANDOFF_BRIEFING.md` (datado 23-Abr-2026, **STALE** — não é fonte da verdade).
 > **Memória persistente do projeto:** @memory/MEMORY.md
 
