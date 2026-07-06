@@ -13,8 +13,16 @@
 // (fichaToCanonical). A UI da ficha e os demais consumidores não mudam.
 //
 // Convenção: na ficha, k1 = MÁXIMO, k2 = MÍNIMO (renderiza "máx - mín").
-// Cross-system: glicemia e temperatura moram em `hemo` no canônico; leucócitos
-// em `hemato`. Na ficha, dx∈tgi, tmax∈infecto, leuco1∈infecto.
+// Cross-system (nomes conferidos contra os LEITORES — clinicalExtract/exportText/
+// TableView/PatientModal — em 05-jul-2026):
+//   • temperatura → `infecto.tmax`  (exportText: v(infecto,'tmax',…); NÃO em hemo)
+//   • glicemia    → `tgi.dx` (+ `tgi.glic_max` p/ o painel de vitais)
+//   • leucócitos  → `hemato.leuco` (ficha guarda em infecto.leuco1)
+//   • Na/K        → `renal.na` / `renal.k`  (planos — exportText lê na/sodio, k/potassio;
+//                    NÃO `na_serico`, que nenhum leitor resolve)
+//   • FR/SpO2     → gravados em DOIS formatos: nome único (`fr`/`spo2`, que o
+//                    exportText lê sem fallback) E `_max`/`_min` (que o painel de
+//                    vitais lê via VITAL_ALIASES). Um só não cobre os dois leitores.
 // ─────────────────────────────────────────────────────────────────────────
 
 type Obj = Record<string, unknown>;
@@ -76,11 +84,11 @@ export function canonicalToFicha(evol: Evol): Record<string, Obj> {
   const renal: Obj = {
     ...keep(rn, RENAL_KEEP),
     na: pick(rn, 'na', 'na_serico'), k: pick(rn, 'k', 'k_serico'),
-    ur1: pick(rn, 'ur1', 'ur'), cr1: pick(rn, 'cr1'),
+    ur1: pick(rn, 'ur1', 'ur'), cr1: pick(rn, 'cr1', 'cr'),
   };
   const hemato: Obj = {
     ...keep(hm, HEMATO_KEEP),
-    hb1: pick(hm, 'hb1', 'hb'), ht1: pick(hm, 'ht1', 'ht'), plaq1: pick(hm, 'plaq1'),
+    hb1: pick(hm, 'hb1', 'hb'), ht1: pick(hm, 'ht1', 'ht'), plaq1: pick(hm, 'plaq1', 'plaq'),
   };
   const infecto: Obj = {
     ...keep(inf, INFECTO_KEEP),
@@ -101,27 +109,37 @@ export function fichaToCanonical(d: Record<string, Obj>): Record<string, Obj> {
     pas_max: pick(h, 'pas1'), pas_min: pick(h, 'pas2'),
     pad_max: pick(h, 'pad1'), pad_min: pick(h, 'pad2'),
     pam_max: pick(h, 'pam1'), pam_min: pick(h, 'pam2'),
+    pam: pick(h, 'pam1'),             // nome único p/ a tabela principal (TableView lê hemo.pam)
     fc_max: pick(h, 'fc1'), fc_min: pick(h, 'fc2'),
-    glic_max: pick(t, 'dx'),          // glicemia mora no hemo no canônico
-    temp_max: pick(inf, 'tmax'),      // temperatura idem
+    // glicemia/temperatura NÃO moram aqui — vão em tgi/infecto (ver abaixo).
   };
   const resp: Obj = {
     ...keep(r, RESP_KEEP),
-    fr_max: pick(r, 'fr1'), fr_min: pick(r, 'fr2'),
-    spo2_min: pick(r, 'spo2'), spo2_max: pick(r, 'spo2'),
+    // FR/SpO2 nos dois formatos: único p/ exportText + max/min p/ painel de vitais.
+    fr: pick(r, 'fr1'), fr_max: pick(r, 'fr1'), fr_min: pick(r, 'fr2'),
+    spo2: pick(r, 'spo2'), spo2_max: pick(r, 'spo2'), spo2_min: pick(r, 'spo2'),
   };
-  const tgi: Obj = { ...keep(t, TGI_KEEP), dieta: pick(t, 'viaDieta') };
+  const tgi: Obj = {
+    ...keep(t, TGI_KEEP),
+    dieta: pick(t, 'viaDieta'),
+    dx: pick(t, 'dx'), glic_max: pick(t, 'dx'),   // dx p/ exportText, glic_max p/ painel
+  };
   const renal: Obj = {
     ...keep(rn, RENAL_KEEP),
-    na_serico: pick(rn, 'na'), k_serico: pick(rn, 'k'),
-    ur: pick(rn, 'ur1'), cr1: pick(rn, 'cr1'),
+    // nomes PLANOS — as telas Exames/Prontuário (sasiSchema) e o card (PatientModal)
+    // leem na/k/ur/cr, NÃO na_serico/ur1/cr1. ur2/ur3/cr2/cr3 (histórico) vêm do keep.
+    na: pick(rn, 'na'), k: pick(rn, 'k'),
+    ur: pick(rn, 'ur1'), cr: pick(rn, 'cr1'),
   };
   const hemato: Obj = {
     ...keep(hm, HEMATO_KEEP),
-    hb: pick(hm, 'hb1'), ht: pick(hm, 'ht1'), plaq1: pick(hm, 'plaq1'),
+    hb: pick(hm, 'hb1'), ht: pick(hm, 'ht1'), plaq: pick(hm, 'plaq1'),
     leuco: pick(inf, 'leuco1'),       // leucócitos moram no hemato no canônico
   };
-  const infecto: Obj = { ...keep(inf, INFECTO_KEEP) };
+  const infecto: Obj = {
+    ...keep(inf, INFECTO_KEEP),
+    tmax: pick(inf, 'tmax'),          // temperatura mora no infecto no canônico
+  };
   const neuro: Obj = { ...keep(n, NEURO_KEEP) };
   return { hemo, resp, tgi, renal, hemato, infecto, neuro };
 }
