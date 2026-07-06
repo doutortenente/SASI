@@ -36,7 +36,7 @@ Skill cirúrgica para redigir a **nota de admissão** (modo D1) no formato exato
 |---|---|---|---|
 | HPMA / Intercorrências 24h | **TEMPO (Δ)** | O que mudou: gatilho, eventos, picos, procedimentos, suspensões, reações | Estado estável; repetir EF; emitir impressão |
 | Exame físico por sistemas | **ESTADO** | Achado objetivo atual por órgão, vitais Max–Min | Narrar evento; opinar/concluir |
-| Impressão | **PROBLEMA ATIVO** | Lista numerada + vetor (↑/↓/=) | Prosa corrida; repetir dado bruto do EF |
+| Impressão | **PROBLEMA ATIVO** | Lista numerada + tendência em palavra (em ascensão/em melhora/estável) | Prosa corrida; repetir dado bruto do EF; seta/vetor decorativo |
 | Conduta por sistemas | **AÇÃO** | Plano 1:1 com cada problema, dose + meta | "Ajustar conforme resposta" sem número; ação órfã |
 
 **Diferença admissão (D1) vs evolução (D2+):** no D1 o eixo TEMPO é a **HPMA** (cronologia de chegada) e `DH = 1º DIA`. Tudo o mais é idêntico ao template da evolução.
@@ -90,7 +90,7 @@ Scores:
 SOFA {total} ({Resp R}, {Coag C}, {Hep L}, {Cardio CV}, {Neuro N}, {Renal RN}). ΔSOFA 24h: {Δ}. {qSOFA se aplicável}.
 
 Impressão:
-1. {Problema ativo} [{↑ / ↓ / =}] — {leitura clínica de 1 linha}.
+1. {Problema ativo}, {tendência em palavra: em ascensão/em melhora/estável} — {leitura clínica de 1 linha}.
 2. {...}
 
 Conduta estruturada por Sistemas:
@@ -109,7 +109,7 @@ Gerado por SASI — Sistema de Auditoria e Síntese Intensiva — TEMPLATE-BASE 
 - **Abreviações MAIÚSCULAS:** PAS, PAD, PAM, FC, FR, SpO2, TAX, DX, BH, HB, HT, PLAQ, LEUCO, UR, CR, NA, K. Unidades obrigatórias.
 - **Flags de absurdo `(revisar)`:** PAS<50/>260 · PAM<30/>200 · FC<20/>250 · FR<4/>80 · SpO2>100/<50 · TAX<30/>43 · DX<20/>800 · BH>±10.000 · Nora>2. Flag não bloqueia.
 - **Cabeçalho:** problemas numerados com qualificador de disfunção, nunca diagnóstico nu.
-- **Impressão:** vetor `↑/↓/=` obrigatório em cada problema.
+- **Impressão:** tendência dita em palavra (em ascensão/em melhora/estável) em cada problema — proibido `↑/↓/=` ou qualquer seta/vetor decorativo.
 - **Conduta:** mapeamento 1:1 com Impressão, metas numéricas sempre.
 - **Campo vazio:** sistema inteiro → `não avaliado`; campo isolado → omite a linha. Nunca inventa.
 
@@ -144,7 +144,7 @@ São os vitais **da admissão na UTI**, não do PS e não os atuais. Com cateter
 - Abdome cirúrgico: descreva Blumberg/Murphy/Giordano/DB — esses sinais matam diagnóstico se omitidos.
 
 ### Impressão
-Lista de problemas ativos numerada, cada um com vetor `↑/↓/=` e leitura de 1 linha. Na admissão, o vetor inicial costuma ser `=` (sem baseline 24h) ou o vetor da trajetória recente do PS.
+Lista de problemas ativos numerada, cada um com tendência dita em palavra (em ascensão/em melhora/estável) e leitura de 1 linha — nunca seta/vetor decorativo. Na admissão, a tendência costuma ser "estável" (sem baseline 24h) ou a trajetória recente do PS.
 
 ### Conduta estruturada por Sistemas
 1:1 com a Impressão. Metas numéricas (PAM ≥ 65, SpO2 92-96%, glicemia 140-180, lactato em queda, diurese ≥ 0,5 mL/kg/h). Profilaxias sempre revisadas (TVP, LAMG, cabeceira 30-45°, higiene oral com clorexidina se IOT). Sem plano fornecido → esqueleto numerado vazio.

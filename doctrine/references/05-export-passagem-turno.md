@@ -47,7 +47,7 @@ Use quando o comando é `"passar turno leito 7"` ou similar.
 ### Regras de preenchimento
 
 - **Pior valor 24h**: sempre o mais grave (PAM min, FC max, SpO2 min, Cr max).
-- **DVAs linha única**: `Nor 0.20↓ · Vaso 0.04` (seta ↓ se desmame, ↑ se escalada).
+- **DVAs linha única, sem seta**: `Nor 0.20 em desmame · Vaso 0.04` (ou `em escalada`) — tendência sempre em palavra.
 - **ATBs com D-X**: `Merop D-3 · Linez D-5` (X = dias de terapia).
 - **Alertas**: apenas o que REALMENTE muda decisão no próximo turno. Máximo 3.
 - **Tarefas pendentes**: checkbox, imperativa, com horário se crítico (`☐ SBT 10h`).
@@ -76,7 +76,7 @@ Use quando o comando é `"passar turno UTI"` ou `"passagem geral"`. Output é ta
 ...
 
 ## 🔴 TOP 5 — Pacientes críticos do turno
-1. **L1 UTI2** — Silva, M. — SOFA 12 ↑2, Nor 0.6 escalando, lactato não clareia. Avaliar ECMO VA.
+1. **L1 UTI2** — Silva, M. — SOFA 12 (+2), Nor 0.6 escalando, lactato não clareia. Avaliar ECMO VA.
 2. **L7 UTI3** — João Silva — ΔSOFA -1 (melhora), mas IRA KDIGO 2. SBT hoje 10h.
 3. ...
 
