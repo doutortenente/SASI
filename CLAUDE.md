@@ -7,7 +7,7 @@
 - Proibido: sigla crua sem expandir, jargão solto, "é só rodar X" sem dizer em palavras o que X faz e por quê.
 
 > Briefing operacional do projeto. Lido pelo Claude Code ao abrir o repo.
-> **Última atualização:** 06-Jul-2026 — adapter da ficha (fichaSchema) mesclado na main; graphify integrado ao repo; endurecimento RLS/índices aplicado em prod.
+> **Última atualização:** 10-Jul-2026 — faxina estrutural: docs clínicas → celebro, staging → `_lab`, duplicatas removidas (ver seção 7-A).
 > Este arquivo substitui qualquer `_HANDOFF_BRIEFING.md` (datado 23-Abr-2026, **STALE** — não é fonte da verdade).
 > **Memória persistente do projeto:** @memory/MEMORY.md
 
@@ -125,7 +125,7 @@ War Room · toggle de visão compacta · SmartPaste · abas por UTI · chips de 
 ### Outras frentes
 
 - Integração Figma: auditoria UX com screenshots anotados, design tokens SASI → Tailwind, master components com variantes.
-- ✅ (resolvido 26-jun) Alertas: hook estava OK, faltava **produtor** — criados `fn_eval_alert` (valor) + `fn_eval_trend` (tendência/Δ), config em `alert_rules`/`trend_rules` (mesa do médico em `docs/DECISOES-CLINICAS.md`).
+- ✅ (resolvido 26-jun) Alertas: hook estava OK, faltava **produtor** — criados `fn_eval_alert` (valor) + `fn_eval_trend` (tendência/Δ), config em `alert_rules`/`trend_rules` (mesa do médico em `~/vaults/celebro/conhecimento/projetos/sasi-decisoes-clinicas.md`, movida do repo em 10-jul-2026).
 
 -----
 
@@ -139,12 +139,29 @@ Fonte da verdade: **`_SASI_TEMPLATE_BASE_v2.md`** (Ramo C) — anatomia idêntic
 - `admissao-uti` — nota de admissão (modo D1).
 - `controles-vitais-janela` — folha de enfermagem → sumário 24h/12h + flags.
 
-**References:** `01-schema-eventos-clinicos`, `02-extraction-dictionary`, `03-clinical-sanity-checks`, `04-export-evolucao-template_v2` (+ v1 legado), `05-export-passagem-turno`, `06-api-automation-prompts`.
+**References:** `01-schema-eventos-clinicos`, `02-extraction-dictionary`, `03-clinical-sanity-checks`, `04-export-evolucao-template_v2` (+ v1 legado), `05-export-passagem-turno`.
 
 **Espelhos da doutrina:**
 
 - **Notion** → espaço 🪖 SASI → página “📐 Doutrina SASI — SKILLs & Templates” (9 subpáginas, escrito direto via MCP).
 - **Obsidian/Drive** → `SASI_OBSIDIAN_doutrina.zip` + Drive “SASI — Arquivo de Operação”.
+
+### 7-A. Faxina estrutural (10-jul-2026)
+
+Docs clínicas de `docs/` viraram conhecimento do cérebro do Claude — movidas pra
+`~/vaults/celebro/conhecimento/projetos/` com prefixo `sasi-`: `sasi-decisoes-clinicas.md`,
+`sasi-sofa-ruleset.md`, `sasi-vera-ingest-spec.md`, `sasi-backlog-clinico.md`,
+`sasi-moc-doutrina.md`. `docs/STATUS.md` → `memory/notes/STATUS.md`. `docs/motor-clinico-v2/`
+(staging) → `~/dev/_lab/sasi-motor-clinico-v2/`. `docs/legado/` → `~/vaults/celebro/_arquivo/sasi-legado/`.
+`docs/JETBRAINS.md` + `docs/idea-runConfigurations/` deletados (duplicata das run configs vivas em
+`~/dev/.idea/runConfigurations/`). `doctrine/references/06-api-automation-prompts.md` deletado
+(idêntico ao canônico em `claude/skills/sasi-ingest-export/`). `doctrine/casos/VANESSA_v2_PROVA.md`
+(PHI) → `~/vaults/celebro/90-PHI-LOCAL/casos-sasi/`. `design-system/` (staging, 75 arquivos nunca
+consumidos pelo app) → `~/dev/_lab/sasi-design-system/`. `docs/AGENTS.md` e `docs/SETUP.md`
+permanecem no repo — não se encaixam com evidência em conhecimento-clínico/staging/duplicata.
+**Atenção:** o restante de `doctrine/` (as 2 SKILLs + 5 references) DIVERGE do espelho canônico em
+`claude/skills/` (não é cópia idêntica) — mantido por precaução, não mesclado; ver relatório da
+faxina para o detalhe da divergência.
 
 -----
 
