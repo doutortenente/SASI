@@ -4,29 +4,28 @@
 > Fonte de verdade: `sasi_index.db` (SQLite). Doutrina ZERO ALUCINAÇÃO: só fato lido do disco.
 > Regenerar: `python3 memory/scripts/build_sasi_index.py` (a partir da raiz do repo).
 
-**Total:** 382 arquivos · 8.6 MB · 170,384 linhas · 541,324 tokens (excluídos `.git`, `node_modules`, `sasi_index.db`).
+**Total:** 374 arquivos · 8.2 MB · 162,665 linhas · 505,713 tokens (excluídos `.git`, `node_modules`, `sasi_index.db`).
 
 ## Por categoria
 
 | Categoria | Arq | Linhas | Tokens | O que é |
 |---|---:|---:|---:|---|
-| `other` | 132 | 134,253 | 373,855 | Sem categoria (revisar regras) |
+| `other` | 134 | 127,525 | 345,521 | Sem categoria (revisar regras) |
 | `frontend_src` | 67 | 13,467 | 51,233 | App React+Vite+TS — `frontend/src/` |
 | `build_artifact` | 41 | 2,539 | 42,259 | **Ruído gerado** — `dist/` de front e mcp |
 | `claude_config` | 13 | 1,588 | 10,680 | `.claude/` (rules) |
 | `db_migration` | 16 | 2,376 | 10,528 | Migrations SQL — `supabase/migrations/` |
 | `frontend_config` | 19 | 5,289 | 10,116 | Configs do front (package-lock, vite, tsconfig) |
-| `doctrine` | 9 | 1,237 | 8,670 | Doutrina clínica/arquitetura — `doctrine/` |
 | `mcp_src` | 11 | 1,813 | 7,998 | Código-fonte MCP — `mcp-server/src/` |
 | `supabase_config` | 14 | 2,027 | 7,361 | Config Supabase (config.toml, seed) |
 | `mcp_config` | 8 | 3,223 | 6,227 | Config do MCP server |
-| `project_memory` | 9 | 1,008 | 5,395 | Esta pasta `memory/` |
+| `project_memory` | 9 | 1,121 | 5,644 | Esta pasta `memory/` |
 | `root_config` | 10 | 682 | 3,562 | CLAUDE.md, README, .env.example, .mcp.json |
 | `edge_function` | 7 | 392 | 1,829 | Edge Functions Deno — `supabase/functions/` |
+| `doctrine` | 1 | 147 | 1,273 | Doutrina clínica/arquitetura — `doctrine/` |
 | `ide_config` | 19 | 298 | 689 | `.idea/` (WebStorm) |
 | `ci` | 2 | 86 | 410 | GitHub Actions — `.github/workflows/` |
 | `docs` | 2 | 91 | 380 | Documentação — `docs/` |
-| `design_system` | 2 | 14 | 129 | Tokens, componentes, guidelines — `design-system/` |
 | `frontend_public` | 1 | 1 | 3 | `frontend/public/` |
 
 ## Núcleo (sem build_artifact nem lock files)
@@ -44,14 +43,14 @@
 
 ### Maiores arquivos de código/texto
 
-- `graphify-out/2026-07-10/graph.json` — 31,747 linhas (`other`)
-- `graphify-out/graph.json` — 30,557 linhas (`other`)
 - `graphify-out/2026-07-06/graph.json` — 30,557 linhas (`other`)
+- `graphify-out/2026-07-10/graph.json` — 30,557 linhas (`other`)
 - `graphify-out/2026-07-03/graph.json` — 30,143 linhas (`other`)
+- `graphify-out/graph.json` — 25,719 linhas (`other`)
 - `packages/clinical-engine/package-lock.json` — 2,465 linhas (`other`)
 - `frontend/src/components/FichaCompleta.tsx` — 1,693 linhas (`frontend_src`)
-- `graphify-out/2026-07-10/manifest.json` — 1,312 linhas (`other`)
-- `graphify-out/manifest.json` — 1,302 linhas (`other`)
+- `graphify-out/2026-07-06/manifest.json` — 1,302 linhas (`other`)
+- `graphify-out/2026-07-10/manifest.json` — 1,302 linhas (`other`)
 
 ### Outros núcleos
 
@@ -62,7 +61,7 @@
 
 ## Memória do projeto (`memory/`)
 
-- `memory/MAPA-SASI.md` — 111 linhas
+- `memory/MAPA-SASI.md` — 224 linhas
 - `memory/MEMORY.md` — 62 linhas
 - `memory/notes/STATUS.md` — 285 linhas
 - `memory/notes/debito-plantao-board-fantasma.md` — 12 linhas
@@ -139,6 +138,7 @@ Sync remoto (opcional): `python3 memory/scripts/push_repo_index_to_postgres.py` 
 - `graphify-out/cache/ast/v0.9.5/ccd7c9daf80c91fca159c2aa70f235b451e2fd72470611a0dedf8d50be05765a.json`
 - `graphify-out/cache/ast/v0.9.5/011a2e82364ef3192ec962af3a2cbaaa95cb956365f1812e350a4fcd3f5ce53d.json`
 - `graphify-out/cache/ast/v0.9.5/ce504410f54216a0b1af6a4bdf3cbdc95ba26e4ced7b407cf5bca03bf99927da.json`
+- `graphify-out/cache/ast/v0.9.5/f4162db913c5a853eb8f65e696dab15f2b8492105938fb1b1a1e382bd1f87380.json`
 - `graphify-out/cache/ast/v0.9.5/6e5acab40e3c51e540d71e31d6a789148d0e66e2ec2fe477f30cfd1424d94179.json`
 - `graphify-out/cache/ast/v0.9.5/7d545ef79ba1827378b8aacfa0c80c193f53128a0a63c80f5cc83bf5870e762e.json`
 - `graphify-out/cache/ast/v0.9.5/f5f9de4aa39eb592338abc37a28cf939897fa95cd560cf24b2059d3f0ed25975.json`
@@ -192,6 +192,7 @@ Sync remoto (opcional): `python3 memory/scripts/push_repo_index_to_postgres.py` 
 - `graphify-out/cache/ast/v0.9.5/7c7827f2f29d6e2cb6cc6902558dac08380f60c414b4968f83e1bc4e61b3e268.json`
 - `graphify-out/cache/ast/v0.9.5/881162d3211c92173a6cd3ea27b67483fe755a206f9726b8abb10618db36831c.json`
 - `graphify-out/cache/ast/v0.9.5/896071c40d0b02de04e53db81b77a6dbc064c1a884762594d2a81db495017742.json`
+- `graphify-out/cache/ast/v0.9.5/eee7b7e094921fcb72ca4ca282eea13a2f8c3c38484fb68ff19acbe1175ea572.json`
 - `graphify-out/cache/ast/v0.9.5/b19591c4db16769219ec281e3d126c4b5c2532beb0ff6653ac5a590bf583634d.json`
 - `graphify-out/cache/ast/v0.9.5/792597c87ab4a9179c5047a42e6b8668b8301e9ba704e85fdf57dce6c89fe960.json`
 - `graphify-out/cache/ast/v0.9.5/0aea6ca2f224abba6d8c0aab4647700a8e04ecaf0b5cbcb7485a044343df8118.json`
