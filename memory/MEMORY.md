@@ -37,7 +37,7 @@ python3 memory/scripts/push_repo_index_to_postgres.py   # SUPABASE_DB_URL no .en
 | MCP | `mcp-server/src/` | skills → Supabase |
 | Edge | `supabase/functions/` | ocr-ingest legado (não usar) |
 | Ingest | skill + MCP | Claude → JSON → deploy |
-| Motor | `docs/motor-clinico-v2/` | SOFA/sepsis (staging) |
+| Motor | `~/dev/_lab/sasi-motor-clinico-v2/` (fora do repo, staging, movido 10-jul-2026) | SOFA/sepsis |
 | Doutrina | `doctrine/` | regras clínicas |
 
 ## Notas
