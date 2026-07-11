@@ -7,7 +7,7 @@
 - Proibido: sigla crua sem expandir, jargão solto, "é só rodar X" sem dizer em palavras o que X faz e por quê.
 
 > Briefing operacional do projeto. Lido pelo Claude Code ao abrir o repo.
-> **Última atualização:** 10-Jul-2026 — faxina estrutural: docs clínicas → celebro, staging → `_lab`, duplicatas removidas (ver seção 7-A).
+> **Última atualização:** 11-Jul-2026 — README reescrito; doctrine/ resolvida (skill admissão unificada, sanity-checks migrados — ver 7-A); arquivo morto (`sasi-import`, bundles) removido do PC (vive no GitHub/OneDrive).
 > Este arquivo substitui qualquer `_HANDOFF_BRIEFING.md` (datado 23-Abr-2026, **STALE** — não é fonte da verdade).
 > **Memória persistente do projeto:** @memory/MEMORY.md
 
@@ -159,9 +159,11 @@ Docs clínicas de `docs/` viraram conhecimento do cérebro do Claude — movidas
 (PHI) → `~/vaults/celebro/90-PHI-LOCAL/casos-sasi/`. `design-system/` (staging, 75 arquivos nunca
 consumidos pelo app) → `~/dev/_lab/sasi-design-system/`. `docs/AGENTS.md` e `docs/SETUP.md`
 permanecem no repo — não se encaixam com evidência em conhecimento-clínico/staging/duplicata.
-**Atenção:** o restante de `doctrine/` (as 2 SKILLs + 5 references) DIVERGE do espelho canônico em
-`claude/skills/` (não é cópia idêntica) — mantido por precaução, não mesclado; ver relatório da
-faxina para o detalhe da divergência.
+**Fecho da divergência (11-jul-2026):** o restante de `doctrine/` foi resolvido — 6 arquivos
+ancestrais-puros deletados; 4 regras de sanity-check únicas migradas pro canônico
+(`claude/skills/sasi-ingest-export/references/03-clinical-sanity-checks.md`); a skill de admissão
+foi UNIFICADA na canônica `claude/skills/admissao-uti` (base Ramo C + enxertos da v1, aprovado pelo
+operador). Em `doctrine/` sobra SÓ `_SASI_TEMPLATE_BASE_v2.md` (fonte da verdade compartilhada, §7).
 
 -----
 

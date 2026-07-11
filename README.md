@@ -1,52 +1,39 @@
-# SASI — Sistema de Auditoria e Síntese Intensiva
+# SASI — Comando UTI
 
-Ferramenta **pessoal** de gestão clínica para o Dr. Nicolas Nagaita
-(33 leitos — UTI 2/3/4). Uso solo em plantão — não é produto hospitalar multi-usuário.
-Documentação clínica + suporte à decisão; ingest via **Claude → JSON → Supabase**.
+Dashboard de UTI do Dr. Nicolas Nagaita (33 leitos — UTI 2/3/4, São Caetano do Sul).
+Ferramenta **pessoal** de plantão — não é produto hospitalar multi-usuário.
+Produção: **https://sasi-uti.netlify.app** (deploy automático a cada merge na `main`).
 
-> Toda documentação clínica é em **Português do Brasil**. Doutrina inviolável
-> (zero alucinação, ortogonalidade de eixos, sinais vitais Max–Min, conduta 1:1):
-> ver [`CLAUDE.md`](CLAUDE.md) e [`docs/AGENTS.md`](docs/AGENTS.md).
+## O que cada pasta é
 
-## Estrutura (monorepo)
+| Pasta | Papel |
+|---|---|
+| `frontend/` | **As telas do app** — React + Vite + TypeScript. 5 janelas: Leitos · EixoTempo/HPMA · EixoEstado/Terapias · Problema→Ação · Passagem de Turno |
+| `mcp-server/` | **O garçom de dados** — recebe as extrações clínicas das skills e grava no banco (`sasi_deploy_ingest`, `sasi_sitrep`) |
+| `packages/` | **O motor clínico** — `clinical-engine`: SOFA, parse de números pt-BR; testes Vitest |
+| `supabase/` | **O banco** — schema (baseline 26-jun-2026), migrations, edge functions |
+| `doctrine/` | Só o template-base clínico v2 (Ramo C), compartilhado pelas skills `admissao-uti` e `sasi-ingest-export` |
+| `docs/` | Guias de operação: `AGENTS.md` (subagentes) e `SETUP.md` (ambiente) |
+| `memory/` | Índice do repo pro Claude (`MAPA-SASI.md`; regenerar: `python3 memory/scripts/build_sasi_index.py`) |
+| `scripts/` | `audit_eventos.py` — auditoria da fila de revisão de eventos clínicos |
 
-```text
-SASI/
-├── frontend/      React + Vite + TypeScript + Tailwind  → deploy Netlify
-├── mcp-server/    MCP server (Node + TS) — ferramentas IA p/ Supabase
-├── supabase/      Backend — migrations (ocr-ingest legado, não usar)
-├── doctrine/      Doutrina clínica (Ramo C): templates + skills
-├── docs/          STATUS.md · AGENTS.md · SETUP.md
-├── CLAUDE.md      Briefing operacional para IA
-└── .mcp.json      Servidores MCP (Supabase + sasi)
-```
-
-## Stack
-
-- **Frontend:** React + TypeScript + Tailwind + Vite — deploy **Netlify** (base `frontend/`).
-- **Backend:** Supabase (PostgreSQL 17, projeto `idswehsvvqczzkiatuzu`, `sa-east-1`).
-- **Ingest:** skill `sasi-ingest-export` → JSON → MCP (`deploy`).
-- **Edge Functions:** `ocr-ingest` legado — não usar no fluxo diário.
-
-## Comandos
+## Rodar
 
 ```bash
-# Frontend
-cd frontend && npm install && npm run dev      # dev server (Vite, :5173)
-cd frontend && npm run build                   # build de produção → dist/
-
-# MCP server
-cd mcp-server && npm install && npm run build
-
-# Supabase (Edge Functions locais)
-supabase functions serve
+cd frontend && npm run dev        # app local em http://localhost:5173
+npm run build | typecheck | lint  # verificações (Node 24 — ver netlify.toml)
 ```
 
-## Setup
+## Consultar o repo sem abrir arquivo por arquivo
 
-Copie `.env.example` → `frontend/.env` e `mcp-server/.env`, preencha as chaves
-(nunca commitar). Ver [`docs/SETUP.md`](docs/SETUP.md).
+```bash
+graphify query "<pergunta>"       # grafo de conhecimento em graphify-out/ (auto-atualiza a cada commit)
+```
 
----
+## Onde mora o resto (fonte única por categoria)
 
-Parte da família de repos em `~/dev/`. Índice do workspace: `~/dev/CLAUDE.md` e `memory/MAPA-DEV.md`.
+- **Doutrina/conhecimento clínico** (decisões, SOFA-ruleset, Vera, backlog): vault `celebro` → `conhecimento/projetos/sasi-*.md`
+- **Rascunhos e staging de design** (design-system, motor-clinico-v2): `~/dev/_lab/`
+- **Histórico antigo** ("fases", protótipos, experimentos pré-Supabase, qualquer menção a Firebase): repo morto `sasi-import` no GitHub — **nada disso faz parte deste app**, que nasceu e vive em Supabase
+
+_Atualizado: 11-jul-2026._
