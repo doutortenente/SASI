@@ -8,17 +8,18 @@ import {
   Brain, Wind, Heart, Utensils, FlaskConical, TestTube, Bug,
   Syringe, Clipboard, Droplets, Activity, Pill, AlertTriangle,
   Microscope, AlertCircle, ListChecks, ClipboardList, Trash2, Plus,
-  Save, Loader2, Calculator, Flame, ShieldAlert,
+  Save, Loader2, Calculator, Flame, ShieldAlert, Database,
 } from 'lucide-react';
 import type { Paciente, Evolucao, Pendencia, SasiProblemaAtivo, SasiCondutaSistema, SasiRisco } from '../lib/supabaseClient';
 import { supabase, type PatientSummary } from '../lib/supabaseClient';
 import { useSupabasePatients } from '../hooks/useSupabasePatients';
+import { useSofaDiario } from '../hooks/useSofaDiario';
 import SasiSynthesis from './SasiSynthesis';
 import { buildPatientContext } from '../lib/sasiAI';
 import { canonicalToFicha, fichaToCanonical } from '../lib/fichaSchema';
 import {
   DVA_DICT, SEDACAO_DICT, calculateDose, ESCALAS_NEURO,
-  isHigh, isLow, formatDiureseEfetiva,
+  isHigh, isLow, formatDiureseEfetiva, sofaColorClass,
 } from '../lib/drugs';
 import InlineInput from './clinical/InlineInput';
 import NotasField from './clinical/NotasField';
@@ -293,6 +294,9 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
   const sofaTotal = evolucao?.sofa_total ?? 0;
   const isSeptic = sofaTotal >= 2 && (evolucao?.sofa_snapshot?.suppressed?.length ?? 0) === 0;
 
+  // ─── SOFA automático (vw_sofa_diario) ──────────────────────────────────
+  const { resultado: sofaAuto } = useSofaDiario(paciente.id);
+
   // ─── Infusion array helpers ────────────────────────────────────────────
   function addInf(arr: 'dvas' | 'sed') {
     const setter = arr === 'dvas' ? setDvasDraft : setSedDraft;
@@ -362,6 +366,47 @@ export default function FichaCompleta({ paciente, evolucao, pendencias, onSaved 
             </div>
           )}
         </div>
+      </div>
+
+      {/* SOFA AUTOMÁTICO (calculado do banco — vw_sofa_diario) */}
+      <div className="p-3 rounded-xl border-l-4 border-app-border bg-app-tertiary shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-app-text-muted/20 text-app-text-2">
+            <Database className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-black uppercase tracking-wider text-xs text-app-text-2">
+              SOFA (automático — calculado do banco)
+            </h3>
+            <p className={`font-mono text-sm font-bold ${sofaAuto.completo ? sofaColorClass(sofaAuto.valor) : 'text-app-text-muted'}`}>
+              {sofaAuto.rotulo}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {sofaAuto.chips.map((chip) => (
+            <span
+              key={chip.sigla}
+              title={chip.faltante}
+              className={`text-[9px] font-bold border px-1.5 py-0.5 rounded font-mono ${
+                chip.faltante
+                  ? 'bg-app-card border-app-border text-app-text-muted'
+                  : 'bg-app-card border-app-border text-app-text-2'
+              }`}
+            >
+              {chip.sigla}: {chip.valor ?? '—'}
+            </span>
+          ))}
+        </div>
+
+        <p className="text-[11px] text-app-text-muted mt-2">
+          {sofaAuto.delta.tipo === 'valor' && (
+            <>ΔSOFA 24h: <span className="font-mono font-bold text-app-text-2">{sofaAuto.delta.valor! > 0 ? `+${sofaAuto.delta.valor}` : sofaAuto.delta.valor}</span></>
+          )}
+          {sofaAuto.delta.tipo === 'nao-comparavel' && 'Δ não comparável (componentes diferentes entre os dias)'}
+          {sofaAuto.delta.tipo === 'sem-baseline' && 'Δ 24h: sem baseline (sem dado de ontem)'}
+        </p>
       </div>
 
       {/* IDENTIFICAÇÃO */}
