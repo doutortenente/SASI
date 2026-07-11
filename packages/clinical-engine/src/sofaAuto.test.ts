@@ -101,6 +101,27 @@ describe('buildSofaAuto', () => {
     expect(r.delta).toEqual({ tipo: 'sem-baseline' });
   });
 
+  it('Δ sem baseline: ontem é linha REAL mas com 0 componentes (não é "nao-comparavel")', () => {
+    const hoje = row({
+      s_resp: 2, s_cardio: 1,
+      sofa_parcial: 3, componentes_presentes: 2,
+    });
+    const ontem = row({ componentes_presentes: 0, sofa_parcial: 0, dia: '2026-07-10' });
+    const r = buildSofaAuto(hoje, ontem);
+    expect(r.delta).toEqual({ tipo: 'sem-baseline' });
+  });
+
+  it('Δ sem baseline: hoje 6/6 e ontem linha-vazia (furo do fiscal — não pode virar "nao-comparavel")', () => {
+    const hoje = row({
+      s_resp: 2, s_coag: 1, s_liver: 0, s_cardio: 3, s_neuro: 1, s_renal: 2,
+      sofa_parcial: 9, componentes_presentes: 6,
+    });
+    const ontem = row({ componentes_presentes: 0, sofa_parcial: 0, dia: '2026-07-10' });
+    const r = buildSofaAuto(hoje, ontem);
+    expect(r.delta.tipo).toBe('sem-baseline');
+    expect(r.delta.tipo).not.toBe('nao-comparavel');
+  });
+
   it('chips seguem sempre a ordem fixa Resp/Coag/Hep/Cardio/Neuro/Renal', () => {
     const r = buildSofaAuto(null, null);
     expect(r.chips.map((c) => c.sigla)).toEqual(['Resp', 'Coag', 'Hep', 'Cardio', 'Neuro', 'Renal']);

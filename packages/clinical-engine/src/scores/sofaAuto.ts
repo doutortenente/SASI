@@ -89,14 +89,19 @@ function mesmoConjunto(a: Set<ComponenteKey>, b: Set<ComponenteKey>): boolean {
 }
 
 /**
- * Δ entre hoje e ontem. Regra (só coberta explicitamente p/ ontem):
- * - falta hoje OU falta ontem (sem dado pra basear a comparação) → 'sem-baseline'.
+ * Δ entre hoje e ontem. Regra SIMÉTRICA (mesmo critério `?? 0` pros 2 lados):
+ * - falta hoje OU hoje sem componentes OU falta ontem OU ontem sem componentes
+ *   (linha existe mas componentes_presentes===0 — sem dado real, não é baseline
+ *   utilizável) → 'sem-baseline'.
  * - conjuntos de componentes presentes DIFERENTES entre os dias → 'nao-comparavel'
  *   (comparar sofa_parcial de bases distintas seria alucinar precisão).
  * - conjuntos iguais → 'valor' = hoje.sofa_parcial − ontem.sofa_parcial.
  */
 function buildDelta(hoje: SofaDiarioRow | null, ontem: SofaDiarioRow | null): SofaAutoDelta {
-  if (!ontem || !hoje || (hoje.componentes_presentes ?? 0) === 0) {
+  if (
+    !hoje || (hoje.componentes_presentes ?? 0) === 0 ||
+    !ontem || (ontem.componentes_presentes ?? 0) === 0
+  ) {
     return { tipo: 'sem-baseline' };
   }
   const setHoje = componentesPresentesSet(hoje);
