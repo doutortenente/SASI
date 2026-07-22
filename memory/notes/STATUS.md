@@ -25,7 +25,7 @@
 | Ícones          | lucide-react                                     | — |
 | Ingest clínico  | Skill `sasi-ingest-export` → JSON → MCP `sasi_deploy_ingest` | Claude lê foto/PDF/texto; **sem** pipeline OCR automático |
 | Edge Function   | `ocr-ingest` legado (não usar) | Ingest real: Claude → JSON → MCP |
-| Índice do repo  | `memory/scripts/build_sasi_index.py` → SQLite 244 arq | Ver `memory/MEMORY.md` |
+| Índice do repo  | `scripts/build_sasi_index.py` → SQLite 244 arq | Ver `memory/MEMORY.md` |
 
 **Princípio arquitetural:**  
 Ingest = **Claude extrai → JSON validado → grava no Supabase** (MCP com `deploy`, ou edição no frontend). Uso **pessoal solo** — um operador, sem OAuth.

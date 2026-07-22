@@ -30,4 +30,4 @@ paths:
 
 ## Tipos & MCP
 - Regenerar tipos TS após qualquer mudança de schema.
-- MCP Supabase em produção: `read_only=true`. Escrita só via migration revisada.
+- MCP Supabase em produção: `read_only=false`. Escrita só via migration revisada.

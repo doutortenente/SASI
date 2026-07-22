@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Popula repo_index.files / repo_index.dirs no Postgres do Supabase a partir do
 SQLite local (memory/sasi_index.db). Idempotente: recria schema se faltar e
-da TRUNCATE antes de inserir. Rode da raiz do repo: python3 memory/scripts/push_repo_index_to_postgres.py
+da TRUNCATE antes de inserir. Rode da raiz do repo: python3 scripts/push_repo_index_to_postgres.py
 
 Requer: psycopg (ja instalado em ~/.local via pip --user) e SUPABASE_DB_URL no .env.
 ESCREVE direto na producao -> rode em sessao autorizada (ex: claude --dangerously-skip-permissions)."""
@@ -11,7 +11,7 @@ try:
 except ImportError:
     sys.exit("psycopg ausente. Instale: pip install --user --break-system-packages 'psycopg[binary]'")
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB   = os.path.join(ROOT, "memory", "sasi_index.db")
 
 def db_url():

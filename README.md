@@ -14,7 +14,7 @@ Produção: **https://sasi-uti.netlify.app** (deploy automático a cada merge na
 | `supabase/` | **O banco** — schema (baseline 26-jun-2026), migrations, edge functions |
 | `doctrine/` | Só o template-base clínico v2 (Ramo C), compartilhado pelas skills `admissao-uti` e `sasi-ingest-export` |
 | `docs/` | Guias de operação: `AGENTS.md` (subagentes) e `SETUP.md` (ambiente) |
-| `memory/` | Índice do repo pro Claude (`MAPA-SASI.md`; regenerar: `python3 memory/scripts/build_sasi_index.py`) |
+| `memory/` | Índice do repo pro Claude (`MAPA-SASI.md`; regenerar: `python3 scripts/build_sasi_index.py`) |
 | `scripts/` | `audit_eventos.py` — auditoria da fila de revisão de eventos clínicos |
 
 ## Rodar

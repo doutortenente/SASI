@@ -4,7 +4,7 @@
 Doutrina ZERO ALUCINACAO: so registra fato lido do disco. Nada inferido sem regra explicita.
 Ao final, regenera MAPA-SASI.md a partir da base (evita drift manual).
 
-Uso (da raiz do repo): python3 memory/scripts/build_sasi_index.py
+Uso (da raiz do repo): python3 scripts/build_sasi_index.py
 """
 import datetime
 import hashlib
@@ -12,7 +12,7 @@ import os
 import re
 import sqlite3
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "memory", "sasi_index.db")
 MAPA = os.path.join(ROOT, "memory", "MAPA-SASI.md")
 SKIP_DIRS = {".git", "node_modules"}
@@ -201,9 +201,9 @@ def write_mapa(c, today):
     lines = [
         "# MAPA DO SASI — inventário do repositório",
         "",
-        f"> Gerado automaticamente em {today} por `memory/scripts/build_sasi_index.py`.",
+        f"> Gerado automaticamente em {today} por `scripts/build_sasi_index.py`.",
         "> Fonte de verdade: `sasi_index.db` (SQLite). Doutrina ZERO ALUCINAÇÃO: só fato lido do disco.",
-        "> Regenerar: `python3 memory/scripts/build_sasi_index.py` (a partir da raiz do repo).",
+        "> Regenerar: `python3 scripts/build_sasi_index.py` (a partir da raiz do repo).",
         "",
         f"**Total:** {tot_files} arquivos · {tot_bytes / 1024 / 1024:.1f} MB · {tot_lines:,} linhas · "
         f"{tot_tokens:,} tokens (excluídos `.git`, `node_modules`, `sasi_index.db`).",
@@ -254,20 +254,20 @@ def write_mapa(c, today):
         "",
         "```bash",
         "# Resumo por categoria",
-        "python3 memory/scripts/query_sasi_index.py categorias",
+        "python3 scripts/query_sasi_index.py categorias",
         "",
         "# Top arquivos por linhas",
-        "python3 memory/scripts/query_sasi_index.py top --n 15",
+        "python3 scripts/query_sasi_index.py top --n 15",
         "",
         "# Buscar path",
-        "python3 memory/scripts/query_sasi_index.py find FichaCompleta",
+        "python3 scripts/query_sasi_index.py find FichaCompleta",
         "",
         "# Busca full-text (FTS5, token a token indexado)",
-        "python3 memory/scripts/query_sasi_index.py search eventos_clinicos",
+        "python3 scripts/query_sasi_index.py search eventos_clinicos",
         "```",
         "",
         "Tabelas SQLite: `files` (sha256, tokens), `dirs`, `files_fts` (FTS5), view `categorias`.",
-        "Sync remoto (opcional): `python3 memory/scripts/push_repo_index_to_postgres.py` → schema `repo_index` no Supabase.",
+        "Sync remoto (opcional): `python3 scripts/push_repo_index_to_postgres.py` → schema `repo_index` no Supabase.",
     ]
     if other:
         lines += ["", "## ⚠️ Categoria `other` (revisar regras)", ""]

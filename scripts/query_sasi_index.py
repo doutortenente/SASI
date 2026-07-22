@@ -2,25 +2,25 @@
 """Consultas rápidas ao índice local do SASI (memory/sasi_index.db).
 
 Uso (da raiz do repo):
-  python3 memory/scripts/query_sasi_index.py categorias
-  python3 memory/scripts/query_sasi_index.py top [--n 15]
-  python3 memory/scripts/query_sasi_index.py find <termo>
-  python3 memory/scripts/query_sasi_index.py cat <categoria>
-  python3 memory/scripts/query_sasi_index.py dir <caminho-parcial>
-  python3 memory/scripts/query_sasi_index.py search <termo>   # FTS5 full-text
+  python3 scripts/query_sasi_index.py categorias
+  python3 scripts/query_sasi_index.py top [--n 15]
+  python3 scripts/query_sasi_index.py find <termo>
+  python3 scripts/query_sasi_index.py cat <categoria>
+  python3 scripts/query_sasi_index.py dir <caminho-parcial>
+  python3 scripts/query_sasi_index.py search <termo>   # FTS5 full-text
 """
 import argparse
 import os
 import sqlite3
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "memory", "sasi_index.db")
 
 
 def connect():
     if not os.path.exists(DB):
-        sys.exit(f"Índice ausente: {DB}\nRode: python3 memory/scripts/build_sasi_index.py")
+        sys.exit(f"Índice ausente: {DB}\nRode: python3 scripts/build_sasi_index.py")
     return sqlite3.connect(DB)
 
 
