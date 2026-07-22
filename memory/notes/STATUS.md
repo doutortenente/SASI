@@ -25,7 +25,7 @@
 | Ícones          | lucide-react                                     | — |
 | Ingest clínico  | Skill `sasi-ingest-export` → JSON → MCP `sasi_deploy_ingest` | Claude lê foto/PDF/texto; **sem** pipeline OCR automático |
 | Edge Function   | `ocr-ingest` legado (não usar) | Ingest real: Claude → JSON → MCP |
-| Índice do repo  | `scripts/build_sasi_index.py` → SQLite 244 arq | Ver `memory/MEMORY.md` |
+| Índice do repo  | `~/dev/scripts/indices/build_sasi_index.py` → SQLite 244 arq | Ver `memory/MEMORY.md` |
 
 **Princípio arquitetural:**  
 Ingest = **Claude extrai → JSON validado → grava no Supabase** (MCP com `deploy`, ou edição no frontend). Uso **pessoal solo** — um operador, sem OAuth.
@@ -98,7 +98,7 @@ Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persis
 |20 | MCP `sasi_deploy_ingest` (bulk payload v1) | 24/06/2026 | ✅ Ativo   | `mcp-server/src/tools/ingest-deploy.ts` |
 |21 | Realtime dashboard em `pendencias` | 24/06/2026 | ✅ Ativo   | `useSupabasePatients.ts` |
 |22 | `clinical-engine` — 7 testes Vitest (parseBR, SOFA display) | 24/06/2026 | ✅ Ativo   | `packages/clinical-engine/` |
-|23 | Auditoria `eventos_clinicos` (script + query plantão) | 24/06/2026 | ✅ Ativo   | `scripts/audit_eventos.py`, `plantao_queries.sql` §11b |
+|23 | Auditoria `eventos_clinicos` (script + query plantão) | 24/06/2026 | ✅ Ativo   | `~/dev/scripts/sasi/audit_eventos.py`, `plantao_queries.sql` §11b |
 |24 | Design BAYES.OPS — 2 temas Tactical/Clinical        | 27/06/2026 | ✅ Ativo   | `src/index.css` + `tailwind.config.js` + LeitoCard/TopBar/Dashboard; commits `acce2c7`+`f185ab8`; Netlify `6a3fc8f0` READY |
 
 **Funcionalidades em destaque recentes (maio/2026):**  
@@ -181,7 +181,7 @@ Workspace irmão: `~/dev/` (Claude, JARVIS, `memory/MAPA-DEV.md`). `comando-uti`
 - [ ] Ingest folha → `sasi_deploy_ingest` → eventos na timeline
 - [ ] Ficha → síntese → save → reload mostra JSONB
 - [ ] Passagem 3 linhas + PDF com dados do DB
-- [ ] `python3 scripts/audit_eventos.py` — fila review < 10 itens críticos
+- [ ] `python3 ~/dev/scripts/sasi/audit_eventos.py` — fila review < 10 itens críticos
 
 ### Prioridade MÉDIA
 - [x] Consolidar cópias duplicadas (faxina 11/06/2026)
@@ -255,7 +255,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 1. **Regenerar `schema-live-dump.sql`** pós-migration `07`.
 2. **CI ampliado** — jobs mcp-server + clinical-engine (bloqueado: scope `workflow` no token GitHub).
 3. **Smoke plantão** — checklist Definition of Done (§6).
-4. **Qualidade ingest** — 24 `eventos_clinicos` em fila review (`scripts/audit_eventos.py`).
+4. **Qualidade ingest** — 24 `eventos_clinicos` em fila review (`~/dev/scripts/sasi/audit_eventos.py`).
 5. **Rotacionar JWTs** se ainda não fez (histórico `AGENTS.md`).
 
 ---

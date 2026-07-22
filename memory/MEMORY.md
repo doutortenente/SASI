@@ -21,10 +21,10 @@ memory/
 
 ```bash
 cd ~/dev/sasi
-python3 scripts/build_sasi_index.py
-python3 scripts/query_sasi_index.py categorias
-python3 scripts/query_sasi_index.py find FichaCompleta
-python3 scripts/push_repo_index_to_postgres.py   # SUPABASE_DB_URL no .env
+python3 ~/dev/scripts/indices/build_sasi_index.py
+python3 ~/dev/scripts/indices/query_sasi_index.py categorias
+python3 ~/dev/scripts/indices/query_sasi_index.py find FichaCompleta
+python3 ~/dev/scripts/indices/push_repo_index_to_postgres.py   # SUPABASE_DB_URL no .env
 ```
 
 ## Mapa
