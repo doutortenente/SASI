@@ -27,6 +27,7 @@ import type { ReactElement } from "react";
 import type { Infusao, Prescricao } from "@/types/clinical";
 import { TRAVESSAO, txt } from "@/features/patients/components/PatientHeader";
 import { num } from "@/lib/formatters/br";
+import { unidadeSegura } from "@/lib/formatters/br";
 
 // ---------------------------------------------------------------------------
 // 1. Categorias do kardex — ORDEM DE LEITURA do plantao
@@ -141,11 +142,11 @@ interface DoseExib {
 function doseDe(i: Infusao): DoseExib | null {
   const bruto: unknown = i.dose;
   if (typeof bruto === "number" && Number.isFinite(bruto)) {
-    return { valor: num(bruto, 3), unidade: txt(i.unidade) };
+    return { valor: num(bruto, 3), unidade: unidadeSegura(txt(i.unidade)) };
   }
   if (typeof bruto === "string") {
     const t = txt(bruto);
-    if (t) return { valor: t, unidade: txt(i.unidade) };
+    if (t) return { valor: t, unidade: unidadeSegura(txt(i.unidade)) };
   }
   if (i.vazao_ml_h != null) return { valor: num(i.vazao_ml_h, 2), unidade: "mL/h" };
   if (i.vazao_mcg_h != null) return { valor: num(i.vazao_mcg_h, 2), unidade: "µg/h" };

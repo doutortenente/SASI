@@ -18,6 +18,7 @@ import type { Leito } from "../types";
 import type { Gravity } from "@/features/war-room/triage";
 import type { Dispositivos, Infusao, Isolamento } from "@/types/clinical";
 import { num } from "@/lib/formatters/br";
+import { unidadeSegura } from "@/lib/formatters/br";
 
 // ---------------------------------------------------------------------------
 // Contratos
@@ -114,7 +115,7 @@ function rotuloInfusao(i: Infusao): string | null {
   const droga = (i.droga ?? "").trim();
   if (!droga) return null;
   const dose = i.dose != null ? String(i.dose).trim() : "";
-  if (dose) return `${droga} ${dose}${i.unidade ? ` ${i.unidade}` : ""}`.trim();
+  if (dose) return `${droga} ${dose}${i.unidade ? ` ${unidadeSegura(i.unidade)}` : ""}`.trim();
   if (i.vazao_ml_h != null) return `${droga} ${num(i.vazao_ml_h, 1)} ml/h`;
   return droga;
 }

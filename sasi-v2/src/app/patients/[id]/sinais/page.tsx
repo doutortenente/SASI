@@ -45,6 +45,7 @@ import type { EventoClinico, EventoTipoRef } from "@/types/clinical";
 import { VitalsTable, CSS_VITALS_TABLE, type LinhaVital } from "@/features/vitals/components/VitalsTable";
 import { BalancoHidrico, CSS_BALANCO_HIDRICO, type PontoBh } from "@/features/vitals/components/BalancoHidrico";
 import type { PontoSparkline } from "@/features/vitals/components/Sparkline";
+import { unidadeSegura } from "@/lib/formatters/br";
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +73,7 @@ function unidadeDe(codigo: string, refs: Map<string, EventoTipoRef>, eventos: Ev
   if (padrao) return padrao;
   for (let i = eventos.length - 1; i >= 0; i -= 1) {
     const ev = eventos[i];
-    if (ev.tipo === codigo && ev.unidade) return ev.unidade;
+    if (ev.tipo === codigo && ev.unidade) return unidadeSegura(ev.unidade);
   }
   return null;
 }

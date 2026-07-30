@@ -11,6 +11,7 @@
 // Colunas conferidas em supabase/schema-producao-v3.sql.
 // ============================================================================
 
+import { unidadeSegura } from "@/lib/formatters/br";
 import { cache } from "react";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import type { EventoClinico, EventoTipoRef } from "@/types/clinical";
@@ -244,7 +245,7 @@ const especDe = (r: EventoTipoRef): EspecLinha => ({
   codigo: r.codigo,
   rotulo: r.rotulo,
   categoria: r.categoria,
-  unidade: r.unidade_padrao,
+  unidade: r.unidade_padrao ? unidadeSegura(r.unidade_padrao) : null, // grafia segura: µg -> mcg (ISMP)
   faixa_min: r.faixa_min,
   faixa_max: r.faixa_max,
 });
@@ -288,7 +289,7 @@ const aggVazio = (): Agg => ({ max: null, min: null, ultimo: null, ts: null, n: 
 
 function acumula(a: Agg, ev: EventoClinico): void {
   if (ev.requires_review) a.review = true;
-  if (ev.unidade) a.unidadeEvento = ev.unidade;
+  if (ev.unidade) a.unidadeEvento = unidadeSegura(ev.unidade); // grafia segura: µg -> mcg (ISMP)
   const valor = ev.valor_num;
   if (valor == null) return;
   a.n += 1;

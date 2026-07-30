@@ -27,6 +27,7 @@ import type { ReactElement } from "react";
 import type { SerieVital } from "@/lib/data";
 import { num } from "@/lib/formatters/br";
 import { Sparkline, type PontoSparkline } from "./Sparkline";
+import { unidadeSegura } from "@/lib/formatters/br";
 
 const TRAVESSAO = "—";
 
@@ -94,7 +95,7 @@ function tituloFora(min: number | null, max: number | null, unidade: string | nu
 /** Resumo da linha em uma frase (vira title da celula do parametro). */
 function resumoLinha(l: LinhaVital, horas: number): string {
   if (l.n === 0) return `${l.rotulo}: não avaliado nas últimas ${horas} h`;
-  const un = l.unidade ? ` ${l.unidade}` : "";
+  const un = l.unidade ? ` ${unidadeSegura(l.unidade)}` : "";
   const par = l.n === 1 ? `${num(l.max, CASAS)}${un} (medida única)` : `${num(l.max, CASAS)}–${num(l.min, CASAS)}${un}`;
   const hora = hhmm(l.ts);
   const ultimo = l.ultimo != null ? ` · último ${num(l.ultimo, CASAS)}${un}${hora ? ` às ${hora}` : ""}` : "";
@@ -241,7 +242,7 @@ export function VitalsTable({ linhas, horas = 24, semDimensao = false }: VitalsT
                   </td>
 
                   {/* UNIDADE — de evento_tipo_ref (ou do evento gravado). Nunca chutada. */}
-                  <td className="vt__un">{l.unidade ?? <span className="vt__vazio">{TRAVESSAO}</span>}</td>
+                  <td className="vt__un">{l.unidade ? unidadeSegura(l.unidade) : <span className="vt__vazio">{TRAVESSAO}</span>}</td>
 
                   {/* TENDENCIA — SVG puro; menos de 2 pontos nao desenha */}
                   <td className="vt__trend">
@@ -249,7 +250,7 @@ export function VitalsTable({ linhas, horas = 24, semDimensao = false }: VitalsT
                       <Sparkline
                         pontos={l.pontos}
                         rotulo={l.rotulo}
-                        unidade={l.unidade}
+                        unidade={unidadeSegura(l.unidade)}
                         faixaMin={l.faixa_min}
                         faixaMax={l.faixa_max}
                         casas={CASAS}

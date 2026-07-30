@@ -22,6 +22,7 @@
 //  - Numero em fonte mono tabular (.tabnum).
 //  - Texto puro de export: pt-BR, sem markdown, sem emoji, 3 linhas por leito.
 // ============================================================================
+import { unidadeSegura } from "@/lib/formatters/br";
 import Link from "next/link";
 import type { ReactElement } from "react";
 import { ROTULO_GRAVIDADE } from "@/features/beds/components/BedCard";
@@ -137,7 +138,7 @@ function rotuloInfusao(i: Infusao): string | null {
   if (!droga) return null;
   const dose = txt(i.dose);
   if (dose) {
-    const un = txt(i.unidade);
+    const un = unidadeSegura(txt(i.unidade));
     return un ? `${droga} ${dose} ${un}` : `${droga} ${dose}`;
   }
   if (i.vazao_mcg_h != null) return `${droga} ${num(i.vazao_mcg_h, 1)} mcg/h`;

@@ -21,6 +21,7 @@
 //  - Precisao preservada: 7,35 continua 7,35 (fmtLab le as casas do valor gravado).
 //  - Todas as cores por token CSS. Zero hex neste arquivo.
 // ============================================================================
+import { unidadeSegura } from "@/lib/formatters/br";
 import type { ReactElement } from "react";
 import type { Folhao, FolhaoCelula, FolhaoLinha } from "@/lib/data";
 import {
@@ -115,7 +116,7 @@ function prepararCelulas(linha: FolhaoLinha): CelulaExib[] {
 
 /** Texto do title da celula: tudo que o numero sozinho nao conta. */
 function tituloCelula(linha: FolhaoLinha, c: FolhaoCelula): string {
-  const un = sufixo(linha.unidade);
+  const un = sufixo(unidadeSegura(linha.unidade));
   const cabeca = `${linha.rotulo} — ${diaLongo(c.dia)}`;
 
   if (c.n === 0) {
@@ -265,7 +266,7 @@ export function TabelaoLabs({ folhao, dimensaoIndisponivel = false }: TabelaoLab
               </tr>
 
               {bloco.linhas.map((linha: FolhaoLinha) => {
-                const un = linha.unidade?.trim() ?? "";
+                const un = unidadeSegura(linha.unidade).trim();
                 return (
                   <tr key={linha.tipo}>
                     <th scope="row" className="tlab__exame">
