@@ -61,13 +61,24 @@ Direção ASPIRACIONAL para telas novas — **“Monitor de UTI Tático / HUD”
 
 -----
 
-## 4. Schema do banco (estado VIVO — 26-Jun-2026)
+## 4. Schema do banco (estado VIVO — 30-Jul-2026, **modelo v3**)
 
-Fonte fiel: **migration baseline** `20260626000000_baseline.sql` (substitui `schema-live-dump.sql`; migrations `01–07` arquivadas em `migrations/_archive/`). 10 tabelas clínicas + 2 de config de alerta (`alert_rules`, `trend_rules`). RAG (`protocolos`/`protocolo_chunks`, migration `06`) **congelado, não aplicado**. RLS habilitado (`dev_bypass`, débito aceito solo).
+Fonte fiel: **migration baseline** `20260626000000_baseline.sql` + **formalização v3** (`20260730120000_enums_e_dimensao_eventos`, `20260730120100_eventos_tipo_fk`, `20260730120200_memorias_dono_e_severidade_insert`), aplicada em produção em 30-jul-2026. Schema de referência completo: `supabase/schema-producao-v3.sql`. RAG (`protocolos`/`protocolo_chunks`, migration `06`) **congelado, não aplicado**. RLS habilitado (`dev_bypass` ainda ativo — remoção é passo *gated*, ver abaixo).
+
+**O que o modelo v3 trouxe (30-jul):**
+- **14 enums nativos** (`uti_enum`, `gravidade_enum`, `status_leito_enum`, `isolamento_enum`, `severidade_visual_enum`, `plantao_enum`, `via_atb_enum`, `intencao_atb_enum`, `material_cultura_enum`, `antibiograma_resultado_enum`, `severidade_alerta_enum`, `fonte_evento_enum`, `comparador_enum`, `trend_modo_enum`). As colunas ainda são `text` — a adoção (`text→enum`) é passo *gated*.
+- **`evento_tipo_ref`** (13ª tabela): dimensão que governa o vocabulário de `eventos_clinicos.tipo` — 56 códigos com `rotulo`, `unidade_padrao`, `faixa_min`/`faixa_max` (flags de absurdo fisiológico, de `03-clinical-sanity-checks`) e `loinc_code` (FHIR; só os 5 vitais verificados preenchidos — resto null por ZERO ALUCINAÇÃO). **Tipo novo = nova LINHA, não mexe em código.**
+- **FKs**: `eventos_clinicos.tipo`, `alert_rules.tipo_evento` e `trend_rules.tipo_evento` → `evento_tipo_ref(codigo)`. O CHECK antigo de 56 valores foi removido.
+- **`memorias`** ganhou `user_id` + 4 policies de dono (antes: RLS ligada sem policy nenhuma).
+- **`trg_severidade_on_insert`**: o semáforo de gravidade passa a valer também no INSERT (antes só no UPDATE).
+- **Extensão do vocabulário** (eco/hemodinâmica/imagem/cultura): `tipo='custom'` + `valor_json {dominio, subtipo, unidade}`. Não inflar `evento_tipo_ref` com isso.
+
+**⛔ Passos GATED (em `supabase/migrations/_gated/`, NÃO rodam sozinhos):** `10_adocao_enums.sql` (converter `text→enum`, branch-first) e `20_rls_producao.sql` (policies por comando + remover `dev_bypass` — **só depois do login real**, senão trava o app). Ordem obrigatória em `docs/RUNBOOK-migracao-v3.md`.
 
 |Tabela            |Função                                                             |Linhas (23-jun-2026)|
 |------------------|-------------------------------------------------------------------|--------------------:|
 |`pacientes`       |Cadastro + status do leito + severidade visual + `riscos_flags`    |16                   |
+|`evento_tipo_ref` |**Dimensão** do vocabulário de eventos (unidade, faixa, LOINC)     |56                   |
 |`evolucoes`       |Snapshot por sistema (JSONB) + SOFA + conduta                      |16                   |
 |`eventos_clinicos`|**Timeseries** — núcleo de tendências/alertas                      |130                  |
 |`atbs`            |Antibiotic stewardship (D-ATB + `duracao_planejada_dias`)          |12                   |
@@ -79,10 +90,12 @@ Fonte fiel: **migration baseline** `20260626000000_baseline.sql` (substitui `sch
 |`alert_rules`     |Config alertas por valor (25 regras; `fonte`=DOI Vera)             |25                   |
 |`trend_rules`     |Config alertas de tendência/Δ (AKI creatinina, GCS)                |3                    |
 
-**Views (7):** `vw_dashboard_uti`, `vw_sofa_trend_72h`, `vw_bh_acumulado`, `vw_dias_atb_ativo`, `vw_alertas_abertos`, `vw_eventos_pendentes_revisao`, `vw_eventos_tendencia`.
-**Funções:** `fn_updated_at`, `fn_invalidate_sofa_cache`, `sync_severidade_visual`, `fn_alert_hash`, `fn_eval_alert` (produtor de alerta), `fn_eval_trend` (tendência/Δ), `fn_autoflag_lowconf`, `save_ficha` (RPC escrita atômica ficha). `match_protocolos` só na migration 06 (não aplicada).
+**Views (8):** `vw_dashboard_uti`, `vw_sofa_diario` (motor de SOFA/dia sobre eventos), `vw_sofa_trend_72h`, `vw_bh_acumulado`, `vw_dias_atb_ativo`, `vw_alertas_abertos`, `vw_eventos_pendentes_revisao`, `vw_eventos_tendencia`.
+**Funções:** `fn_updated_at`, `fn_invalidate_sofa_cache`, `sync_severidade_visual`, `fn_set_severidade_on_insert` (v3), `fn_alert_hash`, `fn_eval_alert` (produtor de alerta), `fn_eval_trend` (tendência/Δ), `fn_autoflag_lowconf`, `save_ficha` (RPC escrita atômica ficha). `match_protocolos` só na migration 06 (não aplicada).
 **Edge Functions (sasi):** `ocr-ingest` e `ingest-patient` — **legado**, não usar no fluxo diário.
-**Extensões:** `pgcrypto`, `pg_trgm`, `vector` (pgvector 0.8).
+**Extensões:** `pgcrypto`, `pg_trgm`, `vector` (pgvector 0.8). *(Advisor pede mover `pg_trgm`/`vector` de `public` para `extensions` — pendente.)*
+
+> 🖥️ **App novo (`sasi-v2/`, Next.js 15):** esqueleto verificado em 30-jul — build verde e lendo os 7 leitos reais da `vw_dashboard_uti`. Camada de dados em `src/lib/data/`, telas em `src/app/`, domínios em `src/features/`. O **cálculo clínico não mora na tela**: SOFA vem do banco (`vw_sofa_diario`/`evolucoes.sofa_total`); o motor v2 está em `packages/clinical-engine/scores-v2-staging/` (**não compila**, fase futura). Design system real em `packages/design-system/`.
 
 > ⚠️ **`eventos_clinicos` (130) com débito de qualidade:** ingest manual via Claude; ~27 na fila `vw_eventos_pendentes_revisao`. O trigger `trg_autoflag_lowconf` força `requires_review` em `confidence<0.7`.
 >
