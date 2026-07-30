@@ -54,7 +54,15 @@ export type Database = {
           severidade?: string
           tipo_evento?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "alert_rules_tipo_fk"
+            columns: ["tipo_evento"]
+            isOneToOne: false
+            referencedRelation: "evento_tipo_ref"
+            referencedColumns: ["codigo"]
+          },
+        ]
       }
       alerts_log: {
         Row: {
@@ -300,6 +308,42 @@ export type Database = {
           },
         ]
       }
+      evento_tipo_ref: {
+        Row: {
+          ativo: boolean
+          categoria: string
+          codigo: string
+          faixa_max: number | null
+          faixa_min: number | null
+          loinc_code: string | null
+          ordem: number
+          rotulo: string
+          unidade_padrao: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          categoria: string
+          codigo: string
+          faixa_max?: number | null
+          faixa_min?: number | null
+          loinc_code?: string | null
+          ordem?: number
+          rotulo: string
+          unidade_padrao?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string
+          codigo?: string
+          faixa_max?: number | null
+          faixa_min?: number | null
+          loinc_code?: string | null
+          ordem?: number
+          rotulo?: string
+          unidade_padrao?: string | null
+        }
+        Relationships: []
+      }
       eventos_clinicos: {
         Row: {
           confidence: number | null
@@ -377,6 +421,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_dashboard_uti"
             referencedColumns: ["paciente_id"]
+          },
+          {
+            foreignKeyName: "eventos_tipo_fk"
+            columns: ["tipo"]
+            isOneToOne: false
+            referencedRelation: "evento_tipo_ref"
+            referencedColumns: ["codigo"]
           },
         ]
       }
@@ -543,6 +594,7 @@ export type Database = {
           embedding: string | null
           id: number
           metadata: Json | null
+          user_id: string | null
         }
         Insert: {
           conteudo: string
@@ -550,6 +602,7 @@ export type Database = {
           embedding?: string | null
           id?: never
           metadata?: Json | null
+          user_id?: string | null
         }
         Update: {
           conteudo?: string
@@ -557,6 +610,7 @@ export type Database = {
           embedding?: string | null
           id?: never
           metadata?: Json | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -746,7 +800,15 @@ export type Database = {
           severidade?: string
           tipo_evento?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trend_rules_tipo_fk"
+            columns: ["tipo_evento"]
+            isOneToOne: false
+            referencedRelation: "evento_tipo_ref"
+            referencedColumns: ["codigo"]
+          },
+        ]
       }
     }
     Views: {
@@ -967,6 +1029,13 @@ export type Database = {
             referencedRelation: "vw_dashboard_uti"
             referencedColumns: ["paciente_id"]
           },
+          {
+            foreignKeyName: "eventos_tipo_fk"
+            columns: ["tipo"]
+            isOneToOne: false
+            referencedRelation: "evento_tipo_ref"
+            referencedColumns: ["codigo"]
+          },
         ]
       }
       vw_eventos_tendencia: {
@@ -979,6 +1048,44 @@ export type Database = {
           unidade: string | null
           valor_anterior: number | null
           valor_num: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_clinicos_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+          {
+            foreignKeyName: "eventos_tipo_fk"
+            columns: ["tipo"]
+            isOneToOne: false
+            referencedRelation: "evento_tipo_ref"
+            referencedColumns: ["codigo"]
+          },
+        ]
+      }
+      vw_sofa_diario: {
+        Row: {
+          componentes_faltantes: string[] | null
+          componentes_presentes: number | null
+          dia: string | null
+          paciente_id: string | null
+          s_cardio: number | null
+          s_coag: number | null
+          s_liver: number | null
+          s_neuro: number | null
+          s_renal: number | null
+          s_resp: number | null
+          sofa_parcial: number | null
         }
         Relationships: [
           {
@@ -1063,8 +1170,36 @@ export type Database = {
       show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
+      antibiograma_resultado_enum: "S" | "I" | "R"
+      comparador_enum: "lt" | "lte" | "gt" | "gte"
+      fonte_evento_enum:
+        | "manual"
+        | "gemini_ocr"
+        | "claude_ocr"
+        | "appsheet"
+        | "auto_trigger"
+        | "edge_function"
+        | "api_import"
       gravidade_enum: "estavel" | "moderado" | "grave" | "critico" | "obito"
+      intencao_atb_enum: "empirica" | "dirigida" | "profilatica"
+      isolamento_enum: "none" | "contact" | "droplet" | "aerosol"
+      material_cultura_enum:
+        | "hemocultura"
+        | "urocultura"
+        | "aspirado_traqueal"
+        | "lavado_bal"
+        | "lcr"
+        | "secrecao_ferida"
+        | "liquido_peritoneal"
+        | "liquido_pleural"
+        | "outro"
+      plantao_enum: "manha" | "tarde" | "noite" | "plantao_24h"
+      severidade_alerta_enum: "info" | "warning" | "critical"
+      severidade_visual_enum: "red" | "yellow" | "green"
       status_leito_enum: "ativo" | "alta" | "obito" | "transferencia"
+      trend_modo_enum: "subida_abs" | "subida_rel" | "queda_abs"
+      uti_enum: "UTI2" | "UTI3" | "UTI4"
+      via_atb_enum: "EV" | "VO" | "IM" | "SC" | "SNE" | "SNG" | "IT" | "Tópico"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1192,8 +1327,38 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      antibiograma_resultado_enum: ["S", "I", "R"],
+      comparador_enum: ["lt", "lte", "gt", "gte"],
+      fonte_evento_enum: [
+        "manual",
+        "gemini_ocr",
+        "claude_ocr",
+        "appsheet",
+        "auto_trigger",
+        "edge_function",
+        "api_import",
+      ],
       gravidade_enum: ["estavel", "moderado", "grave", "critico", "obito"],
+      intencao_atb_enum: ["empirica", "dirigida", "profilatica"],
+      isolamento_enum: ["none", "contact", "droplet", "aerosol"],
+      material_cultura_enum: [
+        "hemocultura",
+        "urocultura",
+        "aspirado_traqueal",
+        "lavado_bal",
+        "lcr",
+        "secrecao_ferida",
+        "liquido_peritoneal",
+        "liquido_pleural",
+        "outro",
+      ],
+      plantao_enum: ["manha", "tarde", "noite", "plantao_24h"],
+      severidade_alerta_enum: ["info", "warning", "critical"],
+      severidade_visual_enum: ["red", "yellow", "green"],
       status_leito_enum: ["ativo", "alta", "obito", "transferencia"],
+      trend_modo_enum: ["subida_abs", "subida_rel", "queda_abs"],
+      uti_enum: ["UTI2", "UTI3", "UTI4"],
+      via_atb_enum: ["EV", "VO", "IM", "SC", "SNE", "SNG", "IT", "Tópico"],
     },
   },
 } as const
