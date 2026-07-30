@@ -1,0 +1,15 @@
+# dependencias
+/node_modules
+
+# build do Next.js (gerado — nunca versionar)
+/.next/
+/out/
+next-env.d.ts
+
+# ambiente (segredos — nunca versionar)
+.env
+.env*.local
+
+# sistema
+.DS_Store
+*.tsbuildinfo
