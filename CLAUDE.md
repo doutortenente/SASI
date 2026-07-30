@@ -7,7 +7,7 @@
 - Proibido: sigla crua sem expandir, jargão solto, "é só rodar X" sem dizer em palavras o que X faz e por quê.
 
 > Briefing operacional do projeto. Lido pelo Claude Code ao abrir o repo.
-> **Última atualização:** 11-Jul-2026 — README reescrito; doctrine/ resolvida (skill admissão unificada, sanity-checks migrados — ver 7-A); arquivo morto (`sasi-import`, bundles) removido do PC (vive no GitHub/OneDrive).
+> **Última atualização:** 30-Jul-2026 — deploy canônico Vercel; paths `~/projetos/`; docs alinhados.
 > Este arquivo substitui qualquer `_HANDOFF_BRIEFING.md` (datado 23-Abr-2026, **STALE** — não é fonte da verdade).
 > **Memória persistente do projeto:** @memory/MEMORY.md
 
@@ -40,7 +40,7 @@ Toda documentação clínica é em **Português do Brasil**.
 
 ## 3. Stack
 
-- **Frontend:** React + TypeScript + Tailwind + Vite → **Netlify** `sasi-uti.netlify.app`.
+- **Frontend:** React + TypeScript + Tailwind + Vite → **Vercel** `sasi-uti.vercel.app`.
 - **Backend:** Supabase (PostgreSQL 17, projeto `idswehsvvqczzkiatuzu`, região `sa-east-1`).
 - **Ingest clínico:** Claude (skill `sasi-ingest-export`) → JSON → MCP ou frontend.
 - **Edge Functions:** `ocr-ingest` legado no repo — **não** é fluxo operacional.
@@ -133,7 +133,7 @@ War Room · toggle de visão compacta · SmartPaste · abas por UTI · chips de 
 
 Fonte da verdade: **`_SASI_TEMPLATE_BASE_v2.md`** (Ramo C) — anatomia idêntica nas duas skills; alterou em uma, replica na outra no mesmo commit (divergência = bug clínico-legal).
 
-**Skills** (fonte única: `~/dev/claude/skills/` · symlink `~/.claude/skills` · commit `582f117`):
+**Skills** (fonte única: `~/projetos/claude/skills/` · symlink `~/.claude/skills` · commit `582f117`):
 
 - `sasi-ingest-export` — extrai dados de fotos/PDFs/laudos → payload JSON validado; gera “Exportar Evolução” e “Exportar Turno”.
 - `admissao-uti` — nota de admissão (modo D1).
@@ -152,12 +152,12 @@ Docs clínicas de `docs/` viraram conhecimento do cérebro do Claude — movidas
 `~/vaults/celebro/conhecimento/projetos/` com prefixo `sasi-`: `sasi-decisoes-clinicas.md`,
 `sasi-sofa-ruleset.md`, `sasi-vera-ingest-spec.md`, `sasi-backlog-clinico.md`,
 `sasi-moc-doutrina.md`. `docs/STATUS.md` → `memory/notes/STATUS.md`. `docs/motor-clinico-v2/`
-(staging) → `~/dev/_lab/sasi-motor-clinico-v2/`. `docs/legado/` → `~/vaults/celebro/_arquivo/sasi-legado/`.
+(staging) → `~/projetos/rascunhos/sasi-motor-clinico-v2/`. `docs/legado/` → `~/vaults/celebro/_arquivo/sasi-legado/`.
 `docs/JETBRAINS.md` + `docs/idea-runConfigurations/` deletados (duplicata das run configs vivas em
-`~/dev/.idea/runConfigurations/`). `doctrine/references/06-api-automation-prompts.md` deletado
+`~/projetos/.idea/runConfigurations/`). `doctrine/references/06-api-automation-prompts.md` deletado
 (idêntico ao canônico em `claude/skills/sasi-ingest-export/`). `doctrine/casos/VANESSA_v2_PROVA.md`
 (PHI) → `~/vaults/celebro/90-PHI-LOCAL/casos-sasi/`. `design-system/` (staging, 75 arquivos nunca
-consumidos pelo app) → `~/dev/_lab/sasi-design-system/`. `docs/AGENTS.md` e `docs/SETUP.md`
+consumidos pelo app) → `~/projetos/rascunhos/sasi-design-system/`. `docs/AGENTS.md` e `docs/SETUP.md`
 permanecem no repo — não se encaixam com evidência em conhecimento-clínico/staging/duplicata.
 **Fecho da divergência (11-jul-2026):** o restante de `doctrine/` foi resolvido — 6 arquivos
 ancestrais-puros deletados; 4 regras de sanity-check únicas migradas pro canônico

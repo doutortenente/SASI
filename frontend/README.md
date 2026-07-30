@@ -1,6 +1,6 @@
 # SASI Frontend
 
-React + Vite + TypeScript + Tailwind. Deploy: **Netlify** (`sasi-uti.netlify.app`).
+React + Vite + TypeScript + Tailwind. Deploy: **Vercel** (`sasi-uti.vercel.app`).
 
 **Uso pessoal** — operador único (Dr. Nicolas). Sem login/OAuth em produção.
 

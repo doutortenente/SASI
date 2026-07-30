@@ -60,4 +60,4 @@ Este checklist evita que mudanças entrem sem que outras sessões fiquem sabendo
 
 ---
 
-> **Lembrete:** se este PR muda env vars no Netlify, deploy strategy, ou auth URL, **AVISE no commit message**. Outro Claude vai ler o `git log` antes de mexer.
+> **Lembrete:** se este PR muda env vars na Vercel, deploy strategy, ou auth URL, **AVISE no commit message**. Outro Claude vai ler o `git log` antes de mexer.

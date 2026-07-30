@@ -6,11 +6,9 @@ Checklist para deixar um PC pronto para desenvolver o SASI (frontend + MCP + Sup
 
 | App | Para quê |
 |---|---|
-| **Node.js LTS** (>= 18) | Frontend Vite + MCP server |
+| **Node.js 24 LTS** | Frontend Vite + MCP server |
 | **Git** | Controle de versão |
-| **WebStorm** ou **IntelliJ IDEA Ultimate** | IDE — configs em `.idea/` |
-
-Ver [JETBRAINS.md](JETBRAINS.md) para run configurations.
+| **WebStorm** ou **IntelliJ IDEA Ultimate** | IDE — run configs em `~/projetos/.idea/runConfigurations/` |
 
 ## Recomendados
 
@@ -34,7 +32,7 @@ cd ../mcp-server && npm install
 
 ## Variáveis de ambiente
 
-Criar `.env` em `frontend/`:
+O cofre canônico é `~/projetos/.env` (symlink `sasi/.env` aponta pra ele). Chaves mínimas:
 
 ```
 VITE_SUPABASE_URL=https://seu-projeto.supabase.co
@@ -52,8 +50,8 @@ cd frontend && npm run typecheck
 
 Ou use as run configs `frontend: dev` e `frontend: typecheck` no WebStorm.
 
-## Workspace ~/dev/
+## Workspace ~/projetos/
 
-Na máquina do Dr. Tenente, o SASI vive em `~/dev/sasi` junto com repos irmãos
-(`claude`, `jarvis`, `memory`). Skills canônicas: `~/dev/claude/skills`
+Na máquina do Dr. Tenente, o SASI vive em `~/projetos/sasi` junto com repos irmãos
+(`claude`, `memory`, `scripts`). Skills canônicas: `~/projetos/claude/skills`
 (symlink `~/.claude/skills`).

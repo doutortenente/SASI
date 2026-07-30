@@ -205,7 +205,7 @@ export async function generateStructuredSynthesisViaGrok(
 ): Promise<SASISynthesisOutput> {
   const apiKey = getXaiApiKey();
   if (!apiKey) {
-    throw new Error('VITE_XAI_API_KEY não configurada (frontend/.env ou Netlify)');
+    throw new Error('VITE_XAI_API_KEY não configurada (frontend/.env ou Vercel)');
   }
 
   const prompt = buildStrongSASIPrompt(request);

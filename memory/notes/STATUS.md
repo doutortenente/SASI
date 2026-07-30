@@ -1,8 +1,8 @@
 # STATUS — SASI (Sistema de Auditoria e Síntese Intensiva)
 **Comando UTI Alpha — 33 leitos (UTI 2/3/4)**
 
-**Data desta revisão:** 27/06/2026
-**Produção:** https://sasi-uti.netlify.app  
+**Data desta revisão:** 30/07/2026
+**Produção:** https://sasi-uti.vercel.app  
 **Operador:** Dr. Nicolas Tenente (dr.tenente@nagaitaltda.com)  
 **Supabase:** idswehsvvqczzkiatuzu (Postgres 17.6)
 
@@ -20,12 +20,12 @@
 | Frontend        | React 18.3 + TypeScript + Vite 5                 | Código ativo em subpasta (ver seção 5) |
 | Estilo          | Tailwind 3.4 + CSS vars — **BAYES.OPS 2 temas** | Tactical (escuro OLED) ⇄ Clinical (claro); toggle `lib/theme.tsx`; tokens `--app-*`; nunca hex hardcoded |
 | Backend         | Supabase (Postgres + Auth + Realtime + Edge Functions) | Única fonte de dados |
-| Deploy          | Netlify `sasi-uti` (CI em `main`)                | `netlify.toml` na raiz: `base = "frontend"` |
+| Deploy          | Vercel `sasi-uti` (CI em `main`)                 | `frontend/vercel.json`; root directory = `frontend` |
 | PDF             | jsPDF + jspdf-autotable (lazy)                   | Export de passagem de turno |
 | Ícones          | lucide-react                                     | — |
 | Ingest clínico  | Skill `sasi-ingest-export` → JSON → MCP `sasi_deploy_ingest` | Claude lê foto/PDF/texto; **sem** pipeline OCR automático |
 | Edge Function   | `ocr-ingest` legado (não usar) | Ingest real: Claude → JSON → MCP |
-| Índice do repo  | `~/dev/scripts/indices/build_sasi_index.py` → SQLite 244 arq | Ver `memory/MEMORY.md` |
+| Índice do repo  | `~/projetos/scripts/indices/build_sasi_index.py` → SQLite | Ver `memory/MEMORY.md` |
 
 **Princípio arquitetural:**  
 Ingest = **Claude extrai → JSON validado → grava no Supabase** (MCP com `deploy`, ou edição no frontend). Uso **pessoal solo** — um operador, sem OAuth.
@@ -54,7 +54,7 @@ Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persis
 | `eventos_clinicos` | 93 | 100% fonte `claude_ocr`; 24/93 `requires_review`; 18/93 `confidence<0.7` |
 | `atbs` / `culturas` / `pendencias` | 0 | Stewardship e tarefas ainda vazios |
 
-Último ingest (Claude→JSON): **21-jun-2026**. Queries de plantão: `plantao_queries.sql`.
+Último ingest (Claude→JSON): **21-jun-2026**. Queries de plantão: `supabase/queries/plantao_queries.sql`.
 
 ---
 
@@ -98,8 +98,8 @@ Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persis
 |20 | MCP `sasi_deploy_ingest` (bulk payload v1) | 24/06/2026 | ✅ Ativo   | `mcp-server/src/tools/ingest-deploy.ts` |
 |21 | Realtime dashboard em `pendencias` | 24/06/2026 | ✅ Ativo   | `useSupabasePatients.ts` |
 |22 | `clinical-engine` — 7 testes Vitest (parseBR, SOFA display) | 24/06/2026 | ✅ Ativo   | `packages/clinical-engine/` |
-|23 | Auditoria `eventos_clinicos` (script + query plantão) | 24/06/2026 | ✅ Ativo   | `~/dev/scripts/sasi/audit_eventos.py`, `plantao_queries.sql` §11b |
-|24 | Design BAYES.OPS — 2 temas Tactical/Clinical        | 27/06/2026 | ✅ Ativo   | `src/index.css` + `tailwind.config.js` + LeitoCard/TopBar/Dashboard; commits `acce2c7`+`f185ab8`; Netlify `6a3fc8f0` READY |
+|23 | Auditoria `eventos_clinicos` (script + query plantão) | 24/06/2026 | ✅ Ativo   | `~/projetos/scripts/sasi/audit_eventos.py`, `supabase/queries/plantao_queries.sql` §11b |
+|24 | Design BAYES.OPS — 2 temas Tactical/Clinical        | 27/06/2026 | ✅ Ativo   | `src/index.css` + `tailwind.config.js` + LeitoCard/TopBar/Dashboard; commits `acce2c7`+`f185ab8` |
 
 **Funcionalidades em destaque recentes (maio/2026):**  
 - `FichaCompleta.tsx` — edição completa de todos os sistemas (neuro, resp, hemo, tgi, renal, hemato, infecto) + DVA/sedativos + impressão/conduta/pendências.  
@@ -131,27 +131,27 @@ Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persis
 
 **Código ATIVO (repo `doutortenente/SASI`):**
 ```
-frontend/                           ← React+Vite (deploy Netlify)
+frontend/                           ← React+Vite (deploy Vercel)
 ├── src/
-├── netlify.toml
+├── vercel.json
 └── package.json
 
 mcp-server/                         ← MCP local (.mcp.json)
-supabase/                           ← migrations + Edge Functions
+supabase/                           ← migrations + Edge Functions + queries/
 ├── functions/ocr-ingest (legado)
+├── queries/plantao_queries.sql
 └── types/database.types.ts
 
-doctrine/                           ← doutrina clínica
-memory/                             ← sasi_index.db + scripts
-docs/                               ← SETUP, JETBRAINS, STATUS, AGENTS
-design-system/                      ← tokens + UI kit
+doctrine/                           ← template-base clínico
+memory/                             ← sasi_index.db + STATUS
+docs/                               ← SETUP, AGENTS
 CLAUDE.md · .mcp.json
 ```
 
-Workspace irmão: `~/dev/` (Claude, JARVIS, `memory/MAPA-DEV.md`). `comando-uti` **arquivado**.
+Workspace irmão: `~/projetos/` (Claude, memory, scripts). `comando-uti` **arquivado**.
 
 **Faxina 16/06/2026 (organização):**
-- Mapa do workspace: `~/dev/memory/MAPA-DEV.md` (pós-split; `comando-uti` descontinuado).
+- Mapa do workspace: `~/projetos/memory/MAPA-DEV.md` (pós-split; `comando-uti` descontinuado).
 - Fundido `CONFIGURAÇÕES_CLAUDE_JB.idea/` → `.idea/` canônico; removida run config `raiz: lint` (sem package.json raiz).
 - Removido `node_modules/` órfão na raiz (423 MB, sem `package.json`).
 - `.sasi-session-backup/` movido para gitignore (scratch de sessão IA).
@@ -181,7 +181,7 @@ Workspace irmão: `~/dev/` (Claude, JARVIS, `memory/MAPA-DEV.md`). `comando-uti`
 - [ ] Ingest folha → `sasi_deploy_ingest` → eventos na timeline
 - [ ] Ficha → síntese → save → reload mostra JSONB
 - [ ] Passagem 3 linhas + PDF com dados do DB
-- [ ] `python3 ~/dev/scripts/sasi/audit_eventos.py` — fila review < 10 itens críticos
+- [ ] `python3 ~/projetos/scripts/sasi/audit_eventos.py` — fila review < 10 itens críticos
 
 ### Prioridade MÉDIA
 - [x] Consolidar cópias duplicadas (faxina 11/06/2026)
@@ -195,7 +195,7 @@ Workspace irmão: `~/dev/` (Claude, JARVIS, `memory/MAPA-DEV.md`). `comando-uti`
 - [ ] 1 teste E2E (Playwright)
 
 ### Prioridade BAIXA
-- [ ] Renomear caminho do projeto para `sasi/` simples (breaking change — avaliar impacto no Netlify)
+- [ ] Renomear caminho do projeto para `sasi/` simples (breaking change — avaliar impacto na Vercel)
 - [ ] Code splitting + lazy loading mais agressivo (FichaCompleta + exportPDF já são lazy)
 - [ ] Logger estruturado (substituir console.log)
 
@@ -238,7 +238,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 | Data       | Decisão                                      | Commit / Motivo |
 |------------|----------------------------------------------|-----------------|
 | 27-Abr     | Setup inicial Vite + React + Supabase        | Stack definida |
-| 30-Abr     | Deploy CI no Netlify + renomeio para sasi-uti.netlify.app | Fase A faxina |
+| 30-Abr     | Deploy CI no Netlify + renomeio para sasi-uti.netlify.app | Fase A faxina (migrado p/ Vercel jul/2026) |
 | 30-Abr     | Implementação do bundle de design (3 temas + 3 views + calculadora) | 6020c0e |
 | 06-Mai     | **Acesso solo** (mock + dev_bypass RLS) | fc8cd75 — uso pessoal sem auth |
 | 06-09-Mai  | Port de features do protótipo Gemini (FichaCompleta, LeitoCard, labs estruturados) | d8a648c, 760b52d, b3c82eb |
@@ -246,7 +246,8 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 | 11-Jun     | **Redesign 5 Janelas** — severity/Watcher, clinicalExtract, Passagem 3-linhas | feat/5-janelas |
 | 24-Jun     | **SASI executável (sessão agentes)** — Ficha↔Supabase, MCP deploy, clinical-engine, bundle ingest | `779741a`…`19586a8`; handoff `docs/SECRETARIA-2026-06-24.md` |
 | 24-Jun     | **Skill template evolução D2+ v2** promovido no repo `claude` | `35df460` |
-| 27-Jun     | **Design BAYES.OPS deployado** — 2 temas Tactical/Clinical; reticle HUD; bugs de token corrigidos; 2 animações `infinite` removidas | `f185ab8`; Netlify `6a3fc8f0` READY |
+| 27-Jun     | **Design BAYES.OPS deployado** — 2 temas Tactical/Clinical; reticle HUD; bugs de token corrigidos; 2 animações `infinite` removidas | `f185ab8` |
+| 30-Jul     | **Deploy canônico → Vercel** (`sasi-uti.vercel.app`); `netlify.toml` removido; paths `~/dev/` → `~/projetos/` | Faxina docs |
 
 ---
 
@@ -255,7 +256,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 1. **Regenerar `schema-live-dump.sql`** pós-migration `07`.
 2. **CI ampliado** — jobs mcp-server + clinical-engine (bloqueado: scope `workflow` no token GitHub).
 3. **Smoke plantão** — checklist Definition of Done (§6).
-4. **Qualidade ingest** — 24 `eventos_clinicos` em fila review (`~/dev/scripts/sasi/audit_eventos.py`).
+4. **Qualidade ingest** — 24 `eventos_clinicos` em fila review (`~/projetos/scripts/sasi/audit_eventos.py`).
 5. **Rotacionar JWTs** se ainda não fez (histórico `AGENTS.md`).
 
 ---
@@ -269,7 +270,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 
 | Item | Status |
 |---|---|
-| Netlify `sasi-uti` | Repo `doutortenente/SASI`; `netlify.toml` na raiz com `base = "frontend"` |
+| Vercel `sasi-uti` | Repo `doutortenente/SASI`; root directory = `frontend`; `frontend/vercel.json` |
 | VPS Hermes | `/opt/data/projects/jarvis` + `sasi`; `comando-uti` arquivado |
 | JARVIS CI | Secret `VPS_SSH_PRIVATE_KEY` configurado |
 
@@ -280,6 +281,6 @@ JWTs antigos vazaram no histórico do git via `AGENTS.md`. Rotacione no Supabase
 
 *Referências rápidas (atualizado após faxina):*  
 - Código ativo: `frontend/`  
-- Deploy: Netlify `sasi-uti` — https://sasi-uti.netlify.app
+- Deploy: Vercel `sasi-uti` — https://sasi-uti.vercel.app
 - Supabase: projeto `idswehsvvqczzkiatuzu`  
 - Plano de auth: Google Drive (documento "Plano de ação login e autenticação SASI")

@@ -11,8 +11,8 @@ dist
 dist-ssr
 tsconfig.tsbuildinfo
 
-# Netlify CLI/MCP cache
-.netlify
+# Vercel CLI cache (se usar localmente)
+.vercel
 
 # Claude Code worktrees (criados sob demanda, não versionar)
 .claude/worktrees/
