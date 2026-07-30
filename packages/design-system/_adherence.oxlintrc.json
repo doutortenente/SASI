@@ -1,0 +1,507 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/clinical/**",
+              "components/core/**",
+              "ui_kits/comando-uti/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:IBM Plex Sans|IBM Plex Mono))/i]",
+        "message": "Font not provided by the design system. Available: IBM Plex Sans, IBM Plex Mono."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Badge'] > JSXAttribute > JSXIdentifier[name!=/^(?:tone|variant|size|icon|key|ref|className|style|children)$/]",
+        "message": "<Badge> doesn't accept that prop. Declared props: tone, variant, size, icon."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Badge'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md)$/]",
+        "message": "<Badge> size must be one of 'sm' | 'md'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|icon|iconRight|block|as|disabled|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, size, icon, iconRight, block, as, disabled."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='as'] > Literal[value!=/^(?:button|a)$/]",
+        "message": "<Button> as must be one of 'button' | 'a'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Card'] > JSXAttribute > JSXIdentifier[name!=/^(?:title|eyebrow|number|action|gravity|padded|interactive|key|ref|className|style|children)$/]",
+        "message": "<Card> doesn't accept that prop. Declared props: title, eyebrow, number, action, gravity, padded, interactive."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='GravityBadge'] > JSXAttribute > JSXIdentifier[name!=/^(?:level|size|label|dot|key|ref|className|style|children)$/]",
+        "message": "<GravityBadge> doesn't accept that prop. Declared props: level, size, label, dot."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='GravityBadge'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<GravityBadge> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Input'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|hint|icon|multiline|invalid|key|ref|className|style|children)$/]",
+        "message": "<Input> doesn't accept that prop. Declared props: label, hint, icon, multiline, invalid."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='LeitoProblem'] > JSXAttribute > JSXIdentifier[name!=/^(?:text|vetor|key|ref|className|style|children)$/]",
+        "message": "<LeitoProblem> doesn't accept that prop. Declared props: text, vetor."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='LeitoProblem'] > JSXAttribute[name.name='vetor'] > Literal[value!=/^(?:↑|↓|=)$/]",
+        "message": "<LeitoProblem> vetor must be one of '↑' | '↓' | '='."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ProblemRow'] > JSXAttribute > JSXIdentifier[name!=/^(?:text|vetor|system|hero|eyebrow|key|ref|className|style|children)$/]",
+        "message": "<ProblemRow> doesn't accept that prop. Declared props: text, vetor, system, hero, eyebrow."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SegmentOption'] > JSXAttribute > JSXIdentifier[name!=/^(?:value|label|icon|hint|key|ref|className|style|children)$/]",
+        "message": "<SegmentOption> doesn't accept that prop. Declared props: value, label, icon, hint."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SofaBadge'] > JSXAttribute > JSXIdentifier[name!=/^(?:score|delta|showIcon|key|ref|className|style|children)$/]",
+        "message": "<SofaBadge> doesn't accept that prop. Declared props: score, delta, showIcon."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='StatPill'] > JSXAttribute > JSXIdentifier[name!=/^(?:value|label|tone|icon|delta|active|onClick|key|ref|className|style|children)$/]",
+        "message": "<StatPill> doesn't accept that prop. Declared props: value, label, tone, icon, delta, active, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SystemPanel'] > JSXAttribute > JSXIdentifier[name!=/^(?:system|rows|data|title|key|ref|className|style|children)$/]",
+        "message": "<SystemPanel> doesn't accept that prop. Declared props: system, rows, data, title."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='TherapyBadge'] > JSXAttribute > JSXIdentifier[name!=/^(?:type|count|label|showIcon|pulse|key|ref|className|style|children)$/]",
+        "message": "<TherapyBadge> doesn't accept that prop. Declared props: type, count, label, showIcon, pulse."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='VitalStat'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|value|unit|status|key|ref|className|style|children)$/]",
+        "message": "<VitalStat> doesn't accept that prop. Declared props: label, value, unit, status."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "Badge": {
+        "replaces": []
+      },
+      "Button": {
+        "replaces": []
+      },
+      "Card": {
+        "replaces": []
+      },
+      "GravityBadge": {
+        "replaces": []
+      },
+      "Input": {
+        "replaces": []
+      },
+      "LeitoProblem": {
+        "replaces": []
+      },
+      "ProblemRow": {
+        "replaces": []
+      },
+      "SegmentOption": {
+        "replaces": []
+      },
+      "SofaBadge": {
+        "replaces": []
+      },
+      "StatPill": {
+        "replaces": []
+      },
+      "SystemPanel": {
+        "replaces": []
+      },
+      "TherapyBadge": {
+        "replaces": []
+      },
+      "VitalStat": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--accent",
+      "--accent-hover",
+      "--accent-soft",
+      "--accent-text",
+      "--amber-300",
+      "--amber-500",
+      "--badge-atb-bg",
+      "--badge-atb-text",
+      "--badge-dva-bg",
+      "--badge-dva-text",
+      "--badge-pend-bg",
+      "--badge-pend-text",
+      "--badge-sed-bg",
+      "--badge-sed-text",
+      "--badge-sepsis-bg",
+      "--badge-sepsis-text",
+      "--badge-vm-bg",
+      "--badge-vm-text",
+      "--badge-vni-bg",
+      "--badge-vni-text",
+      "--blue-400",
+      "--blue-500",
+      "--blue-600",
+      "--blue-700",
+      "--border-default",
+      "--border-strong",
+      "--border-subtle",
+      "--border-width",
+      "--chrome-active",
+      "--chrome-active-bar",
+      "--chrome-bg",
+      "--chrome-border",
+      "--chrome-muted",
+      "--chrome-text",
+      "--content-max",
+      "--danger",
+      "--dur-base",
+      "--dur-fast",
+      "--dur-slow",
+      "--ease-in-out",
+      "--ease-out",
+      "--emerald-400",
+      "--emerald-500",
+      "--focus-ring",
+      "--font-mono",
+      "--font-sans",
+      "--grav-critical-bg",
+      "--grav-critical-solid",
+      "--grav-critical-text",
+      "--grav-deceased-bg",
+      "--grav-deceased-solid",
+      "--grav-deceased-text",
+      "--grav-stable-bg",
+      "--grav-stable-solid",
+      "--grav-stable-text",
+      "--grav-unstable-bg",
+      "--grav-unstable-solid",
+      "--grav-unstable-text",
+      "--grav-watcher-bg",
+      "--grav-watcher-solid",
+      "--grav-watcher-text",
+      "--gravity-bar",
+      "--header-height",
+      "--leading-normal",
+      "--leading-snug",
+      "--leading-tight",
+      "--lime-500",
+      "--navy-600",
+      "--navy-700",
+      "--navy-800",
+      "--navy-900",
+      "--orange-400",
+      "--orange-500",
+      "--pink-500",
+      "--purple-500",
+      "--radius-2xl",
+      "--radius-lg",
+      "--radius-md",
+      "--radius-pill",
+      "--radius-sm",
+      "--radius-xl",
+      "--radius-xs",
+      "--red-400",
+      "--red-500",
+      "--red-600",
+      "--red-700",
+      "--red-950",
+      "--rose-500",
+      "--shadow-card",
+      "--shadow-focus",
+      "--shadow-pop",
+      "--shadow-raised",
+      "--sidebar-width",
+      "--sky-500",
+      "--slate-100",
+      "--slate-200",
+      "--slate-300",
+      "--slate-400",
+      "--slate-50",
+      "--slate-500",
+      "--slate-600",
+      "--slate-700",
+      "--slate-800",
+      "--slate-900",
+      "--slate-950",
+      "--sofa-critical",
+      "--sofa-high",
+      "--sofa-low",
+      "--sofa-medium",
+      "--space-0",
+      "--space-1",
+      "--space-10",
+      "--space-12",
+      "--space-2",
+      "--space-3",
+      "--space-4",
+      "--space-5",
+      "--space-6",
+      "--space-8",
+      "--success",
+      "--surface-app",
+      "--surface-card",
+      "--surface-raised",
+      "--surface-sunken",
+      "--sys-hemato",
+      "--sys-hemato-bar",
+      "--sys-hemato-bg",
+      "--sys-hemo",
+      "--sys-hemo-bar",
+      "--sys-hemo-bg",
+      "--sys-infecto",
+      "--sys-infecto-bar",
+      "--sys-infecto-bg",
+      "--sys-neuro",
+      "--sys-neuro-bar",
+      "--sys-neuro-bg",
+      "--sys-renal",
+      "--sys-renal-bar",
+      "--sys-renal-bg",
+      "--sys-resp",
+      "--sys-resp-bar",
+      "--sys-resp-bg",
+      "--sys-tgi",
+      "--sys-tgi-bar",
+      "--sys-tgi-bg",
+      "--teal-500",
+      "--text-2xl",
+      "--text-2xs",
+      "--text-3xl",
+      "--text-base",
+      "--text-body",
+      "--text-faint",
+      "--text-heading",
+      "--text-lg",
+      "--text-md",
+      "--text-muted",
+      "--text-on-accent",
+      "--text-sm",
+      "--text-xl",
+      "--text-xs",
+      "--tracking-eyebrow",
+      "--tracking-wide",
+      "--warning",
+      "--weight-bold",
+      "--weight-medium",
+      "--weight-regular",
+      "--weight-semibold"
+    ],
+    "tokenKinds": {
+      "--slate-50": "color",
+      "--slate-100": "color",
+      "--slate-200": "color",
+      "--slate-300": "color",
+      "--slate-400": "color",
+      "--slate-500": "color",
+      "--slate-600": "color",
+      "--slate-700": "color",
+      "--slate-800": "color",
+      "--slate-900": "color",
+      "--slate-950": "color",
+      "--navy-900": "color",
+      "--navy-800": "color",
+      "--navy-700": "color",
+      "--navy-600": "color",
+      "--blue-400": "color",
+      "--blue-500": "color",
+      "--blue-600": "color",
+      "--blue-700": "color",
+      "--red-400": "color",
+      "--red-500": "color",
+      "--red-600": "color",
+      "--red-700": "color",
+      "--red-950": "color",
+      "--emerald-500": "color",
+      "--emerald-400": "color",
+      "--amber-500": "color",
+      "--amber-300": "color",
+      "--orange-500": "color",
+      "--orange-400": "color",
+      "--purple-500": "color",
+      "--sky-500": "color",
+      "--rose-500": "color",
+      "--lime-500": "color",
+      "--pink-500": "color",
+      "--teal-500": "color",
+      "--surface-app": "color",
+      "--surface-card": "color",
+      "--surface-raised": "color",
+      "--surface-sunken": "color",
+      "--border-subtle": "color",
+      "--border-default": "color",
+      "--border-strong": "color",
+      "--text-heading": "font",
+      "--text-body": "font",
+      "--text-muted": "font",
+      "--text-faint": "font",
+      "--text-on-accent": "font",
+      "--accent": "color",
+      "--accent-hover": "color",
+      "--accent-soft": "color",
+      "--accent-text": "font",
+      "--focus-ring": "color",
+      "--chrome-bg": "color",
+      "--chrome-text": "font",
+      "--chrome-muted": "color",
+      "--chrome-active": "color",
+      "--chrome-active-bar": "color",
+      "--chrome-border": "color",
+      "--success": "color",
+      "--warning": "color",
+      "--danger": "color",
+      "--grav-stable-solid": "color",
+      "--grav-stable-bg": "color",
+      "--grav-stable-text": "font",
+      "--grav-watcher-solid": "color",
+      "--grav-watcher-bg": "color",
+      "--grav-watcher-text": "font",
+      "--grav-unstable-solid": "color",
+      "--grav-unstable-bg": "color",
+      "--grav-unstable-text": "font",
+      "--grav-critical-solid": "color",
+      "--grav-critical-bg": "color",
+      "--grav-critical-text": "font",
+      "--grav-deceased-solid": "color",
+      "--grav-deceased-bg": "color",
+      "--grav-deceased-text": "font",
+      "--sofa-low": "color",
+      "--sofa-medium": "color",
+      "--sofa-high": "color",
+      "--sofa-critical": "color",
+      "--sys-neuro": "color",
+      "--sys-neuro-bg": "color",
+      "--sys-neuro-bar": "color",
+      "--sys-resp": "color",
+      "--sys-resp-bg": "color",
+      "--sys-resp-bar": "color",
+      "--sys-hemo": "color",
+      "--sys-hemo-bg": "color",
+      "--sys-hemo-bar": "color",
+      "--sys-tgi": "color",
+      "--sys-tgi-bg": "color",
+      "--sys-tgi-bar": "color",
+      "--sys-renal": "color",
+      "--sys-renal-bg": "color",
+      "--sys-renal-bar": "color",
+      "--sys-hemato": "color",
+      "--sys-hemato-bg": "color",
+      "--sys-hemato-bar": "color",
+      "--sys-infecto": "color",
+      "--sys-infecto-bg": "color",
+      "--sys-infecto-bar": "color",
+      "--badge-dva-bg": "color",
+      "--badge-dva-text": "font",
+      "--badge-sed-bg": "color",
+      "--badge-sed-text": "font",
+      "--badge-vm-bg": "color",
+      "--badge-vm-text": "font",
+      "--badge-vni-bg": "color",
+      "--badge-vni-text": "font",
+      "--badge-atb-bg": "color",
+      "--badge-atb-text": "font",
+      "--badge-pend-bg": "color",
+      "--badge-pend-text": "font",
+      "--badge-sepsis-bg": "color",
+      "--badge-sepsis-text": "font",
+      "--shadow-card": "shadow",
+      "--shadow-raised": "shadow",
+      "--shadow-pop": "shadow",
+      "--font-sans": "font",
+      "--font-mono": "font",
+      "--text-2xs": "font",
+      "--text-xs": "font",
+      "--text-sm": "font",
+      "--text-base": "font",
+      "--text-md": "font",
+      "--text-lg": "font",
+      "--text-xl": "font",
+      "--text-2xl": "font",
+      "--text-3xl": "font",
+      "--weight-regular": "font",
+      "--weight-medium": "font",
+      "--weight-semibold": "font",
+      "--weight-bold": "font",
+      "--leading-tight": "font",
+      "--leading-snug": "font",
+      "--leading-normal": "font",
+      "--tracking-eyebrow": "font",
+      "--tracking-wide": "font",
+      "--space-0": "spacing",
+      "--space-1": "spacing",
+      "--space-2": "spacing",
+      "--space-3": "spacing",
+      "--space-4": "spacing",
+      "--space-5": "spacing",
+      "--space-6": "spacing",
+      "--space-8": "spacing",
+      "--space-10": "spacing",
+      "--space-12": "spacing",
+      "--radius-xs": "radius",
+      "--radius-sm": "radius",
+      "--radius-md": "radius",
+      "--radius-lg": "radius",
+      "--radius-xl": "radius",
+      "--radius-2xl": "radius",
+      "--radius-pill": "radius",
+      "--border-width": "spacing",
+      "--gravity-bar": "spacing",
+      "--shadow-focus": "shadow",
+      "--sidebar-width": "spacing",
+      "--header-height": "spacing",
+      "--content-max": "spacing",
+      "--ease-out": "other",
+      "--ease-in-out": "other",
+      "--dur-fast": "other",
+      "--dur-base": "other",
+      "--dur-slow": "other"
+    },
+    "fontFamilies": [
+      "IBM Plex Mono",
+      "IBM Plex Sans"
+    ]
+  }
+}

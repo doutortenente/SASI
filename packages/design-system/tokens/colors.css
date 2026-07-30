@@ -1,0 +1,130 @@
+/* ============================================================================
+   SASI · Comando UTI — Color tokens
+   Base palette + semantic aliases. :root = CLINICAL theme (light executive,
+   the primary brand expression). The dark TACTICAL theme lives in themes.css.
+
+   Three layers:
+     1. Raw palette        --slate-700, --red-600 …  (never used directly in UI)
+     2. Brand + semantic   --accent, --surface-card, --text-body …
+     3. Clinical domain    --grav-*, --sofa-*, --sys-*, --badge-*  (theme-aware)
+   ============================================================================ */
+:root {
+  /* ---- Raw palette: Slate (neutral spine) ---- */
+  --slate-50:  #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  --slate-950: #020617;
+
+  /* ---- Raw palette: command navy (sidebar / brand chrome) ---- */
+  --navy-900: #0a1c33;
+  --navy-800: #0f2742;
+  --navy-700: #16365a;
+  --navy-600: #1e4878;
+
+  /* ---- Raw palette: accent blue (clinical command) ---- */
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+
+  /* ---- Raw palette: red (tactical command / danger) ---- */
+  --red-400: #f87171;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --red-700: #b91c1c;
+  --red-950: #450a0a;
+
+  /* ---- Raw palette: clinical status hues ---- */
+  --emerald-500: #10b981;
+  --emerald-400: #34d399;
+  --amber-500:   #f59e0b;
+  --amber-300:   #fcd34d;
+  --orange-500:  #f97316;
+  --orange-400:  #fb923c;
+
+  /* ---- Raw palette: system hues (per-organ-system coding) ---- */
+  --purple-500: #a855f7;
+  --sky-500:    #0ea5e9;
+  --rose-500:   #f43f5e;
+  --lime-500:   #84cc16;
+  --pink-500:   #ec4899;
+  --teal-500:   #14b8a6;
+
+  /* ======================================================================
+     SEMANTIC — Clinical theme (light executive). Override in themes.css.
+     ====================================================================== */
+  --surface-app:     #eef1f6;   /* page canvas (cool light gray) */
+  --surface-card:    #ffffff;   /* primary card surface */
+  --surface-raised:  #f4f6fa;   /* nested / striped / inset surface */
+  --surface-sunken:  #e8edf3;   /* track, well, table header */
+
+  --border-subtle:   #e7ecf2;   /* hairlines inside cards */
+  --border-default:  #dbe3ec;   /* card & control borders */
+  --border-strong:   #c4cdd9;   /* emphasized dividers */
+
+  --text-heading:    #0f172a;   /* slate-900 — titles, big numbers */
+  --text-body:       #334155;   /* slate-700 — body copy */
+  --text-muted:      #64748b;   /* slate-500 — labels, captions */
+  --text-faint:      #94a3b8;   /* slate-400 — disabled, placeholders */
+  --text-on-accent:  #ffffff;
+
+  --accent:          var(--blue-600);
+  --accent-hover:    var(--blue-700);
+  --accent-soft:     #e8f0fe;   /* tinted accent fill */
+  --accent-text:     #1d4ed8;   /* accent text on light */
+  --focus-ring:      rgba(37, 99, 235, .35);
+
+  /* Brand chrome — the command sidebar is navy in BOTH themes */
+  --chrome-bg:        linear-gradient(170deg, #13294a 0%, #0b1d35 100%);
+  --chrome-text:      #e6edf6;
+  --chrome-muted:     #8aa1bd;
+  --chrome-active:    rgba(59, 130, 246, .22);
+  --chrome-active-bar:#3b82f6;
+  --chrome-border:    rgba(255, 255, 255, .08);
+
+  --success: #059669;
+  --warning: #d97706;
+  --danger:  #dc2626;
+
+  /* ======================================================================
+     CLINICAL DOMAIN — gravity scale (patient acuity)
+     Stable → Watcher → Unstable → Critical → Deceased
+     Estável → Watcher → Instável → Crítico → Óbito
+     ====================================================================== */
+  --grav-stable-solid:   #10b981;  --grav-stable-bg:   #d1fae5;  --grav-stable-text:   #065f46;
+  --grav-watcher-solid:  #f59e0b;  --grav-watcher-bg:  #fef3c7;  --grav-watcher-text:  #92400e;
+  --grav-unstable-solid: #f97316;  --grav-unstable-bg: #ffedd5;  --grav-unstable-text: #9a3412;
+  --grav-critical-solid: #dc2626;  --grav-critical-bg: #fee2e2;  --grav-critical-text: #991b1b;
+  --grav-deceased-solid: #475569;  --grav-deceased-bg: #e2e8f0;  --grav-deceased-text: #334155;
+
+  /* ---- SOFA score thresholds (text color) ---- */
+  --sofa-low:      #059669;
+  --sofa-medium:   #d97706;
+  --sofa-high:     #ea580c;
+  --sofa-critical: #dc2626;
+
+  /* ---- Organ-system accents (left-border + title) ---- */
+  --sys-neuro:   #7e22ce;  --sys-neuro-bg:   #faf5ff;  --sys-neuro-bar:   #a855f7;
+  --sys-resp:    #0369a1;  --sys-resp-bg:    #f0f9ff;  --sys-resp-bar:    #0ea5e9;
+  --sys-hemo:    #be123c;  --sys-hemo-bg:    #fff1f2;  --sys-hemo-bar:    #f43f5e;
+  --sys-tgi:     #b45309;  --sys-tgi-bg:     #fffbeb;  --sys-tgi-bar:     #f59e0b;
+  --sys-renal:   #4d7c0f;  --sys-renal-bg:   #f7fee7;  --sys-renal-bar:   #84cc16;
+  --sys-hemato:  #be185d;  --sys-hemato-bg:  #fdf2f8;  --sys-hemato-bar:  #ec4899;
+  --sys-infecto: #0f766e;  --sys-infecto-bg: #f0fdfa;  --sys-infecto-bar: #14b8a6;
+
+  /* ---- Therapy / device badge pills ---- */
+  --badge-dva-bg:    #ffe4e6;  --badge-dva-text:    #9f1239;  /* drogas vasoativas */
+  --badge-sed-bg:    #f3e8ff;  --badge-sed-text:    #6b21a8;  /* sedação */
+  --badge-vm-bg:     #e0f2fe;  --badge-vm-text:     #0c4a6e;  /* ventilação mecânica */
+  --badge-vni-bg:    #f0f9ff;  --badge-vni-text:    #0369a1;  /* VNI / CNAF */
+  --badge-atb-bg:    #ccfbf1;  --badge-atb-text:    #115e59;  /* antibióticos */
+  --badge-pend-bg:   #fef3c7;  --badge-pend-text:   #92400e;  /* pendências */
+  --badge-sepsis-bg: #dc2626;  --badge-sepsis-text: #ffffff;  /* alerta sepse-3 */
+}

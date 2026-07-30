@@ -1,0 +1,13 @@
+@import "./ds/tokens/fonts.css";
+@import "./ds/tokens/colors.css";
+@import "./ds/tokens/themes.css";
+@import "./ds/tokens/typography.css";
+@import "./ds/tokens/spacing.css";
+@import "./ds/tokens/animations.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Clinical (:root, claro) e Tactical (data-theme="tactical", escuro) — tokens do design system SASI. */
+body { background: var(--surface-app); color: var(--text-body); font-family: "IBM Plex Sans", system-ui, sans-serif; }
+.tabnum { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }

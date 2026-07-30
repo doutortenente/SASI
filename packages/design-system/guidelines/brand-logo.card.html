@@ -1,0 +1,44 @@
+<!-- @dsCard group="Brand" viewport="700x180" name="Logo Lockup" subtitle="Command mark + SASI wordmark over navy chrome" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; font-family: var(--font-sans); background: var(--chrome-bg); color: var(--chrome-text); }
+  .wrap { padding: 0; height: 180px; display: flex; }
+  .left { flex: 1; display: flex; align-items: center; justify-content: center; gap: 16px; border-right: 1px solid var(--chrome-border); }
+  .right { width: 220px; display: flex; align-items: center; justify-content: center; background: var(--surface-card); }
+  .mark { width: 56px; height: 56px; border-radius: var(--radius-lg); background: linear-gradient(160deg,#2f6fed,#1d4ed8); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(37,99,235,.4); }
+  .mark svg { width: 30px; height: 30px; color: #fff; stroke-width: 2.4; }
+  .word { display: flex; flex-direction: column; gap: 2px; }
+  .word b { font-size: 34px; font-weight: 700; letter-spacing: .14em; line-height: 1; }
+  .word small { font-size: 9.5px; letter-spacing: .04em; color: var(--chrome-muted); max-width: 180px; }
+  .badge { font-family: var(--font-mono); font-size: 9px; color: var(--chrome-muted); margin-top: 4px; letter-spacing:.08em; }
+  .mini { display: flex; align-items: center; gap: 9px; }
+  .mini .mark { width: 38px; height: 38px; border-radius: var(--radius-md); }
+  .mini .mark svg { width: 21px; height: 21px; }
+  .mini b { font-size: 22px; font-weight: 700; letter-spacing: .12em; color: var(--text-heading); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="left">
+      <div class="mark"><i data-lucide="activity"></i></div>
+      <div class="word">
+        <b>SASI</b>
+        <small>Sistema de Auditoria e Síntese Intensiva</small>
+        <span class="badge">COMANDO UTI · 33 LEITOS</span>
+      </div>
+    </div>
+    <div class="right">
+      <div class="mini">
+        <div class="mark"><i data-lucide="activity"></i></div>
+        <b>SASI</b>
+      </div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

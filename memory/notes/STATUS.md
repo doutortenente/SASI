@@ -284,3 +284,27 @@ JWTs antigos vazaram no histórico do git via `AGENTS.md`. Rotacione no Supabase
 - Deploy: Vercel `sasi-uti` — https://sasi-uti.vercel.app
 - Supabase: projeto `idswehsvvqczzkiatuzu`  
 - Plano de auth: Google Drive (documento "Plano de ação login e autenticação SASI")
+
+---
+
+## 30-jul-2026 — F0 modelo de dados v3 APLICADO no banco vivo (branch `feat/modelo-dados-v3`)
+
+Sessão Cowork. Formalização do modelo de dados **aplicada em produção** via `apply_migration`
+(migrations `modelo_dados_v3_formalizacao` + `fix_enums_por_tipo`):
+- **14 enums nativos** (12 novos + os 2 que já existiam), dimensão **`evento_tipo_ref`** (56 tipos,
+  com faixa fisiológica de `03-clinical-sanity-checks` + LOINC dos 5 vitais verificados).
+- **`eventos_clinicos.tipo` → FK** para `evento_tipo_ref` (CHECK de 56 valores removido). Idem `alert_rules`/`trend_rules`.
+- **`memorias`** ganhou `user_id` + 4 policies de dono (antes: RLS sem policy — advisor resolvido).
+- **Semáforo** passa a valer no INSERT de `pacientes` (`trg_severidade_on_insert`).
+- 76 eventos intactos; nenhuma perda de dado. Bug de enum (do-block único) corrigido → per-tipo.
+
+**GATED (não aplicado; `supabase/migrations/_gated/`):** adoção texto→enum (branch-first) e RLS de
+produção + remover `dev_bypass` (só pós-login real — senão trava o app).
+
+**Novos no repo:** `supabase/schema-producao-v3.sql`, `supabase/types/sasi.types.ts`,
+`docs/{PLANO-SASI-v3.md,PLANO-SASI-v3.html,RUNBOOK-migracao-v3.md}`,
+`sasi-v2/` (esqueleto Next.js 15 com o design system real integrado),
+`packages/design-system/` (tokens+componentes), `packages/clinical-engine/scores-v2-staging/` (motor v2 — fase futura, não compila).
+
+**Dívida:** `dev_bypass` segue ativo (gated, pós-auth). ⚠️ **Rotacionar segredos** — o cofre `.env`
+foi colado no chat em 30-jul (Supabase service_role, PATs GitHub, Vaultwarden master, e-mails).

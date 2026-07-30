@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SASI v3 — Plano de Migração e Modelo de Dados</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<style>
+  :root{
+    --bg:#080B12; --panel:#0E1622; --panel2:#141E2D; --line:rgba(255,255,255,.08);
+    --tx:#EAF0F7; --mut:#8694A8; --teal:#2DD4BF; --amber:#F5A623; --red:#F0506E; --violet:#8B80F9;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+    --sans:'Inter',system-ui,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--sans);line-height:1.6;font-size:15.5px}
+  a{color:var(--teal);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{display:grid;grid-template-columns:290px 1fr;min-height:100vh}
+  nav{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line);background:var(--panel);padding:22px 16px}
+  nav .brand{font-family:var(--mono);font-weight:700;letter-spacing:.06em;color:var(--teal);font-size:15px}
+  nav .sub{color:var(--mut);font-size:12px;margin:2px 0 18px}
+  nav a{display:block;color:var(--mut);padding:6px 10px;border-radius:8px;font-size:13.5px;border-left:2px solid transparent}
+  nav a:hover{background:var(--panel2);color:var(--tx);text-decoration:none}
+  nav a.active{color:var(--tx);border-left-color:var(--amber);background:var(--panel2)}
+  main{padding:40px 48px;max-width:1100px}
+  h1{font-family:var(--mono);font-size:30px;letter-spacing:.01em;margin:0 0 4px}
+  h2{font-family:var(--mono);font-size:22px;margin:44px 0 12px;padding-top:14px;border-top:1px solid var(--line);color:var(--teal)}
+  h3{font-size:17px;margin:26px 0 8px;color:var(--amber);font-family:var(--mono);letter-spacing:.02em}
+  h4{font-size:15px;margin:18px 0 6px;color:var(--violet)}
+  code{font-family:var(--mono);background:var(--panel2);padding:1.5px 6px;border-radius:5px;font-size:13px;color:#cfe}
+  pre{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;font-family:var(--mono);font-size:12.5px}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--tx);font-family:var(--mono);font-size:12px;letter-spacing:.03em;text-transform:uppercase}
+  tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+  .lead{color:var(--mut);font-size:16px;border-left:3px solid var(--amber);padding:10px 16px;background:var(--panel);border-radius:0 10px 10px 0;margin:16px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 9px;border-radius:999px;letter-spacing:.04em}
+  .ok{background:rgba(45,212,191,.14);color:var(--teal);border:1px solid rgba(45,212,191,.4)}
+  .risk{background:rgba(240,80,110,.13);color:var(--red);border:1px solid rgba(240,80,110,.4)}
+  .warn{background:rgba(245,166,35,.12);color:var(--amber);border:1px solid rgba(245,166,35,.4)}
+  .mut{color:var(--mut)}
+  details{border:1px solid var(--line);border-radius:10px;margin:10px 0;background:var(--panel);overflow:hidden}
+  details>summary{cursor:pointer;padding:12px 16px;font-family:var(--mono);font-size:13.5px;color:var(--tx);list-style:none}
+  details>summary::-webkit-details-marker{display:none}
+  details>summary:before{content:'▸ ';color:var(--amber)} details[open]>summary:before{content:'▾ '}
+  details>div{padding:0 16px 14px}
+  .mermaid{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin:14px 0;text-align:center}
+  .foot{color:var(--mut);font-size:12.5px;border-top:1px solid var(--line);margin-top:40px;padding-top:16px}
+  .kbd{font-family:var(--mono);font-size:11px;color:var(--amber)}
+  ul{padding-left:20px} li{margin:4px 0}
+  @media(max-width:820px){.wrap{grid-template-columns:1fr}nav{position:static;height:auto}main{padding:24px 18px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav id="toc">
+  <div class="brand">🪖 SASI v3</div>
+  <div class="sub">Plano de Migração &amp; Modelo de Dados<br>30/07/2026 · Dr. Nicolas (Tenente)</div>
+  <a href="#resumo">0 · Resumo executivo</a>
+  <a href="#diagnostico">1 · Diagnóstico (hoje)</a>
+  <a href="#alvo">2 · Arquitetura-alvo</a>
+  <a href="#modelo">3 · Modelo de dados</a>
+  <a href="#seguranca">4 · Segurança &amp; dev_bypass</a>
+  <a href="#fhir">5 · FHIR (mapa)</a>
+  <a href="#roadmap">6 · Roadmap por fases</a>
+  <a href="#anexos">7 · Anexos (SQL/tipos)</a>
+</nav>
+<main>
+  <h1>SASI v3 — do "banco vivo" à versão que funciona de verdade</h1>
+  <p class="mut">Plano estruturado, em linguagem de médico (cada termo técnico traduzido). O código pronto e <b>testado</b> está nos anexos — este é o mapa da obra.</p>
+  <p>
+    <span class="pill ok">F0 modelo de dados · EXECUTADO &amp; TESTADO</span>
+    <span class="pill warn">F1 starter · typecheck OK</span>
+    <span class="pill risk">live DB · aplicar em branch (você decide)</span>
+  </p>
+
+  <section id="resumo">
+    <h2>0 · Resumo executivo</h2>
+    <div class="lead">O SASI já é um sistema real em produção (app React/Vite + banco Supabase, 7 leitos ativos, motor de alertas, ingestão por foto). O que falta não é funcionalidade — é <b>formalizar o alicerce</b> (tipos, trancas, contratos) para poder trocar o "motor" da tela por <b>Next.js 15</b> e ligar login de verdade. Esta rodada entrega esse alicerce, pronto e testado.</div>
+    <div class="grid">
+      <div class="card"><h4>As 5 decisões do modelo de dados</h4>
+        <ul>
+          <li><b>Enums nativos</b> p/ vocabulário fixo (acaba o descompasso "enum existe mas coluna é texto").</li>
+          <li><b>evento_tipo_ref</b>: legenda que governa os 56 tipos de medição (unidade, faixa de absurdo, slot LOINC).</li>
+          <li><b>RLS por comando</b> (ler/inserir/editar/apagar) no lugar da <code>dev_bypass</code>.</li>
+          <li><b>memorias</b> ganha dono.</li>
+          <li><b>Extensões</b> fora do <code>public</code>.</li>
+        </ul>
+      </div>
+      <div class="card"><h4>Régua de fases</h4>
+        <ul>
+          <li><span class="pill ok">F0</span> Modelo de dados — <b>esta rodada</b></li>
+          <li>F1 Scaffold Next.js 15 + tipos</li>
+          <li>F2 Views (Dashboard/War Room)</li>
+          <li>F3 Login real + remover <code>dev_bypass</code> <span class="pill risk">ordem crítica</span></li>
+          <li>F4 OCR da folha de enfermagem</li>
+          <li>F5 Camada FHIR</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="diagnostico">
+    <h2>1 · Diagnóstico — onde o SASI está hoje</h2>
+    <p>Levantado lendo o Supabase vivo <b>e</b> o repositório <code>doutortenente/SASI</code> (só leitura).</p>
+    <h3>Stack real (traduzida)</h3>
+    <table><thead><tr><th>Camada</th><th>Tecnologia</th><th>Onde vive</th></tr></thead><tbody>
+      <tr><td>App (tela)</td><td>React 18 + Vite — o "motor" atual</td><td>Netlify (<code>sasi-uti</code>)</td></tr>
+      <tr><td>Banco</td><td>Supabase = PostgreSQL 17 + login + tempo real + funções</td><td>Projeto <code>idswehsvvqczzkiatuzu</code> (SP)</td></tr>
+      <tr><td>Ingestão</td><td>Claude lê foto/PDF → JSON validado → grava</td><td><code>mcp-server</code> + skill de extração</td></tr>
+      <tr><td>Motor clínico</td><td>Pacote com as contas (SOFA, parse pt-BR) + testes</td><td><code>packages/clinical-engine</code></td></tr>
+    </tbody></table>
+    <p class="mut">A migração troca só o motor da tela (Vite → Next.js 15). O banco <b>não muda de casa</b> — por isso o modelo de dados vem primeiro.</p>
+
+    <h3>O banco vivo (mais rico que o molde)</h3>
+    <table><thead><tr><th>Tabela</th><th>O que guarda</th><th>Linhas</th></tr></thead><tbody>
+      <tr><td>pacientes</td><td>Cadastro + status + semáforo + dispositivos + resumo</td><td>7</td></tr>
+      <tr><td>evolucoes</td><td>Retrato do plantão: 7 sistemas (JSONB) + SOFA + impressão/conduta</td><td>7</td></tr>
+      <tr><td>eventos_clinicos</td><td><b>Série temporal</b> — coração das tendências e alertas</td><td>76</td></tr>
+      <tr><td>pendencias</td><td>Tarefas</td><td>21</td></tr>
+      <tr><td>atbs / culturas / antibiograma</td><td>Stewardship + microbiologia + S/I/R</td><td>0</td></tr>
+      <tr><td>alerts_log</td><td>Alertas disparados (anti-repetição SHA-256)</td><td>5</td></tr>
+      <tr><td>ingest_audit_log</td><td>Rastro de cada ingestão (ZERO ALUCINAÇÃO)</td><td>8</td></tr>
+      <tr><td>memorias</td><td>Baú de busca semântica (RAG, vetores)</td><td>0</td></tr>
+      <tr><td>alert_rules / trend_rules</td><td>Config do motor de alertas</td><td>25 / 3</td></tr>
+    </tbody></table>
+    <p>+ 7 views (relatórios prontos), 9 gatilhos, e o <code>save_ficha</code> (grava a ficha "tudo ou nada"). <b>Achado de campo:</b> 100% dos eventos vieram por <code>claude_ocr</code> — a foto já é o fluxo principal.</p>
+
+    <h3>As 7 dívidas que travam a "versão de verdade"</h3>
+    <ol>
+      <li><b><code>dev_bypass</code> — porta escancarada.</b> Regra "pode tudo, pra todos" em todas as tabelas. Gera 1 alerta de segurança + ~180 de desempenho e contraria a sua regra <code>.claude/rules/supabase.md</code>. Maior bloqueio.</li>
+      <li><b>Enum que existe mas não é usado</b> (gravidade/status como texto solto).</li>
+      <li><b>Vocabulário de eventos "chumbado"</b> numa regra de 56 valores.</li>
+      <li><b>"2 esquemas" no JSONB</b> da evolução (ficha grava <code>pas1</code>, resto lê <code>pa_sys_max</code>).</li>
+      <li><b>SOFA bloqueado por dado</b> (bilirrubina/PaO₂ nunca capturadas) — conserto a montante, não no banco.</li>
+      <li><b>Extensões no schema errado</b> (public).</li>
+      <li><b>memorias com tranca sem regra</b>.</li>
+    </ol>
+  </section>
+
+  <section id="alvo">
+    <h2>2 · Para onde vamos — arquitetura-alvo</h2>
+    <p><b>Next.js 15 (App Router)</b> = novo motor da tela: telas montadas no servidor (mais rápidas, chave do banco não vaza no navegador). <b>Zustand</b> = prancheta em memória. <b>shadcn/ui + Tailwind</b> = peças + estilo (mantém os 2 temas).</p>
+    <div class="mermaid">
+flowchart LR
+  subgraph HOJE
+    A1["Tela React+Vite (Netlify)"] -. "mock, sem login" .-> B[("Supabase Postgres 17")]
+  end
+  subgraph ALVO
+    A2["Tela Next.js 15 (App Router)"] -- "login real" --> B2[("Supabase MESMO banco")]
+    MCP["mcp-server (reaproveitado)"] --> B2
+    CE["clinical-engine (reaproveitado)"] --> A2
+  end
+  HOJE ==> ALVO
+    </div>
+    <p class="mut">Reaproveita: o banco inteiro, o clinical-engine, o mcp-server, os 2 temas. Troca: só o motor da tela + liga o login.</p>
+  </section>
+
+  <section id="modelo">
+    <h2>3 · O modelo de dados (o coração desta rodada)</h2>
+    <div class="mermaid">
+erDiagram
+  pacientes ||--o{ evolucoes : tem
+  pacientes ||--o{ eventos_clinicos : "serie temporal"
+  pacientes ||--o{ pendencias : tarefas
+  pacientes ||--o{ atbs : antibioticos
+  pacientes ||--o{ culturas : microbiologia
+  culturas  ||--o{ antibiograma : "S/I/R"
+  pacientes ||--o{ alerts_log : alertas
+  evento_tipo_ref ||--o{ eventos_clinicos : governa
+  evento_tipo_ref ||--o{ alert_rules : "regra valor"
+  evento_tipo_ref ||--o{ trend_rules : "regra tendencia"
+    </div>
+
+    <h3>Decisões (problema → decisão → porquê)</h3>
+    <details open><summary>1 · Enums nativos para vocabulário fechado</summary><div>
+      <p><b>Problema:</b> colunas como <code>uti</code>, <code>gravidade</code>, <code>plantao</code> guardam texto solto; e os enums <code>gravidade_enum</code>/<code>status_leito_enum</code> existem mas não são usados. <b>Decisão:</b> 14 enums nativos (lista suspensa fixa no banco). <b>Porquê:</b> uma fonte da verdade, digitação sem erro, e as opções aparecem sozinhas no TypeScript do app.</p>
+    </div></details>
+    <details open><summary>2 · evento_tipo_ref — a legenda que governa as medições</summary><div>
+      <p><b>Problema:</b> 56 tipos "chumbados" numa regra, sem unidade/faixa/LOINC. <b>Decisão:</b> uma tabela-legenda (1 linha por parâmetro) com <code>unidade_padrao</code>, <code>faixa_min/max</code> (as flags de absurdo da sua doutrina + do sanity-check) e <code>loinc_code</code> (slot FHIR); <code>eventos_clinicos.tipo</code> aponta pra ela. <b>Porquê:</b> tipo novo = inserir <b>linha</b> (dado), não reescrever código.</p>
+      <p class="mut">ZERO ALUCINAÇÃO: LOINC preenchido só nos 5 vitais verificados; o resto fica null até a fase 2 (servidores de terminologia). Eco/hemodinâmica (IC, RVS, PSAP, VCI, FEVE, ΔVpeak) entram via <code>tipo='custom'</code> + <code>valor_json {dominio,subtipo,unidade}</code> — sem inflar o vocabulário.</p>
+    </div></details>
+    <details><summary>3 · RLS de produção — 4 trancas por comando</summary><div>
+      <p><b>Decisão:</b> substituir a <code>dev_bypass</code> por 4 regras por tabela (ler/inserir/editar/apagar), escopo "só o dono", como manda <code>.claude/rules/supabase.md</code>. Tabelas-filhas checam posse por uma função <code>fn_owns_paciente()</code>. <b>Porquê:</b> sigilo médico garantido pelo banco. <span class="pill risk">ordem importa — §4</span></p>
+    </div></details>
+    <details><summary>4 · memorias com dono · 5 · extensões fora do public</summary><div>
+      <p><b>memorias:</b> ganha <code>user_id</code> + 4 regras (hoje tem tranca sem regra). <b>Extensões:</b> <code>pg_trgm</code>/<code>vector</code> saem do <code>public</code> p/ <code>extensions</code> (recomendação Supabase).</p>
+    </div></details>
+
+    <h3>Contratos JSONB (o "recheio flexível")</h3>
+    <p>Documentados a partir do que existe de fato no banco — e viram tipos no Anexo C:</p>
+    <ul>
+      <li><code>pacientes.patient_summary</code> — ficha congelada (HPMA, antecedentes, med. domiciliar, suporte_atual, interconsultas[], programacao[], resumo_sistemas[]…).</li>
+      <li><code>evolucoes</code> sistemas — <code>hemo/resp/neuro/renal/hemato/infecto/tgi</code> no esquema <b>canônico Máx–Mín</b> (fonte única; a ficha adapta).</li>
+      <li><code>dvas/sedativos</code> — <code>[{droga, diluicao_mg, diluicao_ml, vazao_ml_h, started_at}]</code>.</li>
+      <li><code>prescricao</code> — por categoria (cardiovascular, snc, gastro_endocrino…).</li>
+    </ul>
+    <p class="warn">⚠️ Achado pequeno já corrigido no Anexo B: o semáforo (<code>sync_severidade_visual</code>) só disparava em edição, não na admissão. Passo A6 faz valer no cadastro.</p>
+  </section>
+
+  <section id="seguranca">
+    <h2>4 · Segurança e o <code>dev_bypass</code> — o passo a passo mais delicado</h2>
+    <div class="mermaid">
+flowchart TD
+  S0["Hoje: app sem login + dev_bypass = porta escancarada"] --> S1["1. App novo liga LOGIN real (Supabase Auth)"]
+  S1 --> S2["2. Carimbar os 7 pacientes + filhos com o seu user_id"]
+  S2 --> S3["3. SO ENTAO remover a dev_bypass"]
+  S3 --> S4["Producao: 4 trancas por dono"]
+    </div>
+    <p><b>Por que a ordem?</b> As regras "só o dono" comparam com quem está logado. Hoje o app entra sem login (usuário "de mentira"). Se eu remover a porta escancarada <b>antes</b> de ligar o login e carimbar os donos, as regras barram tudo e <b>o app trava</b>. Logo: liga login → carimba → remove. O Anexo B traz o SQL de cada passo, e recomenda rodar numa <b>branch</b> (clone descartável) antes do vivo.</p>
+  </section>
+
+  <section id="fhir">
+    <h2>5 · FHIR — a decisão e o mapa (fase futura)</h2>
+    <p><b>Decisão (você delegou):</b> camada de <b>interoperabilidade/export</b>, não modelo nativo. O banco segue pragmático e rápido pra beira-leito; o FHIR é gerado na borda quando precisar exportar/integrar (EHR). Nesta rodada o schema fica só "FHIR-ready" (slot LOINC, IDs estáveis).</p>
+    <table><thead><tr><th>Tabela SASI</th><th>Recurso FHIR R4</th><th>Elemento-chave</th><th>Sistema de código</th></tr></thead><tbody>
+      <tr><td>pacientes</td><td>Patient (+ Encounter p/ internação)</td><td>name, birthDate; Encounter.class=IMP, period</td><td>identifier/MRN (se houver)</td></tr>
+      <tr><td>eventos_clinicos (vitais)</td><td>Observation (category: vital-signs)</td><td>code, valueQuantity, effectiveDateTime</td><td><b>LOINC</b></td></tr>
+      <tr><td>eventos_clinicos (labs)</td><td>Observation (category: laboratory)</td><td>code, valueQuantity</td><td><b>LOINC</b></td></tr>
+      <tr><td>evolucoes.problemas_ativos / hd</td><td>Condition</td><td>code, clinicalStatus, subject</td><td><b>ICD-10</b> / SNOMED</td></tr>
+      <tr><td>atbs</td><td>MedicationRequest / MedicationAdministration</td><td>medication[x], status, intent, dosage</td><td><b>RxNorm</b></td></tr>
+      <tr><td>culturas + antibiograma</td><td>Specimen + Observation (micro)</td><td>specimen, code, interpretation (S/I/R)</td><td><b>SNOMED</b> (organismo)</td></tr>
+      <tr><td>pendencias</td><td>Task</td><td>status, description, priority</td><td>—</td></tr>
+      <tr><td>alerts_log</td><td>Flag / DetectedIssue</td><td>status, code, severity</td><td>—</td></tr>
+      <tr><td>evolucoes.condutas_sistemas</td><td>CarePlan</td><td>activity, goal</td><td>—</td></tr>
+    </tbody></table>
+    <p class="mut">Códigos completados na fase 2 <b>com verificação</b> nos servidores de terminologia já conectados (ICD-10, SNOMED) — nada inventado.</p>
+  </section>
+
+  <section id="roadmap">
+    <h2>6 · Roadmap — o passo a passo executável</h2>
+    <table><thead><tr><th>Fase</th><th>Objetivo</th><th>Passos (o que pedir ao Claude Code)</th><th>Pronto quando</th></tr></thead><tbody>
+      <tr><td><span class="pill ok">F0</span></td><td>Modelo de dados (alicerce)</td><td>Revisar Anexos A/B/C → testar Anexo B numa branch → aplicar → regenerar tipos</td><td>advisors sem <code>dev_bypass</code> (após F3); tipos batendo; save_ficha grava — <b>já validado em teste</b></td></tr>
+      <tr><td>F1</td><td>Esqueleto Next.js + tipos</td><td>Starter incluso; <code>npm install</code>; <code>gen:types</code>; portar temas</td><td>App lista os 7 leitos lendo <code>vw_dashboard_uti</code></td></tr>
+      <tr><td>F2</td><td>Views (Dashboard/War Room)</td><td>Telas sobre as <code>vw_*</code> + tela dividida com calculadoras</td><td>Paridade com as 5 janelas atuais</td></tr>
+      <tr><td>F3</td><td>Login + remover dev_bypass</td><td>Auth → carimbar donos → policies → remover bypass → advisors</td><td>Advisors limpos; RLS isola por dono (provado)</td></tr>
+      <tr><td>F4</td><td>OCR da folha (propósito Cowork)</td><td>Consolidar <code>sasi-ocr-ingest/v1</code>; captura + fila de revisão</td><td>Foto vira eventos revisáveis, ZERO alucinação</td></tr>
+      <tr><td>F5</td><td>Camada FHIR</td><td>Completar LOINC; views/funções que emitem Patient/Observation/…</td><td>Paciente exporta como Bundle FHIR válido</td></tr>
+    </tbody></table>
+  </section>
+
+  <section id="anexos">
+    <h2>7 · Anexos (referência pro Claude Code / IDE)</h2>
+    <table><thead><tr><th>Anexo</th><th>Arquivo</th><th>Status</th></tr></thead><tbody>
+      <tr><td>A · Schema de produção (do zero)</td><td><code>10_schema_producao_v3.sql</code></td><td><span class="pill ok">validado: 13 tabelas, 7 views, 14 enums, 41 policies, 9 gatilhos + testes de constraint/RLS</span></td></tr>
+      <tr><td>B · Migração do banco vivo (delta)</td><td><code>11_migracao_do_vivo.sql</code></td><td><span class="pill ok">validado em fixture "cópia do vivo"</span> <span class="pill warn">rodar em branch</span></td></tr>
+      <tr><td>C · Tipos TypeScript</td><td><code>database.types.ts</code></td><td><span class="pill ok">compila em --strict</span></td></tr>
+      <tr><td>D · Mapa FHIR</td><td>seção 5 acima</td><td>fase 2</td></tr>
+      <tr><td>F1 · Starter Next.js 15</td><td><code>starter-next/</code></td><td><span class="pill ok">lógica clínica typecheck OK</span></td></tr>
+    </tbody></table>
+    <p><b>Como aplicar (em palavras):</b> no painel do Supabase há a tela "SQL Editor"; cola-se o anexo e roda — primeiro numa <b>branch</b> (clone de teste). Depois de mudar o schema: rodar os <b>advisors</b> e <b>regenerar os tipos</b>.</p>
+  </section>
+
+  <div class="foot">
+    Gerado na sessão Cowork · O SQL foi carregado e testado num PostgreSQL descartável — o seu banco vivo (7 pacientes) não foi tocado.<br>
+    Próxima rodada sugerida: F1–F2 (Views) + F4 (OCR).
+  </div>
+</main>
+</div>
+<script>
+  mermaid.initialize({startOnLoad:true, theme:'dark', themeVariables:{
+    primaryColor:'#141E2D', primaryTextColor:'#EAF0F7', primaryBorderColor:'#2DD4BF',
+    lineColor:'#8694A8', fontFamily:'JetBrains Mono, monospace', fontSize:'13px'
+  }});
+  // scrollspy
+  const links=[...document.querySelectorAll('#toc a')];
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+  const obs=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+    const id='#'+e.target.id; links.forEach(l=>l.classList.toggle('active', l.getAttribute('href')===id));
+  }})},{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(s=>s&&obs.observe(s));
+</script>
+</body>
+</html>
