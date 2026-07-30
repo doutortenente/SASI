@@ -160,9 +160,18 @@ export interface TabelaoLabsProps {
 
 export function TabelaoLabs({ folhao, dimensaoIndisponivel = false }: TabelaoLabsProps): ReactElement {
   const nDias = folhao.dias.length;
-  // colunas na ordem de EXIBICAO: mais recente a esquerda
-  const colunas = [...folhao.dias].reverse();
   const hoje = folhao.dias[nDias - 1] ?? null;
+
+  // COLAPSA DIAS VAZIOS: um dia em que NENHUM exame foi colhido (a coluna inteira
+  // e "—") e so ruido. Some da tabela — assim a coluna nobre (a esquerda) passa a
+  // ser a ÚLTIMA COLETA de verdade, e nao um dia em branco. Nao e esconder dado: e
+  // nao desenhar um dia que nunca teve medida (a data no cabecalho denuncia se
+  // "hoje" ficou de fora). O delta continua calculado sobre a serie INTEIRA.
+  const diasComColeta = new Set<string>();
+  for (const l of folhao.linhas) for (const c of l.celulas) if (c.n > 0) diasComColeta.add(c.dia);
+  // colunas na ordem de EXIBICAO: mais recente a esquerda, so dias com coleta
+  const colunas = [...folhao.dias].reverse().filter((d: string) => diasComColeta.has(d));
+  const diasOcultos = nDias - colunas.length;
 
   // agrupamento: linhas na ordem dos blocos; o que sobrar vai para "Outros"
   const porTipo = new Map<string, FolhaoLinha>(folhao.linhas.map((l: FolhaoLinha) => [l.tipo, l] as const));
@@ -229,7 +238,7 @@ export function TabelaoLabs({ folhao, dimensaoIndisponivel = false }: TabelaoLab
         <table className="tlab__tabela">
           <caption className="tlab__sr">
             Folhão de laboratório: uma linha por exame, uma coluna por dia, do mais recente para o mais antigo.
-            Dia sem coleta aparece como travessão.
+            Dias sem nenhuma coleta são omitidos; um exame sem coleta num dia mostrado aparece como travessão.
           </caption>
 
           <thead>
@@ -276,7 +285,9 @@ export function TabelaoLabs({ folhao, dimensaoIndisponivel = false }: TabelaoLab
                       {un ? <span className="tlab__exame-unid tabnum">{un}</span> : null}
                     </th>
 
-                    {prepararCelulas(linha).map(({ celula, anterior, diaAnterior }: CelulaExib, i: number) => {
+                    {prepararCelulas(linha)
+                      .filter(({ celula }: CelulaExib) => diasComColeta.has(celula.dia))
+                      .map(({ celula, anterior, diaAnterior }: CelulaExib, i: number) => {
                       const vazia = celula.n === 0 || celula.ultimo == null;
                       const classes =
                         "tlab__td" +
@@ -322,6 +333,12 @@ export function TabelaoLabs({ folhao, dimensaoIndisponivel = false }: TabelaoLab
       </div>
 
       <ul className="tlab__legenda">
+        {diasOcultos > 0 ? (
+          <li>
+            <span className="tabnum">{diasOcultos}</span> dia{diasOcultos > 1 ? "s" : ""} sem nenhuma coleta{" "}
+            {diasOcultos > 1 ? "omitidos" : "omitido"} — a data no topo de cada coluna mostra os saltos
+          </li>
+        ) : null}
         <li>
           <span className="tlab__valor tabnum">—</span> não coletado (o valor do dia anterior nunca é repetido
           para preencher)

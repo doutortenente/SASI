@@ -11,12 +11,22 @@
 //  - Cor NUNCA e o unico sinal: a gravidade tem barra colorida E rotulo em texto.
 //  - Cor so por token (--grav-*, --sofa-*, --badge-*, --text-*). Zero hex aqui.
 //  - Numero em mono tabular (.tabnum).
+//
+// HIERARQUIA (revisao de design 30-jul):
+//  - O LEITO e a ancora do cartao (e por ele que se acha o paciente na unidade):
+//    vem grande, no topo. O nome vem logo abaixo, secundario mas legivel.
+//  - SOFA e um SELO: quando ha numero, ganha cor de faixa; quando NAO ha, explica
+//    o porque em vez de um "—" mudo (recupera o espaco nobre).
+//  - Terapias que MUDAM conduta (DVA, sedacao, via aerea, isolamento) ficam num
+//    nivel acima dos dispositivos (linhas/sondas), num segundo grupo mais discreto.
+//  - "Idade do dado": a hora da ultima evolucao aparece no cartao; atrasada = aviso.
 // ============================================================================
 import Link from "next/link";
 import type { ReactElement } from "react";
 import type { Leito } from "../types";
 import type { Gravity } from "@/features/war-room/triage";
 import type { Dispositivos, Infusao, Isolamento } from "@/types/clinical";
+import type { EvolucaoResumo } from "@/lib/formatters/tempo";
 import { num } from "@/lib/formatters/br";
 import { unidadeSegura } from "@/lib/formatters/br";
 
@@ -41,6 +51,8 @@ export interface BedCardProps {
   leito: LeitoTriado;
   /** Detalhe das pendencias. Ausente => o card usa so a contagem da view. */
   pendencia?: ResumoPendencia | null;
+  /** Quando foi a ultima evolucao (JA formatado no servidor, fuso do plantao). */
+  evolucao?: EvolucaoResumo | null;
   /** Visao compacta (modo War Room da TopBar): menos linhas, mesma informacao critica. */
   compacto?: boolean;
   /** Destino do clique. Padrao: ficha do paciente. */
@@ -89,13 +101,40 @@ const ORDEM_DISPOSITIVOS: ReadonlyArray<{ chave: keyof Dispositivos; rotulo: str
 // Helpers de apresentacao (puros — sem inventar dado)
 // ---------------------------------------------------------------------------
 
-/** Faixa de cor do SOFA. Sem SOFA => cinza (o numero vira "—"). */
+/** Faixa de cor do SOFA. Sem SOFA => cinza (o selo explica o porque). */
 function corSofa(s: number | null): string {
   if (s == null) return "var(--text-muted)";
   if (s >= 12) return "var(--sofa-critical)";
   if (s >= 8) return "var(--sofa-high)";
   if (s >= 4) return "var(--sofa-medium)";
   return "var(--sofa-low)";
+}
+
+/**
+ * Selo do SOFA. Com numero: cor de faixa + fundo suave. SEM numero: NAO um "—"
+ * mudo — um selo neutro que diz "s/ dado" e, no tooltip, explica que a folha
+ * ainda nao captura os 6 componentes (faltam bilirrubina e PaO2/FiO2). Recupera
+ * o espaco nobre do cartao sem inventar um numero.
+ */
+function seloSofa(s: number | null): { texto: string; cor: string; fundo: string; borda: string; titulo: string } {
+  if (s == null) {
+    return {
+      texto: "SOFA s/ dado",
+      cor: "var(--text-muted)",
+      fundo: "var(--surface-sunken)",
+      borda: "var(--border-default)",
+      titulo:
+        "SOFA não calculado: a folha ainda não captura todos os 6 componentes (faltam bilirrubina e a relação PaO₂/FiO₂). Fica em branco em vez de mostrar um número inventado.",
+    };
+  }
+  const cor = corSofa(s);
+  return {
+    texto: `SOFA ${num(s, 0)}`,
+    cor,
+    fundo: `color-mix(in srgb, ${cor} 14%, transparent)`,
+    borda: `color-mix(in srgb, ${cor} 34%, transparent)`,
+    titulo: "SOFA da última evolução (calculado no banco).",
+  };
 }
 
 /** Delta de SOFA em 24 h: subiu = pior (danger), caiu = melhor (success), null = "—". */
@@ -165,10 +204,17 @@ function Chip({ tom, children, title }: { tom: TomChip; children: string; title?
 // ---------------------------------------------------------------------------
 // Componente
 // ---------------------------------------------------------------------------
-export function BedCard({ leito, pendencia, compacto = false, href }: BedCardProps): ReactElement {
+export function BedCard({ leito, pendencia, evolucao, compacto = false, href }: BedCardProps): ReactElement {
   const g = leito.gravity;
   const rotuloGrav = ROTULO_GRAVIDADE[g].s;
   const d = delta24h(leito.delta_sofa_24h ?? null);
+  const sofa = seloSofa(leito.sofa_total);
+  // O leito ja vem no padrao canonico "UTI2-L01" — repetir a UTI ("UTI2 · UTI2-L01")
+  // seria ruido. So prefixamos a UTI quando o leito NAO a traz. Nunca reescreve o dado.
+  const leitoRotulo =
+    leito.leito && leito.leito.toUpperCase().startsWith(leito.uti.toUpperCase())
+      ? leito.leito
+      : `${leito.uti} · ${leito.leito}`;
 
   const dvas = infusoes(leito.dvas);
   const seds = infusoes(leito.sedativos);
@@ -182,6 +228,11 @@ export function BedCard({ leito, pendencia, compacto = false, href }: BedCardPro
   // secundarios), nunca o que muda: DVA, sedacao, via aerea, isolamento.
   const dispVisiveis = compacto ? disp.filter((x) => x.viaAerea) : disp;
   const ocultos = disp.length - dispVisiveis.length;
+  // Dois niveis: via aerea sobe para as terapias; o resto (linhas/sondas) fica
+  // num grupo secundario, mais discreto.
+  const viaAerea = dispVisiveis.filter((x) => x.viaAerea);
+  const outrosDisp = dispVisiveis.filter((x) => !x.viaAerea);
+  const semTerapias = dvas.length + seds.length + disp.length === 0 && !isolado;
 
   const abertas = leito.pendencias_abertas ?? 0;
   const altas = pendencia?.altas ?? 0;
@@ -196,13 +247,15 @@ export function BedCard({ leito, pendencia, compacto = false, href }: BedCardPro
         borderLeft: `var(--gravity-bar, 6px) solid var(--grav-${g}-solid)`,
       }}
     >
-      {/* linha 1 — identificacao do leito + SOFA */}
+      {/* linha 1 — LEITO (ancora do cartao) + selo SOFA */}
       <div className="bed-card__topo">
-        <span className="bed-card__leito tabnum">
-          {leito.uti} · {leito.leito}
-        </span>
-        <span className="bed-card__sofa tabnum" style={{ color: corSofa(leito.sofa_total) }} title="SOFA da última evolução (calculado no banco)">
-          SOFA {num(leito.sofa_total, 0)}
+        <span className="bed-card__leito tabnum">{leitoRotulo}</span>
+        <span
+          className="bed-card__sofa tabnum"
+          style={{ color: sofa.cor, background: sofa.fundo, borderColor: sofa.borda }}
+          title={sofa.titulo}
+        >
+          {sofa.texto}
         </span>
       </div>
 
@@ -218,10 +271,21 @@ export function BedCard({ leito, pendencia, compacto = false, href }: BedCardPro
         </div>
       </div>
 
-      {/* linha 3 — hipotese diagnostica */}
+      {/* linha 3 — idade do dado: quando foi a ultima evolucao */}
+      {evolucao ? (
+        <div className="bed-card__idade tabnum" title="Hora da última evolução registrada (fuso do plantão). Atrasada = mais de 24 h sem evoluir.">
+          <span className="bed-card__idade-rot">Evolução</span>{" "}
+          <span style={{ color: evolucao.atrasada ? "var(--warning)" : "var(--text-muted)", fontWeight: evolucao.atrasada ? 700 : 600 }}>
+            {evolucao.rotulo}
+            {evolucao.atrasada ? " · atrasada" : ""}
+          </span>
+        </div>
+      ) : null}
+
+      {/* linha 4 — hipotese diagnostica */}
       {!compacto ? <div className="bed-card__hd">{leito.hd?.trim() ? leito.hd : "—"}</div> : null}
 
-      {/* linha 4 — delta de SOFA em 24 h */}
+      {/* linha 5 — delta de SOFA em 24 h */}
       <div className="bed-card__delta tabnum" title={d.leitura}>
         <span className="bed-card__rotulo">Δ SOFA 24 h</span>
         <span style={{ color: d.cor, fontWeight: 700 }}>
@@ -229,7 +293,7 @@ export function BedCard({ leito, pendencia, compacto = false, href }: BedCardPro
         </span>
       </div>
 
-      {/* linha 5 — terapias em curso e barreiras */}
+      {/* linha 6 — terapias e barreiras que MUDAM conduta (nivel 1) */}
       <div className="bed-card__chips">
         {isolado ? <Chip tom="iso" title={`Isolamento — ${rotuloIso}`}>{`iso ${rotuloIso}`}</Chip> : null}
         {dvas.map((t: string, i: number) => (
@@ -242,22 +306,31 @@ export function BedCard({ leito, pendencia, compacto = false, href }: BedCardPro
             {t}
           </Chip>
         ))}
-        {dispVisiveis.map((x) => (
-          <Chip key={`disp-${x.rotulo}`} tom={x.viaAerea ? "via" : "disp"} title={`Dispositivo: ${x.rotulo}`}>
+        {viaAerea.map((x) => (
+          <Chip key={`via-${x.rotulo}`} tom="via" title={`Via aérea: ${x.rotulo}`}>
             {x.rotulo}
           </Chip>
         ))}
-        {ocultos > 0 ? (
-          <Chip tom="disp" title={disp.filter((x) => !x.viaAerea).map((x) => x.rotulo).join(" · ")}>
-            {`+${ocultos}`}
-          </Chip>
-        ) : null}
-        {dvas.length + seds.length + disp.length === 0 && !isolado ? (
-          <span className="bed-card__vazio">sem terapia contínua registrada</span>
-        ) : null}
+        {semTerapias ? <span className="bed-card__vazio">sem terapia contínua registrada</span> : null}
       </div>
 
-      {/* linha 6 — pendencias abertas */}
+      {/* linha 7 — dispositivos (linhas/sondas): nivel 2, mais discreto */}
+      {outrosDisp.length > 0 || ocultos > 0 ? (
+        <div className="bed-card__chips bed-card__chips--disp">
+          {outrosDisp.map((x) => (
+            <Chip key={`disp-${x.rotulo}`} tom="disp" title={`Dispositivo: ${x.rotulo}`}>
+              {x.rotulo}
+            </Chip>
+          ))}
+          {ocultos > 0 ? (
+            <Chip tom="disp" title={disp.filter((x) => !x.viaAerea).map((x) => x.rotulo).join(" · ")}>
+              {`+${ocultos}`}
+            </Chip>
+          ) : null}
+        </div>
+      ) : null}
+
+      {/* linha 8 — pendencias abertas */}
       <div className="bed-card__pend">
         {abertas > 0 ? (
           <>
@@ -281,6 +354,9 @@ export function BedCard({ leito, pendencia, compacto = false, href }: BedCardPro
 // ---------------------------------------------------------------------------
 // CSS do card. Vive aqui (perto do markup) e e injetado UMA vez pela BedGrid —
 // estilo inline nao suporta hover/foco/line-clamp.
+//
+// LEGIBILIDADE (revisao 30-jul): texto de dado passou de 10px para 11px; os
+// rotulos-etiqueta (eyebrow) seguem em 10px por serem apoio, nunca o dado.
 // ---------------------------------------------------------------------------
 export const CSS_BED_CARD = `
 .bed-card{display:flex;flex-direction:column;gap:8px;min-height:44px;padding:12px 14px;
@@ -291,25 +367,33 @@ export const CSS_BED_CARD = `
 .bed-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .bed-card--compacto{gap:6px;padding:10px 12px}
 
-.bed-card__topo{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-.bed-card__leito{font-size:var(--text-xs,11px);font-weight:700;letter-spacing:var(--tracking-wide,.04em);color:var(--text-muted)}
-.bed-card__sofa{font-size:var(--text-sm,13px);font-weight:700;white-space:nowrap}
+.bed-card__topo{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bed-card__leito{font-size:var(--text-lg,20px);font-weight:700;line-height:var(--leading-tight,1.15);
+  letter-spacing:var(--tracking-wide,.04em);color:var(--text-heading)}
+.bed-card--compacto .bed-card__leito{font-size:var(--text-md,17px)}
+.bed-card__sofa{flex:0 0 auto;padding:2px 9px;border-radius:var(--radius-pill,9999px);border:1px solid transparent;
+  font-size:var(--text-sm,13px);font-weight:700;white-space:nowrap}
 
-.bed-card__nome{font-size:var(--text-md,17px);font-weight:700;line-height:var(--leading-tight,1.15);
+.bed-card__nome{font-size:var(--text-base,15px);font-weight:700;line-height:var(--leading-tight,1.15);
   color:var(--text-heading);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bed-card--compacto .bed-card__nome{font-size:var(--text-sm,13px)}
 .bed-card__meta{margin-top:3px;font-size:var(--text-xs,11px);color:var(--text-muted)}
+
+.bed-card__idade{font-size:var(--text-xs,11px);color:var(--text-muted)}
+.bed-card__idade-rot{font-size:var(--text-2xs,10px);font-weight:700;letter-spacing:var(--tracking-eyebrow,.08em);
+  text-transform:uppercase;color:var(--text-faint)}
 
 .bed-card__hd{font-size:var(--text-sm,13px);line-height:var(--leading-snug,1.35);color:var(--text-body);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
 .bed-card__delta{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:var(--text-xs,11px)}
 .bed-card__rotulo{font-size:var(--text-2xs,10px);font-weight:700;letter-spacing:var(--tracking-eyebrow,.08em);
-  text-transform:uppercase;color:var(--text-faint)}
+  text-transform:uppercase;color:var(--text-muted)}
 
 .bed-card__chips{display:flex;flex-wrap:wrap;gap:4px}
+.bed-card__chips--disp{margin-top:-2px;opacity:.9}
 .bed-chip{display:inline-flex;align-items:center;max-width:100%;padding:3px 8px;border-radius:var(--radius-pill,9999px);
-  font-family:var(--font-mono,monospace);font-size:var(--text-2xs,10px);font-weight:700;
+  font-family:var(--font-mono,monospace);font-size:var(--text-xs,11px);font-weight:700;
   letter-spacing:var(--tracking-wide,.04em);text-transform:uppercase;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 

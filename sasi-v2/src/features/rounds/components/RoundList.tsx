@@ -30,6 +30,7 @@ import { ROTULO_GRAVIDADE, type LeitoTriado } from "@/features/beds/components/B
 import type { Gravity } from "@/features/war-room/triage";
 import type { VwAlertaAberto, VwDiasAtbAtivo } from "@/lib/data";
 import { num } from "@/lib/formatters/br";
+import type { EvolucaoResumo } from "@/lib/formatters/tempo";
 import { ROTULO_UTI, passaFiltroUti, useUiStore } from "@/stores/uiStore";
 import type { Pendencia } from "@/types/clinical";
 
@@ -37,13 +38,9 @@ import type { Pendencia } from "@/types/clinical";
 // Contratos
 // ---------------------------------------------------------------------------
 
-/** Estado da ultima evolucao, JA formatado no servidor (nao ha conta de data no client). */
-export interface EvolucaoResumo {
-  /** Ex.: "hoje 06:12", "29/07 19:40" ou "—" quando nao ha evolucao. */
-  rotulo: string;
-  /** true = sem evolucao nas ultimas 24 h (ou nenhuma evolucao registrada). */
-  atrasada: boolean;
-}
+// Estado da ultima evolucao (JA formatado no servidor). Fonte unica: lib/formatters/tempo.
+// Reexportado para /rounds/page.tsx nao precisar conhecer o modulo de tempo.
+export type { EvolucaoResumo };
 
 /** Uma linha do round: o leito + o que exige decisao agora. */
 export interface LinhaRound {
@@ -181,7 +178,12 @@ function Linha({ l }: { l: LinhaRound }): ReactElement {
   const abertas = l.pendencias.length;
   const criticos = l.alertas?.criticos ?? 0;
   const warnings = l.alertas?.warnings ?? 0;
+  const semAlerta = criticos === 0 && warnings === 0;
+  const semAtb = l.atbs.length === 0;
   const acao = precisaAcao(l);
+  // leito ja vem "UTI2-L01"; nao repetir a UTI ("UTI2 · UTI2-L01").
+  const leitoRotulo =
+    b.leito && b.leito.toUpperCase().startsWith(b.uti.toUpperCase()) ? b.leito : `${b.uti} · ${b.leito}`;
 
   return (
     <Link
@@ -192,9 +194,7 @@ function Linha({ l }: { l: LinhaRound }): ReactElement {
     >
       {/* 1. leito + gravidade */}
       <span className="round-row__c round-row__c--leito">
-        <span className="round-row__leito tabnum">
-          {b.uti} · {b.leito}
-        </span>
+        <span className="round-row__leito tabnum">{leitoRotulo}</span>
         <span className="round-row__grav" style={{ color: `var(--grav-${g}-text)` }}>
           {ROTULO_GRAVIDADE[g].s}
         </span>
@@ -239,7 +239,8 @@ function Linha({ l }: { l: LinhaRound }): ReactElement {
               {`${num(warnings, 0)} aviso${warnings > 1 ? "s" : ""}`}
             </Chip>
           ) : null}
-          {criticos === 0 && warnings === 0 ? <span className="round-row__vazio">sem alerta aberto</span> : null}
+          {/* alertas vazios mas HA ATB: diz "sem alerta" antes dos chips de ATB */}
+          {semAlerta && !semAtb ? <span className="round-row__vazio">sem alerta</span> : null}
 
           {l.atbs.map((a: VwDiasAtbAtivo) => {
             const dias = typeof a.dias_terapia === "number" && Number.isFinite(a.dias_terapia) ? a.dias_terapia : null;
@@ -257,7 +258,10 @@ function Linha({ l }: { l: LinhaRound }): ReactElement {
               </Chip>
             );
           })}
-          {l.atbs.length === 0 ? <span className="round-row__vazio">sem ATB em curso</span> : null}
+          {/* ATB vazio mas HA alerta: diz "sem ATB" depois dos alertas */}
+          {semAtb && !semAlerta ? <span className="round-row__vazio">sem ATB</span> : null}
+          {/* nada dos dois: uma frase so, sem jargao */}
+          {semAlerta && semAtb ? <span className="round-row__vazio">sem alerta · sem ATB</span> : null}
         </span>
       </span>
 

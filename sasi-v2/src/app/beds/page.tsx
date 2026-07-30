@@ -21,17 +21,18 @@ import { BedGrid } from "@/features/beds/components/BedGrid";
 import type { ResumoPendencia } from "@/features/beds/components/BedCard";
 import { SplitPane } from "@/features/war-room/components/SplitPane";
 import { CalcPanel } from "@/features/war-room/components/CalcPanel";
+import { resumoEvolucao, type EvolucaoResumo } from "@/lib/formatters/tempo";
 import type { Pendencia } from "@/types/clinical";
 
 export const dynamic = "force-dynamic";
 
 /** Horario da leitura, no fuso do plantao (o servidor pode estar em UTC). */
-function agoraNoPlantao(): string {
+function agoraNoPlantao(agora: Date): string {
   return new Intl.DateTimeFormat("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
     timeZone: "America/Sao_Paulo",
-  }).format(new Date());
+  }).format(agora);
 }
 
 export default async function BedsPage(): Promise<ReactElement> {
@@ -50,9 +51,15 @@ export default async function BedsPage(): Promise<ReactElement> {
     };
   });
 
+  // 3. idade do dado: quando foi a ultima evolucao de cada leito (fuso do plantao,
+  //    calculado no SERVIDOR — nao existe conta de data no client).
+  const agora = new Date();
+  const evolucoes: Record<string, EvolucaoResumo> = {};
+  for (const l of leitos) evolucoes[l.paciente_id] = resumoEvolucao(l.ultima_evolucao ?? null, agora);
+
   return (
     <SplitPane painel={<CalcPanel />} rotuloPainel="Calculadoras de plantão">
-      <BedGrid leitos={leitos} pendencias={pendencias} lidoEm={agoraNoPlantao()} />
+      <BedGrid leitos={leitos} pendencias={pendencias} evolucoes={evolucoes} lidoEm={agoraNoPlantao(agora)} />
     </SplitPane>
   );
 }

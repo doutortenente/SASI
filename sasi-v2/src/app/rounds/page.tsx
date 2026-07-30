@@ -25,7 +25,7 @@
 // plantao, para nao existir data no client.
 // ============================================================================
 import type { ReactElement } from "react";
-import { RoundList, type EvolucaoResumo, type LinhaRound } from "@/features/rounds/components/RoundList";
+import { RoundList, type LinhaRound } from "@/features/rounds/components/RoundList";
 import { triagem } from "@/features/war-room/triage";
 import {
   listarAtbsAtivos,
@@ -34,41 +34,14 @@ import {
   mapearPendenciasAbertas,
   type VwDiasAtbAtivo,
 } from "@/lib/data";
+import { resumoEvolucao } from "@/lib/formatters/tempo";
 
 export const dynamic = "force-dynamic";
 
 /** Fuso do plantao: o servidor pode estar em UTC, o medico nunca esta. */
 const FUSO = "America/Sao_Paulo";
-const TRAVESSAO = "—";
-
-/** Horas sem evolucao a partir das quais o leito entra na lista de acao. */
-const HORAS_EVOLUCAO_ATRASADA = 24;
 
 const fmtHora = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: FUSO });
-const fmtDiaMes = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", timeZone: FUSO });
-const fmtDiaCheio = new Intl.DateTimeFormat("pt-BR", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-  timeZone: FUSO,
-});
-
-/**
- * Quando foi a ultima evolucao, em texto curto ("hoje 06:12" / "29/07 19:40").
- * Sem evolucao => "—" e conta como ATRASADA (e exatamente o que exige acao).
- */
-function resumoEvolucao(iso: string | null, agora: Date): EvolucaoResumo {
-  if (!iso) return { rotulo: TRAVESSAO, atrasada: true };
-  const t = new Date(iso);
-  if (Number.isNaN(t.getTime())) return { rotulo: TRAVESSAO, atrasada: true };
-
-  const horas = (agora.getTime() - t.getTime()) / 3_600_000;
-  const rotulo =
-    fmtDiaCheio.format(t) === fmtDiaCheio.format(agora)
-      ? `hoje ${fmtHora.format(t)}`
-      : `${fmtDiaMes.format(t)} ${fmtHora.format(t)}`;
-  return { rotulo, atrasada: horas >= HORAS_EVOLUCAO_ATRASADA };
-}
 
 export default async function RoundsPage(): Promise<ReactElement> {
   // 1. leitos ativos (view) + triagem: pior primeiro

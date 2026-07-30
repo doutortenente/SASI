@@ -15,6 +15,7 @@
 import { useMemo, type ReactElement } from "react";
 import { BedCard, CSS_BED_CARD, ORDEM_GRAVIDADE, ROTULO_GRAVIDADE, type LeitoTriado, type ResumoPendencia } from "./BedCard";
 import type { Gravity } from "@/features/war-room/triage";
+import type { EvolucaoResumo } from "@/lib/formatters/tempo";
 import { passaFiltroUti, ROTULO_UTI, useUiStore } from "@/stores/uiStore";
 
 export interface BedGridProps {
@@ -22,6 +23,8 @@ export interface BedGridProps {
   leitos: LeitoTriado[];
   /** paciente_id -> resumo das pendencias abertas (tabela pendencias). */
   pendencias?: Record<string, ResumoPendencia>;
+  /** paciente_id -> hora da ultima evolucao (JA formatada no servidor). */
+  evolucoes?: Record<string, EvolucaoResumo>;
   /** Horario da leitura do banco, formatado no servidor (evita divergencia de fuso). */
   lidoEm?: string;
 }
@@ -30,7 +33,7 @@ type Contagem = Record<Gravity, number>;
 
 const ZERO: Contagem = { critical: 0, unstable: 0, watcher: 0, stable: 0, deceased: 0 };
 
-export function BedGrid({ leitos, pendencias, lidoEm }: BedGridProps): ReactElement {
+export function BedGrid({ leitos, pendencias, evolucoes, lidoEm }: BedGridProps): ReactElement {
   const filtro = useUiStore((s) => s.uti);
   const setUti = useUiStore((s) => s.setUti);
   const compacto = useUiStore((s) => s.warRoom);
@@ -124,7 +127,13 @@ export function BedGrid({ leitos, pendencias, lidoEm }: BedGridProps): ReactElem
 
       <div className={`bedgrid__grade${compacto ? " bedgrid__grade--compacta" : ""}`}>
         {visiveis.map((l: LeitoTriado) => (
-          <BedCard key={l.paciente_id} leito={l} pendencia={pendencias?.[l.paciente_id] ?? null} compacto={compacto} />
+          <BedCard
+            key={l.paciente_id}
+            leito={l}
+            pendencia={pendencias?.[l.paciente_id] ?? null}
+            evolucao={evolucoes?.[l.paciente_id] ?? null}
+            compacto={compacto}
+          />
         ))}
       </div>
     </section>

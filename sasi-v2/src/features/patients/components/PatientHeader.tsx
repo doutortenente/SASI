@@ -65,6 +65,64 @@ export function numeroOuNull(v: number | string | null | undefined): number | nu
   return Number.isFinite(n) ? n : null;
 }
 
+// Vocabulario de NEGACAO de alergia. Comeca com uma dessas palavras E o resto e
+// so preenchimento => o campo NEGA alergia (sinal tranquilizador, sem alarme).
+const ALERGIA_NEG_INICIO = /^(nkda|nka|nega\w*|nego|nenhum\w*|sem|ausente\w*|nao|nunca|isento\w*|desconhec\w*)$/;
+const ALERGIA_NEG_PREENCHIMENTO = new Set([
+  "alergia", "alergias", "alergico", "alergica", "alergicos", "alergicas",
+  "medicamento", "medicamentos", "medicamentosa", "medicamentosas", "medicamentoso",
+  "conhecida", "conhecidas", "conhecido", "conhecidos", "previa", "previas", "previo", "previos",
+  "referida", "referidas", "referido", "relatada", "relatadas", "relatado", "relata", "relatar",
+  "droga", "drogas", "alimentar", "alimentares", "substancia", "substancias",
+  "a", "ao", "aos", "as", "de", "do", "da", "para", "com", "e", "ou", "que", "o", "os",
+  "sabe", "refere", "possui", "tem", "ha", "informar", "informa", "informado", "informacao",
+  "nada", "consta", "ate", "momento", "presente", "atual", "atuais", "no", "na", "sic",
+]);
+
+/**
+ * Classifica o texto de alergia em: alergia REAL (merece destaque de alerta),
+ * NEGADA (paciente nega — sinal tranquilizador, sem cor de alarme) ou ausente (null).
+ *
+ * MOTIVO CLINICO: antes, qualquer texto pintava a faixa de VERMELHO — inclusive
+ * "Nega alergias". Isso inverte o sinal: os leitos SEM alergia ficavam com a cara
+ * de perigo, gerando fadiga de alarme. Agora o vermelho fica reservado a alergia
+ * de verdade. Na DUVIDA, classificamos como REAL: e mais seguro um alarme a mais
+ * do que esconder uma alergia verdadeira.
+ */
+export function classificaAlergia(v: string | null | undefined): "real" | "negada" | null {
+  const t = txt(v);
+  if (!t) return null;
+  const limpo = t
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // tira acento
+    .replace(/[.,;:!()/-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const toks = limpo.split(" ").filter(Boolean);
+  if (toks.length === 0) return null;
+  if (!ALERGIA_NEG_INICIO.test(toks[0])) return "real";
+  // primeiro token nega; so e negacao pura se TODO o resto for preenchimento.
+  return toks.slice(1).every((w) => ALERGIA_NEG_PREENCHIMENTO.has(w)) ? "negada" : "real";
+}
+
+/**
+ * Quebra a HD (hipoteses diagnosticas) em problemas SEPARADOS — mas so quando o
+ * medico marcou a separacao com quebra de linha ou ";". A virgula NAO separa (ela
+ * costuma estar DENTRO de um mesmo diagnostico), entao nao inventamos divisao que
+ * o autor nao fez. Remove marcadores de lista no inicio de cada item ("1.", "-").
+ * Um problema so => devolve [texto] e a tela mostra como prosa (nao vira lista de 1).
+ */
+export function problemasDeHD(hd: string | null | undefined): string[] {
+  const t = txt(hd);
+  if (!t) return [];
+  const partes = t
+    .split(/[\n;]+/)
+    .map((s) => s.replace(/^\s*(?:\d{1,2}\s*[.)\-]|[-–•*])\s*/, "").trim())
+    .filter((s) => s.length > 0);
+  return partes.length > 0 ? partes : [t];
+}
+
 /**
  * Rotulo do leito. No banco vivo `leito` ja vem no padrao canonico "UTI2-L01"
  * (CLAUDE.md §1), entao repetir a UTI ao lado seria ruido. Se o leito NAO
@@ -278,8 +336,10 @@ export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
   // Alergia e informacao de SEGURANCA: se a coluna estiver vazia mas a ficha de
   // admissao tiver o dado, mostramos o da ficha (dado gravado, nao inventado).
   const alergias = txt(p.alergias) ?? txt(p.patient_summary?.alergias);
+  const alergiaClasse = classificaAlergia(alergias);
   const isolamento = p.isolation !== "none" ? ROTULO_ISOLAMENTO[p.isolation] : null;
   const hd = txt(p.hd);
+  const problemas = problemasDeHD(hd);
 
   return (
     <header className="pt-header">
@@ -334,22 +394,57 @@ export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
         >
           {txt(p.nome) ?? TRAVESSAO}
         </h2>
-        <p
-          title="Hipóteses diagnósticas / problemas ativos (pacientes.hd)"
-          style={{
-            margin: "4px 0 0",
-            fontSize: "var(--text-sm, 13px)",
-            lineHeight: "var(--leading-snug, 1.35)",
-            color: hd ? "var(--text-body)" : "var(--text-faint)",
-          }}
-        >
-          <span style={ESTILO_EYEBROW}>HD </span>
-          {hd ?? TRAVESSAO}
-        </p>
+        {problemas.length > 1 ? (
+          <div title="Hipóteses diagnósticas / problemas ativos (pacientes.hd)" style={{ margin: "4px 0 0" }}>
+            <span style={ESTILO_EYEBROW}>HD</span>
+            <ol
+              style={{
+                margin: "3px 0 0",
+                padding: 0,
+                listStyle: "none",
+                display: "flex",
+                flexDirection: "column",
+                gap: 3,
+              }}
+            >
+              {problemas.map((prob: string, i: number) => (
+                <li
+                  key={`${i}-${prob}`}
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    fontSize: "var(--text-sm, 13px)",
+                    lineHeight: "var(--leading-snug, 1.35)",
+                    color: "var(--text-body)",
+                  }}
+                >
+                  <span className="tabnum" style={{ flex: "0 0 auto", fontWeight: 700, color: "var(--text-faint)" }}>
+                    {i + 1}.
+                  </span>
+                  <span style={{ minWidth: 0 }}>{prob}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ) : (
+          <p
+            title="Hipóteses diagnósticas / problemas ativos (pacientes.hd)"
+            style={{
+              margin: "4px 0 0",
+              fontSize: "var(--text-sm, 13px)",
+              lineHeight: "var(--leading-snug, 1.35)",
+              color: hd ? "var(--text-body)" : "var(--text-faint)",
+            }}
+          >
+            <span style={ESTILO_EYEBROW}>HD </span>
+            {hd ?? TRAVESSAO}
+          </p>
+        )}
       </div>
 
       {/* linha 3 — alergias (sinal de seguranca) */}
-      {alergias ? (
+      {/* VERMELHO so para alergia REAL. "Nega" fica neutro (sem fadiga de alarme). */}
+      {alergiaClasse === "real" ? (
         <div
           role="note"
           style={{
@@ -364,9 +459,34 @@ export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
           }}
         >
           <strong style={{ ...ESTILO_EYEBROW, color: "var(--grav-critical-text)", paddingTop: 2, flex: "0 0 auto" }}>
-            Alergias
+            <span aria-hidden="true">⚠ </span>Alergias
           </strong>
           <span style={{ fontSize: "var(--text-sm, 13px)", fontWeight: 600, lineHeight: "var(--leading-snug, 1.35)" }}>
+            {alergias}
+          </span>
+        </div>
+      ) : alergiaClasse === "negada" ? (
+        <div
+          role="note"
+          style={{
+            display: "flex",
+            alignItems: "baseline",
+            gap: 8,
+            padding: "6px 12px",
+            borderRadius: "var(--radius-md, 8px)",
+            background: "var(--surface-sunken)",
+            border: "1px solid var(--border-default)",
+          }}
+        >
+          <strong style={{ ...ESTILO_EYEBROW, color: "var(--text-muted)", flex: "0 0 auto" }}>Alergias</strong>
+          <span
+            style={{
+              fontSize: "var(--text-sm, 13px)",
+              fontWeight: 600,
+              lineHeight: "var(--leading-snug, 1.35)",
+              color: "var(--text-body)",
+            }}
+          >
             {alergias}
           </span>
         </div>

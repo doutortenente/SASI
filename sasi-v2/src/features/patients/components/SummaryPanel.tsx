@@ -277,8 +277,12 @@ export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
         <strong style={{ fontSize: "var(--text-md, 17px)", color: "var(--text-heading)" }}>
           Ficha de admissão não preenchida
         </strong>
-        <span style={{ fontSize: "var(--text-sm, 13px)", color: "var(--text-muted)" }}>
-          Nenhum campo de <code className="tabnum">patient_summary</code> foi registrado para este paciente.
+        <span
+          title="pacientes.patient_summary (JSONB) vazio"
+          style={{ fontSize: "var(--text-sm, 13px)", color: "var(--text-muted)", maxWidth: "52ch" }}
+        >
+          Ainda não há dados de admissão registrados para este paciente. A ficha é preenchida na ingestão da
+          folha — o app nunca a completa sozinho.
         </span>
       </section>
     );
