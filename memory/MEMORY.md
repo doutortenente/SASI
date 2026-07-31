@@ -40,7 +40,7 @@ python3 ~/projetos/scripts/sasi/audit_eventos.py                   # fila evento
 ## Débitos
 
 1. 🔴 **SEGREDOS EXPOSTOS (30-jul)** — o cofre `.env` foi colado num chat. **Rotacionar**: token GitHub, `service_role` + senha do banco Supabase, senha-mestra do Vaultwarden, senhas de e-mail. Prioridade máxima.
-2. **`dev_bypass` ainda ativo** — remoção está pronta e *gated* em `supabase/migrations/_gated/20_rls_producao.sql`; depende do login real (F3). Rodar antes disso trava o app.
+2. ~~`dev_bypass`~~ **DECISÃO 31-jul: fica ativo de propósito** — F3/F4/F5 riscadas do plano por ordem do operador (uso pessoal solo, `CLAUDE.md` §5). NÃO propor login/RLS/OCR-no-app/FHIR de novo. O gated `_gated/20_rls_producao.sql` fica arquivado caso o escopo um dia mude. Exposição pública do app: mitigar na Vercel (Deployment Protection), não com auth.
 3. **rag-protocolos** — migration `06` versionada; falta aplicar no Supabase + Edge `protocolo-ingest`
 4. **eventos_clinicos** — ~27 na fila `vw_eventos_pendentes_revisao` (revisar)
 5. **SOFA bloqueado por dado** — 0/16 evoluções têm os 6 componentes (bilirrubina/PaO2 nunca capturados); fix = skill `sasi-ingest-export` capturar a montante. *(Confirmado 30-jul: os 7 leitos vivos mostram SOFA null — a tela exibe "—", nunca inventa.)*

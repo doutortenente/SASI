@@ -39,13 +39,20 @@ Glossário-relâmpago dos termos que mais aparecem:
 **A régua de fases:**
 
 ```
-F0  Modelo de dados          ← ESTA RODADA (SQL validado ✓)
-F1  Scaffold Next.js 15 + tipos
-F2  Views (Dashboard/War Room) lendo o banco
-F3  Login real + remover dev_bypass  (ORDEM É CRÍTICA)
-F4  OCR da folha de enfermagem (o propósito do projeto Cowork)
-F5  Camada FHIR (interoperabilidade)
+F0  Modelo de dados          ✅ APLICADO EM PRODUÇÃO (30-jul)
+F1  Scaffold Next.js 15      ✅ ENTREGUE (sasi-v2, 30-jul)
+F2  Views (Dashboard/War Room) ✅ ENTREGUE + revisão de design (31-jul)
+F3  Login real + remover dev_bypass   ❌ RISCADA (ordem do operador, 31-jul)
+F4  OCR da folha de enfermagem        ❌ RISCADA (ordem do operador, 31-jul)
+F5  Camada FHIR                       ❌ RISCADA (ordem do operador, 31-jul)
 ```
+
+> **Decisão do operador (31-jul-2026): F3, F4 e F5 estão FORA DO PLANO.**
+> Coerente com o `CLAUDE.md` §5 (uso pessoal e solo, sem auth no backlog): o
+> `dev_bypass` fica ativo **de propósito**; o OCR segue pelo fluxo que já opera
+> (skill `sasi-ingest-export` → JSON → MCP), sem virar tela do app; FHIR só se o
+> escopo um dia mudar. As seções F3–F5 abaixo ficam como referência histórica —
+> **nenhuma sessão futura deve propô-las de novo.**
 
 **As 5 decisões de modelo de dados desta rodada** (todas justificadas na §3, todas validadas em Postgres):
 
@@ -294,17 +301,17 @@ Cada fase tem **objetivo · passos (o que pedir ao Claude Code) · pronto quando
 - **Passos:** Dashboard lendo `vw_dashboard_uti`; painéis de tendência lendo `vw_eventos_tendencia`/`vw_sofa_trend_72h`; fila de revisão lendo `vw_eventos_pendentes_revisao`; modo "War Room" (tela dividida + calculadoras do `clinical-engine`).
 - **Pronto quando:** paridade com as 5 janelas atuais.
 
-### F3 — Login real + remover `dev_bypass` (ORDEM DA §4)
+### F3 — Login real + remover `dev_bypass` — ❌ FORA DE ESCOPO (31-jul-2026)
 - **Objetivo:** segurança de produção sem travar o app.
 - **Passos:** ligar Supabase Auth no Next.js → carimbar donos → aplicar as 41 policies (Anexo A/§6) → remover `dev_bypass` → rodar advisors.
 - **Pronto quando:** advisors limpos; login funciona; RLS isola por dono (já provado em teste).
 
-### F4 — OCR da folha de enfermagem (propósito do projeto Cowork)
+### F4 — OCR da folha de enfermagem — ❌ FORA DE ESCOPO (31-jul-2026; o OCR vive na skill, não no app)
 - **Objetivo:** foto da folha → eventos na timeline, com confiança e revisão.
 - **Passos:** consolidar o contrato `sasi-ocr-ingest/v1` (já existe na edge function); tela de captura + fila de revisão; honrar `requires_review`/`confidence` e o rastro em `ingest_audit_log`.
 - **Pronto quando:** foto de uma folha real vira eventos revisáveis, ZERO alucinação.
 
-### F5 — Camada FHIR (interoperabilidade)
+### F5 — Camada FHIR — ❌ FORA DE ESCOPO (31-jul-2026)
 - **Objetivo:** exportar/integrar em FHIR R4.
 - **Passos:** completar `loinc_code` na legenda (verificado); views/funções que emitem Patient/Observation/Condition/MedicationRequest; endpoint de export.
 - **Pronto quando:** um paciente exporta como Bundle FHIR válido.
