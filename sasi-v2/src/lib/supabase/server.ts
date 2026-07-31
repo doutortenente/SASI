@@ -20,9 +20,11 @@ export async function getSupabaseServer() {
     },
   };
 
+  // Integracao Vercel<->Supabase injeta PUBLISHABLE_KEY (nome novo);
+  // .env local historico usa ANON_KEY (nome antigo). Mesma chave publica.
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!,
     { cookies: cookieMethods },
   );
 }
