@@ -7,15 +7,11 @@
 // ============================================================================
 
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { falhaBanco } from "@/lib/data/erros";
 import type { Evolucao, Plantao } from "@/types/clinical";
 
 const LIMITE_MAX = 1000;
 
-type ErroPostgrest = { message?: string | null; code?: string | null; details?: string | null } | null;
-
-function logErro(fn: string, e: ErroPostgrest): void {
-  console.error(`[data/evolucoes] ${fn}: ${e?.message ?? "erro desconhecido"}${e?.code ? ` (${e.code})` : ""}`);
-}
 
 /**
  * Colunas da evolucao (explicitas: se o schema mudar, o erro aparece aqui e nao na tela).
@@ -38,10 +34,35 @@ export async function getUltimaEvolucao(pacienteId: string): Promise<Evolucao | 
     .limit(1)
     .maybeSingle();
   if (error) {
-    logErro("getUltimaEvolucao", error);
-    return null;
+    throw falhaBanco("data/evolucoes", "getUltimaEvolucao", error);
   }
   return (data as Evolucao | null) ?? null;
+}
+
+/**
+ * Ultima evolucao de VARIOS pacientes numa consulta so (a passagem de plantao
+ * fazia 1 consulta POR LEITO — 33 leitos = 33 idas ao banco; agora e 1).
+ * Busca as evolucoes dos ids ordenadas por data desc e guarda a PRIMEIRA vista
+ * de cada paciente. Paciente sem evolucao simplesmente nao aparece no Map.
+ */
+export async function mapearUltimasEvolucoes(pacienteIds: string[]): Promise<Map<string, Evolucao>> {
+  const ids = pacienteIds.filter(Boolean);
+  const mapa = new Map<string, Evolucao>();
+  if (ids.length === 0) return mapa;
+  const sb = await getSupabaseServer();
+  const { data, error } = await sb
+    .from("evolucoes")
+    .select(COLS)
+    .in("paciente_id", ids)
+    .order("data_evolucao", { ascending: false })
+    .limit(LIMITE_MAX);
+  if (error) {
+    throw falhaBanco("data/evolucoes", "mapearUltimasEvolucoes", error);
+  }
+  for (const row of (data ?? []) as Evolucao[]) {
+    if (!mapa.has(row.paciente_id)) mapa.set(row.paciente_id, row); // desc: a 1ª e a mais nova
+  }
+  return mapa;
 }
 
 /** Historico de evolucoes, da mais nova para a mais antiga. */
@@ -55,8 +76,7 @@ export async function listarEvolucoes(pacienteId: string, limite = 10): Promise<
     .order("data_evolucao", { ascending: false })
     .limit(Math.min(limite, LIMITE_MAX));
   if (error) {
-    logErro("listarEvolucoes", error);
-    return [];
+    throw falhaBanco("data/evolucoes", "listarEvolucoes", error);
   }
   return (data ?? []) as Evolucao[];
 }
@@ -67,8 +87,7 @@ export async function getEvolucao(evolucaoId: string): Promise<Evolucao | null> 
   const sb = await getSupabaseServer();
   const { data, error } = await sb.from("evolucoes").select(COLS).eq("id", evolucaoId).maybeSingle();
   if (error) {
-    logErro("getEvolucao", error);
-    return null;
+    throw falhaBanco("data/evolucoes", "getEvolucao", error);
   }
   return (data as Evolucao | null) ?? null;
 }
@@ -94,8 +113,7 @@ export async function serieSofaEvolucoes(pacienteId: string, limite = 10): Promi
     .order("data_evolucao", { ascending: false })
     .limit(Math.min(limite, LIMITE_MAX));
   if (error) {
-    logErro("serieSofaEvolucoes", error);
-    return [];
+    throw falhaBanco("data/evolucoes", "serieSofaEvolucoes", error);
   }
   type Linha = { id: string; data_evolucao: string; plantao: Plantao; sofa_total: number | null };
   const rows = (data ?? []) as Linha[];

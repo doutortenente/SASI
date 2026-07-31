@@ -28,6 +28,7 @@ import {
   ROTULO_ISOLAMENTO,
   ROTULO_STATUS,
   TRAVESSAO,
+  classificaAlergia,
   diasInternacao,
   fmtNum,
   gravityDoPaciente,
@@ -232,6 +233,9 @@ export default async function PatientsPage({ searchParams }: PatientsPageProps):
 function CardPaciente({ linha }: { linha: LinhaIndice }): ReactElement {
   const { p, gravity, dias, sofa, pendencias } = linha;
   const alergias = txt(p.alergias) ?? txt(p.patient_summary?.alergias);
+  // MESMA regra do PatientHeader: vermelho SO para alergia real. "Nega" nao
+  // pinta chip de alerta (fadiga de alarme) — o indice tinha ficado pra tras.
+  const alergiaClasse = classificaAlergia(alergias);
   const isolamento = p.isolation !== "none" ? ROTULO_ISOLAMENTO[p.isolation] : null;
   const hd = txt(p.hd);
 
@@ -262,11 +266,12 @@ function CardPaciente({ linha }: { linha: LinhaIndice }): ReactElement {
         {pendencias != null && pendencias > 0 ? <span title="Pendências abertas">pend. {pendencias}</span> : null}
       </div>
 
-      {alergias || isolamento || p.status_leito !== "ativo" ? (
+      {alergiaClasse === "real" || isolamento || p.status_leito !== "ativo" ? (
         <div className="pac-chips">
-          {alergias ? (
+          {alergiaClasse === "real" && alergias ? (
+            /* o ALERGENO vai no corpo do chip (celular nao tem hover pra ler title) */
             <Chip tom="alerta" titulo={alergias}>
-              Alergia
+              {`Alergia: ${alergias.length > 28 ? `${alergias.slice(0, 27)}…` : alergias}`}
             </Chip>
           ) : null}
           {isolamento ? <Chip tom="atencao">Isol. {isolamento}</Chip> : null}

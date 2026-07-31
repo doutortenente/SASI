@@ -2,7 +2,8 @@
 // SASI — camada de dados: EVENTOS CLINICOS (serie temporal) + dimensao de tipos
 // ----------------------------------------------------------------------------
 // DOUTRINA APLICADA AQUI:
-//  - ZERO ALUCINACAO: sem medida => null (NUNCA 0). Erro => vazio + console.error.
+//  - ZERO ALUCINACAO: sem medida => null (NUNCA 0). ERRO de banco => throw (falhaBanco)
+//    — excecao unica: getTipoRef degrada com aviso NA TELA (rotulo=codigo), nunca em silencio.
 //  - MAX-MIN: os agregados devolvem { max, min } — a TELA imprime nessa ordem
 //    (ex.: "SpO2 98-89%"), nunca min primeiro.
 //  - "Flags gritam, nao consertam": evento marcado requires_review ENTRA no agregado
@@ -12,6 +13,7 @@
 // ============================================================================
 
 import { unidadeSegura } from "@/lib/formatters/br";
+import { falhaBanco } from "@/lib/data/erros";
 import { cache } from "react";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import type { EventoClinico, EventoTipoRef } from "@/types/clinical";
@@ -90,7 +92,15 @@ export const getTipoRef = cache(async (): Promise<EventoTipoRef[]> => {
   }
   type Linha = Omit<EventoTipoRef, "faixa_min" | "faixa_max"> & { faixa_min: unknown; faixa_max: unknown };
   const refs = ((data ?? []) as Linha[]).map(
-    (r: Linha): EventoTipoRef => ({ ...r, faixa_min: toNum(r.faixa_min), faixa_max: toNum(r.faixa_max) }),
+    (r: Linha): EventoTipoRef => ({
+      ...r,
+      // Grafia SEGURA da unidade JA na origem (µg->mcg): TODO consumidor da
+      // dimensao (sinais, SystemPanel, folhao) recebe a forma que aguenta
+      // caixa alta. Ponto unico — ninguem mais precisa lembrar de sanitizar.
+      unidade_padrao: r.unidade_padrao ? unidadeSegura(r.unidade_padrao) : r.unidade_padrao,
+      faixa_min: toNum(r.faixa_min),
+      faixa_max: toNum(r.faixa_max),
+    }),
   );
   if (refs.length === 0) {
     console.error(
@@ -151,16 +161,21 @@ export async function listarEventos(pacienteId: string, opts?: ListarEventosOpts
     q = q.gte("ts", new Date(Date.now() - opts.desdeHoras * 3_600_000).toISOString());
   }
 
-  const { data, error } = await q.order("ts", { ascending: opts?.crescente ?? false }).limit(limite);
+  // SEMPRE busca do mais RECENTE para o mais antigo. Com `crescente` a lista e
+  // invertida DEPOIS, em memoria. Motivo: o teto de 1000 linhas corta o que
+  // sobra — buscando em ordem crescente, o corte jogava fora exatamente as
+  // medicoes mais NOVAS (a coluna "hoje" do folhao sumia sem aviso). Buscando
+  // decrescente, o que se perde e o rabo antigo da serie, nunca o presente.
+  const { data, error } = await q.order("ts", { ascending: false }).limit(limite);
   if (error) {
-    logErro("listarEventos", error);
-    return [];
+    throw falhaBanco("data/eventos", "listarEventos", error);
   }
   type Linha = Omit<EventoClinico, "valor_num" | "confidence"> & { valor_num: unknown; confidence: unknown };
   const rows = ((data ?? []) as Linha[]).map(
     (r: Linha): EventoClinico => ({ ...r, valor_num: toNum(r.valor_num), confidence: toNum(r.confidence) }),
   );
   avisaTruncado("listarEventos", rows.length, limite);
+  if (opts?.crescente) rows.reverse();
   return rows;
 }
 
@@ -177,8 +192,7 @@ export async function ultimoEvento(pacienteId: string, tipo: string): Promise<Ev
     .limit(1)
     .maybeSingle();
   if (error) {
-    logErro("ultimoEvento", error);
-    return null;
+    throw falhaBanco("data/eventos", "ultimoEvento", error);
   }
   if (!data) return null;
   const r = data as EventoClinico & { valor_num: unknown; confidence: unknown };
@@ -288,10 +302,13 @@ async function resolverLinhas(
 const aggVazio = (): Agg => ({ max: null, min: null, ultimo: null, ts: null, n: 0, review: false, unidadeEvento: null });
 
 function acumula(a: Agg, ev: EventoClinico): void {
-  if (ev.requires_review) a.review = true;
   if (ev.unidade) a.unidadeEvento = unidadeSegura(ev.unidade); // grafia segura: µg -> mcg (ISMP)
   const valor = ev.valor_num;
   if (valor == null) return;
+  // review so conta para evento COM valor numerico: um registro sem valor
+  // marcava a celula "—" com chip "revisar" — mandava revisar uma medida que a
+  // propria tela dizia nao existir. Registro sem valor vive na fila de revisao.
+  if (ev.requires_review) a.review = true;
   a.n += 1;
   a.max = a.max == null || valor > a.max ? valor : a.max;
   a.min = a.min == null || valor < a.min ? valor : a.min;
@@ -419,7 +436,7 @@ export interface SerieLabsOpts {
  * Quando `tipos` e informado, TODAS as linhas pedidas aparecem (mesmo vazias).
  */
 export async function serieLabs(pacienteId: string, dias = 7, opts?: SerieLabsOpts): Promise<Folhao> {
-  const nDias = Math.max(1, Math.min(Math.trunc(dias), 90));
+  const nDias = Number.isFinite(dias) ? Math.max(1, Math.min(Math.trunc(dias), 90)) : 7; // NaN nao passa (viraria scan sem filtro / RangeError)
 
   // colunas: hoje e os (nDias-1) dias anteriores, do mais antigo ao mais recente
   const colunas: string[] = [diaLocal(new Date())];
@@ -515,8 +532,7 @@ export async function serieTendencia(pacienteId: string, tipo: string, limite = 
     .order("ts", { ascending: true })
     .limit(Math.min(limite, LIMITE_MAX));
   if (error) {
-    logErro("serieTendencia", error);
-    return [];
+    throw falhaBanco("data/eventos", "serieTendencia", error);
   }
   type Linha = Record<string, unknown>;
   return ((data ?? []) as Linha[]).map(
@@ -549,8 +565,7 @@ export async function serieSofa72h(pacienteId: string): Promise<PontoSofa72h[]> 
     .order("ts", { ascending: true })
     .limit(LIMITE_MAX);
   if (error) {
-    logErro("serieSofa72h", error);
-    return [];
+    throw falhaBanco("data/eventos", "serieSofa72h", error);
   }
   type Linha = { ts: string | null; sofa_total: unknown };
   return ((data ?? []) as Linha[]).map((r: Linha): PontoSofa72h => ({ ts: String(r.ts ?? ""), sofa_total: toNum(r.sofa_total) }));
@@ -612,7 +627,7 @@ function mapSofaDiario(r: Record<string, unknown>): SofaDiario {
 /** SOFA/dia dos ultimos `dias` dias (vw_sofa_diario). Ordem: mais antigo -> mais recente. */
 export async function serieSofaDiario(pacienteId: string, dias = 7): Promise<SofaDiario[]> {
   if (!pacienteId) return [];
-  const nDias = Math.max(1, Math.min(Math.trunc(dias), 90));
+  const nDias = Number.isFinite(dias) ? Math.max(1, Math.min(Math.trunc(dias), 90)) : 7; // NaN nao passa (viraria scan sem filtro / RangeError)
   const corte = new Date(Date.now() - nDias * 86_400_000).toISOString().slice(0, 10);
   const sb = await getSupabaseServer();
   const { data, error } = await sb
@@ -623,8 +638,7 @@ export async function serieSofaDiario(pacienteId: string, dias = 7): Promise<Sof
     .order("dia", { ascending: true })
     .limit(LIMITE_MAX);
   if (error) {
-    logErro("serieSofaDiario", error);
-    return [];
+    throw falhaBanco("data/eventos", "serieSofaDiario", error);
   }
   return ((data ?? []) as Record<string, unknown>[]).map(mapSofaDiario);
 }
@@ -641,8 +655,7 @@ export async function getSofaDiarioAtual(pacienteId: string): Promise<SofaDiario
     .limit(1)
     .maybeSingle();
   if (error) {
-    logErro("getSofaDiarioAtual", error);
-    return null;
+    throw falhaBanco("data/eventos", "getSofaDiarioAtual", error);
   }
   return data ? mapSofaDiario(data as Record<string, unknown>) : null;
 }
@@ -668,8 +681,7 @@ export async function getBhAcumulado(pacienteId: string): Promise<BhAcumulado | 
     .eq("paciente_id", pacienteId)
     .maybeSingle();
   if (error) {
-    logErro("getBhAcumulado", error);
-    return null;
+    throw falhaBanco("data/eventos", "getBhAcumulado", error);
   }
   if (!data) return null;
   const r = data as Record<string, unknown>;

@@ -321,6 +321,13 @@ export function TabelaoLabs({ folhao, dimensaoIndisponivel = false }: TabelaoLab
                             diaAnterior={diaAnterior}
                             diaAtual={celula.dia}
                           />
+                          {/* MAX-MIN do dia VISIVEL (doutrina): no celular nao ha
+                              hover — o par nao pode viver so no tooltip */}
+                          {celula.n > 1 ? (
+                            <span className="tlab__mm tabnum" aria-label="máximo–mínimo do dia">
+                              {fmtLab(celula.max)}–{fmtLab(celula.min)}
+                            </span>
+                          ) : null}
                         </td>
                       );
                     })}
@@ -343,7 +350,7 @@ export function TabelaoLabs({ folhao, dimensaoIndisponivel = false }: TabelaoLab
           <span className="tlab__valor tabnum">—</span> não coletado (o valor do dia anterior nunca é repetido
           para preencher)
         </li>
-        <li>valor exibido = último do dia; passe o mouse para máximo–mínimo, hora e nº de coletas</li>
+        <li>valor exibido = último do dia; com mais de uma coleta o máx–mín aparece embaixo (hora e detalhe no tooltip)</li>
         <li>
           <span className="tlab__n tabnum" aria-hidden="true">
             ²
@@ -436,6 +443,7 @@ export const CSS_TABELAO_LABS = `
 .tlab__valor--vazio{font-weight:400;color:var(--text-faint)}
 .tlab__td--fora .tlab__valor{color:var(--warning)}
 .tlab__n{margin-left:2px;font-size:var(--text-2xs,10px);font-weight:400;color:var(--text-muted)}
+.tlab__mm{display:block;margin-top:1px;font-size:var(--text-2xs,10px);font-weight:400;color:var(--text-muted)}
 .tlab__flag{margin-left:2px;font-size:var(--text-2xs,10px);font-weight:700;color:var(--warning)}
 .tlab__rev{margin-left:2px;font-size:var(--text-2xs,10px);font-weight:700;color:var(--text-muted)}
 

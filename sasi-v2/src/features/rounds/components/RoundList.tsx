@@ -81,12 +81,14 @@ const ROTULO_STEWARDSHIP: Record<string, string> = {
  * obito > critico > instavel > vigilancia > estavel). Repetido aqui porque a
  * triagem exporta a ordenacao pronta, nao a escala numerica.
  */
+// Obito NAO disputa prioridade com quem ainda se trata: vai pro fim da lista
+// (mesma regra de features/war-room/triage). O rotulo continua visivel.
 const PESO_GRAVIDADE: Record<Gravity, number> = {
-  deceased: 4,
-  critical: 3,
-  unstable: 2,
-  watcher: 1,
-  stable: 0,
+  critical: 4,
+  unstable: 3,
+  watcher: 2,
+  stable: 1,
+  deceased: 0,
 };
 
 const txt = (v: string | null | undefined): string | null => {
@@ -107,8 +109,7 @@ function precisaAcao(l: LinhaRound): boolean {
     atbsEmAtencao(l) > 0 ||
     l.evolucao.atrasada ||
     (l.leito.delta_sofa_24h ?? 0) >= 2 ||
-    l.leito.gravity === "critical" ||
-    l.leito.gravity === "deceased"
+    l.leito.gravity === "critical"
   );
 }
 
@@ -208,6 +209,7 @@ function Linha({ l }: { l: LinhaRound }): ReactElement {
           {b.dias_internacao == null ? `internação ${TRAVESSAO}` : `${num(b.dias_internacao, 0)} d de UTI`} · evolução{" "}
           <span style={{ color: l.evolucao.atrasada ? "var(--warning)" : "inherit", fontWeight: l.evolucao.atrasada ? 700 : 400 }}>
             {l.evolucao.rotulo}
+            {l.evolucao.atrasada ? " · atrasada" : ""}
           </span>
         </span>
         <span className="round-row__hd">{txt(b.hd) ?? TRAVESSAO}</span>

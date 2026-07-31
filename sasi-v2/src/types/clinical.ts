@@ -69,7 +69,7 @@ export interface RiscosFlags {
 export interface Infusao {
   id?: string;
   droga: string;
-  dose?: string;            // forma simples (legado do molde)
+  dose?: string | number | null; // banco vivo grava NUMERO ({"dose": 0.04}); molde legado gravava string
   unidade?: string;
   diluicao_mg?: number;     // forma rica (skill de ingestão)
   diluicao_ml?: number;

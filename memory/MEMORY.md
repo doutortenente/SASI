@@ -51,6 +51,10 @@ python3 ~/projetos/scripts/sasi/audit_eventos.py                   # fila evento
 10. ~~alerts_log vazia~~ **resolvido 26-jun**: produtor criado (`fn_eval_alert`/`fn_eval_trend`, config `alert_rules`/`trend_rules`)
 11. ~~memorias sem policy~~ **resolvido 30-jul**: ganhou `user_id` + 4 policies de dono (advisor limpo)
 12. ~~vocabulário de eventos chumbado em CHECK~~ **resolvido 30-jul**: virou a dimensão `evento_tipo_ref` (FK)
+13. **Revisão de código 31-jul (3 lentes) — consertados os críticos**: erro de banco agora GRITA (`falhaBanco` → `app/error.tsx`) em vez de fingir "sem dados"; corte de 1000 linhas preservava o rabo VELHO da série (agora preserva o recente); óbito não ranqueia acima de crítico; dose numérica não some mais da passagem; "Nega" sem chip vermelho também no índice; µg banido dos 3 últimos pontos; cabeçalhos de segurança HTTP ligados; 7 arquivos mortos removidos.
+14. **CSP pendente** — Content-Security-Policy exige nonce nos 19 `<style>` inline + 1 `<script>` do tema; fazer com calma (errado = tela branca). Fontes IBM Plex ainda vêm do CDN do Google (auto-hospedar via `next/font` quando mexer).
+15. **Consolidação anti-drift** — travessão "—" declarado em 8 módulos; helpers duplicados (`corSofa`, `delta24h`, `rotuloInfusao` ×3, `txt` ×5, rótulo de leito ×4, vocabulários). O drift JÁ causou 3 bugs reais (dose sumida, µg cru, alergia no índice). Unificar em `lib/formatters`.
+16. **`select("*")` nas tabelas largas** — `pacientes`/`vw_dashboard_uti` puxam JSONB inteiro (ficha, sofa_snapshot) em telas que usam 2 campos; estreitar colunas por chamador.
 
 ## Schema (30-jul-2026 — modelo v3)
 

@@ -7,10 +7,12 @@
 // chamado de Server Component, Route Handler ou Server Action.
 // Toda pagina que consome estas funcoes precisa de:  export const dynamic = "force-dynamic";
 //
-// CONTRATO DE ERRO (uniforme): falha de banco NUNCA vira dado falso.
-//   - funcao de lista  -> []      + console.error
-//   - funcao de item   -> null    + console.error
-//   - ausencia de medida -> null  (NUNCA 0). A tela imprime "—".
+// CONTRATO DE ERRO (uniforme, 31-jul-2026): falha de banco NUNCA vira dado falso.
+//   - ERRO de leitura      -> throw falhaBanco(...) -> tela de erro (app/error.tsx).
+//     "Consulta falhou" NAO pode parecer "paciente sem dado" — isso afirmaria
+//     um vazio clinico falso ("nenhum sinal vital", "sem alerta") numa queda de rede.
+//   - ausencia de medida   -> null (NUNCA 0). A tela imprime "—".
+//   - excecao desenhada: getTipoRef degrada com AVISO NA TELA (rotulo=codigo).
 // ============================================================================
 
 export {
@@ -23,6 +25,7 @@ export {
 
 export {
   getUltimaEvolucao,
+  mapearUltimasEvolucoes,
   listarEvolucoes,
   getEvolucao,
   serieSofaEvolucoes,

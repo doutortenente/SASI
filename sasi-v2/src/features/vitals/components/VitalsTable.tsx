@@ -121,6 +121,12 @@ function Valor({
       title={alerta ? tituloFora(linha.faixa_min, linha.faixa_max, linha.unidade) : undefined}
     >
       {num(v, CASAS)}
+      {/* cor NUNCA e o unico sinal: o "!" acompanha (daltonismo, impressao P&B) */}
+      {alerta ? (
+        <sup aria-hidden="true" style={{ marginLeft: 2, fontSize: "var(--text-2xs, 10px)", fontWeight: 700 }}>
+          !
+        </sup>
+      ) : null}
     </span>
   );
 }
@@ -153,7 +159,7 @@ export function VitalsTable({ linhas, horas = 24, semDimensao = false }: VitalsT
         </span>
       </div>
 
-      <div className="vt-wrap">
+      <div className="vt-wrap" role="region" aria-label="Sinais vitais — rolagem horizontal" tabIndex={0}>
         <table className="vt">
           <caption className="vt__cap">
             Máximo–mínimo por parâmetro nas últimas {horas} h — fonte <code className="tabnum">eventos_clinicos</code>
@@ -308,6 +314,7 @@ export const CSS_VITALS_TABLE = `
 .vt-cab__ttl{margin:0;font-size:var(--text-lg,20px);font-weight:700;color:var(--text-heading)}
 .vt-cab__sub{font-size:var(--text-xs,11px);color:var(--text-muted)}
 
+.vt-wrap:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .vt-wrap{overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
   background:var(--surface-card);border:1px solid var(--border-default);
   border-radius:var(--radius-xl,16px);box-shadow:var(--shadow-card)}

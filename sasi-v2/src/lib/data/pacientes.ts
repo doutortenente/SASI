@@ -2,22 +2,20 @@
 // SASI — camada de dados: PACIENTES / LEITOS
 // ----------------------------------------------------------------------------
 // Toda leitura do banco vive aqui (Server-side). Regras:
-//  - ZERO ALUCINACAO: erro do Supabase => lista vazia + console.error. Nunca dado falso.
+//  - ZERO ALUCINACAO: ausencia => null/[] (a tela mostra "—"). ERRO de banco => throw
+//    (falhaBanco -> app/error.tsx): leitura quebrada NUNCA se disfarca de prontuario vazio.
 //  - Nenhuma funcao inventa valor: ausencia continua null e a tela mostra "—".
 //  - Colunas conferidas em supabase/schema-producao-v3.sql (schema v3, ja em producao).
 // ============================================================================
 
+import { cache } from "react";
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { falhaBanco } from "@/lib/data/erros";
 import type { Paciente, StatusLeito, Uti, VwDashboardUti } from "@/types/clinical";
 
 /** PostgREST corta a resposta em 1000 linhas (supabase/config.toml: max_rows). */
 const LIMITE_MAX = 1000;
 
-type ErroPostgrest = { message?: string | null; code?: string | null; details?: string | null } | null;
-
-function logErro(fn: string, e: ErroPostgrest): void {
-  console.error(`[data/pacientes] ${fn}: ${e?.message ?? "erro desconhecido"}${e?.code ? ` (${e.code})` : ""}`);
-}
 
 function avisaTruncado(fn: string, n: number, limite: number): void {
   if (n >= limite) console.warn(`[data/pacientes] ${fn}: retorno truncado em ${limite} linhas — refine o filtro.`);
@@ -51,8 +49,7 @@ export async function listarLeitosAtivos(uti?: Uti | string | null): Promise<VwD
   }
   const { data, error } = await q.order("uti", { ascending: true }).order("leito", { ascending: true }).limit(LIMITE_MAX);
   if (error) {
-    logErro("listarLeitosAtivos", error);
-    return [];
+    throw falhaBanco("data/pacientes", "listarLeitosAtivos", error);
   }
   return (data ?? []) as VwDashboardUti[];
 }
@@ -82,25 +79,30 @@ export async function listarPacientes(uti?: Uti | string | null, opts?: ListarPa
     .order("leito", { ascending: true })
     .limit(limite);
   if (error) {
-    logErro("listarPacientes", error);
-    return [];
+    throw falhaBanco("data/pacientes", "listarPacientes", error);
   }
   const rows = (data ?? []) as Paciente[];
   avisaTruncado("listarPacientes", rows.length, limite);
   return rows;
 }
 
-/** 1 paciente pelo id (uuid). Nao encontrado ou erro => null (nunca objeto vazio inventado). */
-export async function getPaciente(id: string): Promise<Paciente | null> {
-  if (!id) return null;
+/** uuid v4-like: valida ANTES de ir ao banco (URL e input de fora). */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * 1 paciente pelo id (uuid). Nao encontrado, id ilegivel ou vazio => null.
+ * Erro de banco => throw (app/error.tsx). Memoizada por requisicao (React cache):
+ * layout e aba pediam o MESMO paciente em 2 consultas identicas — agora e 1.
+ */
+export const getPaciente = cache(async (id: string): Promise<Paciente | null> => {
+  if (!id || !UUID_RE.test(id)) return null; // lixo na URL nao vira round-trip no banco
   const sb = await getSupabaseServer();
   const { data, error } = await sb.from("pacientes").select("*").eq("id", id).maybeSingle();
   if (error) {
-    logErro("getPaciente", error);
-    return null;
+    throw falhaBanco("data/pacientes", "getPaciente", error);
   }
   return (data as Paciente | null) ?? null;
-}
+});
 
 /**
  * Paciente ATIVO de um leito (uti + leito). O banco garante 1 ativo por leito
@@ -117,8 +119,7 @@ export async function getPacientePorLeito(uti: Uti | string, leito: string): Pro
     .eq("status_leito", "ativo")
     .maybeSingle();
   if (error) {
-    logErro("getPacientePorLeito", error);
-    return null;
+    throw falhaBanco("data/pacientes", "getPacientePorLeito", error);
   }
   return (data as Paciente | null) ?? null;
 }

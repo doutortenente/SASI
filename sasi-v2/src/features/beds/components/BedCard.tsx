@@ -153,7 +153,8 @@ function delta24h(d: number | null): { texto: string; glifo: string; cor: string
 function rotuloInfusao(i: Infusao): string | null {
   const droga = (i.droga ?? "").trim();
   if (!droga) return null;
-  const dose = i.dose != null ? String(i.dose).trim() : "";
+  // Numero vira pt-BR (0,04 — nunca "0.04"); string legada passa como veio.
+  const dose = typeof i.dose === "number" ? num(i.dose, 3) : i.dose != null ? String(i.dose).trim() : "";
   if (dose) return `${droga} ${dose}${i.unidade ? ` ${unidadeSegura(i.unidade)}` : ""}`.trim();
   if (i.vazao_ml_h != null) return `${droga} ${num(i.vazao_ml_h, 1)} ml/h`;
   return droga;

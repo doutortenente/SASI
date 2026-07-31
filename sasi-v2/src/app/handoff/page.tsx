@@ -9,7 +9,7 @@
 //        1 linha por leito ativo: leito, nome, idade, HD, dias de internacao,
 //        SOFA da ultima evolucao, delta_sofa_24h, dvas, sedativos, dispositivos,
 //        isolamento, severidade_visual e contagem de pendencias abertas.
-//   2. getUltimaEvolucao(id)      -> tabela evolucoes (1 chamada por leito, em paralelo)
+//   2. mapearUltimasEvolucoes(ids) -> tabela evolucoes (TODAS numa consulta so)
 //        conduta vigente (condutas_sistemas / conduta), riscos e suporte
 //        ventilatorio (resp.suporte) da ultima evolucao.
 //   3. mapearPendenciasAbertas()  -> tabela pendencias (1 consulta para todos)
@@ -36,7 +36,7 @@ import {
   type HandoffLeito,
 } from "@/features/exports/components/HandoffCard";
 import {
-  getUltimaEvolucao,
+  mapearUltimasEvolucoes,
   listarAtbsAtivos,
   listarLeitosAtivos,
   listarPacientes,
@@ -74,12 +74,13 @@ export default async function HandoffPage(): Promise<ReactElement> {
   const linhas = await listarLeitosAtivos();
   const ids = linhas.map((l: VwDashboardUti) => l.paciente_id);
 
-  // 2. o resto em paralelo (3 consultas de conjunto + 1 evolucao por leito)
+  // 2. o resto em paralelo — 4 consultas de CONJUNTO (antes era 1 evolucao POR
+  //    leito: 33 leitos = 33 idas ao banco so nesta pagina)
   const [pendencias, atbs, pacientes, evolucoes] = await Promise.all([
     mapearPendenciasAbertas(ids),
     listarAtbsAtivos(),
     listarPacientes(),
-    Promise.all(ids.map((id: string) => getUltimaEvolucao(id))),
+    mapearUltimasEvolucoes(ids),
   ]);
 
   const atbPorPaciente = new Map<string, VwDiasAtbAtivo[]>();
@@ -93,7 +94,7 @@ export default async function HandoffPage(): Promise<ReactElement> {
 
   const leitos: HandoffLeito[] = linhas.map((l: VwDashboardUti, i: number): HandoffLeito => {
     const p = cadastro.get(l.paciente_id) ?? null;
-    const evolucao: Evolucao | null = evolucoes[i] ?? null;
+    const evolucao: Evolucao | null = evolucoes.get(l.paciente_id) ?? null;
     return {
       leito: { ...l, gravity: gravityDe(l) },
       evolucao,

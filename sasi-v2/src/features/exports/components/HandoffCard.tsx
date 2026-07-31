@@ -136,7 +136,10 @@ function deltaTexto(d: number | null | undefined): string {
 function rotuloInfusao(i: Infusao): string | null {
   const droga = txt(i.droga);
   if (!droga) return null;
-  const dose = txt(i.dose);
+  // O banco vivo grava dose como NUMERO ({"dose": 0.04, ...}); txt() so aceita
+  // string e engolia o valor — a passagem imprimia "noradrenalina" SEM dose.
+  // Numero vira pt-BR (0,04); string passa como veio. Nunca inventa.
+  const dose = typeof i.dose === "number" ? num(i.dose, 3) : txt(i.dose);
   if (dose) {
     const un = unidadeSegura(txt(i.unidade));
     return un ? `${droga} ${dose} ${un}` : `${droga} ${dose}`;
@@ -241,8 +244,13 @@ function suporteEmCurso(h: HandoffLeito): string[] {
   const ventilacao = txt(e?.resp?.suporte);
   if (ventilacao) out.push(`ventilação ${ventilacao}`);
 
-  for (const d of infusoes(e?.dvas ?? h.leito.dvas)) out.push(`DVA ${d}`);
-  for (const s of infusoes(e?.sedativos ?? h.leito.sedativos)) out.push(`sedação ${s}`);
+  // A evolucao pode existir com dvas = [] (lista vazia, nao-nula) — o "??" nunca
+  // caia pro painel vivo e a passagem afirmava "sem suporte" com noradrenalina
+  // correndo na view. Vazio TAMBEM cai pro painel.
+  const dvas = e?.dvas?.length ? e.dvas : h.leito.dvas;
+  const seds = e?.sedativos?.length ? e.sedativos : h.leito.sedativos;
+  for (const d of infusoes(dvas)) out.push(`DVA ${d}`);
+  for (const s of infusoes(seds)) out.push(`sedação ${s}`);
 
   const disp = dispositivosAtivos(h.leito.dispositivos);
   if (disp.length > 0) out.push(`dispositivos ${disp.join(", ")}`);

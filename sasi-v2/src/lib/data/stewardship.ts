@@ -8,15 +8,11 @@
 // ============================================================================
 
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { falhaBanco } from "@/lib/data/erros";
 import type { Antibiograma, Atb, Cultura, IntencaoAtb, ViaAtb } from "@/types/clinical";
 
 const LIMITE_MAX = 1000;
 
-type ErroPostgrest = { message?: string | null; code?: string | null; details?: string | null } | null;
-
-function logErro(fn: string, e: ErroPostgrest): void {
-  console.error(`[data/stewardship] ${fn}: ${e?.message ?? "erro desconhecido"}${e?.code ? ` (${e.code})` : ""}`);
-}
 
 // ---------------------------------------------------------------------------
 // 1. ANTIBIOTICOS
@@ -56,8 +52,7 @@ export async function listarAtbsAtivos(pacienteId?: string | null): Promise<VwDi
   if (pacienteId) q = q.eq("paciente_id", pacienteId);
   const { data, error } = await q.order("data_inicio", { ascending: true }).limit(LIMITE_MAX);
   if (error) {
-    logErro("listarAtbsAtivos", error);
-    return [];
+    throw falhaBanco("data/stewardship", "listarAtbsAtivos", error);
   }
   return (data ?? []) as VwDiasAtbAtivo[];
 }
@@ -86,8 +81,7 @@ export async function listarAtbs(pacienteId: string, opts?: ListarAtbsOpts): Pro
     .order("data_inicio", { ascending: false })
     .limit(Math.min(opts?.limite ?? LIMITE_MAX, LIMITE_MAX));
   if (error) {
-    logErro("listarAtbs", error);
-    return [];
+    throw falhaBanco("data/stewardship", "listarAtbs", error);
   }
   return (data ?? []) as Atb[];
 }
@@ -120,8 +114,7 @@ export async function listarCulturas(pacienteId: string, limite = 50): Promise<C
     .order("coleta_ts", { ascending: false })
     .limit(Math.min(limite, LIMITE_MAX));
   if (error) {
-    logErro("listarCulturas", error);
-    return [];
+    throw falhaBanco("data/stewardship", "listarCulturas", error);
   }
   type Linha = Omit<CulturaComAntibiograma, "antibiograma"> & { antibiograma: Antibiograma[] | null };
   return ((data ?? []) as Linha[]).map((c: Linha): CulturaComAntibiograma => ({

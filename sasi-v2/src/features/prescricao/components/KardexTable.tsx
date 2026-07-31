@@ -149,7 +149,9 @@ function doseDe(i: Infusao): DoseExib | null {
     if (t) return { valor: t, unidade: unidadeSegura(txt(i.unidade)) };
   }
   if (i.vazao_ml_h != null) return { valor: num(i.vazao_ml_h, 2), unidade: "mL/h" };
-  if (i.vazao_mcg_h != null) return { valor: num(i.vazao_mcg_h, 2), unidade: "µg/h" };
+  // "mcg/h", nunca "µg/h": o µ sob caixa alta vira "M" (grafia perigosa do ISMP;
+  // mesma regra de lib/formatters/br.ts). Era o UNICO µ literal que chegava a tela.
+  if (i.vazao_mcg_h != null) return { valor: num(i.vazao_mcg_h, 2), unidade: "mcg/h" };
   if (i.vazao_mg_h != null) return { valor: num(i.vazao_mg_h, 2), unidade: "mg/h" };
   return null;
 }

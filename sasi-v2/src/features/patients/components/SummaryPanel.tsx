@@ -189,7 +189,8 @@ const SISTEMA_TOKEN: Record<string, string> = {
 
 function CardSistema({ sistema }: { sistema: ResumoSistema }): ReactElement {
   const id = txt(sistema.id)?.toLowerCase() ?? "";
-  const token = SISTEMA_TOKEN[id];
+  // hasOwn: id vem de JSONB livre — "constructor"/"toString" pegariam funcao herdada
+  const token = Object.hasOwn(SISTEMA_TOKEN, id) ? SISTEMA_TOKEN[id] : undefined;
   const critico = id === "pontos_criticos";
 
   const barra = token ? `var(--sys-${token}-bar)` : critico ? "var(--grav-critical-solid)" : "var(--border-strong)";

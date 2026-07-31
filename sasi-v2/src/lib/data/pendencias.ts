@@ -7,15 +7,11 @@
 // ============================================================================
 
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { falhaBanco } from "@/lib/data/erros";
 import type { Pendencia } from "@/types/clinical";
 
 const LIMITE_MAX = 1000;
 
-type ErroPostgrest = { message?: string | null; code?: string | null; details?: string | null } | null;
-
-function logErro(fn: string, e: ErroPostgrest): void {
-  console.error(`[data/pendencias] ${fn}: ${e?.message ?? "erro desconhecido"}${e?.code ? ` (${e.code})` : ""}`);
-}
 
 const COLS = "id,paciente_id,evolucao_id,user_id,tarefa,prioridade,concluida,concluida_at,created_at";
 
@@ -44,8 +40,7 @@ export async function listarPendencias(
     .order("created_at", { ascending: true })
     .limit(Math.min(limite, LIMITE_MAX));
   if (error) {
-    logErro("listarPendencias", error);
-    return [];
+    throw falhaBanco("data/pendencias", "listarPendencias", error);
   }
   return (data ?? []) as Pendencia[];
 }
@@ -69,8 +64,7 @@ export async function mapearPendenciasAbertas(pacienteIds: string[]): Promise<Ma
     .order("created_at", { ascending: true })
     .limit(LIMITE_MAX);
   if (error) {
-    logErro("mapearPendenciasAbertas", error);
-    return mapa;
+    throw falhaBanco("data/pendencias", "mapearPendenciasAbertas", error);
   }
   for (const p of (data ?? []) as Pendencia[]) {
     const atual = mapa.get(p.paciente_id);

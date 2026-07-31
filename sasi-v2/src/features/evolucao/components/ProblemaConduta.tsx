@@ -26,6 +26,7 @@
 // ============================================================================
 import type { ReactElement } from "react";
 import type { CondutaSistema, ProblemaAtivo, Risco } from "@/types/clinical";
+import { unidadeSegura } from "@/lib/formatters/br";
 import { TRAVESSAO } from "./SystemPanel";
 
 // ---------------------------------------------------------------------------
@@ -114,7 +115,10 @@ const TOKEN_SISTEMA: Readonly<Record<string, string>> = {
 /** Chip do sistema, colorido pelo token quando reconhecido. Desconhecido = neutro. */
 function ChipSistema({ sistema }: { sistema: string | null }): ReactElement | null {
   if (!sistema) return null;
-  const token = TOKEN_SISTEMA[sistema.toLowerCase()];
+  // hasOwn: sistema e texto livre do JSONB — "constructor"/"toString" cairiam na
+  // heranca do Object e devolveriam funcao em vez de undefined (chip quebrado).
+  const chave = sistema.toLowerCase();
+  const token = Object.hasOwn(TOKEN_SISTEMA, chave) ? TOKEN_SISTEMA[chave] : undefined;
   return (
     <span
       className="pc-chip"
@@ -231,7 +235,7 @@ export function ProblemaConduta({
             <code className="tabnum">conduta</code> vazias).
           </p>
         ) : (
-          <div className="pc-wrap">
+          <div className="pc-wrap" role="region" aria-label="Problema → Conduta — rolagem horizontal" tabIndex={0}>
             <table className="pc-tab">
               <caption className="pc-tab__cap">
                 Cada linha é um problema e a sua conduta — casados pela posição na lista
@@ -323,8 +327,10 @@ export function ProblemaConduta({
           </div>
           <ul className="pc-lista">
             {condutas.map((c: CondutaSistema, i: number) => {
-              const meta = texto(c.meta);
-              const prazo = texto(c.prazo);
+              // unidadeSegura: a meta e texto livre com DOSE ("nora < 0,05 µg/kg/min")
+              // e o chip usa caixa alta — µ viraria "M" (o bug original da dose 1000x).
+              const meta = unidadeSegura(texto(c.meta) ?? "") || null;
+              const prazo = unidadeSegura(texto(c.prazo) ?? "") || null;
               return (
                 <li key={`${i}-${c.texto}`} className="pc-item">
                   <span className="pc-item__txt">{texto(c.texto)}</span>
@@ -425,6 +431,7 @@ export const CSS_PROBLEMA_CONDUTA = `
   background:var(--surface-card);border:1px dashed var(--border-strong);border-radius:var(--radius-lg,12px);
   font-size:var(--text-sm,13px);color:var(--text-muted)}
 
+.pc-wrap:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .pc-wrap{overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
   background:var(--surface-card);border:1px solid var(--border-default);
   border-radius:var(--radius-xl,16px);box-shadow:var(--shadow-card)}

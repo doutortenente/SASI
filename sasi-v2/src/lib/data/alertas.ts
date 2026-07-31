@@ -8,15 +8,11 @@
 // ============================================================================
 
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { falhaBanco } from "@/lib/data/erros";
 import type { AlertLog, EventoClinico, SeveridadeAlerta, Uti } from "@/types/clinical";
 
 const LIMITE_MAX = 1000;
 
-type ErroPostgrest = { message?: string | null; code?: string | null; details?: string | null } | null;
-
-function logErro(fn: string, e: ErroPostgrest): void {
-  console.error(`[data/alertas] ${fn}: ${e?.message ?? "erro desconhecido"}${e?.code ? ` (${e.code})` : ""}`);
-}
 
 // ---------------------------------------------------------------------------
 // 1. ALERTAS ABERTOS (nao reconhecidos)
@@ -50,8 +46,7 @@ export async function listarAlertasAbertos(): Promise<VwAlertaAberto[]> {
     .order("total", { ascending: false })
     .limit(LIMITE_MAX);
   if (error) {
-    logErro("listarAlertasAbertos", error);
-    return [];
+    throw falhaBanco("data/alertas", "listarAlertasAbertos", error);
   }
   return (data ?? []) as VwAlertaAberto[];
 }
@@ -92,8 +87,7 @@ export async function listarAlertasDetalhados(
     .order("created_at", { ascending: false })
     .limit(Math.min(opts?.limite ?? 200, LIMITE_MAX));
   if (error) {
-    logErro("listarAlertasDetalhados", error);
-    return [];
+    throw falhaBanco("data/alertas", "listarAlertasDetalhados", error);
   }
   return (data ?? []) as AlertLog[];
 }
@@ -121,8 +115,7 @@ export async function listarEventosPendentesRevisao(
 
   const { data, error } = await q.order("ts", { ascending: false }).limit(Math.min(limite, LIMITE_MAX));
   if (error) {
-    logErro("listarEventosPendentesRevisao", error);
-    return [];
+    throw falhaBanco("data/alertas", "listarEventosPendentesRevisao", error);
   }
   return (data ?? []) as EventoClinico[];
 }
@@ -134,8 +127,7 @@ export async function contarEventosPendentesRevisao(pacienteId?: string | null):
   if (pacienteId) q = q.eq("paciente_id", pacienteId);
   const { count, error } = await q;
   if (error) {
-    logErro("contarEventosPendentesRevisao", error);
-    return 0;
+    throw falhaBanco("data/alertas", "contarEventosPendentesRevisao", error);
   }
   return count ?? 0;
 }
