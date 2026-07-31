@@ -29,11 +29,11 @@ python3 ~/projetos/scripts/sasi/audit_eventos.py                   # fila evento
 
 | Área | Caminho | Papel |
 |---|---|---|
-| App | `frontend/src/` | UI plantão |
+| App | `sasi-v2/src/` | UI plantão (Next.js 15) — **único app do repo** desde a faxina de 31-jul |
 | MCP | `mcp-server/src/` | skills → Supabase |
 | Edge | `supabase/functions/` | ocr-ingest legado (não usar) |
 | Ingest | skill + MCP | Claude → JSON → deploy |
-| Motor | `~/projetos/rascunhos/sasi-motor-clinico-v2/` (staging, fora do repo) | SOFA/sepsis |
+| Motor | banco (views `vw_sofa_diario`, `vw_eventos_tendencia`) | SOFA/tendências — **não** há pacote local |
 | Doutrina | `doctrine/` | template-base Ramo C |
 | Queries plantão | `supabase/queries/plantao_queries.sql` | SQL ad-hoc no DataGrip |
 
@@ -57,6 +57,8 @@ python3 ~/projetos/scripts/sasi/audit_eventos.py                   # fila evento
 Baseline `20260626000000_baseline.sql` + formalização v3 (`20260730120000/120100/120200`), **aplicada em produção**. Referência completa: `supabase/schema-producao-v3.sql` · runbook: `docs/RUNBOOK-migracao-v3.md` · plano: `docs/PLANO-SASI-v3.md`.
 13 tabelas (nova: `evento_tipo_ref`, 56 códigos) · 8 views · 14 enums nativos · FKs de vocabulário em `eventos_clinicos`/`alert_rules`/`trend_rules`. Config: `alert_rules` (25), `trend_rules` (3). Alertas vivos via trigger. Limiares clínicos: `~/vaults/celebro/conhecimento/projetos/sasi-decisoes-clinicas.md`.
 
-## App novo (`sasi-v2/`)
+## App (`sasi-v2/`) — o único do repo
 
-Next.js 15 + React 19 + TypeScript strict + Zustand, mesmo Supabase. Verificado 30-jul: build verde, lendo os 7 leitos reais. `src/lib/data/` (consultas) · `src/app/` (telas) · `src/features/` (domínios de UI) · `src/types/clinical.ts` (contratos JSONB). Cálculo clínico **não** mora na tela: vem das views. Motor v2 em `packages/clinical-engine/scores-v2-staging/` (não compila — fase futura). Design system em `packages/design-system/`.
+Next.js 15 + React 19 + TypeScript strict + Zustand, mesmo Supabase. Verificado 30-jul: build verde, lendo os 7 leitos reais. `src/lib/data/` (consultas) · `src/app/` (telas) · `src/features/` (domínios de UI) · `src/types/clinical.ts` (contratos JSONB). Cálculo clínico **não** mora na tela: vem das views.
+
+**Faxina 31-jul-2026:** `frontend/` (app React+Vite antigo) e `packages/` (clinical-engine + design-system) saíram do repositório — 375 → 188 arquivos. O clinical-engine só era consumido pelo próprio `frontend/`, por isso os dois saíram juntos. Recuperáveis pela tag `pre-faxina-2026-07-31` e pela branch `archive/frontend-e-packages`. Detalhes em `CLAUDE.md` §7-B.

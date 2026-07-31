@@ -27,7 +27,6 @@ supabase/.branches/
 
 # === Design system — cache de ferramenta ===
 .thumbnail
-design-system/uploads/
 
 # === Config local de IA (scratch) ===
 **/.claude/settings.local.json

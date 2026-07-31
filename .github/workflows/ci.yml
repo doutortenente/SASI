@@ -1,23 +1,24 @@
 name: CI
 
-# "GitHub onde precisa": valida o build do frontend a cada push/PR.
+# "GitHub onde precisa": valida o build do app a cada push/PR.
+# Repontado de frontend/ para sasi-v2/ na faxina de 31-jul-2026 (o app antigo saiu).
 on:
   push:
     branches: [main]
   pull_request:
 
 jobs:
-  build-frontend:
+  build-app:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend
+        working-directory: sasi-v2
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: sasi-v2/package-lock.json
       - run: npm ci
       - run: npm run build

@@ -4,6 +4,11 @@
 > Fonte de verdade: `sasi_index.db` (SQLite). Doutrina ZERO ALUCINAÇÃO: só fato lido do disco.
 > Regenerar: `python3 ~/projetos/scripts/indices/build_sasi_index.py` (a partir da raiz do repo).
 
+> ⚠️ **DESATUALIZADO desde a faxina de 31-jul-2026.** Este inventário ainda lista `frontend/`
+> e `packages/`, que saíram do repositório (ver `CLAUDE.md` §7-B). Como o arquivo é
+> auto-gerado, **não foi editado à mão** — ele se corrige sozinho na próxima regeneração.
+> Até lá, trate os números abaixo como histórico, não como estado atual.
+
 **Total:** 358 arquivos · 9.7 MB · 222,796 linhas · 604,284 tokens (excluídos `.git`, `node_modules`, `sasi_index.db`).
 
 ## Por categoria

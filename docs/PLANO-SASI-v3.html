@@ -111,7 +111,7 @@
       <tr><td>App (tela)</td><td>React 18 + Vite — o "motor" atual</td><td>Netlify (<code>sasi-uti</code>)</td></tr>
       <tr><td>Banco</td><td>Supabase = PostgreSQL 17 + login + tempo real + funções</td><td>Projeto <code>idswehsvvqczzkiatuzu</code> (SP)</td></tr>
       <tr><td>Ingestão</td><td>Claude lê foto/PDF → JSON validado → grava</td><td><code>mcp-server</code> + skill de extração</td></tr>
-      <tr><td>Motor clínico</td><td>Pacote com as contas (SOFA, parse pt-BR) + testes</td><td><code>packages/clinical-engine</code></td></tr>
+      <tr><td>Motor clínico</td><td>As contas (SOFA, tendências) vêm <b>prontas do banco</b>, nas views <code>vw_*</code></td><td>Banco — pacote local arquivado em 31-jul-2026</td></tr>
     </tbody></table>
     <p class="mut">A migração troca só o motor da tela (Vite → Next.js 15). O banco <b>não muda de casa</b> — por isso o modelo de dados vem primeiro.</p>
 
@@ -152,11 +152,10 @@ flowchart LR
   subgraph ALVO
     A2["Tela Next.js 15 (App Router)"] -- "login real" --> B2[("Supabase MESMO banco")]
     MCP["mcp-server (reaproveitado)"] --> B2
-    CE["clinical-engine (reaproveitado)"] --> A2
   end
   HOJE ==> ALVO
     </div>
-    <p class="mut">Reaproveita: o banco inteiro, o clinical-engine, o mcp-server, os 2 temas. Troca: só o motor da tela + liga o login.</p>
+    <p class="mut">Reaproveita: o banco inteiro, o mcp-server, os 2 temas. Troca: o motor da tela. <b>Atualização 31-jul-2026:</b> o clinical-engine NÃO foi reaproveitado (cálculo ficou no banco, views <code>vw_*</code>; pacote arquivado na faxina) e o login saiu de escopo.</p>
   </section>
 
   <section id="modelo">

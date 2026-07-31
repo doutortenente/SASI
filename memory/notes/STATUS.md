@@ -17,10 +17,10 @@
 
 | Camada          | Tecnologia                                      | Observações |
 |-----------------|--------------------------------------------------|-------------|
-| Frontend        | React 18.3 + TypeScript + Vite 5                 | Código ativo em subpasta (ver seção 5) |
+| Frontend        | **Next.js 15 + React 19 + TypeScript + Zustand** | `sasi-v2/` — único app do repo desde a faxina de 31-jul-2026 |
 | Estilo          | Tailwind 3.4 + CSS vars — **BAYES.OPS 2 temas** | Tactical (escuro OLED) ⇄ Clinical (claro); toggle `lib/theme.tsx`; tokens `--app-*`; nunca hex hardcoded |
 | Backend         | Supabase (Postgres + Auth + Realtime + Edge Functions) | Única fonte de dados |
-| Deploy          | Vercel `sasi-uti` (CI em `main`)                 | `frontend/vercel.json`; root directory = `frontend` |
+| Deploy          | Vercel (CI em `main`)                            | **root directory = `sasi-v2`** (era `frontend`; mudou na faxina de 31-jul-2026) |
 | PDF             | jsPDF + jspdf-autotable (lazy)                   | Export de passagem de turno |
 | Ícones          | lucide-react                                     | — |
 | Ingest clínico  | Skill `sasi-ingest-export` → JSON → MCP `sasi_deploy_ingest` | Claude lê foto/PDF/texto; **sem** pipeline OCR automático |
@@ -97,7 +97,7 @@ Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persis
 |19 | Ficha ↔ Supabase síntese (problemas/condutas/riscos) | 24/06/2026 | ✅ Ativo   | Migration `07` + fixes `FichaCompleta`/`SasiSynthesis` |
 |20 | MCP `sasi_deploy_ingest` (bulk payload v1) | 24/06/2026 | ✅ Ativo   | `mcp-server/src/tools/ingest-deploy.ts` |
 |21 | Realtime dashboard em `pendencias` | 24/06/2026 | ✅ Ativo   | `useSupabasePatients.ts` |
-|22 | `clinical-engine` — 7 testes Vitest (parseBR, SOFA display) | 24/06/2026 | ✅ Ativo   | `packages/clinical-engine/` |
+|22 | `clinical-engine` — 7 testes Vitest (parseBR, SOFA display) | 24/06/2026 | 📦 Arquivado 31/07/2026 | saiu do repo na faxina (tag `pre-faxina-2026-07-31`); cálculo hoje vem das views `vw_*` |
 |23 | Auditoria `eventos_clinicos` (script + query plantão) | 24/06/2026 | ✅ Ativo   | `~/projetos/scripts/sasi/audit_eventos.py`, `supabase/queries/plantao_queries.sql` §11b |
 |24 | Design BAYES.OPS — 2 temas Tactical/Clinical        | 27/06/2026 | ✅ Ativo   | `src/index.css` + `tailwind.config.js` + LeitoCard/TopBar/Dashboard; commits `acce2c7`+`f185ab8` |
 
@@ -131,9 +131,9 @@ Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persis
 
 **Código ATIVO (repo `doutortenente/SASI`):**
 ```
-frontend/                           ← React+Vite (deploy Vercel)
+sasi-v2/                            ← Next.js 15 (deploy Vercel, root directory)
 ├── src/
-├── vercel.json
+├── next.config.ts
 └── package.json
 
 mcp-server/                         ← MCP local (.mcp.json)
@@ -254,7 +254,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 ## 10. Próximos passos
 
 1. **Regenerar `schema-live-dump.sql`** pós-migration `07`.
-2. **CI ampliado** — jobs mcp-server + clinical-engine (bloqueado: scope `workflow` no token GitHub).
+2. ~~**CI ampliado** — jobs mcp-server + clinical-engine~~ **obsoleto 31-jul-2026**: o `clinical-engine` saiu do repo na faxina; a CI hoje compila o `sasi-v2`. Um job para o `mcp-server` continua possível, se fizer falta.
 3. **Smoke plantão** — checklist Definition of Done (§6).
 4. **Qualidade ingest** — 24 `eventos_clinicos` em fila review (`~/projetos/scripts/sasi/audit_eventos.py`).
 5. **Rotacionar JWTs** se ainda não fez (histórico `AGENTS.md`).
@@ -262,7 +262,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 ---
 
 **Status resumido (11/06/2026):**  
-**Produção estável** com bypass de auth. Frontend com **5 janelas** (`severity.ts`, `clinicalExtract.ts`, `JanelaNav`). Repo: `frontend/` + `supabase/` + `mcp-server/`. Maior risco residual = drift de schema + bypass de autenticação.
+**Produção estável** com bypass de auth. *(Histórico de 11/06/2026 — o app de 5 janelas era o `frontend/`, aposentado em 31-jul-2026.)* Repo hoje: `sasi-v2/` + `supabase/` + `mcp-server/`. Maior risco residual = drift de schema + bypass de autenticação.
 
 ---
 
@@ -270,7 +270,7 @@ Ver arquivo completo: [AGENTS.md](AGENTS.md)
 
 | Item | Status |
 |---|---|
-| Vercel `sasi-uti` | Repo `doutortenente/SASI`; root directory = `frontend`; `frontend/vercel.json` |
+| Vercel | Repo `doutortenente/SASI`; **root directory = `sasi-v2`** (atualizado 31-jul-2026) |
 | VPS Hermes | `/opt/data/projects/jarvis` + `sasi`; `comando-uti` arquivado |
 | JARVIS CI | Secret `VPS_SSH_PRIVATE_KEY` configurado |
 
@@ -280,7 +280,7 @@ JWTs antigos vazaram no histórico do git via `AGENTS.md`. Rotacione no Supabase
 ---
 
 *Referências rápidas (atualizado após faxina):*  
-- Código ativo: `frontend/`  
+- Código ativo: `sasi-v2/`  
 - Deploy: Vercel `sasi-uti` — https://sasi-uti.vercel.app
 - Supabase: projeto `idswehsvvqczzkiatuzu`  
 - Plano de auth: Google Drive (documento "Plano de ação login e autenticação SASI")
@@ -304,7 +304,7 @@ produção + remover `dev_bypass` (só pós-login real — senão trava o app).
 **Novos no repo:** `supabase/schema-producao-v3.sql`, `supabase/types/sasi.types.ts`,
 `docs/{PLANO-SASI-v3.md,PLANO-SASI-v3.html,RUNBOOK-migracao-v3.md}`,
 `sasi-v2/` (esqueleto Next.js 15 com o design system real integrado),
-`packages/design-system/` (tokens+componentes), `packages/clinical-engine/scores-v2-staging/` (motor v2 — fase futura, não compila).
+*(`packages/design-system/` e `packages/clinical-engine/` saíram do repo na faxina de 31-jul-2026 — ver `CLAUDE.md` §7-B.)*
 
 **Dívida:** `dev_bypass` segue ativo (gated, pós-auth). ⚠️ **Rotacionar segredos** — o cofre `.env`
 foi colado no chat em 30-jul (Supabase service_role, PATs GitHub, Vaultwarden master, e-mails).

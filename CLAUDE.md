@@ -40,7 +40,7 @@ Toda documentação clínica é em **Português do Brasil**.
 
 ## 3. Stack
 
-- **Frontend:** React + TypeScript + Tailwind + Vite → **Vercel** `sasi-uti.vercel.app`.
+- **Frontend:** **`sasi-v2/`** — Next.js 15 (App Router) + React 19 + TypeScript strict + Zustand → **Vercel** (Root Directory = `sasi-v2`). *(O app antigo React+Vite em `frontend/` foi aposentado na faxina de 31-jul-2026 — ver §7-B.)*
 - **Backend:** Supabase (PostgreSQL 17, projeto `idswehsvvqczzkiatuzu`, região `sa-east-1`).
 - **Ingest clínico:** Claude (skill `sasi-ingest-export`) → JSON → MCP ou frontend.
 - **Edge Functions:** `ocr-ingest` legado no repo — **não** é fluxo operacional.
@@ -95,7 +95,7 @@ Fonte fiel: **migration baseline** `20260626000000_baseline.sql` + **formalizaç
 **Edge Functions (sasi):** `ocr-ingest` e `ingest-patient` — **legado**, não usar no fluxo diário.
 **Extensões:** `pgcrypto`, `pg_trgm`, `vector` (pgvector 0.8). *(Advisor pede mover `pg_trgm`/`vector` de `public` para `extensions` — pendente.)*
 
-> 🖥️ **App novo (`sasi-v2/`, Next.js 15):** esqueleto verificado em 30-jul — build verde e lendo os 7 leitos reais da `vw_dashboard_uti`. Camada de dados em `src/lib/data/`, telas em `src/app/`, domínios em `src/features/`. O **cálculo clínico não mora na tela**: SOFA vem do banco (`vw_sofa_diario`/`evolucoes.sofa_total`); o motor v2 está em `packages/clinical-engine/scores-v2-staging/` (**não compila**, fase futura). Design system real em `packages/design-system/`.
+> 🖥️ **App (`sasi-v2/`, Next.js 15) — ÚNICO app do repo desde 31-jul-2026:** verificado em 30-jul — build verde e lendo os 7 leitos reais da `vw_dashboard_uti`. Camada de dados em `src/lib/data/`, telas em `src/app/`, domínios em `src/features/`. O **cálculo clínico não mora na tela**: SOFA e tendências vêm prontos do banco (`vw_sofa_diario`/`evolucoes.sofa_total`). O motor v2 e o design system saíram do repo na faxina (§7-B) — recuperáveis pela tag `pre-faxina-2026-07-31`.
 
 > ⚠️ **`eventos_clinicos` (130) com débito de qualidade:** ingest manual via Claude; ~27 na fila `vw_eventos_pendentes_revisao`. O trigger `trg_autoflag_lowconf` força `requires_review` em `confidence<0.7`.
 >
@@ -120,7 +120,7 @@ Reativar auth só se o escopo mudar (outros usuários). Hoje: **não é backlog.
 
 ## 6. Status das fases
 
-- **FASE ALPHA** — 🔄 Parcial. Frontend modular em `frontend/src/lib/`; testes Vitest em `packages/clinical-engine` (parseBR, SOFA display); extração completa do motor pendente.
+- **FASE ALPHA** — ⏸️ Suspensa pela faxina de 31-jul (§7-B). O frontend modular vivia em `frontend/src/lib/` e os testes Vitest (parseBR, SOFA display) em `packages/clinical-engine` — ambos saíram do repo. O cálculo clínico hoje vem do banco (views `vw_*`), não de pacote local. Retomar só se o motor voltar do arquivo.
 - **FASE BRAVO** — ✅ Entregue e deployada. Schema Supabase, `smoke.sql`, `useClinicalAlerts.ts`, views vivas.
 - **FASE CHARLIE** — 🔄 Em andamento. Timeseries (`eventos_clinicos` 93 linhas, ingest Claude→JSON) + stewardship (`atbs`/`culturas` vazios).
 - **FASE DELTA** — ⬜ Backlog. Automação clínica no app.
@@ -177,6 +177,31 @@ ancestrais-puros deletados; 4 regras de sanity-check únicas migradas pro canôn
 (`claude/skills/sasi-ingest-export/references/03-clinical-sanity-checks.md`); a skill de admissão
 foi UNIFICADA na canônica `claude/skills/admissao-uti` (base Ramo C + enxertos da v1, aprovado pelo
 operador). Em `doctrine/` sobra SÓ `_SASI_TEMPLATE_BASE_v2.md` (fonte da verdade compartilhada, §7).
+
+### 7-B. Faxina estrutural (31-jul-2026) — aposentadoria do app antigo
+
+Metade do repositório (187 de 375 arquivos) era código que ninguém consumia. Saíram:
+
+- **`frontend/`** (86 arquivos) — app React+Vite, substituído por `sasi-v2/` em 30-jul-2026 e
+  nunca aposentado. Levava junto `frontend/vercel.json`, que era armadilha de deploy: com a
+  Vercel apontada pra raiz, publicava o app **errado**.
+- **`packages/`** (101 arquivos) — `clinical-engine` (SOFA, parse pt-BR, testes Vitest) e
+  `design-system`. Era a MAIOR pasta do repo. O `clinical-engine` tinha **um único
+  consumidor: o próprio `frontend/`** (`src/hooks/useSofaDiario.ts`) — por isso os dois
+  saíram no MESMO passo; remover `packages/` mantendo `frontend/` teria quebrado o app antigo.
+  O `design-system` não tinha consumidor nenhum.
+
+**Recuperação:** nada foi destruído. Tag **`pre-faxina-2026-07-31`** e branch
+**`archive/frontend-e-packages`** (as duas no GitHub) guardam o estado completo anterior.
+Cópia local de `packages/` entregue em zip ao operador para `~/projetos/rascunhos/`.
+
+**Consertado no mesmo commit:** `.github/workflows/ci.yml` repontado de `frontend` para
+`sasi-v2` (senão toda subida passaria a falhar — a automação só sabia compilar o app antigo);
+`README.md`, este arquivo (§3, §4, §6), `memory/MEMORY.md`, `docs/PLANO-SASI-v3.{md,html}`,
+`sasi-v2/src/features/README.md`, `.env.example`, `.gitignore` e `.graphifyignore`.
+
+**Regra para sessões futuras:** o repo tem **UM app** (`sasi-v2/`). Não recriar `frontend/`
+nem `packages/`; staging vai para `~/projetos/rascunhos/`, fora do repositório.
 
 -----
 

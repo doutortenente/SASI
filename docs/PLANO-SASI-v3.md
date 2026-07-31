@@ -72,10 +72,10 @@ Levantei isto lendo o seu Supabase vivo **e** o repositório `doutortenente/SASI
 
 | Camada | Tecnologia (o que é, em 1 linha) | Onde vive |
 |---|---|---|
-| **Aplicativo (frontend)** | React 18 + Vite — o "motor" atual da tela. Vite = a ferramenta que monta o site. | `frontend/`, publicado no **Netlify** (`sasi-uti.netlify.app`) |
+| **Aplicativo** | Next.js 15 + React 19 — o "motor" da tela. A página chega pronta do servidor. | `sasi-v2/`, publicado na **Vercel** (Root Directory = `sasi-v2`) |
 | **Banco de dados** | Supabase = PostgreSQL 17 + login + tempo real + funções. É a **única fonte de dados**. | Projeto `idswehsvvqczzkiatuzu` (São Paulo) |
 | **Ponte de ingestão** | Claude lê foto/PDF → gera um JSON validado → grava no banco (via "MCP" = a ponte, ou pela tela). | `mcp-server/` + skill `sasi-ingest-export` |
-| **Motor clínico** | Um pacotinho de código com as contas (SOFA, conversões pt-BR), com testes. | `packages/clinical-engine/` |
+| **Motor clínico** | As contas (SOFA, tendências) vêm **prontas do banco**, nas views `vw_*` — não há pacote local. | Banco (views); o pacote antigo foi arquivado em 31-jul (§ faxina) |
 | **Funções de borda** | Pequenos programas que rodam junto ao banco (ex.: `ocr-ingest`). | `supabase/functions/` (hoje legado) |
 
 **Traduzindo o essencial:** hoje a tela é feita com uma ferramenta (Vite); a migração troca essa ferramenta pelo **Next.js 15** (mais moderno, com "renderização no servidor" — as telas chegam prontas, mais rápidas e seguras). **O banco não muda de casa** — ele continua no Supabase. Por isso faz todo sentido arrumar o banco primeiro.
@@ -139,12 +139,11 @@ flowchart LR
     A2[Tela Next.js 15<br/>App Router] --> B2[(Supabase<br/>MESMO banco)]
     A2 -- login real --> B2
     MCP[mcp-server<br/>reaproveitado] --> B2
-    CE[clinical-engine<br/>reaproveitado] --> A2
   end
   HOJE ==> ALVO
 ```
 
-**Fica de pé (reaproveitado):** o banco Supabase inteiro, o `clinical-engine` (as contas de SOFA), o `mcp-server` (a ponte de ingestão), os 2 temas visuais. **Troca:** só o "motor" da tela (Vite → Next.js) e liga-se o login de verdade.
+**Fica de pé (reaproveitado):** o banco Supabase inteiro, o `mcp-server` (a ponte de ingestão) e os 2 temas visuais. **Troca:** o "motor" da tela (Vite → Next.js). *(Atualização 31-jul-2026: o `clinical-engine` NÃO foi reaproveitado — o cálculo clínico ficou no banco, nas views `vw_*`, e o pacote foi arquivado na faxina. O login de verdade saiu de escopo — ver F3.)*
 
 ### 2.2 Por que o modelo de dados vem primeiro
 
@@ -298,7 +297,7 @@ Cada fase tem **objetivo · passos (o que pedir ao Claude Code) · pronto quando
 
 ### F2 — Views (Dashboard / War Room)
 - **Objetivo:** as telas principais sobre as views que já existem.
-- **Passos:** Dashboard lendo `vw_dashboard_uti`; painéis de tendência lendo `vw_eventos_tendencia`/`vw_sofa_trend_72h`; fila de revisão lendo `vw_eventos_pendentes_revisao`; modo "War Room" (tela dividida + calculadoras do `clinical-engine`).
+- **Passos:** Dashboard lendo `vw_dashboard_uti`; painéis de tendência lendo `vw_eventos_tendencia`/`vw_sofa_trend_72h`; fila de revisão lendo `vw_eventos_pendentes_revisao`; modo "War Room" (tela dividida + calculadoras de plantão, embutidas no app).
 - **Pronto quando:** paridade com as 5 janelas atuais.
 
 ### F3 — Login real + remover `dev_bypass` — ❌ FORA DE ESCOPO (31-jul-2026)
