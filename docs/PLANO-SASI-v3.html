@@ -92,12 +92,12 @@
       </div>
       <div class="card"><h4>Régua de fases</h4>
         <ul>
-          <li><span class="pill ok">F0</span> Modelo de dados — <b>esta rodada</b></li>
-          <li>F1 Scaffold Next.js 15 + tipos</li>
-          <li>F2 Views (Dashboard/War Room)</li>
-          <li>F3 Login real + remover <code>dev_bypass</code> <span class="pill risk">ordem crítica</span></li>
-          <li>F4 OCR da folha de enfermagem</li>
-          <li>F5 Camada FHIR</li>
+          <li><span class="pill ok">F0</span> Modelo de dados — <b>aplicado em produção (30-jul)</b></li>
+          <li><span class="pill ok">F1</span> Scaffold Next.js 15 + tipos — <b>entregue</b></li>
+          <li><span class="pill ok">F2</span> Views (Dashboard/War Room) — <b>entregue + revisão de design (31-jul)</b></li>
+          <li><s>F3 Login real + remover <code>dev_bypass</code></s> <span class="pill risk">FORA DE ESCOPO (31-jul)</span></li>
+          <li><s>F4 OCR da folha de enfermagem</s> <span class="pill risk">FORA DE ESCOPO (31-jul)</span></li>
+          <li><s>F5 Camada FHIR</s> <span class="pill risk">FORA DE ESCOPO (31-jul)</span></li>
         </ul>
       </div>
     </div>
@@ -236,9 +236,7 @@ flowchart TD
       <tr><td><span class="pill ok">F0</span></td><td>Modelo de dados (alicerce)</td><td>Revisar Anexos A/B/C → testar Anexo B numa branch → aplicar → regenerar tipos</td><td>advisors sem <code>dev_bypass</code> (após F3); tipos batendo; save_ficha grava — <b>já validado em teste</b></td></tr>
       <tr><td>F1</td><td>Esqueleto Next.js + tipos</td><td>Starter incluso; <code>npm install</code>; <code>gen:types</code>; portar temas</td><td>App lista os 7 leitos lendo <code>vw_dashboard_uti</code></td></tr>
       <tr><td>F2</td><td>Views (Dashboard/War Room)</td><td>Telas sobre as <code>vw_*</code> + tela dividida com calculadoras</td><td>Paridade com as 5 janelas atuais</td></tr>
-      <tr><td>F3</td><td>Login + remover dev_bypass</td><td>Auth → carimbar donos → policies → remover bypass → advisors</td><td>Advisors limpos; RLS isola por dono (provado)</td></tr>
-      <tr><td>F4</td><td>OCR da folha (propósito Cowork)</td><td>Consolidar <code>sasi-ocr-ingest/v1</code>; captura + fila de revisão</td><td>Foto vira eventos revisáveis, ZERO alucinação</td></tr>
-      <tr><td>F5</td><td>Camada FHIR</td><td>Completar LOINC; views/funções que emitem Patient/Observation/…</td><td>Paciente exporta como Bundle FHIR válido</td></tr>
+      <tr><td colspan="4"><b>F3, F4 e F5 — FORA DE ESCOPO por decisão do operador (31-jul-2026).</b> Coerente com <code>CLAUDE.md</code> §5 (uso pessoal e solo, sem auth no backlog): a <code>dev_bypass</code> fica ativa <b>de propósito</b> e a exposição do link é mitigada na Vercel (Deployment Protection); o OCR segue pelo fluxo que já opera (skill <code>sasi-ingest-export</code> → JSON → MCP), sem virar tela do app; FHIR só se o escopo mudar. Nenhuma sessão futura deve propor estas fases de novo.</td></tr>
     </tbody></table>
   </section>
 
