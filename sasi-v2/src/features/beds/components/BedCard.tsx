@@ -22,13 +22,12 @@
 //  - "Idade do dado": a hora da ultima evolucao aparece no cartao; atrasada = aviso.
 // ============================================================================
 import Link from "next/link";
-import type { ReactElement } from "react";
-import type { Leito } from "../types";
-import type { Gravity } from "@/features/war-room/triage";
-import type { Dispositivos, Infusao, Isolamento } from "@/types/clinical";
-import type { EvolucaoResumo } from "@/lib/formatters/tempo";
-import { num } from "@/lib/formatters/br";
-import { unidadeSegura } from "@/lib/formatters/br";
+import type {ReactElement} from "react";
+import type {Leito} from "../types";
+import type {Gravity} from "@/features/war-room/triage";
+import type {Dispositivos, Infusao, Isolamento} from "@/types/clinical";
+import type {EvolucaoResumo} from "@/lib/formatters/tempo";
+import {num, unidadeSegura} from "@/lib/formatters/br";
 
 // ---------------------------------------------------------------------------
 // Contratos
@@ -65,11 +64,11 @@ export interface BedCardProps {
 
 /** Rotulo da escala de gravidade em pt-BR (singular / plural). */
 export const ROTULO_GRAVIDADE: Record<Gravity, { s: string; p: string }> = {
-  critical: { s: "crítico", p: "críticos" },
-  unstable: { s: "instável", p: "instáveis" },
-  watcher: { s: "em vigilância", p: "em vigilância" },
-  stable: { s: "estável", p: "estáveis" },
-  deceased: { s: "óbito", p: "óbitos" },
+  critical: {s: "crítico", p: "críticos"},
+  unstable: {s: "instável", p: "instáveis"},
+  watcher: {s: "em vigilância", p: "em vigilância"},
+  stable: {s: "estável", p: "estáveis"},
+  deceased: {s: "óbito", p: "óbitos"},
 };
 
 /** Ordem de leitura do painel: pior primeiro (mesma ordem da triagem). */
@@ -83,18 +82,22 @@ const ROTULO_ISOLAMENTO: Record<Isolamento, string> = {
 };
 
 /** Dispositivos na ordem em que importam no leito (via aerea -> acessos -> sondas). */
-const ORDEM_DISPOSITIVOS: ReadonlyArray<{ chave: keyof Dispositivos; rotulo: string; viaAerea?: boolean }> = [
-  { chave: "iot", rotulo: "IOT", viaAerea: true },
-  { chave: "tqt", rotulo: "TQT", viaAerea: true },
-  { chave: "cvc", rotulo: "CVC" },
-  { chave: "picc", rotulo: "PICC" },
-  { chave: "shilley", rotulo: "Shilley" },
-  { chave: "pai", rotulo: "PAI" },
-  { chave: "mpd", rotulo: "MPD" },
-  { chave: "svd", rotulo: "SVD" },
-  { chave: "sne", rotulo: "SNE" },
-  { chave: "dreno", rotulo: "Dreno" },
-  { chave: "avp", rotulo: "AVP" },
+const ORDEM_DISPOSITIVOS: ReadonlyArray<{
+  chave: keyof Dispositivos;
+  rotulo: string;
+  viaAerea?: boolean
+}> = [
+  {chave: "iot", rotulo: "IOT", viaAerea: true},
+  {chave: "tqt", rotulo: "TQT", viaAerea: true},
+  {chave: "cvc", rotulo: "CVC"},
+  {chave: "picc", rotulo: "PICC"},
+  {chave: "shilley", rotulo: "Shilley"},
+  {chave: "pai", rotulo: "PAI"},
+  {chave: "mpd", rotulo: "MPD"},
+  {chave: "svd", rotulo: "SVD"},
+  {chave: "sne", rotulo: "SNE"},
+  {chave: "dreno", rotulo: "Dreno"},
+  {chave: "avp", rotulo: "AVP"},
 ];
 
 // ---------------------------------------------------------------------------
@@ -116,7 +119,13 @@ function corSofa(s: number | null): string {
  * ainda nao captura os 6 componentes (faltam bilirrubina e PaO2/FiO2). Recupera
  * o espaco nobre do cartao sem inventar um numero.
  */
-function seloSofa(s: number | null): { texto: string; cor: string; fundo: string; borda: string; titulo: string } {
+function seloSofa(s: number | null): {
+  texto: string;
+  cor: string;
+  fundo: string;
+  borda: string;
+  titulo: string
+} {
   if (s == null) {
     return {
       texto: "SOFA s/ dado",
@@ -138,11 +147,31 @@ function seloSofa(s: number | null): { texto: string; cor: string; fundo: string
 }
 
 /** Delta de SOFA em 24 h: subiu = pior (danger), caiu = melhor (success), null = "—". */
-function delta24h(d: number | null): { texto: string; glifo: string; cor: string; leitura: string } {
-  if (d == null) return { texto: "—", glifo: "", cor: "var(--text-muted)", leitura: "variação do SOFA em 24 horas não disponível" };
-  if (d > 0) return { texto: num(d, 0), glifo: "▲", cor: "var(--danger)", leitura: `SOFA subiu ${num(d, 0)} em 24 horas` };
-  if (d < 0) return { texto: num(Math.abs(d), 0), glifo: "▼", cor: "var(--success)", leitura: `SOFA caiu ${num(Math.abs(d), 0)} em 24 horas` };
-  return { texto: "0", glifo: "=", cor: "var(--text-muted)", leitura: "SOFA estável em 24 horas" };
+function delta24h(d: number | null): {
+  texto: string;
+  glifo: string;
+  cor: string;
+  leitura: string
+} {
+  if (d == null) return {
+    texto: "—",
+    glifo: "",
+    cor: "var(--text-muted)",
+    leitura: "variação do SOFA em 24 horas não disponível"
+  };
+  if (d > 0) return {
+    texto: num(d, 0),
+    glifo: "▲",
+    cor: "var(--danger)",
+    leitura: `SOFA subiu ${num(d, 0)} em 24 horas`
+  };
+  if (d < 0) return {
+    texto: num(Math.abs(d), 0),
+    glifo: "▼",
+    cor: "var(--success)",
+    leitura: `SOFA caiu ${num(Math.abs(d), 0)} em 24 horas`
+  };
+  return {texto: "0", glifo: "=", cor: "var(--text-muted)", leitura: "SOFA estável em 24 horas"};
 }
 
 /**
@@ -167,7 +196,10 @@ function infusoes(lista: Infusao[] | null | undefined): string[] {
 }
 
 /** Dispositivos marcados como true no JSONB pacientes.dispositivos. */
-function dispositivosAtivos(d: Dispositivos | null | undefined): Array<{ rotulo: string; viaAerea: boolean }> {
+function dispositivosAtivos(d: Dispositivos | null | undefined): Array<{
+  rotulo: string;
+  viaAerea: boolean
+}> {
   if (!d) return [];
   return ORDEM_DISPOSITIVOS.filter((item) => d[item.chave] === true).map((item) => ({
     rotulo: item.rotulo,
@@ -181,21 +213,29 @@ function dispositivosAtivos(d: Dispositivos | null | undefined): Array<{ rotulo:
 type TomChip = "dva" | "sed" | "via" | "disp" | "iso" | "pend";
 
 const TOM_CHIP: Record<TomChip, { bg: string; fg: string }> = {
-  dva: { bg: "var(--badge-dva-bg)", fg: "var(--badge-dva-text)" },
-  sed: { bg: "var(--badge-sed-bg)", fg: "var(--badge-sed-text)" },
-  via: { bg: "var(--badge-vm-bg)", fg: "var(--badge-vm-text)" },
-  disp: { bg: "var(--surface-sunken)", fg: "var(--text-muted)" },
-  iso: { bg: "color-mix(in srgb, var(--warning) 16%, transparent)", fg: "var(--warning)" },
-  pend: { bg: "var(--badge-pend-bg)", fg: "var(--badge-pend-text)" },
+  dva: {bg: "var(--badge-dva-bg)", fg: "var(--badge-dva-text)"},
+  sed: {bg: "var(--badge-sed-bg)", fg: "var(--badge-sed-text)"},
+  via: {bg: "var(--badge-vm-bg)", fg: "var(--badge-vm-text)"},
+  disp: {bg: "var(--surface-sunken)", fg: "var(--text-muted)"},
+  iso: {bg: "color-mix(in srgb, var(--warning) 16%, transparent)", fg: "var(--warning)"},
+  pend: {bg: "var(--badge-pend-bg)", fg: "var(--badge-pend-text)"},
 };
 
-function Chip({ tom, children, title }: { tom: TomChip; children: string; title?: string }): ReactElement {
+function Chip({tom, children, title}: {
+  tom: TomChip;
+  children: string;
+  title?: string
+}): ReactElement {
   const c = TOM_CHIP[tom];
   return (
     <span
       className="bed-chip"
       title={title ?? children}
-      style={{ background: c.bg, color: c.fg, border: `1px solid color-mix(in srgb, ${c.fg} 26%, transparent)` }}
+      style={{
+        background: c.bg,
+        color: c.fg,
+        border: `1px solid color-mix(in srgb, ${c.fg} 26%, transparent)`
+      }}
     >
       {children}
     </span>
@@ -205,7 +245,13 @@ function Chip({ tom, children, title }: { tom: TomChip; children: string; title?
 // ---------------------------------------------------------------------------
 // Componente
 // ---------------------------------------------------------------------------
-export function BedCard({ leito, pendencia, evolucao, compacto = false, href }: BedCardProps): ReactElement {
+export function BedCard({
+                          leito,
+                          pendencia,
+                          evolucao,
+                          compacto = false,
+                          href
+                        }: BedCardProps): ReactElement {
   const g = leito.gravity;
   const rotuloGrav = ROTULO_GRAVIDADE[g].s;
   const d = delta24h(leito.delta_sofa_24h ?? null);
@@ -253,7 +299,7 @@ export function BedCard({ leito, pendencia, evolucao, compacto = false, href }: 
         <span className="bed-card__leito tabnum">{leitoRotulo}</span>
         <span
           className="bed-card__sofa tabnum"
-          style={{ color: sofa.cor, background: sofa.fundo, borderColor: sofa.borda }}
+          style={{color: sofa.cor, background: sofa.fundo, borderColor: sofa.borda}}
           title={sofa.titulo}
         >
           {sofa.texto}
@@ -268,15 +314,19 @@ export function BedCard({ leito, pendencia, evolucao, compacto = false, href }: 
         <div className="bed-card__meta tabnum">
           {leito.idade == null ? "idade —" : `${num(leito.idade, 0)} anos`} ·{" "}
           {leito.dias_internacao == null ? "internação —" : `${num(leito.dias_internacao, 0)} d de UTI`} ·{" "}
-          <span style={{ color: `var(--grav-${g}-text)`, fontWeight: 700 }}>{rotuloGrav}</span>
+          <span style={{color: `var(--grav-${g}-text)`, fontWeight: 700}}>{rotuloGrav}</span>
         </div>
       </div>
 
       {/* linha 3 — idade do dado: quando foi a ultima evolucao */}
       {evolucao ? (
-        <div className="bed-card__idade tabnum" title="Hora da última evolução registrada (fuso do plantão). Atrasada = mais de 24 h sem evoluir.">
+        <div className="bed-card__idade tabnum"
+             title="Hora da última evolução registrada (fuso do plantão). Atrasada = mais de 24 h sem evoluir.">
           <span className="bed-card__idade-rot">Evolução</span>{" "}
-          <span style={{ color: evolucao.atrasada ? "var(--warning)" : "var(--text-muted)", fontWeight: evolucao.atrasada ? 700 : 600 }}>
+          <span style={{
+            color: evolucao.atrasada ? "var(--warning)" : "var(--text-muted)",
+            fontWeight: evolucao.atrasada ? 700 : 600
+          }}>
             {evolucao.rotulo}
             {evolucao.atrasada ? " · atrasada" : ""}
           </span>
@@ -289,14 +339,15 @@ export function BedCard({ leito, pendencia, evolucao, compacto = false, href }: 
       {/* linha 5 — delta de SOFA em 24 h */}
       <div className="bed-card__delta tabnum" title={d.leitura}>
         <span className="bed-card__rotulo">Δ SOFA 24 h</span>
-        <span style={{ color: d.cor, fontWeight: 700 }}>
+        <span style={{color: d.cor, fontWeight: 700}}>
           <span aria-hidden="true">{d.glifo}</span> {d.texto}
         </span>
       </div>
 
       {/* linha 6 — terapias e barreiras que MUDAM conduta (nivel 1) */}
       <div className="bed-card__chips">
-        {isolado ? <Chip tom="iso" title={`Isolamento — ${rotuloIso}`}>{`iso ${rotuloIso}`}</Chip> : null}
+        {isolado ?
+          <Chip tom="iso" title={`Isolamento — ${rotuloIso}`}>{`iso ${rotuloIso}`}</Chip> : null}
         {dvas.map((t: string, i: number) => (
           <Chip key={`dva-${i}-${t}`} tom="dva" title={`Droga vasoativa: ${t}`}>
             {t}
@@ -312,7 +363,8 @@ export function BedCard({ leito, pendencia, evolucao, compacto = false, href }: 
             {x.rotulo}
           </Chip>
         ))}
-        {semTerapias ? <span className="bed-card__vazio">sem terapia contínua registrada</span> : null}
+        {semTerapias ?
+          <span className="bed-card__vazio">sem terapia contínua registrada</span> : null}
       </div>
 
       {/* linha 7 — dispositivos (linhas/sondas): nivel 2, mais discreto */}
@@ -324,7 +376,8 @@ export function BedCard({ leito, pendencia, evolucao, compacto = false, href }: 
             </Chip>
           ))}
           {ocultos > 0 ? (
-            <Chip tom="disp" title={disp.filter((x) => !x.viaAerea).map((x) => x.rotulo).join(" · ")}>
+            <Chip tom="disp"
+                  title={disp.filter((x) => !x.viaAerea).map((x) => x.rotulo).join(" · ")}>
               {`+${ocultos}`}
             </Chip>
           ) : null}

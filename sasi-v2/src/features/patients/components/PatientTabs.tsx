@@ -15,8 +15,8 @@
 // src/app/patients/[id]/layout.tsx (mesmo padrao de Sidebar/NavLink ↔ app/layout.tsx).
 // ============================================================================
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import type { ReactElement } from "react";
+import {usePathname} from "next/navigation";
+import type {ReactElement} from "react";
 
 export interface AbaPaciente {
   /** Segmento da rota. "" = aba padrao (Resumo), que mora em /patients/[id]. */
@@ -32,13 +32,13 @@ export interface AbaPaciente {
  * adiciona aqui e cria a rota correspondente.
  */
 export const ABAS_PACIENTE: readonly AbaPaciente[] = [
-  { slug: "", label: "Resumo", titulo: "Ficha de admissão (patient_summary)" },
-  { slug: "sinais", label: "Sinais 24h", titulo: "Sinais vitais das últimas 24 h (máximo–mínimo)" },
-  { slug: "labs", label: "Folhão Labs", titulo: "Folhão de laboratório — série por dia" },
-  { slug: "exame", label: "Exame físico", titulo: "Exame físico por sistema" },
-  { slug: "evolucao", label: "Evolução", titulo: "Ficha de evolução do plantão" },
-  { slug: "prescricao", label: "Prescrição", titulo: "Prescrição por categoria" },
-  { slug: "especialidades", label: "Especialidades", titulo: "Interconsultas e programação" },
+  {slug: "", label: "Resumo", titulo: "Ficha de admissão (patient_summary)"},
+  {slug: "sinais", label: "Sinais 24h", titulo: "Sinais vitais das últimas 24 h (máximo–mínimo)"},
+  {slug: "labs", label: "Folhão Labs", titulo: "Folhão de laboratório — série por dia"},
+  {slug: "exame", label: "Exame físico", titulo: "Exame físico por sistema"},
+  {slug: "evolucao", label: "Evolução", titulo: "Ficha de evolução do plantão"},
+  {slug: "prescricao", label: "Prescrição", titulo: "Prescrição por categoria"},
+  {slug: "especialidades", label: "Especialidades", titulo: "Interconsultas e programação"},
 ] as const;
 
 export interface PatientTabsProps {
@@ -46,7 +46,7 @@ export interface PatientTabsProps {
   pacienteId: string;
 }
 
-export function PatientTabs({ pacienteId }: PatientTabsProps): ReactElement {
+export function PatientTabs({pacienteId}: PatientTabsProps): ReactElement {
   const pathname = usePathname() ?? "";
   const base = `/patients/${pacienteId}`;
 
@@ -62,7 +62,8 @@ export function PatientTabs({ pacienteId }: PatientTabsProps): ReactElement {
 
           return (
             <li key={aba.slug || "resumo"}>
-              <Link href={href} className="pt-tab" aria-current={ativo ? "page" : undefined} title={aba.titulo}>
+              <Link href={href} className="pt-tab" aria-current={ativo ? "page" : undefined}
+                    title={aba.titulo}>
                 {aba.label}
               </Link>
             </li>

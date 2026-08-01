@@ -38,14 +38,29 @@
 //     a medida mais recente — "não registrado" nunca deve ser lido como
 //     "não medido no leito".
 // ============================================================================
-import type { ReactElement } from "react";
-import { notFound } from "next/navigation";
-import { getBhAcumulado, getPaciente, getTipoRefMap, listarEventos, serieVitais24h, type SerieVital } from "@/lib/data";
-import type { EventoClinico, EventoTipoRef } from "@/types/clinical";
-import { VitalsTable, CSS_VITALS_TABLE, type LinhaVital } from "@/features/vitals/components/VitalsTable";
-import { BalancoHidrico, CSS_BALANCO_HIDRICO, type PontoBh } from "@/features/vitals/components/BalancoHidrico";
-import type { PontoSparkline } from "@/features/vitals/components/Sparkline";
-import { unidadeSegura } from "@/lib/formatters/br";
+import type {ReactElement} from "react";
+import {notFound} from "next/navigation";
+import {
+  getBhAcumulado,
+  getPaciente,
+  getTipoRefMap,
+  listarEventos,
+  serieVitais24h,
+  type SerieVital
+} from "@/lib/data";
+import type {EventoClinico, EventoTipoRef} from "@/types/clinical";
+import {
+  CSS_VITALS_TABLE,
+  type LinhaVital,
+  VitalsTable
+} from "@/features/vitals/components/VitalsTable";
+import {
+  BalancoHidrico,
+  CSS_BALANCO_HIDRICO,
+  type PontoBh
+} from "@/features/vitals/components/BalancoHidrico";
+import type {PontoSparkline} from "@/features/vitals/components/Sparkline";
+import {unidadeSegura} from "@/lib/formatters/br";
 
 export const dynamic = "force-dynamic";
 
@@ -109,7 +124,7 @@ function pontosDe(eventos: EventoClinico[], codigo: string): PontoBh[] {
   const saida: PontoBh[] = [];
   for (const ev of eventos) {
     if (ev.tipo !== codigo || ev.valor_num == null) continue;
-    saida.push({ ts: ev.ts, valor: ev.valor_num });
+    saida.push({ts: ev.ts, valor: ev.valor_num});
   }
   return saida;
 }
@@ -118,19 +133,19 @@ export interface SinaisPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function SinaisPage({ params }: SinaisPageProps): Promise<ReactElement> {
-  const { id } = await params;
+export default async function SinaisPage({params}: SinaisPageProps): Promise<ReactElement> {
+  const {id} = await params;
 
   const [paciente, series, eventosVitais, refs, bh, eventosBhDiurese, ultimoVital] = await Promise.all([
     getPaciente(id),
-    serieVitais24h(id, { horas: HORAS, tipos: TIPOS_VITAIS }),
-    listarEventos(id, { tipos: TIPOS_VITAIS, desdeHoras: HORAS, crescente: true }),
+    serieVitais24h(id, {horas: HORAS, tipos: TIPOS_VITAIS}),
+    listarEventos(id, {tipos: TIPOS_VITAIS, desdeHoras: HORAS, crescente: true}),
     getTipoRefMap(),
     getBhAcumulado(id),
-    listarEventos(id, { tipos: TIPOS_BH, desdeHoras: HORAS_BH, crescente: true }),
+    listarEventos(id, {tipos: TIPOS_BH, desdeHoras: HORAS_BH, crescente: true}),
     // SEM corte de janela: so para dizer de QUANDO e a medida mais recente
     // quando as 24 h estao vazias. Nunca entra na tabela.
-    listarEventos(id, { tipos: TIPOS_VITAIS, limite: 1 }),
+    listarEventos(id, {tipos: TIPOS_VITAIS, limite: 1}),
   ]);
 
   if (!paciente) notFound();
@@ -140,8 +155,8 @@ export default async function SinaisPage({ params }: SinaisPageProps): Promise<R
   for (const ev of eventosVitais) {
     if (ev.valor_num == null) continue; // ausencia NUNCA vira ponto no grafico
     const lista = pontosPorTipo.get(ev.tipo);
-    if (lista) lista.push({ ts: ev.ts, valor: ev.valor_num });
-    else pontosPorTipo.set(ev.tipo, [{ ts: ev.ts, valor: ev.valor_num }]);
+    if (lista) lista.push({ts: ev.ts, valor: ev.valor_num});
+    else pontosPorTipo.set(ev.tipo, [{ts: ev.ts, valor: ev.valor_num}]);
   }
 
   // ---- linhas da tabela: agregado + faixa da dimensao + pontos ---------------
@@ -169,37 +184,47 @@ export default async function SinaisPage({ params }: SinaisPageProps): Promise<R
 
   return (
     <div className="sinais">
-      <style dangerouslySetInnerHTML={{ __html: CSS_SINAIS + CSS_VITALS_TABLE + CSS_BALANCO_HIDRICO }} />
+      <style
+        dangerouslySetInnerHTML={{__html: CSS_SINAIS + CSS_VITALS_TABLE + CSS_BALANCO_HIDRICO}}/>
 
       {/* Flag desligada precisa GRITAR: sem a dimensao nao ha faixa fisiologica,
           logo nenhum valor implausivel sera marcado nesta tela. */}
       {semDimensao ? (
         <p className="sinais__aviso sinais__aviso--grave">
           <strong>Sinalização de valor implausível DESLIGADA nesta sessão.</strong> A dimensão{" "}
-          <code className="tabnum">evento_tipo_ref</code> voltou vazia (a única policy de leitura é para o papel{" "}
-          <code className="tabnum">authenticated</code> e o app usa a chave anônima). Sem ela não há rótulo clínico,
-          unidade padrão nem <code className="tabnum">faixa_min</code>/<code className="tabnum">faixa_max</code> — os
-          valores abaixo aparecem como vieram, e <strong>nenhum</strong> é marcado como fora de faixa. Correção é a
+          <code className="tabnum">evento_tipo_ref</code> voltou vazia (a única policy de leitura é
+          para o papel{" "}
+          <code className="tabnum">authenticated</code> e o app usa a chave anônima). Sem ela não há
+          rótulo clínico,
+          unidade padrão nem <code className="tabnum">faixa_min</code>/<code
+          className="tabnum">faixa_max</code> — os
+          valores abaixo aparecem como vieram, e <strong>nenhum</strong> é marcado como fora de
+          faixa. Correção é a
           montante: policy de leitura para anônimo ou login real.
         </p>
       ) : null}
 
-      <VitalsTable linhas={linhas} horas={HORAS} semDimensao={semDimensao} />
+      <VitalsTable linhas={linhas} horas={HORAS} semDimensao={semDimensao}/>
 
       {semMedida24h ? (
         <p className="sinais__aviso">
           {foraDaJanela ? (
             <>
-              <strong>Nenhum sinal vital lançado nas últimas {HORAS} h.</strong> A medida mais recente deste paciente é
+              <strong>Nenhum sinal vital lançado nas últimas {HORAS} h.</strong> A medida mais
+              recente deste paciente é
               de <span className="tabnum">{quando(foraDaJanela.ts) ?? "—"}</span>
-              {haQuanto(foraDaJanela.ts, agora) ? ` (${haQuanto(foraDaJanela.ts, agora)})` : ""} — fora desta janela,
-              por isso a tabela mostra {"—"} em todas as linhas. Sem registro não significa sem medida no leito:
+              {haQuanto(foraDaJanela.ts, agora) ? ` (${haQuanto(foraDaJanela.ts, agora)})` : ""} —
+              fora desta janela,
+              por isso a tabela mostra {"—"} em todas as linhas. Sem registro não significa sem
+              medida no leito:
               significa que não chegou ao <code className="tabnum">eventos_clinicos</code>.
             </>
           ) : (
             <>
-              <strong>Este paciente não tem nenhum sinal vital em <code className="tabnum">eventos_clinicos</code>.</strong>{" "}
-              Nada foi lançado até agora — a tabela mostra {"—"} em todas as linhas e o app não preenche o vazio.
+              <strong>Este paciente não tem nenhum sinal vital em <code
+                className="tabnum">eventos_clinicos</code>.</strong>{" "}
+              Nada foi lançado até agora — a tabela mostra {"—"} em todas as linhas e o app não
+              preenche o vazio.
             </>
           )}
         </p>

@@ -26,9 +26,9 @@
 //
 // O CSS (CSS_BALANCO_HIDRICO) e injetado UMA vez pela pagina da aba.
 // ============================================================================
-import type { ReactElement } from "react";
-import type { BhAcumulado } from "@/lib/data";
-import { num } from "@/lib/formatters/br";
+import type {ReactElement} from "react";
+import type {BhAcumulado} from "@/lib/data";
+import {num} from "@/lib/formatters/br";
 
 const TRAVESSAO = "—";
 
@@ -90,7 +90,7 @@ function janela(pontos: PontoBh[], horas: number, agora: number): Janela {
     max = max == null || p.valor > max ? p.valor : max;
     min = min == null || p.valor < min ? p.valor : min;
   }
-  return { n, max, min };
+  return {n, max, min};
 }
 
 /** Valor com sinal explicito. Positivo ganha "+"; negativo mantem o "-" real. */
@@ -108,13 +108,13 @@ const ehMlPorHora = (u: string | null | undefined): boolean => norm(u) === "ml/h
 
 /** Cartao de uma janela de BH acumulado. */
 function Tile({
-  rotulo,
-  valor,
-  unidade,
-  medidas,
-  porKg,
-  formula,
-}: {
+                rotulo,
+                valor,
+                unidade,
+                medidas,
+                porKg,
+                formula,
+              }: {
   rotulo: string;
   valor: number | null;
   unidade: string | null;
@@ -148,13 +148,13 @@ function Tile({
 }
 
 export function BalancoHidrico({
-  bh,
-  eventosBh,
-  eventosDiurese,
-  pesoKg,
-  unidadeBh = null,
-  unidadeDiurese = null,
-}: BalancoHidricoProps): ReactElement {
+                                 bh,
+                                 eventosBh,
+                                 eventosDiurese,
+                                 pesoKg,
+                                 unidadeBh = null,
+                                 unidadeDiurese = null,
+                               }: BalancoHidricoProps): ReactElement {
   const agora = Date.now();
 
   // Peso zero/negativo nao e peso — vira ausencia (nunca dividimos por lixo).
@@ -203,9 +203,11 @@ export function BalancoHidrico({
 
       {semNada ? (
         <div className="bh-vazio">
-          <strong className="bh-vazio__ttl">Sem registro de balanço hídrico nas últimas 72 h</strong>
+          <strong className="bh-vazio__ttl">Sem registro de balanço hídrico nas últimas 72
+            h</strong>
           <span className="bh-vazio__txt">
-            Nenhum evento <code className="tabnum">bh_h</code> ou <code className="tabnum">diurese_h</code> foi lançado
+            Nenhum evento <code className="tabnum">bh_h</code> ou <code
+            className="tabnum">diurese_h</code> foi lançado
             para este paciente no período. Ausência de lançamento não é balanço zero.
           </span>
         </div>
@@ -247,10 +249,12 @@ export function BalancoHidrico({
               <span className="bh-diurese__cap">última</span>
               <span className="bh-diurese__val tabnum">
                 {ultimaDiurese ? num(ultimaDiurese.valor, 1) : TRAVESSAO}
-                {ultimaDiurese && unidadeDiurese ? <span className="bh-tile__un"> {unidadeDiurese}</span> : null}
+                {ultimaDiurese && unidadeDiurese ?
+                  <span className="bh-tile__un"> {unidadeDiurese}</span> : null}
               </span>
               {ultimaDiurese ? (
-                <span className="bh-diurese__quando tabnum" title="horário da medida (America/Sao_Paulo)">
+                <span className="bh-diurese__quando tabnum"
+                      title="horário da medida (America/Sao_Paulo)">
                   {quando(ultimaDiurese.ts) ?? TRAVESSAO}
                 </span>
               ) : null}
@@ -279,7 +283,8 @@ export function BalancoHidrico({
                 ) : (
                   `${num(jd24.max, 1)}–${num(jd24.min, 1)}`
                 )}
-                {jd24.n > 0 && unidadeDiurese ? <span className="bh-tile__un"> {unidadeDiurese}</span> : null}
+                {jd24.n > 0 && unidadeDiurese ?
+                  <span className="bh-tile__un"> {unidadeDiurese}</span> : null}
               </span>
               <span className="bh-diurese__n tabnum">
                 {jd24.n > 0 ? `${jd24.n} medida${jd24.n > 1 ? "s" : ""}` : "não avaliado"}
@@ -300,13 +305,15 @@ export function BalancoHidrico({
         {peso != null && eventosBh.length > 0 && !ehMl(unidadeBh) ? (
           <li className="bh-notas__alerta">
             Unidade de <code className="tabnum">bh_h</code> não é mL
-            {unidadeBh ? ` (registrada: ${unidadeBh})` : " (não registrada)"} — normalização por peso indisponível.
+            {unidadeBh ? ` (registrada: ${unidadeBh})` : " (não registrada)"} — normalização por
+            peso indisponível.
           </li>
         ) : null}
         {peso != null && eventosDiurese.length > 0 && !ehMlPorHora(unidadeDiurese) ? (
           <li className="bh-notas__alerta">
             Unidade de <code className="tabnum">diurese_h</code> não é mL/h
-            {unidadeDiurese ? ` (registrada: ${unidadeDiurese})` : " (não registrada)"} — normalização por peso
+            {unidadeDiurese ? ` (registrada: ${unidadeDiurese})` : " (não registrada)"} —
+            normalização por peso
             indisponível.
           </li>
         ) : null}
@@ -318,16 +325,21 @@ export function BalancoHidrico({
         {bh == null && eventosBh.length > 0 ? (
           <li className="bh-notas__alerta">
             Há {eventosBh.length} evento(s) <code className="tabnum">bh_h</code> em 72 h, mas{" "}
-            <code className="tabnum">vw_bh_acumulado</code> não devolveu linha — acumulado indisponível.
+            <code className="tabnum">vw_bh_acumulado</code> não devolveu linha — acumulado
+            indisponível.
           </li>
         ) : null}
         <li>
-          Sinal preservado: <span className="tabnum">+</span> retenção, <span className="tabnum">-</span> balanço
-          negativo. Janela sem lançamento aparece como {TRAVESSAO}, nunca como <span className="tabnum">0</span>.
+          Sinal preservado: <span className="tabnum">+</span> retenção, <span
+          className="tabnum">-</span> balanço
+          negativo. Janela sem lançamento aparece como {TRAVESSAO}, nunca como <span
+          className="tabnum">0</span>.
         </li>
         <li>
-          Fonte: <code className="tabnum">vw_bh_acumulado</code> (soma de <code className="tabnum">bh_h</code>) e{" "}
-          <code className="tabnum">eventos_clinicos</code> (<code className="tabnum">diurese_h</code>).
+          Fonte: <code className="tabnum">vw_bh_acumulado</code> (soma de <code
+          className="tabnum">bh_h</code>) e{" "}
+          <code className="tabnum">eventos_clinicos</code> (<code
+          className="tabnum">diurese_h</code>).
         </li>
       </ul>
     </section>

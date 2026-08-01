@@ -1,5 +1,5 @@
 'use client';
-import { createBrowserClient } from "@supabase/ssr";
+import {createBrowserClient} from "@supabase/ssr";
 
 // A integracao Vercel<->Supabase injeta o nome NOVO (PUBLISHABLE_KEY);
 // o .env local historico usa o nome ANTIGO (ANON_KEY). E a MESMA chave

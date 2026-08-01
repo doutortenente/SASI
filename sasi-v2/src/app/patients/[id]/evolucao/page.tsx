@@ -30,23 +30,31 @@
 //  - ZERO ALUCINACAO: nada aqui e resumido, deduzido ou completado.
 //  - A nota copiada NAO leva metadado do app; o aviso de conferencia fica na tela.
 // ============================================================================
-import type { ReactElement } from "react";
-import { notFound } from "next/navigation";
-import { getPaciente, getTipoRefMap, getUltimaEvolucao } from "@/lib/data";
-import type { ProblemaAtivo } from "@/types/clinical";
-import { ProblemaConduta, CSS_PROBLEMA_CONDUTA } from "@/features/evolucao/components/ProblemaConduta";
-import { NotaPreview, CSS_NOTA_PREVIEW, type NotaFonte, type NotaSistema } from "@/features/evolucao/components/NotaPreview";
+import type {ReactElement} from "react";
+import {notFound} from "next/navigation";
+import {getPaciente, getTipoRefMap, getUltimaEvolucao} from "@/lib/data";
+import type {ProblemaAtivo} from "@/types/clinical";
 import {
-  ORDEM_SISTEMAS,
-  ROTULO_PLANTAO,
-  ROTULO_SISTEMA,
-  TRAVESSAO,
+  CSS_PROBLEMA_CONDUTA,
+  ProblemaConduta
+} from "@/features/evolucao/components/ProblemaConduta";
+import {
+  CSS_NOTA_PREVIEW,
+  type NotaFonte,
+  NotaPreview,
+  type NotaSistema
+} from "@/features/evolucao/components/NotaPreview";
+import {
   diasDesde,
   fmtDataBR,
   mapaUnidades,
+  ORDEM_SISTEMAS,
+  ROTULO_PLANTAO,
+  ROTULO_SISTEMA,
+  type SistemaId,
   sistemasDaEvolucao,
   textoSistema,
-  type SistemaId,
+  TRAVESSAO,
 } from "@/features/evolucao/components/SystemPanel";
 
 export const dynamic = "force-dynamic";
@@ -73,8 +81,8 @@ export interface EvolucaoPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function EvolucaoPage({ params }: EvolucaoPageProps): Promise<ReactElement> {
-  const { id } = await params;
+export default async function EvolucaoPage({params}: EvolucaoPageProps): Promise<ReactElement> {
+  const {id} = await params;
 
   const [paciente, evolucao, refs] = await Promise.all([getPaciente(id), getUltimaEvolucao(id), getTipoRefMap()]);
   if (!paciente) notFound();
@@ -97,10 +105,10 @@ export default async function EvolucaoPage({ params }: EvolucaoPageProps): Promi
           borderRadius: "var(--radius-lg, 12px)",
         }}
       >
-        <strong style={{ fontSize: "var(--text-md, 17px)", color: "var(--text-heading)" }}>
+        <strong style={{fontSize: "var(--text-md, 17px)", color: "var(--text-heading)"}}>
           Nenhuma evolução registrada
         </strong>
-        <span style={{ fontSize: "var(--text-sm, 13px)", color: "var(--text-muted)" }}>
+        <span style={{fontSize: "var(--text-sm, 13px)", color: "var(--text-muted)"}}>
           A ficha é lida da tabela <code className="tabnum">evolucoes</code>. Este paciente ainda não tem nenhuma
           evolução — não há impressão, conduta nem nota para o prontuário.
         </span>
@@ -147,15 +155,27 @@ export default async function EvolucaoPage({ params }: EvolucaoPageProps): Promi
   };
 
   return (
-    <section style={{ display: "flex", flexDirection: "column", gap: 18, minWidth: 0 }} aria-labelledby="ev-titulo">
-      <style dangerouslySetInnerHTML={{ __html: CSS_PROBLEMA_CONDUTA + CSS_NOTA_PREVIEW }} />
+    <section style={{display: "flex", flexDirection: "column", gap: 18, minWidth: 0}}
+             aria-labelledby="ev-titulo">
+      <style dangerouslySetInnerHTML={{__html: CSS_PROBLEMA_CONDUTA + CSS_NOTA_PREVIEW}}/>
 
       {/* ---- cabecalho da aba ---- */}
-      <header style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 10 }}>
-        <div style={{ flex: "1 1 320px", minWidth: 0 }}>
+      <header style={{
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "flex-end",
+        justifyContent: "space-between",
+        gap: 10
+      }}>
+        <div style={{flex: "1 1 320px", minWidth: 0}}>
           <h2
             id="ev-titulo"
-            style={{ margin: 0, fontSize: "var(--text-lg, 20px)", fontWeight: 700, color: "var(--text-heading)" }}
+            style={{
+              margin: 0,
+              fontSize: "var(--text-lg, 20px)",
+              fontWeight: 700,
+              color: "var(--text-heading)"
+            }}
           >
             Ficha de evolução
           </h2>
@@ -168,22 +188,30 @@ export default async function EvolucaoPage({ params }: EvolucaoPageProps): Promi
               color: "var(--text-muted)",
             }}
           >
-            Cada problema com a sua conduta, casados pela posição na lista (<strong>1:1</strong>). Abaixo, a nota em
+            Cada problema com a sua conduta, casados pela posição na lista (<strong>1:1</strong>).
+            Abaixo, a nota em
             texto corrido pronta para o prontuário.
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: 18, textAlign: "right" }}>
+        <div style={{display: "flex", gap: 18, textAlign: "right"}}>
           <div>
             <div style={EYEBROW}>Evolução</div>
             <div
               className="tabnum"
               title="evolucoes.data_evolucao · evolucoes.plantao"
-              style={{ fontSize: "var(--text-md, 17px)", fontWeight: 700, color: "var(--text-heading)" }}
+              style={{
+                fontSize: "var(--text-md, 17px)",
+                fontWeight: 700,
+                color: "var(--text-heading)"
+              }}
             >
               {data}
             </div>
-            <div style={{ fontSize: "var(--text-xs, 11px)", color: "var(--text-muted)" }}>plantão {plantao}</div>
+            <div style={{
+              fontSize: "var(--text-xs, 11px)",
+              color: "var(--text-muted)"
+            }}>plantão {plantao}</div>
           </div>
           <div>
             <div style={EYEBROW}>SOFA</div>
@@ -217,10 +245,12 @@ export default async function EvolucaoPage({ params }: EvolucaoPageProps): Promi
             color: "var(--text-body)",
           }}
         >
-          <strong style={{ color: "var(--text-heading)" }}>
-            Esta ficha é de {data} (há <span className="tabnum">{dias}</span> {dias === 1 ? "dia" : "dias"}).
+          <strong style={{color: "var(--text-heading)"}}>
+            Esta ficha é de {data} (há <span
+            className="tabnum">{dias}</span> {dias === 1 ? "dia" : "dias"}).
           </strong>{" "}
-          Impressão, conduta e nota abaixo são daquele plantão. Copiar sem revisar é assinar um plano que pode não
+          Impressão, conduta e nota abaixo são daquele plantão. Copiar sem revisar é assinar um
+          plano que pode não
           valer mais.
         </p>
       ) : null}
@@ -235,7 +265,7 @@ export default async function EvolucaoPage({ params }: EvolucaoPageProps): Promi
       />
 
       {/* ---- nota em texto corrido, com botao copiar ---- */}
-      <NotaPreview fonte={fonte} />
+      <NotaPreview fonte={fonte}/>
     </section>
   );
 }

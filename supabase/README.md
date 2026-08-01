@@ -2,13 +2,13 @@
 
 ## Arquivos canônicos
 
-| Arquivo | Função |
-|---|---|
-| `schema-live-dump.sql` | DDL do schema **real** em produção (2026-06-21, 10 tabelas incl. `memorias`) |
-| `migrations/01`–`06` | Histórico incremental versionado |
-| `types/database.types.ts` | Tipos TS gerados do schema (web + mobile) |
-| `functions/ocr-ingest` | **Legado** — ingest real é Claude→JSON→MCP |
-| `functions/_legacy/ingest-patient` | **Legado** — app mobile antigo; não deployar |
+| Arquivo                            | Função                                                                       |
+| ---------------------------------- | ---------------------------------------------------------------------------- |
+| `schema-live-dump.sql`             | DDL do schema **real** em produção (2026-06-21, 10 tabelas incl. `memorias`) |
+| `migrations/01`–`06`               | Histórico incremental versionado                                             |
+| `types/database.types.ts`          | Tipos TS gerados do schema (web + mobile)                                    |
+| `functions/ocr-ingest`             | **Legado** — ingest real é Claude→JSON→MCP                                   |
+| `functions/_legacy/ingest-patient` | **Legado** — app mobile antigo; não deployar                                 |
 
 ## Regenerar tipos
 

@@ -1,7 +1,7 @@
 # sasi-v2 — app de plantao (Next.js 15)
 
-Reescrita do SASI seguindo o **template original** (War Room · dominios clinicos por feature).
-Mesmo banco Supabase de sempre (nao muda de casa). Estrutura:
+Reescrita do SASI seguindo o **template original** (War Room · dominios clinicos por feature). Mesmo banco Supabase de
+sempre (nao muda de casa). Estrutura:
 
 ```
 src/
@@ -14,6 +14,6 @@ src/
 supabase/functions/  # generate-sofa, sepsis-bundle-check, export-round, ocr-nursing-note
 ```
 
-Rodar: `cp .env.example .env.local` -> preencher -> `npm install` -> `npm run dev`.
-As migrations do banco vivem em `../supabase/migrations/` (raiz do repo). Regenerar tipos: `npm run gen:types`.
-Design: 2 temas (Tactical/Clinical) via CSS vars em `src/styles/globals.css` — cada cor e um sinal.
+Rodar: `cp .env.example .env.local` -> preencher -> `npm install` -> `npm run dev`. As migrations do banco vivem em
+`../supabase/migrations/` (raiz do repo). Regenerar tipos: `npm run gen:types`. Design: 2 temas (Tactical/Clinical) via
+CSS vars em `src/styles/globals.css` — cada cor e um sinal.

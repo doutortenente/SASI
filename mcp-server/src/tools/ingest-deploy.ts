@@ -1,6 +1,6 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import { getDB, handleDBError } from "../db.js";
+import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
+import {z} from "zod";
+import {getDB, handleDBError} from "../db.js";
 
 const UTI_ENUM = z.enum(["UTI2", "UTI3", "UTI4"]);
 const PLANTAO_ENUM = z.enum(["manha", "tarde", "noite", "plantao_24h"]);

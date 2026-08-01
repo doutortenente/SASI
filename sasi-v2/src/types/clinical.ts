@@ -39,14 +39,61 @@ export type TrendModo = 'subida_abs' | 'subida_rel' | 'queda_abs';
 
 // Códigos de tipo de evento (dimensão evento_tipo_ref). Extensível como DADO.
 export type EventoTipo =
-  | 'pa_sys' | 'pa_dia' | 'pam' | 'pam_min' | 'fc' | 'fr' | 'spo2' | 'temp' | 'glicemia'
-  | 'pf_ratio' | 'lactato' | 'ph' | 'pco2' | 'po2' | 'hco3' | 'be'
-  | 'diurese_h' | 'bh_h' | 'bh_acumulado' | 'cr' | 'ur' | 'na' | 'k' | 'mg' | 'ca' | 'p'
-  | 'hb' | 'ht' | 'plaq' | 'leuco' | 'inr' | 'bb' | 'pcr' | 'procalcitonina'
-  | 'nor_dose' | 'adr_dose' | 'vaso_dose' | 'dobuta_dose' | 'dopa_dose'
-  | 'fent_dose' | 'midaz_dose' | 'propofol_dose' | 'precedex_dose'
-  | 'gcs' | 'rass' | 'cam_icu' | 'bps' | 'cpot'
-  | 'sofa_total' | 'sofa_resp' | 'sofa_coag' | 'sofa_liver' | 'sofa_cardio' | 'sofa_neuro' | 'sofa_renal'
+  | 'pa_sys'
+  | 'pa_dia'
+  | 'pam'
+  | 'pam_min'
+  | 'fc'
+  | 'fr'
+  | 'spo2'
+  | 'temp'
+  | 'glicemia'
+  | 'pf_ratio'
+  | 'lactato'
+  | 'ph'
+  | 'pco2'
+  | 'po2'
+  | 'hco3'
+  | 'be'
+  | 'diurese_h'
+  | 'bh_h'
+  | 'bh_acumulado'
+  | 'cr'
+  | 'ur'
+  | 'na'
+  | 'k'
+  | 'mg'
+  | 'ca'
+  | 'p'
+  | 'hb'
+  | 'ht'
+  | 'plaq'
+  | 'leuco'
+  | 'inr'
+  | 'bb'
+  | 'pcr'
+  | 'procalcitonina'
+  | 'nor_dose'
+  | 'adr_dose'
+  | 'vaso_dose'
+  | 'dobuta_dose'
+  | 'dopa_dose'
+  | 'fent_dose'
+  | 'midaz_dose'
+  | 'propofol_dose'
+  | 'precedex_dose'
+  | 'gcs'
+  | 'rass'
+  | 'cam_icu'
+  | 'bps'
+  | 'cpot'
+  | 'sofa_total'
+  | 'sofa_resp'
+  | 'sofa_coag'
+  | 'sofa_liver'
+  | 'sofa_cardio'
+  | 'sofa_neuro'
+  | 'sofa_renal'
   | 'custom';
 
 // ---------------------------------------------------------------------------
@@ -55,14 +102,27 @@ export type EventoTipo =
 
 /** pacientes.dispositivos */
 export interface Dispositivos {
-  iot?: boolean; cvc?: boolean; pai?: boolean; svd?: boolean; sne?: boolean;
-  avp?: boolean; picc?: boolean; tqt?: boolean; dreno?: boolean; mpd?: boolean;
-  shilley?: boolean; detalhe?: string | null;
+  iot?: boolean;
+  cvc?: boolean;
+  pai?: boolean;
+  svd?: boolean;
+  sne?: boolean;
+  avp?: boolean;
+  picc?: boolean;
+  tqt?: boolean;
+  dreno?: boolean;
+  mpd?: boolean;
+  shilley?: boolean;
+  detalhe?: string | null;
 }
 
 /** pacientes.riscos_flags */
 export interface RiscosFlags {
-  pav?: boolean; broncoaspiracao?: boolean; upp?: boolean; queda?: boolean; diabetico?: boolean;
+  pav?: boolean;
+  broncoaspiracao?: boolean;
+  upp?: boolean;
+  queda?: boolean;
+  diabetico?: boolean;
 }
 
 /** Item de infusão contínua (evolucoes.dvas / sedativos). Forma canônica da ingestão. */
@@ -81,13 +141,35 @@ export interface Infusao {
 }
 
 /** patient_summary.interconsultas[] */
-export interface Interconsulta { especialidade: string; data?: string; status?: 'pendente' | 'concluida' | string; notas?: string; }
+export interface Interconsulta {
+  especialidade: string;
+  data?: string;
+  status?: 'pendente' | 'concluida' | string;
+  notas?: string;
+}
+
 /** patient_summary.programacao[] */
-export interface Programacao { descricao: string; data?: string; tipo?: string; status?: string; }
+export interface Programacao {
+  descricao: string;
+  data?: string;
+  tipo?: string;
+  status?: string;
+}
+
 /** patient_summary.resumo_sistemas[] — ids: hemo_cv,infecto,renal,gi,resp,snc,pontos_criticos */
-export interface ResumoSistema { id: string; label: string; emoji?: string; texto: string; }
+export interface ResumoSistema {
+  id: string;
+  label: string;
+  emoji?: string;
+  texto: string;
+}
+
 /** patient_summary.dispositivos[] (lista estruturada) */
-export interface DispositivoDetalhe { tipo: string; local?: string; data_insercao?: string; }
+export interface DispositivoDetalhe {
+  tipo: string;
+  local?: string;
+  data_insercao?: string;
+}
 
 /** pacientes.patient_summary — a "ficha congelada" da admissão (contrato do frontend) */
 export interface PatientSummary {
@@ -116,26 +198,101 @@ export interface PatientSummary {
 }
 
 // evolucoes: sistemas (esquema CANÔNICO Máx–Mín — fonte única da verdade)
-export interface SistemaNeuro { descricao?: string | null; rass?: string | number | null; [k: string]: Json | undefined; }
-export interface SistemaResp { suporte?: string | null; fr_max?: string | number | null; fr_min?: string | number | null; spo2_max?: string | number | null; spo2_min?: string | number | null; obs?: string | null; [k: string]: Json | undefined; }
-export interface SistemaHemo {
-  pa_sys_max?: string | number | null; pa_sys_min?: string | number | null;
-  pa_dia_max?: string | number | null; pa_dia_min?: string | number | null;
-  pam_max?: string | number | null; pam_min?: string | number | null;
-  fc_max?: string | number | null; fc_min?: string | number | null;
-  ritmo?: string | null; obs?: string | null; [k: string]: Json | undefined;
-}
-export interface SistemaTgi { dieta?: string | null; obs?: string | null; [k: string]: Json | undefined; }
-export interface SistemaRenal { cr?: string | number | null; ur?: string | number | null; diurese_6_18h_ml?: string | number | null; bh_6_18h_ml?: string | number | null; descricao?: string | null; obs?: string | null; [k: string]: Json | undefined; }
-export interface SistemaHemato { hb?: string | number | null; ht?: string | number | null; plaq?: string | number | null; obs?: string | null; [k: string]: Json | undefined; }
-export interface SistemaInfecto { atb?: string | null; tmax?: string | number | null; leuco?: string | number | null; obs?: string | null; [k: string]: Json | undefined; }
+export interface SistemaNeuro {
+  descricao?: string | null;
+  rass?: string | number | null;
 
-export interface ProblemaAtivo { texto: string; sistema?: string; gravidade?: 'leve' | 'moderada' | 'grave' | 'critica'; }
-export interface CondutaSistema { sistema: string; texto: string; meta?: string; prazo?: string; }
-export interface Risco { texto: string; nivel?: 'baixo' | 'medio' | 'alto'; }
+  [k: string]: Json | undefined;
+}
+
+export interface SistemaResp {
+  suporte?: string | null;
+  fr_max?: string | number | null;
+  fr_min?: string | number | null;
+  spo2_max?: string | number | null;
+  spo2_min?: string | number | null;
+  obs?: string | null;
+
+  [k: string]: Json | undefined;
+}
+
+export interface SistemaHemo {
+  pa_sys_max?: string | number | null;
+  pa_sys_min?: string | number | null;
+  pa_dia_max?: string | number | null;
+  pa_dia_min?: string | number | null;
+  pam_max?: string | number | null;
+  pam_min?: string | number | null;
+  fc_max?: string | number | null;
+  fc_min?: string | number | null;
+  ritmo?: string | null;
+  obs?: string | null;
+
+  [k: string]: Json | undefined;
+}
+
+export interface SistemaTgi {
+  dieta?: string | null;
+  obs?: string | null;
+
+  [k: string]: Json | undefined;
+}
+
+export interface SistemaRenal {
+  cr?: string | number | null;
+  ur?: string | number | null;
+  diurese_6_18h_ml?: string | number | null;
+  bh_6_18h_ml?: string | number | null;
+  descricao?: string | null;
+  obs?: string | null;
+
+  [k: string]: Json | undefined;
+}
+
+export interface SistemaHemato {
+  hb?: string | number | null;
+  ht?: string | number | null;
+  plaq?: string | number | null;
+  obs?: string | null;
+
+  [k: string]: Json | undefined;
+}
+
+export interface SistemaInfecto {
+  atb?: string | null;
+  tmax?: string | number | null;
+  leuco?: string | number | null;
+  obs?: string | null;
+
+  [k: string]: Json | undefined;
+}
+
+export interface ProblemaAtivo {
+  texto: string;
+  sistema?: string;
+  gravidade?: 'leve' | 'moderada' | 'grave' | 'critica';
+}
+
+export interface CondutaSistema {
+  sistema: string;
+  texto: string;
+  meta?: string;
+  prazo?: string;
+}
+
+export interface Risco {
+  texto: string;
+  nivel?: 'baixo' | 'medio' | 'alto';
+}
+
 export interface Prescricao {
-  cardiovascular?: string[]; snc?: string[]; gastro_endocrino?: string[];
-  infeccioso_resp?: string[]; sintomaticos_sn?: string[]; solucoes_diureticos?: string[]; nutricao?: string[];
+  cardiovascular?: string[];
+  snc?: string[];
+  gastro_endocrino?: string[];
+  infeccioso_resp?: string[];
+  sintomaticos_sn?: string[];
+  solucoes_diureticos?: string[];
+  nutricao?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -185,14 +342,25 @@ export interface Evolucao {
   user_id: string | null;
   data_evolucao: string;
   plantao: Plantao;
-  neuro: SistemaNeuro; resp: SistemaResp; hemo: SistemaHemo; tgi: SistemaTgi;
-  renal: SistemaRenal; hemato: SistemaHemato; infecto: SistemaInfecto;
-  dvas: Infusao[]; sedativos: Infusao[];
-  impressao: string[]; conduta: string[];
-  problemas_ativos: ProblemaAtivo[]; condutas_sistemas: CondutaSistema[]; riscos: Risco[];
+  neuro: SistemaNeuro;
+  resp: SistemaResp;
+  hemo: SistemaHemo;
+  tgi: SistemaTgi;
+  renal: SistemaRenal;
+  hemato: SistemaHemato;
+  infecto: SistemaInfecto;
+  dvas: Infusao[];
+  sedativos: Infusao[];
+  impressao: string[];
+  conduta: string[];
+  problemas_ativos: ProblemaAtivo[];
+  condutas_sistemas: CondutaSistema[];
+  riscos: Risco[];
   prescricao: Prescricao | null;
-  sofa_snapshot: Json | null; sofa_total: number | null;
-  created_at: string; updated_at: string;
+  sofa_snapshot: Json | null;
+  sofa_total: number | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface EventoClinico {
@@ -213,65 +381,157 @@ export interface EventoClinico {
 }
 
 export interface Atb {
-  id: string; paciente_id: string; user_id: string | null;
-  droga: string; dose: string | null; via: ViaAtb | null; frequencia: string | null;
-  data_inicio: string; data_fim: string | null;
-  intencao: IntencaoAtb | null; foco: string | null; agente_alvo: string | null;
-  motivo_suspensao: string | null; duracao_planejada_dias: number | null;
-  created_at: string; updated_at: string;
+  id: string;
+  paciente_id: string;
+  user_id: string | null;
+  droga: string;
+  dose: string | null;
+  via: ViaAtb | null;
+  frequencia: string | null;
+  data_inicio: string;
+  data_fim: string | null;
+  intencao: IntencaoAtb | null;
+  foco: string | null;
+  agente_alvo: string | null;
+  motivo_suspensao: string | null;
+  duracao_planejada_dias: number | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Cultura {
-  id: string; paciente_id: string; user_id: string | null;
-  material: MaterialCultura; coleta_ts: string; laudo_ts: string | null;
-  crescimento: boolean; agente: string | null; ufc_por_ml: number | null;
-  observacoes: string | null; created_at: string; updated_at: string;
+  id: string;
+  paciente_id: string;
+  user_id: string | null;
+  material: MaterialCultura;
+  coleta_ts: string;
+  laudo_ts: string | null;
+  crescimento: boolean;
+  agente: string | null;
+  ufc_por_ml: number | null;
+  observacoes: string | null;
+  created_at: string;
+  updated_at: string;
 }
+
 export interface Antibiograma {
-  id: string; cultura_id: string; antibiotico: string;
-  resultado: AntibiogramaResultado; cim: number | null; created_at: string;
+  id: string;
+  cultura_id: string;
+  antibiotico: string;
+  resultado: AntibiogramaResultado;
+  cim: number | null;
+  created_at: string;
 }
 
 export interface Pendencia {
-  id: string; paciente_id: string; evolucao_id: string | null; user_id: string | null;
-  tarefa: string; prioridade: 1 | 2 | 3; concluida: boolean; concluida_at: string | null; created_at: string;
+  id: string;
+  paciente_id: string;
+  evolucao_id: string | null;
+  user_id: string | null;
+  tarefa: string;
+  prioridade: 1 | 2 | 3;
+  concluida: boolean;
+  concluida_at: string | null;
+  created_at: string;
 }
 
 export interface AlertLog {
-  id: string; paciente_id: string; evento_id: string | null; user_id: string | null;
-  tipo: string; severidade: SeveridadeAlerta; mensagem: string; payload: Json | null;
-  hash_key: string; acked: boolean; acked_at: string | null; acked_by: string | null; created_at: string;
+  id: string;
+  paciente_id: string;
+  evento_id: string | null;
+  user_id: string | null;
+  tipo: string;
+  severidade: SeveridadeAlerta;
+  mensagem: string;
+  payload: Json | null;
+  hash_key: string;
+  acked: boolean;
+  acked_at: string | null;
+  acked_by: string | null;
+  created_at: string;
 }
+
 export interface AlertRule {
-  id: string; ativo: boolean; tipo_evento: EventoTipo | string; comparador: Comparador;
-  limiar: number; severidade: SeveridadeAlerta; rotulo: string; mensagem: string;
-  fonte: string | null; ordem: number; created_at: string;
+  id: string;
+  ativo: boolean;
+  tipo_evento: EventoTipo | string;
+  comparador: Comparador;
+  limiar: number;
+  severidade: SeveridadeAlerta;
+  rotulo: string;
+  mensagem: string;
+  fonte: string | null;
+  ordem: number;
+  created_at: string;
 }
+
 export interface TrendRule {
-  id: string; ativo: boolean; tipo_evento: EventoTipo | string; modo: TrendModo;
-  limiar: number; janela_max_horas: number | null; severidade: SeveridadeAlerta;
-  rotulo: string; mensagem: string; fonte: string | null; ordem: number; created_at: string;
+  id: string;
+  ativo: boolean;
+  tipo_evento: EventoTipo | string;
+  modo: TrendModo;
+  limiar: number;
+  janela_max_horas: number | null;
+  severidade: SeveridadeAlerta;
+  rotulo: string;
+  mensagem: string;
+  fonte: string | null;
+  ordem: number;
+  created_at: string;
 }
 
 export interface IngestAuditLog {
-  id: string; user_id: string | null; paciente_id: string | null;
-  source_type: string | null; fonte: string | null; payload_raw: Json | null;
-  response: Json | null; eventos_ids: string[] | null; warnings: string[] | null;
-  ok: boolean; error_msg: string | null; created_at: string;
+  id: string;
+  user_id: string | null;
+  paciente_id: string | null;
+  source_type: string | null;
+  fonte: string | null;
+  payload_raw: Json | null;
+  response: Json | null;
+  eventos_ids: string[] | null;
+  warnings: string[] | null;
+  ok: boolean;
+  error_msg: string | null;
+  created_at: string;
 }
-export interface Memoria { id: number; user_id: string | null; conteudo: string; metadata: Json | null; embedding: number[] | null; created_at: string | null; }
+
+export interface Memoria {
+  id: number;
+  user_id: string | null;
+  conteudo: string;
+  metadata: Json | null;
+  embedding: number[] | null;
+  created_at: string | null;
+}
 
 // ---------------------------------------------------------------------------
 // 4. VIEWS (contratos de leitura — o que o Dashboard/telas consomem)
 // ---------------------------------------------------------------------------
 export interface VwDashboardUti {
-  paciente_id: string; user_id: string | null; leito: string; uti: Uti; nome: string;
-  idade: number | null; peso: number | null; hd: string | null; gravidade: Gravidade;
-  status_leito: StatusLeito; data_adm: string; dias_internacao: number | null;
-  evolucao_id: string | null; ultima_evolucao: string | null;
-  sofa_total: number | null; sofa_snapshot: Json | null; dvas: Infusao[] | null; sedativos: Infusao[] | null;
-  delta_sofa_24h: number | null; pendencias_abertas: number;
-  dispositivos: Dispositivos; isolation: Isolamento; out_of_range_count: number; severidade_visual: SeveridadeVisual;
+  paciente_id: string;
+  user_id: string | null;
+  leito: string;
+  uti: Uti;
+  nome: string;
+  idade: number | null;
+  peso: number | null;
+  hd: string | null;
+  gravidade: Gravidade;
+  status_leito: StatusLeito;
+  data_adm: string;
+  dias_internacao: number | null;
+  evolucao_id: string | null;
+  ultima_evolucao: string | null;
+  sofa_total: number | null;
+  sofa_snapshot: Json | null;
+  dvas: Infusao[] | null;
+  sedativos: Infusao[] | null;
+  delta_sofa_24h: number | null;
+  pendencias_abertas: number;
+  dispositivos: Dispositivos;
+  isolation: Isolamento;
+  out_of_range_count: number;
+  severidade_visual: SeveridadeVisual;
 }
 
 // ---------------------------------------------------------------------------
@@ -285,8 +545,14 @@ export interface OcrIngestPayloadV1 {
   paciente_upsert?: Partial<Paciente> | null;
   evolucao_snapshot?: Partial<Evolucao> | null;
   eventos_clinicos?: Array<{
-    ts: string; tipo: EventoTipo | string; valor_num?: number | null; valor_json?: Json;
-    unidade?: string | null; confidence?: number | null; source_text?: string | null; requires_review?: boolean;
+    ts: string;
+    tipo: EventoTipo | string;
+    valor_num?: number | null;
+    valor_json?: Json;
+    unidade?: string | null;
+    confidence?: number | null;
+    source_text?: string | null;
+    requires_review?: boolean;
   }>;
   pendencias?: Array<{ tarefa: string; prioridade?: 1 | 2 | 3 }>;
 }

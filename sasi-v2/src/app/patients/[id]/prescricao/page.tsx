@@ -25,12 +25,12 @@
 // vazio como se fosse "sem medicacao"). Categoria sem item some; prescricao
 // inteira vazia vira estado vazio explicito.
 // ============================================================================
-import type { ReactElement } from "react";
-import { getUltimaEvolucao, listarAtbsAtivos, type VwDiasAtbAtivo } from "@/lib/data";
-import type { Evolucao, Plantao } from "@/types/clinical";
-import { fmtData } from "@/features/patients/components/PatientHeader";
-import { KardexTable, CSS_KARDEX } from "@/features/prescricao/components/KardexTable";
-import { AtbStewardship, CSS_ATB_STEWARDSHIP } from "@/features/prescricao/components/AtbStewardship";
+import type {ReactElement} from "react";
+import {getUltimaEvolucao, listarAtbsAtivos, type VwDiasAtbAtivo} from "@/lib/data";
+import type {Evolucao, Plantao} from "@/types/clinical";
+import {fmtData} from "@/features/patients/components/PatientHeader";
+import {CSS_KARDEX, KardexTable} from "@/features/prescricao/components/KardexTable";
+import {AtbStewardship, CSS_ATB_STEWARDSHIP} from "@/features/prescricao/components/AtbStewardship";
 
 export const dynamic = "force-dynamic";
 
@@ -52,8 +52,8 @@ export interface PrescricaoPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function PrescricaoPage({ params }: PrescricaoPageProps): Promise<ReactElement> {
-  const { id } = await params;
+export default async function PrescricaoPage({params}: PrescricaoPageProps): Promise<ReactElement> {
+  const {id} = await params;
 
   // O layout ja garantiu que o paciente existe (getPaciente + notFound).
   const [evolucao, atbs]: [Evolucao | null, VwDiasAtbAtivo[]] = await Promise.all([
@@ -68,7 +68,7 @@ export default async function PrescricaoPage({ params }: PrescricaoPageProps): P
 
   return (
     <section className="presc" aria-labelledby="presc-titulo">
-      <style dangerouslySetInnerHTML={{ __html: CSS_PRESCRICAO + CSS_KARDEX + CSS_ATB_STEWARDSHIP }} />
+      <style dangerouslySetInnerHTML={{__html: CSS_PRESCRICAO + CSS_KARDEX + CSS_ATB_STEWARDSHIP}}/>
 
       <header className="presc__topo">
         <div className="presc__ident">
@@ -76,13 +76,15 @@ export default async function PrescricaoPage({ params }: PrescricaoPageProps): P
             Prescrição
           </h2>
           <p className="presc__sub">
-            Kardex da <strong>última evolução gravada</strong> — uma seção por categoria, mais as infusões contínuas em
+            Kardex da <strong>última evolução gravada</strong> — uma seção por categoria, mais as
+            infusões contínuas em
             curso. Texto e dose aparecem exatamente como foram registrados.
           </p>
         </div>
 
         {evolucao ? (
-          <span className="presc__origem tabnum" title="evolucoes.data_evolucao · evolucoes.plantao">
+          <span className="presc__origem tabnum"
+                title="evolucoes.data_evolucao · evolucoes.plantao">
             evolução de {quando}
             {plantao ? ` · ${plantao}` : ""}
           </span>
@@ -90,7 +92,8 @@ export default async function PrescricaoPage({ params }: PrescricaoPageProps): P
       </header>
 
       {evolucao ? (
-        <KardexTable prescricao={evolucao.prescricao} dvas={evolucao.dvas} sedativos={evolucao.sedativos} />
+        <KardexTable prescricao={evolucao.prescricao} dvas={evolucao.dvas}
+                     sedativos={evolucao.sedativos}/>
       ) : (
         <div className="presc__vazio" aria-live="polite">
           <strong className="presc__vazio-titulo">Nenhuma evolução registrada</strong>
@@ -101,9 +104,9 @@ export default async function PrescricaoPage({ params }: PrescricaoPageProps): P
         </div>
       )}
 
-      <hr className="presc__divisor" />
+      <hr className="presc__divisor"/>
 
-      <AtbStewardship atbs={atbs} />
+      <AtbStewardship atbs={atbs}/>
     </section>
   );
 }

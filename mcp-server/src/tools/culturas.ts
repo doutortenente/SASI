@@ -1,6 +1,6 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import { getDB, handleDBError, fmtTs } from "../db.js";
+import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
+import {z} from "zod";
+import {fmtTs, getDB, handleDBError} from "../db.js";
 
 const MATERIAL_ENUM = z.enum([
   "hemocultura","urocultura","aspirado_traqueal","lavado_bal",

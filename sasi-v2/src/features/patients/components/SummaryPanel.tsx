@@ -18,9 +18,9 @@
 // Interconsultas e programacao TAMBEM moram no patient_summary, mas pertencem
 // a aba "Especialidades" — nao sao duplicadas aqui.
 // ============================================================================
-import type { CSSProperties, ReactElement, ReactNode } from "react";
-import type { DispositivoDetalhe, PatientSummary, ResumoSistema } from "@/types/clinical";
-import { TRAVESSAO, fmtData, txt } from "./PatientHeader";
+import type {CSSProperties, ReactElement, ReactNode} from "react";
+import type {DispositivoDetalhe, PatientSummary, ResumoSistema} from "@/types/clinical";
+import {fmtData, TRAVESSAO, txt} from "./PatientHeader";
 
 // ---------------------------------------------------------------------------
 // Leitura segura do JSONB (o banco nao garante forma: filtramos lixo)
@@ -84,12 +84,12 @@ const GRADE: CSSProperties = {
 // Pecas
 // ---------------------------------------------------------------------------
 function Card({
-  titulo,
-  barra,
-  corTitulo,
-  fundo,
-  children,
-}: {
+                titulo,
+                barra,
+                corTitulo,
+                fundo,
+                children,
+              }: {
   titulo: string;
   barra?: string;
   corTitulo?: string;
@@ -110,14 +110,14 @@ function Card({
         minWidth: 0,
       }}
     >
-      <h3 style={{ ...EYEBROW, color: corTitulo ?? "var(--text-muted)" }}>{titulo}</h3>
+      <h3 style={{...EYEBROW, color: corTitulo ?? "var(--text-muted)"}}>{titulo}</h3>
       {children}
     </section>
   );
 }
 
 /** Texto clinico. Preserva as quebras de linha escritas pelo medico. */
-function Prosa({ valor }: { valor: string | null }): ReactElement {
+function Prosa({valor}: { valor: string | null }): ReactElement {
   return (
     <p
       style={{
@@ -133,9 +133,10 @@ function Prosa({ valor }: { valor: string | null }): ReactElement {
   );
 }
 
-function Chips({ itens, fundo, cor }: { itens: string[]; fundo: string; cor: string }): ReactElement {
+function Chips({itens, fundo, cor}: { itens: string[]; fundo: string; cor: string }): ReactElement {
   return (
-    <ul style={{ display: "flex", flexWrap: "wrap", gap: 6, listStyle: "none", margin: 0, padding: 0 }}>
+    <ul
+      style={{display: "flex", flexWrap: "wrap", gap: 6, listStyle: "none", margin: 0, padding: 0}}>
       {itens.map((item: string, i: number) => (
         <li
           key={`${i}-${item}`}
@@ -156,11 +157,16 @@ function Chips({ itens, fundo, cor }: { itens: string[]; fundo: string; cor: str
 }
 
 /** Par rotulo/valor do bloco "Suporte atual". Vazio vira travessao (nunca some). */
-function Linha({ rotulo, valor }: { rotulo: string; valor: ReactNode }): ReactElement {
+function Linha({rotulo, valor}: { rotulo: string; valor: ReactNode }): ReactElement {
   return (
-    <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-      <span style={{ ...EYEBROW, flex: "0 0 84px" }}>{rotulo}</span>
-      <div style={{ flex: "1 1 140px", minWidth: 0, fontSize: "var(--text-sm, 13px)", color: "var(--text-body)" }}>
+    <div style={{display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap"}}>
+      <span style={{...EYEBROW, flex: "0 0 84px"}}>{rotulo}</span>
+      <div style={{
+        flex: "1 1 140px",
+        minWidth: 0,
+        fontSize: "var(--text-sm, 13px)",
+        color: "var(--text-body)"
+      }}>
         {valor}
       </div>
     </div>
@@ -187,7 +193,7 @@ const SISTEMA_TOKEN: Record<string, string> = {
   infeccioso: "infecto",
 };
 
-function CardSistema({ sistema }: { sistema: ResumoSistema }): ReactElement {
+function CardSistema({sistema}: { sistema: ResumoSistema }): ReactElement {
   const id = txt(sistema.id)?.toLowerCase() ?? "";
   // hasOwn: id vem de JSONB livre — "constructor"/"toString" pegariam funcao herdada
   const token = Object.hasOwn(SISTEMA_TOKEN, id) ? SISTEMA_TOKEN[id] : undefined;
@@ -205,7 +211,7 @@ function CardSistema({ sistema }: { sistema: ResumoSistema }): ReactElement {
       corTitulo={corTitulo}
       fundo={fundo}
     >
-      <Prosa valor={txt(sistema.texto)} />
+      <Prosa valor={txt(sistema.texto)}/>
     </Card>
   );
 }
@@ -218,7 +224,7 @@ export interface SummaryPanelProps {
   resumo: PatientSummary | null | undefined;
 }
 
-export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
+export function SummaryPanel({resumo}: SummaryPanelProps): ReactElement {
   const r = resumo ?? null;
 
   const motivo = txt(r?.motivo_admissao);
@@ -275,12 +281,12 @@ export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
           textAlign: "center",
         }}
       >
-        <strong style={{ fontSize: "var(--text-md, 17px)", color: "var(--text-heading)" }}>
+        <strong style={{fontSize: "var(--text-md, 17px)", color: "var(--text-heading)"}}>
           Ficha de admissão não preenchida
         </strong>
         <span
           title="pacientes.patient_summary (JSONB) vazio"
-          style={{ fontSize: "var(--text-sm, 13px)", color: "var(--text-muted)", maxWidth: "52ch" }}
+          style={{fontSize: "var(--text-sm, 13px)", color: "var(--text-muted)", maxWidth: "52ch"}}
         >
           Ainda não há dados de admissão registrados para este paciente. A ficha é preenchida na ingestão da
           folha — o app nunca a completa sozinho.
@@ -290,14 +296,20 @@ export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <div style={{display: "flex", flexDirection: "column", gap: 16}}>
       {/* ---- cabecalho do painel ---- */}
-      <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
-        <h2 style={{ margin: 0, fontSize: "var(--text-lg, 20px)", fontWeight: 700, color: "var(--text-heading)" }}>
+      <div style={{display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap"}}>
+        <h2 style={{
+          margin: 0,
+          fontSize: "var(--text-lg, 20px)",
+          fontWeight: 700,
+          color: "var(--text-heading)"
+        }}>
           Ficha de admissão
         </h2>
         {dataAdmissao ? (
-          <span className="tabnum" style={{ fontSize: "var(--text-xs, 11px)", color: "var(--text-muted)" }}>
+          <span className="tabnum"
+                style={{fontSize: "var(--text-xs, 11px)", color: "var(--text-muted)"}}>
             admissão {dataAdmissao}
           </span>
         ) : null}
@@ -305,7 +317,11 @@ export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
           <span
             className="tabnum"
             title="patient_summary.ultima_atualizacao"
-            style={{ fontSize: "var(--text-xs, 11px)", color: "var(--text-faint)", marginLeft: "auto" }}
+            style={{
+              fontSize: "var(--text-xs, 11px)",
+              color: "var(--text-faint)",
+              marginLeft: "auto"
+            }}
           >
             atualizada em {atualizacao}
           </span>
@@ -315,13 +331,13 @@ export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
       {/* ---- 1. espinha do caso (sempre visivel; vazio = travessao) ---- */}
       <div style={GRADE}>
         <Card titulo="Motivo da admissão">
-          <Prosa valor={motivo} />
+          <Prosa valor={motivo}/>
         </Card>
         <Card titulo="HPMA">
-          <Prosa valor={hpma} />
+          <Prosa valor={hpma}/>
         </Card>
         <Card titulo="Antecedentes">
-          <Prosa valor={antecedentes} />
+          <Prosa valor={antecedentes}/>
         </Card>
       </div>
 
@@ -334,24 +350,25 @@ export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
                 rotulo="DVAs"
                 valor={
                   dvas.length > 0 ? (
-                    <Chips itens={dvas} fundo="var(--badge-dva-bg)" cor="var(--badge-dva-text)" />
+                    <Chips itens={dvas} fundo="var(--badge-dva-bg)" cor="var(--badge-dva-text)"/>
                   ) : (
-                    <span style={{ color: "var(--text-faint)" }}>{TRAVESSAO}</span>
+                    <span style={{color: "var(--text-faint)"}}>{TRAVESSAO}</span>
                   )
                 }
               />
               <Linha
                 rotulo="Ventilação"
-                valor={ventilacao ?? <span style={{ color: "var(--text-faint)" }}>{TRAVESSAO}</span>}
+                valor={ventilacao ?? <span style={{color: "var(--text-faint)"}}>{TRAVESSAO}</span>}
               />
-              <Linha rotulo="Sedação" valor={sedacao ?? <span style={{ color: "var(--text-faint)" }}>{TRAVESSAO}</span>} />
+              <Linha rotulo="Sedação" valor={sedacao ??
+                <span style={{color: "var(--text-faint)"}}>{TRAVESSAO}</span>}/>
               <Linha
                 rotulo="Antibióticos"
                 valor={
                   atbs.length > 0 ? (
-                    <Chips itens={atbs} fundo="var(--badge-atb-bg)" cor="var(--badge-atb-text)" />
+                    <Chips itens={atbs} fundo="var(--badge-atb-bg)" cor="var(--badge-atb-text)"/>
                   ) : (
-                    <span style={{ color: "var(--text-faint)" }}>{TRAVESSAO}</span>
+                    <span style={{color: "var(--text-faint)"}}>{TRAVESSAO}</span>
                   )
                 }
               />
@@ -360,19 +377,35 @@ export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
 
           {dispositivos.length > 0 ? (
             <Card titulo="Dispositivos">
-              <ul style={{ display: "flex", flexDirection: "column", gap: 6, listStyle: "none", margin: 0, padding: 0 }}>
+              <ul style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+                listStyle: "none",
+                margin: 0,
+                padding: 0
+              }}>
                 {dispositivos.map((d: DispositivoDetalhe, i: number) => {
                   const local = txt(d.local);
                   const desde = fmtQuando(d.data_insercao);
                   return (
                     <li
                       key={`${i}-${d.tipo}`}
-                      style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap", fontSize: "var(--text-sm, 13px)" }}
+                      style={{
+                        display: "flex",
+                        gap: 8,
+                        alignItems: "baseline",
+                        flexWrap: "wrap",
+                        fontSize: "var(--text-sm, 13px)"
+                      }}
                     >
-                      <strong style={{ color: "var(--text-heading)" }}>{txt(d.tipo)}</strong>
-                      {local ? <span style={{ color: "var(--text-muted)" }}>{local}</span> : null}
+                      <strong style={{color: "var(--text-heading)"}}>{txt(d.tipo)}</strong>
+                      {local ? <span style={{color: "var(--text-muted)"}}>{local}</span> : null}
                       {desde ? (
-                        <span className="tabnum" style={{ fontSize: "var(--text-xs, 11px)", color: "var(--text-faint)" }}>
+                        <span className="tabnum" style={{
+                          fontSize: "var(--text-xs, 11px)",
+                          color: "var(--text-faint)"
+                        }}>
                           desde {desde}
                         </span>
                       ) : null}
@@ -385,7 +418,7 @@ export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
 
           {medicamentos.length > 0 ? (
             <Card titulo="Medicamentos domiciliares">
-              <Chips itens={medicamentos} fundo="var(--surface-sunken)" cor="var(--text-body)" />
+              <Chips itens={medicamentos} fundo="var(--surface-sunken)" cor="var(--text-body)"/>
             </Card>
           ) : null}
         </div>
@@ -393,11 +426,11 @@ export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
 
       {/* ---- 3. resumo por sistemas ---- */}
       {sistemas.length > 0 ? (
-        <section style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <section style={{display: "flex", flexDirection: "column", gap: 8}}>
           <h3 style={EYEBROW}>Resumo por sistemas</h3>
           <div style={GRADE}>
             {sistemas.map((s: ResumoSistema, i: number) => (
-              <CardSistema key={`${i}-${s.id ?? s.label}`} sistema={s} />
+              <CardSistema key={`${i}-${s.id ?? s.label}`} sistema={s}/>
             ))}
           </div>
         </section>
@@ -406,7 +439,7 @@ export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
       {/* ---- 4. plano terapeutico (largura total: e o que orienta a conduta) ---- */}
       {plano ? (
         <Card titulo="Plano terapêutico atual" barra="var(--accent)" corTitulo="var(--accent-text)">
-          <Prosa valor={plano} />
+          <Prosa valor={plano}/>
         </Card>
       ) : null}
 
@@ -415,22 +448,22 @@ export function SummaryPanel({ resumo }: SummaryPanelProps): ReactElement {
         <div style={GRADE}>
           {exames ? (
             <Card titulo="Exames relevantes">
-              <Prosa valor={exames} />
+              <Prosa valor={exames}/>
             </Card>
           ) : null}
           {dvaFluidos ? (
             <Card titulo="DVA e fluidos" barra="var(--sys-hemo-bar)" corTitulo="var(--sys-hemo)">
-              <Prosa valor={dvaFluidos} />
+              <Prosa valor={dvaFluidos}/>
             </Card>
           ) : null}
           {iatrogenias ? (
             <Card titulo="Iatrogenias" barra="var(--warning)" corTitulo="var(--warning)">
-              <Prosa valor={iatrogenias} />
+              <Prosa valor={iatrogenias}/>
             </Card>
           ) : null}
           {sutilezas ? (
             <Card titulo="Sutilezas" barra="var(--border-strong)">
-              <Prosa valor={sutilezas} />
+              <Prosa valor={sutilezas}/>
             </Card>
           ) : null}
         </div>

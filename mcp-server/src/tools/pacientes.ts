@@ -1,6 +1,6 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import { getDB, handleDBError, fmtTs, semaforo } from "../db.js";
+import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
+import {z} from "zod";
+import {fmtTs, getDB, handleDBError, semaforo} from "../db.js";
 
 const UTI_ENUM = z.enum(["UTI2", "UTI3", "UTI4"]);
 const GRAVIDADE_ENUM = z.enum(["estavel", "moderado", "grave", "critico", "obito"]);

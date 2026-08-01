@@ -22,13 +22,12 @@
 //  - Numero em fonte mono tabular (.tabnum).
 //  - Texto puro de export: pt-BR, sem markdown, sem emoji, 3 linhas por leito.
 // ============================================================================
-import { unidadeSegura } from "@/lib/formatters/br";
+import {num, unidadeSegura} from "@/lib/formatters/br";
 import Link from "next/link";
-import type { ReactElement } from "react";
-import { ROTULO_GRAVIDADE } from "@/features/beds/components/BedCard";
-import type { Gravity } from "@/features/war-room/triage";
-import type { VwDiasAtbAtivo } from "@/lib/data";
-import { num } from "@/lib/formatters/br";
+import type {ReactElement} from "react";
+import {ROTULO_GRAVIDADE} from "@/features/beds/components/BedCard";
+import type {Gravity} from "@/features/war-room/triage";
+import type {VwDiasAtbAtivo} from "@/lib/data";
 import type {
   Dispositivos,
   Evolucao,
@@ -86,26 +85,26 @@ const ROTULO_STEWARDSHIP: Record<string, string> = {
 };
 
 const ROTULO_RISCO_FLAG: ReadonlyArray<{ chave: keyof RiscosFlags; rotulo: string }> = [
-  { chave: "pav", rotulo: "PAV" },
-  { chave: "broncoaspiracao", rotulo: "broncoaspiração" },
-  { chave: "upp", rotulo: "UPP" },
-  { chave: "queda", rotulo: "queda" },
-  { chave: "diabetico", rotulo: "diabético" },
+  {chave: "pav", rotulo: "PAV"},
+  {chave: "broncoaspiracao", rotulo: "broncoaspiração"},
+  {chave: "upp", rotulo: "UPP"},
+  {chave: "queda", rotulo: "queda"},
+  {chave: "diabetico", rotulo: "diabético"},
 ];
 
 /** Dispositivos na ordem clinica (via aerea -> acessos -> sondas/drenos). */
 const ORDEM_DISPOSITIVOS: ReadonlyArray<{ chave: keyof Dispositivos; rotulo: string }> = [
-  { chave: "iot", rotulo: "IOT" },
-  { chave: "tqt", rotulo: "TQT" },
-  { chave: "cvc", rotulo: "CVC" },
-  { chave: "picc", rotulo: "PICC" },
-  { chave: "shilley", rotulo: "Shilley" },
-  { chave: "pai", rotulo: "PAI" },
-  { chave: "mpd", rotulo: "MPD" },
-  { chave: "svd", rotulo: "SVD" },
-  { chave: "sne", rotulo: "SNE" },
-  { chave: "dreno", rotulo: "dreno" },
-  { chave: "avp", rotulo: "AVP" },
+  {chave: "iot", rotulo: "IOT"},
+  {chave: "tqt", rotulo: "TQT"},
+  {chave: "cvc", rotulo: "CVC"},
+  {chave: "picc", rotulo: "PICC"},
+  {chave: "shilley", rotulo: "Shilley"},
+  {chave: "pai", rotulo: "PAI"},
+  {chave: "mpd", rotulo: "MPD"},
+  {chave: "svd", rotulo: "SVD"},
+  {chave: "sne", rotulo: "SNE"},
+  {chave: "dreno", rotulo: "dreno"},
+  {chave: "avp", rotulo: "AVP"},
 ];
 
 // ---------------------------------------------------------------------------
@@ -314,7 +313,7 @@ export function linhasDoLeito(h: HandoffLeito): LinhasHandoff {
   // alergia null = NAO REGISTRADA (nunca "sem alergia" — isso seria inventar)
   partesRisco.push(`Alergias: ${txt(h.alergias) ?? "não registradas"}`);
 
-  return { sintese, mudou, riscos: partesRisco.join(" · ") };
+  return {sintese, mudou, riscos: partesRisco.join(" · ")};
 }
 
 // ---------------------------------------------------------------------------
@@ -348,7 +347,7 @@ export function textoDaPassagem(leitos: HandoffLeito[], meta: MetaPassagem): str
   const utis = Array.from(new Set(leitos.map((h: HandoffLeito) => txt(h.leito.uti) ?? TRAVESSAO)));
 
   const blocos = leitos.map((h: HandoffLeito, i: number) => {
-    const { sintese, mudou, riscos } = linhasDoLeito(h);
+    const {sintese, mudou, riscos} = linhasDoLeito(h);
     return [`${i + 1}) ${sintese}`, `   ${mudou}`, `   ${riscos}`].join("\n");
   });
 
@@ -374,7 +373,7 @@ export interface HandoffCardProps {
   ordem: number;
 }
 
-export function HandoffCard({ h, ordem }: HandoffCardProps): ReactElement {
+export function HandoffCard({h, ordem}: HandoffCardProps): ReactElement {
   const l = h.leito;
   const linhas = linhasDoLeito(h);
   const g = l.gravity;
@@ -383,7 +382,7 @@ export function HandoffCard({ h, ordem }: HandoffCardProps): ReactElement {
   return (
     <article
       className="hcard"
-      style={{ borderLeft: `var(--gravity-bar, 6px) solid var(--grav-${g}-solid)` }}
+      style={{borderLeft: `var(--gravity-bar, 6px) solid var(--grav-${g}-solid)`}}
       aria-label={`Leito ${l.uti} ${l.leito} — ${l.nome}`}
     >
       {/* linha 1 — sintese */}
@@ -400,11 +399,11 @@ export function HandoffCard({ h, ordem }: HandoffCardProps): ReactElement {
         <span className="hcard__meta tabnum">
           {l.idade == null ? `idade ${TRAVESSAO}` : `${num(l.idade, 0)} anos`} ·{" "}
           {l.dias_internacao == null ? `internação ${TRAVESSAO}` : `${num(l.dias_internacao, 0)} d de UTI`} ·{" "}
-          <b style={{ color: `var(--grav-${g}-text)` }}>{ROTULO_GRAVIDADE[g].s}</b>
+          <b style={{color: `var(--grav-${g}-text)`}}>{ROTULO_GRAVIDADE[g].s}</b>
           {altas > 0 ? (
             <>
               {" · "}
-              <b style={{ color: "var(--danger)" }}>
+              <b style={{color: "var(--danger)"}}>
                 {num(altas, 0)} pendência{altas > 1 ? "s" : ""} alta{altas > 1 ? "s" : ""}
               </b>
             </>

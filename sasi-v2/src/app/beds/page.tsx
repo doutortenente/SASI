@@ -14,15 +14,15 @@
 // Nada e calculado aqui: a triagem so ordena/rotula (features/war-room/triage)
 // e o SOFA vem pronto do banco. Onde falta dado, a tela imprime "—".
 // ============================================================================
-import type { ReactElement } from "react";
-import { listarLeitosAtivos, mapearPendenciasAbertas } from "@/lib/data";
-import { triagem } from "@/features/war-room/triage";
-import { BedGrid } from "@/features/beds/components/BedGrid";
-import type { ResumoPendencia } from "@/features/beds/components/BedCard";
-import { SplitPane } from "@/features/war-room/components/SplitPane";
-import { CalcPanel } from "@/features/war-room/components/CalcPanel";
-import { resumoEvolucao, type EvolucaoResumo } from "@/lib/formatters/tempo";
-import type { Pendencia } from "@/types/clinical";
+import type {ReactElement} from "react";
+import {listarLeitosAtivos, mapearPendenciasAbertas} from "@/lib/data";
+import {triagem} from "@/features/war-room/triage";
+import {BedGrid} from "@/features/beds/components/BedGrid";
+import type {ResumoPendencia} from "@/features/beds/components/BedCard";
+import {SplitPane} from "@/features/war-room/components/SplitPane";
+import {CalcPanel} from "@/features/war-room/components/CalcPanel";
+import {type EvolucaoResumo, resumoEvolucao} from "@/lib/formatters/tempo";
+import type {Pendencia} from "@/types/clinical";
 
 export const dynamic = "force-dynamic";
 
@@ -58,8 +58,9 @@ export default async function BedsPage(): Promise<ReactElement> {
   for (const l of leitos) evolucoes[l.paciente_id] = resumoEvolucao(l.ultima_evolucao ?? null, agora);
 
   return (
-    <SplitPane painel={<CalcPanel />} rotuloPainel="Calculadoras de plantão">
-      <BedGrid leitos={leitos} pendencias={pendencias} evolucoes={evolucoes} lidoEm={agoraNoPlantao(agora)} />
+    <SplitPane painel={<CalcPanel/>} rotuloPainel="Calculadoras de plantão">
+      <BedGrid leitos={leitos} pendencias={pendencias} evolucoes={evolucoes}
+               lidoEm={agoraNoPlantao(agora)}/>
     </SplitPane>
   );
 }

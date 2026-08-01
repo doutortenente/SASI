@@ -20,14 +20,14 @@
 // os MESMOS de InterconsultaList — importados de la para nao existirem duas
 // verdades sobre "pendente" na mesma aba.
 // ============================================================================
-import type { ReactElement } from "react";
-import type { Programacao } from "@/types/clinical";
-import { TRAVESSAO, txt } from "@/features/patients/components/PatientHeader";
+import type {ReactElement} from "react";
+import type {Programacao} from "@/types/clinical";
+import {TRAVESSAO, txt} from "@/features/patients/components/PatientHeader";
 import {
+  agrupaPorStatus,
   AvisoIgnorados,
   ChipStatus,
   EstadoVazio,
-  agrupaPorStatus,
   fmtDataEsp,
   statusEsp,
   type StatusEsp,
@@ -50,7 +50,7 @@ export interface ProgramacaoListProps {
   itens: Programacao[] | null | undefined;
 }
 
-export function ProgramacaoList({ itens }: ProgramacaoListProps): ReactElement {
+export function ProgramacaoList({itens}: ProgramacaoListProps): ReactElement {
   const brutos: unknown[] = Array.isArray(itens) ? (itens as unknown[]) : [];
   const validos: Programacao[] = brutos.filter(ehProgramacao);
   const ignorados = brutos.length - validos.length;
@@ -69,7 +69,7 @@ export function ProgramacaoList({ itens }: ProgramacaoListProps): ReactElement {
         <span className="esp__fonte tabnum">patient_summary.programacao[]</span>
       </h3>
 
-      <AvisoIgnorados n={ignorados} onde="programacao[]" />
+      <AvisoIgnorados n={ignorados} onde="programacao[]"/>
 
       {validos.length === 0 ? (
         <EstadoVazio
@@ -90,7 +90,8 @@ export function ProgramacaoList({ itens }: ProgramacaoListProps): ReactElement {
                 const tipo = txt(p.tipo);
                 const data = fmtDataEsp(p.data);
                 return (
-                  <li key={`${g.chave}-${k}-${descricao}`} className="esp-item" style={{ borderLeftColor: info.cor }}>
+                  <li key={`${g.chave}-${k}-${descricao}`} className="esp-item"
+                      style={{borderLeftColor: info.cor}}>
                     <div className="esp-item__topo">
                       <span className="esp-item__nome" title={descricao}>
                         {descricao}
@@ -100,7 +101,7 @@ export function ProgramacaoList({ itens }: ProgramacaoListProps): ReactElement {
                           {tipo}
                         </span>
                       ) : null}
-                      <ChipStatus info={info} />
+                      <ChipStatus info={info}/>
                       <span className="esp-item__data tabnum" title="programacao[].data">
                         {data ?? TRAVESSAO}
                       </span>

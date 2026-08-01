@@ -13,38 +13,38 @@
 
 ## Por categoria
 
-| Categoria | Arq | Linhas | Tokens | O que é |
-|---|---:|---:|---:|---|
-| `other` | 120 | 188,197 | 445,473 | Sem categoria (revisar regras) |
-| `frontend_src` | 68 | 13,611 | 51,775 | App React+Vite+TS — `frontend/src/` |
-| `build_artifact` | 41 | 2,544 | 42,419 | **Ruído gerado** — `dist/` de front e mcp |
-| `claude_config` | 13 | 1,588 | 10,680 | `.claude/` (rules) |
-| `db_migration` | 16 | 2,376 | 10,528 | Migrations SQL — `supabase/migrations/` |
-| `frontend_config` | 20 | 5,292 | 10,125 | Configs do front (package-lock, vite, tsconfig) |
-| `mcp_src` | 11 | 1,813 | 7,998 | Código-fonte MCP — `mcp-server/src/` |
-| `supabase_config` | 14 | 2,027 | 7,361 | Config Supabase (config.toml, seed) |
-| `mcp_config` | 8 | 3,223 | 6,227 | Config do MCP server |
-| `project_memory` | 6 | 619 | 3,793 | Esta pasta `memory/` |
-| `root_config` | 9 | 491 | 3,321 | CLAUDE.md, README, .env.example, .mcp.json |
-| `edge_function` | 7 | 392 | 1,829 | Edge Functions Deno — `supabase/functions/` |
-| `doctrine` | 1 | 147 | 1,273 | Doutrina clínica/arquitetura — `doctrine/` |
-| `ide_config` | 19 | 298 | 689 | `.idea/` (WebStorm) |
-| `ci` | 2 | 86 | 410 | GitHub Actions — `.github/workflows/` |
-| `docs` | 2 | 91 | 380 | Documentação — `docs/` |
-| `frontend_public` | 1 | 1 | 3 | `frontend/public/` |
+| Categoria         | Arq |  Linhas |  Tokens | O que é                                         |
+| ----------------- | --: | ------: | ------: | ----------------------------------------------- |
+| `other`           | 120 | 188,197 | 445,473 | Sem categoria (revisar regras)                  |
+| `frontend_src`    |  68 |  13,611 |  51,775 | App React+Vite+TS — `frontend/src/`             |
+| `build_artifact`  |  41 |   2,544 |  42,419 | **Ruído gerado** — `dist/` de front e mcp       |
+| `claude_config`   |  13 |   1,588 |  10,680 | `.claude/` (rules)                              |
+| `db_migration`    |  16 |   2,376 |  10,528 | Migrations SQL — `supabase/migrations/`         |
+| `frontend_config` |  20 |   5,292 |  10,125 | Configs do front (package-lock, vite, tsconfig) |
+| `mcp_src`         |  11 |   1,813 |   7,998 | Código-fonte MCP — `mcp-server/src/`            |
+| `supabase_config` |  14 |   2,027 |   7,361 | Config Supabase (config.toml, seed)             |
+| `mcp_config`      |   8 |   3,223 |   6,227 | Config do MCP server                            |
+| `project_memory`  |   6 |     619 |   3,793 | Esta pasta `memory/`                            |
+| `root_config`     |   9 |     491 |   3,321 | CLAUDE.md, README, .env.example, .mcp.json      |
+| `edge_function`   |   7 |     392 |   1,829 | Edge Functions Deno — `supabase/functions/`     |
+| `doctrine`        |   1 |     147 |   1,273 | Doutrina clínica/arquitetura — `doctrine/`      |
+| `ide_config`      |  19 |     298 |     689 | `.idea/` (WebStorm)                             |
+| `ci`              |   2 |      86 |     410 | GitHub Actions — `.github/workflows/`           |
+| `docs`            |   2 |      91 |     380 | Documentação — `docs/`                          |
+| `frontend_public` |   1 |       1 |       3 | `frontend/public/`                              |
 
 ## Núcleo (sem build_artifact nem lock files)
 
 ### `frontend/src/` — por diretório
 
-| Diretório | Arq | Linhas |
-|---|---:|---:|
-| `frontend/src/components` | 31 | 7,773 |
-| `frontend/src/lib` | 14 | 3,293 |
-| `frontend/src/hooks` | 5 | 732 |
-| `frontend/src` | 4 | 682 |
-| `frontend/src/components/clinical` | 8 | 575 |
-| `frontend/src/components/janelas` | 6 | 556 |
+| Diretório                          | Arq | Linhas |
+| ---------------------------------- | --: | -----: |
+| `frontend/src/components`          |  31 |  7,773 |
+| `frontend/src/lib`                 |  14 |  3,293 |
+| `frontend/src/hooks`               |   5 |    732 |
+| `frontend/src`                     |   4 |    682 |
+| `frontend/src/components/clinical` |   8 |    575 |
+| `frontend/src/components/janelas`  |   6 |    556 |
 
 ### Maiores arquivos de código/texto
 
@@ -89,8 +89,8 @@ python3 ~/projetos/scripts/indices/query_sasi_index.py find FichaCompleta
 python3 ~/projetos/scripts/indices/query_sasi_index.py search eventos_clinicos
 ```
 
-Tabelas SQLite: `files` (sha256, tokens), `dirs`, `files_fts` (FTS5), view `categorias`.
-Sync remoto (opcional): `python3 scripts/push_repo_index_to_postgres.py` → schema `repo_index` no Supabase.
+Tabelas SQLite: `files` (sha256, tokens), `dirs`, `files_fts` (FTS5), view `categorias`. Sync remoto (opcional):
+`python3 scripts/push_repo_index_to_postgres.py` → schema `repo_index` no Supabase.
 
 ## ⚠️ Categoria `other` (revisar regras)
 

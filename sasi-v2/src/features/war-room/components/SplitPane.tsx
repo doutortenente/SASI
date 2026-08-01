@@ -11,7 +11,15 @@
 // O painel fica MONTADO quando fechado (display:none) para nao perder o que o
 // medico ja digitou ao alternar a visao.
 // ============================================================================
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactElement, type ReactNode } from "react";
+import {
+  type KeyboardEvent,
+  type ReactElement,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 
 export interface SplitPaneProps {
   /** Coluna da esquerda — o conteudo principal da tela (a grade de leitos). */
@@ -25,11 +33,11 @@ export interface SplitPaneProps {
 }
 
 export function SplitPane({
-  children,
-  painel,
-  rotuloPainel = "Painel de apoio",
-  inicialmenteAberto = false,
-}: SplitPaneProps): ReactElement {
+                            children,
+                            painel,
+                            rotuloPainel = "Painel de apoio",
+                            inicialmenteAberto = false,
+                          }: SplitPaneProps): ReactElement {
   const [aberto, setAberto] = useState<boolean>(inicialmenteAberto && !!painel);
   const refPainel = useRef<HTMLElement | null>(null);
   const refBotao = useRef<HTMLButtonElement | null>(null);
@@ -56,7 +64,7 @@ export function SplitPane({
 
   return (
     <div className="sasi-split" data-aberto={aberto ? "true" : "false"}>
-      <style dangerouslySetInnerHTML={{ __html: CSS_SPLIT }} />
+      <style dangerouslySetInnerHTML={{__html: CSS_SPLIT}}/>
 
       {painel ? (
         <div className="sasi-split__barra">
@@ -80,12 +88,13 @@ export function SplitPane({
               strokeLinejoin="round"
               aria-hidden="true"
             >
-              <rect x="3" y="4.5" width="18" height="15" rx="2" />
-              <path d="M13.5 4.5v15" />
-              <path d="M16 10h3M16 13.5h3" />
+              <rect x="3" y="4.5" width="18" height="15" rx="2"/>
+              <path d="M13.5 4.5v15"/>
+              <path d="M16 10h3M16 13.5h3"/>
             </svg>
             <span className="sasi-split__lbl">War Room</span>
-            <span className="sasi-split__sub">{aberto ? "fechar tela dividida" : "tela dividida"}</span>
+            <span
+              className="sasi-split__sub">{aberto ? "fechar tela dividida" : "tela dividida"}</span>
           </button>
         </div>
       ) : null}
@@ -104,9 +113,11 @@ export function SplitPane({
         >
           <div className="sasi-split__cab">
             <h2 className="sasi-split__ttl">{rotuloPainel}</h2>
-            <button type="button" className="sasi-split__fechar" onClick={fechar} aria-label="Fechar painel (Esc)" title="Fechar painel (Esc)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" aria-hidden="true">
-                <path d="M6 6l12 12M18 6L6 18" />
+            <button type="button" className="sasi-split__fechar" onClick={fechar}
+                    aria-label="Fechar painel (Esc)" title="Fechar painel (Esc)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9}
+                   strokeLinecap="round" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18"/>
               </svg>
             </button>
           </div>

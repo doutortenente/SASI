@@ -19,8 +19,8 @@
 // utilitarios de formatacao numerica/data compartilhados moram aqui (nao ha
 // import de volta, entao nao ha ciclo).
 // ============================================================================
-import type { ReactElement } from "react";
-import { num } from "@/lib/formatters/br";
+import type {ReactElement} from "react";
+import {num} from "@/lib/formatters/br";
 
 // ---------------------------------------------------------------------------
 // Utilitarios compartilhados com o TabelaoLabs
@@ -89,8 +89,12 @@ export interface DeltaBadgeProps {
   diaAtual?: string | null;
 }
 
-const GLIFO: Record<DirecaoDelta, string> = { subiu: "▲", desceu: "▼", estavel: "=" };
-const VERBO: Record<DirecaoDelta, string> = { subiu: "subiu", desceu: "caiu", estavel: "sem variação" };
+const GLIFO: Record<DirecaoDelta, string> = {subiu: "▲", desceu: "▼", estavel: "="};
+const VERBO: Record<DirecaoDelta, string> = {
+  subiu: "subiu",
+  desceu: "caiu",
+  estavel: "sem variação"
+};
 
 /** Direcao pura (exportada para teste/reuso). Empate exato => estavel. */
 export function direcaoDelta(atual: number, anterior: number): DirecaoDelta {
@@ -108,13 +112,13 @@ export function direcaoDelta(atual: number, anterior: number): DirecaoDelta {
  * a ausencia de seta ja diz "nao ha com o que comparar").
  */
 export function DeltaBadge({
-  atual,
-  anterior,
-  rotulo,
-  unidade,
-  diaAnterior,
-  diaAtual,
-}: DeltaBadgeProps): ReactElement | null {
+                             atual,
+                             anterior,
+                             rotulo,
+                             unidade,
+                             diaAnterior,
+                             diaAtual,
+                           }: DeltaBadgeProps): ReactElement | null {
   if (atual == null || anterior == null) return null;
 
   const dir = direcaoDelta(atual, anterior);

@@ -9,28 +9,28 @@
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace;
 
   /* Type scale (dashboard-calibrated — dense but legible) */
-  --text-2xs: 0.625rem;   /* 10px — eyebrow labels, badge text */
-  --text-xs:  0.6875rem;  /* 11px — captions, table cells */
-  --text-sm:  0.8125rem;  /* 13px — body in cards */
-  --text-base:0.9375rem;  /* 15px — default body */
-  --text-md:  1.0625rem;  /* 17px — card titles */
-  --text-lg:  1.25rem;    /* 20px — section / panel titles */
-  --text-xl:  1.5rem;     /* 24px — bed number, key metric */
-  --text-2xl: 2rem;       /* 32px — hero numerals (SOFA, leito) */
-  --text-3xl: 2.5rem;     /* 40px — display */
+  --text-2xs: 0.625rem; /* 10px — eyebrow labels, badge text */
+  --text-xs: 0.6875rem; /* 11px — captions, table cells */
+  --text-sm: 0.8125rem; /* 13px — body in cards */
+  --text-base: 0.9375rem; /* 15px — default body */
+  --text-md: 1.0625rem; /* 17px — card titles */
+  --text-lg: 1.25rem; /* 20px — section / panel titles */
+  --text-xl: 1.5rem; /* 24px — bed number, key metric */
+  --text-2xl: 2rem; /* 32px — hero numerals (SOFA, leito) */
+  --text-3xl: 2.5rem; /* 40px — display */
 
-  --weight-regular:  400;
-  --weight-medium:   500;
+  --weight-regular: 400;
+  --weight-medium: 500;
   --weight-semibold: 600;
-  --weight-bold:     700;
+  --weight-bold: 700;
 
-  --leading-tight:  1.15;
-  --leading-snug:   1.35;
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
   --leading-normal: 1.55;
 
   /* Eyebrow / uppercase label treatment */
   --tracking-eyebrow: 0.08em;
-  --tracking-wide:    0.04em;
+  --tracking-wide: 0.04em;
 }
 
 /* Optional global baseline — consumers may opt in by targeting body */
@@ -50,6 +50,7 @@ body {
   text-transform: uppercase;
   color: var(--text-muted);
 }
+
 .sasi-num {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;

@@ -4,7 +4,7 @@ name: CI
 # Repontado de frontend/ para sasi-v2/ na faxina de 31-jul-2026 (o app antigo saiu).
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
 
 jobs:

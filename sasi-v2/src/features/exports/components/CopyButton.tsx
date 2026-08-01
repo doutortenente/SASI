@@ -19,7 +19,7 @@
 //  - Alvo >= 44 px, foco visivel, feedback anunciado por aria-live.
 //  - Cor so por token do design system; nenhum hex aqui.
 // ============================================================================
-import { useCallback, useEffect, useRef, useState, type ReactElement } from "react";
+import {type ReactElement, useCallback, useEffect, useRef, useState} from "react";
 
 /** Estado da ultima tentativa de copia. */
 export type EstadoCopia = "pronto" | "copiado" | "falhou";
@@ -81,11 +81,11 @@ function copiaLegado(texto: string): boolean {
 // Botao de copia
 // ---------------------------------------------------------------------------
 export function CopyButton({
-  texto,
-  rotulo = "Copiar passagem",
-  rotuloCopiado = "Copiado",
-  titulo = "Copia a passagem inteira como texto puro (sem formatação), pronta para colar no prontuário ou no WhatsApp",
-}: CopyButtonProps): ReactElement {
+                             texto,
+                             rotulo = "Copiar passagem",
+                             rotuloCopiado = "Copiado",
+                             titulo = "Copia a passagem inteira como texto puro (sem formatação), pronta para colar no prontuário ou no WhatsApp",
+                           }: CopyButtonProps): ReactElement {
   const [estado, setEstado] = useState<EstadoCopia>("pronto");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -153,7 +153,7 @@ export function CopyButton({
 // de ser client: chama uma API do navegador). Fica neste arquivo para nao criar
 // um segundo modulo de 10 linhas com a mesma responsabilidade.
 // ---------------------------------------------------------------------------
-export function PrintButton({ rotulo = "Imprimir" }: { rotulo?: string }): ReactElement {
+export function PrintButton({rotulo = "Imprimir"}: { rotulo?: string }): ReactElement {
   return (
     <button
       type="button"

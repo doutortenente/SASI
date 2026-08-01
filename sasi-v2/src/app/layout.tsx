@@ -4,11 +4,11 @@
 // Tudo em tokens do design system: nenhum hex hardcoded aqui.
 // ============================================================================
 import "@/styles/globals.css";
-import type { Metadata, Viewport } from "next";
-import type { ReactNode } from "react";
-import { Sidebar } from "@/components/shared/Sidebar";
-import { TopBar } from "@/components/shared/TopBar";
-import { CHAVE_TEMA } from "@/stores/uiStore";
+import type {Metadata, Viewport} from "next";
+import type {ReactNode} from "react";
+import {Sidebar} from "@/components/shared/Sidebar";
+import {TopBar} from "@/components/shared/TopBar";
+import {CHAVE_TEMA} from "@/stores/uiStore";
 
 export const metadata: Metadata = {
   title: "SASI v2 — Comando UTI",
@@ -25,27 +25,27 @@ export const viewport: Viewport = {
 // Mesmo default do uiStore: sem valor salvo => tema clinical (claro).
 const SCRIPT_TEMA = `(function(){try{var t=localStorage.getItem(${JSON.stringify(CHAVE_TEMA)});document.documentElement.dataset.theme=t==="tactical"?"tactical":"";}catch(e){}})();`;
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({children}: { children: ReactNode }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body>
-        <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />
-        <style dangerouslySetInnerHTML={{ __html: CSS_CHASSI }} />
+    <body>
+    <script dangerouslySetInnerHTML={{__html: SCRIPT_TEMA}}/>
+    <style dangerouslySetInnerHTML={{__html: CSS_CHASSI}}/>
 
-        <a className="sasi-skip" href="#conteudo">
-          Ir para o conteúdo
-        </a>
+    <a className="sasi-skip" href="#conteudo">
+      Ir para o conteúdo
+    </a>
 
-        <div className="sasi-shell">
-          <Sidebar />
-          <div className="sasi-shell__col">
-            <TopBar />
-            <main id="conteudo" className="sasi-content">
-              {children}
-            </main>
-          </div>
-        </div>
-      </body>
+    <div className="sasi-shell">
+      <Sidebar/>
+      <div className="sasi-shell__col">
+        <TopBar/>
+        <main id="conteudo" className="sasi-content">
+          {children}
+        </main>
+      </div>
+    </div>
+    </body>
     </html>
   );
 }

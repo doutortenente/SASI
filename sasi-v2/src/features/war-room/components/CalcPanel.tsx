@@ -19,7 +19,14 @@
 //  - "Flags gritam, nao consertam": valor implausivel ganha aviso, nao correcao.
 //  - Nada aqui grava no banco.
 // ============================================================================
-import { useCallback, useId, useState, type ChangeEvent, type ReactElement, type ReactNode } from "react";
+import {
+  type ChangeEvent,
+  type ReactElement,
+  type ReactNode,
+  useCallback,
+  useId,
+  useState
+} from "react";
 
 // ---------------------------------------------------------------------------
 // 1. Leitura de numero em pt-BR (virgula decimal) — puro e testavel
@@ -37,10 +44,10 @@ export interface Entrada {
  */
 export function paraNumero(txt: string): Entrada {
   const bruto = (txt ?? "").trim().replace(/\s+/g, "");
-  if (!bruto) return { valor: null, aviso: null };
+  if (!bruto) return {valor: null, aviso: null};
 
   // Ainda digitando ("1," ou "0.") — nao e erro, so ainda nao ha numero.
-  if (/[.,]$/.test(bruto)) return { valor: null, aviso: null };
+  if (/[.,]$/.test(bruto)) return {valor: null, aviso: null};
 
   // Separador no inicio (",5") vira "0,5" — leitura unica, sem ambiguidade.
   const t = /^[.,]/.test(bruto) ? `0${bruto}` : bruto;
@@ -49,16 +56,19 @@ export function paraNumero(txt: string): Entrada {
   const temPonto = t.includes(".");
 
   if (temPonto && !temVirgula && /\.\d{3}(?!\d)/.test(t)) {
-    return { valor: null, aviso: "Ambíguo: ponto com 3 casas parece separador de milhar. Escreva 1500 ou 1,5." };
+    return {
+      valor: null,
+      aviso: "Ambíguo: ponto com 3 casas parece separador de milhar. Escreva 1500 ou 1,5."
+    };
   }
 
   const normal = temVirgula ? t.replace(/\./g, "").replace(",", ".") : t;
   if (!/^\d+(\.\d+)?$/.test(normal)) {
-    return { valor: null, aviso: "Use só números positivos (vírgula para decimal)." };
+    return {valor: null, aviso: "Use só números positivos (vírgula para decimal)."};
   }
 
   const v = Number(normal);
-  return Number.isFinite(v) ? { valor: v, aviso: null } : { valor: null, aviso: "Número inválido." };
+  return Number.isFinite(v) ? {valor: v, aviso: null} : {valor: null, aviso: "Número inválido."};
 }
 
 // ---------------------------------------------------------------------------
@@ -103,13 +113,13 @@ export function diureseMlKgH(volumeMl: number | null, pesoKg: number | null, hor
 // ---------------------------------------------------------------------------
 function fixo(v: number | null, casas: number): string {
   if (v == null) return "—";
-  return v.toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas });
+  return v.toLocaleString("pt-BR", {minimumFractionDigits: casas, maximumFractionDigits: casas});
 }
 
 /** Numero como o medico digitou, so normalizado (para a memoria de calculo). */
 function cru(v: number | null): string {
   if (v == null) return "—";
-  return v.toLocaleString("pt-BR", { maximumFractionDigits: 3 });
+  return v.toLocaleString("pt-BR", {maximumFractionDigits: 3});
 }
 
 // ---------------------------------------------------------------------------
@@ -125,7 +135,7 @@ interface CampoProps {
   exemplo?: string;
 }
 
-function Campo({ id, rotulo, unidade, valor, onChange, aviso, exemplo }: CampoProps): ReactElement {
+function Campo({id, rotulo, unidade, valor, onChange, aviso, exemplo}: CampoProps): ReactElement {
   return (
     <div className="calc__campo">
       <label className="calc__lbl" htmlFor={id}>
@@ -165,7 +175,15 @@ interface CalcProps {
   bandeira?: string | null;
 }
 
-function Calc({ titulo, formula, children, resultado, unidade, memoria, bandeira }: CalcProps): ReactElement {
+function Calc({
+                titulo,
+                formula,
+                children,
+                resultado,
+                unidade,
+                memoria,
+                bandeira
+              }: CalcProps): ReactElement {
   const vazio = resultado === "—";
   return (
     <section className="calc">
@@ -173,12 +191,14 @@ function Calc({ titulo, formula, children, resultado, unidade, memoria, bandeira
       <p className="calc__formula tabnum">{formula}</p>
       <div className="calc__campos">{children}</div>
       <p className="calc__res">
-        <span className="calc__res-num tabnum" style={{ color: vazio ? "var(--text-muted)" : "var(--text-heading)" }}>
+        <span className="calc__res-num tabnum"
+              style={{color: vazio ? "var(--text-muted)" : "var(--text-heading)"}}>
           {resultado}
         </span>
         <span className="calc__res-un">{unidade}</span>
       </p>
-      {memoria ? <p className="calc__memoria tabnum">{memoria}</p> : <p className="calc__memoria">preencha os campos acima</p>}
+      {memoria ? <p className="calc__memoria tabnum">{memoria}</p> :
+        <p className="calc__memoria">preencha os campos acima</p>}
       {bandeira ? <p className="calc__bandeira">{bandeira}</p> : null}
     </section>
   );
@@ -240,7 +260,7 @@ export function CalcPanel(): ReactElement {
 
   return (
     <div className="calcpanel">
-      <style dangerouslySetInnerHTML={{ __html: CSS_CALC }} />
+      <style dangerouslySetInnerHTML={{__html: CSS_CALC}}/>
 
       <div className="calcpanel__topo">
         <p className="calcpanel__nota">
@@ -263,7 +283,8 @@ export function CalcPanel(): ReactElement {
             : `(${cru(eVazao.valor)} × ${cru(eConc.valor)} × 1000) ÷ (${cru(ePeso.valor)} × 60) = ${fixo(dose, 2)}`
         }
       >
-        <Campo id={`${uid}-vazao`} rotulo="Vazão da bomba" unidade="mL/h" exemplo="12" valor={vazao} onChange={setVazao} aviso={eVazao.aviso} />
+        <Campo id={`${uid}-vazao`} rotulo="Vazão da bomba" unidade="mL/h" exemplo="12" valor={vazao}
+               onChange={setVazao} aviso={eVazao.aviso}/>
         <Campo
           id={`${uid}-conc`}
           rotulo="Concentração da diluição"
@@ -273,7 +294,8 @@ export function CalcPanel(): ReactElement {
           onChange={setConc}
           aviso={eConc.aviso}
         />
-        <Campo id={`${uid}-peso-a`} rotulo="Peso (compartilhado)" unidade="kg" exemplo="70" valor={peso} onChange={setPeso} aviso={ePeso.aviso} />
+        <Campo id={`${uid}-peso-a`} rotulo="Peso (compartilhado)" unidade="kg" exemplo="70"
+               valor={peso} onChange={setPeso} aviso={ePeso.aviso}/>
       </Calc>
 
       {/* (b) PAM --------------------------------------------------------- */}
@@ -285,8 +307,10 @@ export function CalcPanel(): ReactElement {
         memoria={pam == null ? null : `(${cru(ePas.valor)} + 2 × ${cru(ePad.valor)}) ÷ 3 = ${fixo(pam, 0)}`}
         bandeira={bandeiraPam}
       >
-        <Campo id={`${uid}-pas`} rotulo="PAS" unidade="mmHg" exemplo="120" valor={pas} onChange={setPas} aviso={ePas.aviso} />
-        <Campo id={`${uid}-pad`} rotulo="PAD" unidade="mmHg" exemplo="70" valor={pad} onChange={setPad} aviso={ePad.aviso} />
+        <Campo id={`${uid}-pas`} rotulo="PAS" unidade="mmHg" exemplo="120" valor={pas}
+               onChange={setPas} aviso={ePas.aviso}/>
+        <Campo id={`${uid}-pad`} rotulo="PAD" unidade="mmHg" exemplo="70" valor={pad}
+               onChange={setPad} aviso={ePad.aviso}/>
       </Calc>
 
       {/* (c) relacao PaO2/FiO2 ------------------------------------------- */}
@@ -298,8 +322,10 @@ export function CalcPanel(): ReactElement {
         memoria={pf == null ? null : `${cru(ePao2.valor)} ÷ (${cru(eFio2.valor)} ÷ 100) = ${fixo(pf, 0)}`}
         bandeira={bandeiraFio2}
       >
-        <Campo id={`${uid}-pao2`} rotulo="PaO₂ (gasometria arterial)" unidade="mmHg" exemplo="80" valor={pao2} onChange={setPao2} aviso={ePao2.aviso} />
-        <Campo id={`${uid}-fio2`} rotulo="FiO₂" unidade="%" exemplo="40" valor={fio2} onChange={setFio2} aviso={eFio2.aviso} />
+        <Campo id={`${uid}-pao2`} rotulo="PaO₂ (gasometria arterial)" unidade="mmHg" exemplo="80"
+               valor={pao2} onChange={setPao2} aviso={ePao2.aviso}/>
+        <Campo id={`${uid}-fio2`} rotulo="FiO₂" unidade="%" exemplo="40" valor={fio2}
+               onChange={setFio2} aviso={eFio2.aviso}/>
       </Calc>
 
       {/* (d) diurese ----------------------------------------------------- */}
@@ -312,9 +338,12 @@ export function CalcPanel(): ReactElement {
           diurese == null ? null : `${cru(eVolume.valor)} ÷ (${cru(ePeso.valor)} × ${cru(eHoras.valor)}) = ${fixo(diurese, 2)}`
         }
       >
-        <Campo id={`${uid}-vol`} rotulo="Volume urinário" unidade="mL" exemplo="600" valor={volume} onChange={setVolume} aviso={eVolume.aviso} />
-        <Campo id={`${uid}-horas`} rotulo="Período" unidade="h" exemplo="12" valor={horas} onChange={setHoras} aviso={eHoras.aviso} />
-        <Campo id={`${uid}-peso-d`} rotulo="Peso (compartilhado)" unidade="kg" exemplo="70" valor={peso} onChange={setPeso} aviso={ePeso.aviso} />
+        <Campo id={`${uid}-vol`} rotulo="Volume urinário" unidade="mL" exemplo="600" valor={volume}
+               onChange={setVolume} aviso={eVolume.aviso}/>
+        <Campo id={`${uid}-horas`} rotulo="Período" unidade="h" exemplo="12" valor={horas}
+               onChange={setHoras} aviso={eHoras.aviso}/>
+        <Campo id={`${uid}-peso-d`} rotulo="Peso (compartilhado)" unidade="kg" exemplo="70"
+               valor={peso} onChange={setPeso} aviso={ePeso.aviso}/>
       </Calc>
 
       <p className="calcpanel__rodape">

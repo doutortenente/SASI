@@ -15,7 +15,7 @@
 // deploy com verify_jwt=false; quando o login voltar, exigir JWT e derivar
 // user_id do token (TODO no plano, Fase 6).
 // ============================================================================
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -26,13 +26,13 @@ const cors = {
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...cors, 'Content-Type': 'application/json' },
+    headers: {...cors, 'Content-Type': 'application/json'},
   });
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
-  if (req.method !== 'POST') return json({ ok: false, error: 'Method not allowed' }, 405);
+  if (req.method === 'OPTIONS') return new Response('ok', {headers: cors});
+  if (req.method !== 'POST') return json({ok: false, error: 'Method not allowed'}, 405);
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -43,17 +43,17 @@ Deno.serve(async (req: Request) => {
   try {
     bundle = await req.json();
   } catch {
-    return json({ ok: false, error: 'JSON inválido' }, 400);
+    return json({ok: false, error: 'JSON inválido'}, 400);
   }
 
-  const { paciente, evolucao, pendencias = [], eventos = [] } = bundle ?? {};
+  const {paciente, evolucao, pendencias = [], eventos = []} = bundle ?? {};
 
   // Validação mínima (constraints do schema fazem o resto).
   if (!paciente?.id || !paciente?.leito || !paciente?.uti || !paciente?.nome) {
-    return json({ ok: false, error: 'paciente.id/leito/uti/nome são obrigatórios' }, 400);
+    return json({ok: false, error: 'paciente.id/leito/uti/nome são obrigatórios'}, 400);
   }
   if (!String(paciente.nome).trim()) {
-    return json({ ok: false, error: 'paciente.nome não pode ser vazio (constraint do SASI)' }, 400);
+    return json({ok: false, error: 'paciente.nome não pode ser vazio (constraint do SASI)'}, 400);
   }
 
   const pacienteId = paciente.id as string;
@@ -63,20 +63,20 @@ Deno.serve(async (req: Request) => {
 
   try {
     // 1. pacientes — upsert idempotente
-    const { error: ePac } = await supabase.from('pacientes').upsert(paciente, { onConflict: 'id' });
+    const {error: ePac} = await supabase.from('pacientes').upsert(paciente, {onConflict: 'id'});
     if (ePac) throw new Error(`pacientes: ${ePac.message}`);
 
     // 2. evolucoes — snapshot
-    const { data: ev, error: eEvo } = await supabase
+    const {data: ev, error: eEvo} = await supabase
       .from('evolucoes')
-      .insert({ ...evolucao, paciente_id: pacienteId })
+      .insert({...evolucao, paciente_id: pacienteId})
       .select('id')
       .single();
     if (eEvo) throw new Error(`evolucoes: ${eEvo.message}`);
     evolucaoId = ev!.id;
 
     // 3. pendencias — replace (last-write-wins)
-    const { error: eDel } = await supabase.from('pendencias').delete().eq('paciente_id', pacienteId);
+    const {error: eDel} = await supabase.from('pendencias').delete().eq('paciente_id', pacienteId);
     if (eDel) warnings.push(`pendencias.delete: ${eDel.message}`);
     if (Array.isArray(pendencias) && pendencias.length > 0) {
       const rows = pendencias.map((pe: any) => ({
@@ -84,7 +84,7 @@ Deno.serve(async (req: Request) => {
         paciente_id: pacienteId,
         evolucao_id: evolucaoId,
       }));
-      const { error: ePend } = await supabase.from('pendencias').insert(rows);
+      const {error: ePend} = await supabase.from('pendencias').insert(rows);
       if (ePend) warnings.push(`pendencias.insert: ${ePend.message}`);
     }
 
@@ -95,7 +95,10 @@ Deno.serve(async (req: Request) => {
         paciente_id: pacienteId,
         evolucao_id: evolucaoId,
       }));
-      const { data: evs, error: eEvt } = await supabase.from('eventos_clinicos').insert(rows).select('id');
+      const {
+        data: evs,
+        error: eEvt
+      } = await supabase.from('eventos_clinicos').insert(rows).select('id');
       if (eEvt) warnings.push(`eventos.insert: ${eEvt.message}`);
       else eventosIds = (evs ?? []).map((x: { id: string }) => x.id);
     }
@@ -106,13 +109,13 @@ Deno.serve(async (req: Request) => {
       source_type: 'mobile_app',
       fonte: 'api_import',
       payload_raw: bundle,
-      response: { evolucao_id: evolucaoId, eventos_ids: eventosIds, warnings },
+      response: {evolucao_id: evolucaoId, eventos_ids: eventosIds, warnings},
       eventos_ids: eventosIds,
       warnings,
       ok: true,
     });
 
-    return json({ ok: true, evolucao_id: evolucaoId, eventos_ids: eventosIds, warnings });
+    return json({ok: true, evolucao_id: evolucaoId, eventos_ids: eventosIds, warnings});
   } catch (err) {
     const error = err instanceof Error ? err.message : String(err);
     // audit log (falha) — best effort
@@ -126,7 +129,9 @@ Deno.serve(async (req: Request) => {
         ok: false,
         error_msg: error,
       })
-      .then(() => {}, () => {});
-    return json({ ok: false, error }, 500);
+      .then(() => {
+      }, () => {
+      });
+    return json({ok: false, error}, 500);
   }
 });

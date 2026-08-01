@@ -22,22 +22,36 @@ update public.memorias         set user_id = '<SEU-UUID>' where user_id is null;
 --    Helper de posse evita repetir o JOIN em cada tabela-filha.
 -- ============================================================================
 create or replace function public.fn_owns_paciente(p_id uuid) returns boolean
-  language sql stable security definer set search_path to 'public','pg_catalog' as $$
-  select exists (select 1 from pacientes p where p.id = p_id and p.user_id = (select auth.uid()));
+  language sql
+  stable security definer set search_path to 'public','pg_catalog' as
+$$
+select exists (select 1 from pacientes p where p.id = p_id and p.user_id = (select auth.uid()));
 $$;
 
-alter table public.pacientes        enable row level security;
-alter table public.evolucoes        enable row level security;
-alter table public.eventos_clinicos enable row level security;
-alter table public.pendencias       enable row level security;
-alter table public.atbs             enable row level security;
-alter table public.culturas         enable row level security;
-alter table public.antibiograma     enable row level security;
-alter table public.alerts_log       enable row level security;
-alter table public.ingest_audit_log enable row level security;
-alter table public.memorias         enable row level security;
-alter table public.alert_rules      enable row level security;
-alter table public.trend_rules      enable row level security;
+alter table public.pacientes
+  enable row level security;
+alter table public.evolucoes
+  enable row level security;
+alter table public.eventos_clinicos
+  enable row level security;
+alter table public.pendencias
+  enable row level security;
+alter table public.atbs
+  enable row level security;
+alter table public.culturas
+  enable row level security;
+alter table public.antibiograma
+  enable row level security;
+alter table public.alerts_log
+  enable row level security;
+alter table public.ingest_audit_log
+  enable row level security;
+alter table public.memorias
+  enable row level security;
+alter table public.alert_rules
+  enable row level security;
+alter table public.trend_rules
+  enable row level security;
 
 -- pacientes (dono direto)
 create policy pacientes_select on public.pacientes for select to authenticated using ((select auth.uid()) = user_id);
@@ -73,14 +87,29 @@ create policy culturas_delete on public.culturas for delete to authenticated usi
 
 -- antibiograma: posse via cultura -> paciente
 create policy antibiograma_select on public.antibiograma for select to authenticated
-  using (exists (select 1 from culturas c where c.id = cultura_id and public.fn_owns_paciente(c.paciente_id)));
+  using (exists (select 1
+                 from culturas c
+                 where c.id = cultura_id
+                   and public.fn_owns_paciente(c.paciente_id)));
 create policy antibiograma_insert on public.antibiograma for insert to authenticated
-  with check (exists (select 1 from culturas c where c.id = cultura_id and public.fn_owns_paciente(c.paciente_id)));
+  with check (exists (select 1
+                      from culturas c
+                      where c.id = cultura_id
+                        and public.fn_owns_paciente(c.paciente_id)));
 create policy antibiograma_update on public.antibiograma for update to authenticated
-  using (exists (select 1 from culturas c where c.id = cultura_id and public.fn_owns_paciente(c.paciente_id)))
-  with check (exists (select 1 from culturas c where c.id = cultura_id and public.fn_owns_paciente(c.paciente_id)));
+  using (exists (select 1
+                 from culturas c
+                 where c.id = cultura_id
+                   and public.fn_owns_paciente(c.paciente_id)))
+  with check (exists (select 1
+                      from culturas c
+                      where c.id = cultura_id
+                        and public.fn_owns_paciente(c.paciente_id)));
 create policy antibiograma_delete on public.antibiograma for delete to authenticated
-  using (exists (select 1 from culturas c where c.id = cultura_id and public.fn_owns_paciente(c.paciente_id)));
+  using (exists (select 1
+                 from culturas c
+                 where c.id = cultura_id
+                   and public.fn_owns_paciente(c.paciente_id)));
 
 create policy alerts_select on public.alerts_log for select to authenticated using (public.fn_owns_paciente(paciente_id));
 create policy alerts_insert on public.alerts_log for insert to authenticated with check (public.fn_owns_paciente(paciente_id));

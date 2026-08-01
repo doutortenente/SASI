@@ -33,9 +33,9 @@
 // JSONB, datas e o texto corrido de cada sistema), reusado pelas duas abas e
 // pela NotaPreview. Fonte unica: quem mudar a doutrina de exibicao mexe aqui.
 // ============================================================================
-import type { CSSProperties, ReactElement } from "react";
-import type { Evolucao, EventoTipoRef, Json, Plantao } from "@/types/clinical";
-import { num } from "@/lib/formatters/br";
+import type {CSSProperties, ReactElement} from "react";
+import type {EventoTipoRef, Evolucao, Json, Plantao} from "@/types/clinical";
+import {num} from "@/lib/formatters/br";
 
 // ---------------------------------------------------------------------------
 // Vocabulario
@@ -123,61 +123,106 @@ interface EspecSistema {
   rodape: readonly CampoTexto[];
 }
 
-const OBS: CampoTexto = { tipo: "texto", id: "obs", rotulo: "Observação", abrev: "obs" };
+const OBS: CampoTexto = {tipo: "texto", id: "obs", rotulo: "Observação", abrev: "obs"};
 
 const ESPEC: Readonly<Record<SistemaId, EspecSistema>> = {
   neuro: {
-    topo: [{ tipo: "texto", id: "descricao", rotulo: "Descrição", abrev: "" }],
-    metricas: [{ tipo: "num", id: "rass", rotulo: "RASS", abrev: "RASS", casas: 0 }],
+    topo: [{tipo: "texto", id: "descricao", rotulo: "Descrição", abrev: ""}],
+    metricas: [{tipo: "num", id: "rass", rotulo: "RASS", abrev: "RASS", casas: 0}],
     rodape: [OBS],
   },
   resp: {
-    topo: [{ tipo: "texto", id: "suporte", rotulo: "Suporte", abrev: "" }],
+    topo: [{tipo: "texto", id: "suporte", rotulo: "Suporte", abrev: ""}],
     metricas: [
-      { tipo: "par", id: "fr", rotulo: "FR", abrev: "FR", max: "fr_max", min: "fr_min", casas: 0 },
-      { tipo: "par", id: "spo2", rotulo: "SpO2", abrev: "SpO2", max: "spo2_max", min: "spo2_min", casas: 0 },
+      {tipo: "par", id: "fr", rotulo: "FR", abrev: "FR", max: "fr_max", min: "fr_min", casas: 0},
+      {
+        tipo: "par",
+        id: "spo2",
+        rotulo: "SpO2",
+        abrev: "SpO2",
+        max: "spo2_max",
+        min: "spo2_min",
+        casas: 0
+      },
     ],
     rodape: [OBS],
   },
   hemo: {
     topo: [],
     metricas: [
-      { tipo: "par", id: "pa_sys", rotulo: "PA sistólica", abrev: "PAS", max: "pa_sys_max", min: "pa_sys_min", casas: 0 },
-      { tipo: "par", id: "pa_dia", rotulo: "PA diastólica", abrev: "PAD", max: "pa_dia_max", min: "pa_dia_min", casas: 0 },
-      { tipo: "par", id: "pam", rotulo: "PAM", abrev: "PAM", max: "pam_max", min: "pam_min", casas: 0 },
-      { tipo: "par", id: "fc", rotulo: "FC", abrev: "FC", max: "fc_max", min: "fc_min", casas: 0 },
+      {
+        tipo: "par",
+        id: "pa_sys",
+        rotulo: "PA sistólica",
+        abrev: "PAS",
+        max: "pa_sys_max",
+        min: "pa_sys_min",
+        casas: 0
+      },
+      {
+        tipo: "par",
+        id: "pa_dia",
+        rotulo: "PA diastólica",
+        abrev: "PAD",
+        max: "pa_dia_max",
+        min: "pa_dia_min",
+        casas: 0
+      },
+      {
+        tipo: "par",
+        id: "pam",
+        rotulo: "PAM",
+        abrev: "PAM",
+        max: "pam_max",
+        min: "pam_min",
+        casas: 0
+      },
+      {tipo: "par", id: "fc", rotulo: "FC", abrev: "FC", max: "fc_max", min: "fc_min", casas: 0},
     ],
-    rodape: [{ tipo: "texto", id: "ritmo", rotulo: "Ritmo", abrev: "" }, OBS],
+    rodape: [{tipo: "texto", id: "ritmo", rotulo: "Ritmo", abrev: ""}, OBS],
   },
   tgi: {
-    topo: [{ tipo: "texto", id: "dieta", rotulo: "Dieta", abrev: "dieta" }],
+    topo: [{tipo: "texto", id: "dieta", rotulo: "Dieta", abrev: "dieta"}],
     metricas: [],
     rodape: [OBS],
   },
   renal: {
     topo: [],
     metricas: [
-      { tipo: "num", id: "cr", rotulo: "Creatinina", abrev: "Cr", casas: 2 },
-      { tipo: "num", id: "ur", rotulo: "Ureia", abrev: "U", casas: 1 },
-      { tipo: "num", id: "diurese_6_18h_ml", rotulo: "Diurese 6–18 h", abrev: "diurese 6–18 h", casas: 0 },
-      { tipo: "num", id: "bh_6_18h_ml", rotulo: "BH 6–18 h", abrev: "BH 6–18 h", casas: 0, sinal: true },
+      {tipo: "num", id: "cr", rotulo: "Creatinina", abrev: "Cr", casas: 2},
+      {tipo: "num", id: "ur", rotulo: "Ureia", abrev: "U", casas: 1},
+      {
+        tipo: "num",
+        id: "diurese_6_18h_ml",
+        rotulo: "Diurese 6–18 h",
+        abrev: "diurese 6–18 h",
+        casas: 0
+      },
+      {
+        tipo: "num",
+        id: "bh_6_18h_ml",
+        rotulo: "BH 6–18 h",
+        abrev: "BH 6–18 h",
+        casas: 0,
+        sinal: true
+      },
     ],
-    rodape: [{ tipo: "texto", id: "descricao", rotulo: "Descrição", abrev: "" }, OBS],
+    rodape: [{tipo: "texto", id: "descricao", rotulo: "Descrição", abrev: ""}, OBS],
   },
   hemato: {
     topo: [],
     metricas: [
-      { tipo: "num", id: "hb", rotulo: "Hb", abrev: "Hb", casas: 1 },
-      { tipo: "num", id: "ht", rotulo: "Ht", abrev: "Ht", casas: 1 },
-      { tipo: "num", id: "plaq", rotulo: "Plaquetas", abrev: "plaquetas", casas: 0 },
+      {tipo: "num", id: "hb", rotulo: "Hb", abrev: "Hb", casas: 1},
+      {tipo: "num", id: "ht", rotulo: "Ht", abrev: "Ht", casas: 1},
+      {tipo: "num", id: "plaq", rotulo: "Plaquetas", abrev: "plaquetas", casas: 0},
     ],
     rodape: [OBS],
   },
   infecto: {
-    topo: [{ tipo: "texto", id: "atb", rotulo: "Antibiótico", abrev: "ATB" }],
+    topo: [{tipo: "texto", id: "atb", rotulo: "Antibiótico", abrev: "ATB"}],
     metricas: [
-      { tipo: "num", id: "tmax", rotulo: "T máx", abrev: "T máx", casas: 1 },
-      { tipo: "num", id: "leuco", rotulo: "Leucócitos", abrev: "leucócitos", casas: 0 },
+      {tipo: "num", id: "tmax", rotulo: "T máx", abrev: "T máx", casas: 1},
+      {tipo: "num", id: "leuco", rotulo: "Leucócitos", abrev: "leucócitos", casas: 0},
     ],
     rodape: [OBS],
   },
@@ -254,16 +299,16 @@ interface Valor {
   s: string | null;
 }
 
-const VAZIO: Valor = { n: null, s: null };
+const VAZIO: Valor = {n: null, s: null};
 
 function ler(dados: DadosSistema, chave: string): Valor {
   const v = dados ? dados[chave] : undefined;
-  if (typeof v === "number") return Number.isFinite(v) ? { n: v, s: null } : VAZIO;
+  if (typeof v === "number") return Number.isFinite(v) ? {n: v, s: null} : VAZIO;
   if (typeof v === "string") {
     const t = v.trim();
-    return t.length > 0 ? { n: null, s: t } : VAZIO;
+    return t.length > 0 ? {n: null, s: t} : VAZIO;
   }
-  if (typeof v === "boolean") return { n: null, s: v ? "sim" : "não" };
+  if (typeof v === "boolean") return {n: null, s: v ? "sim" : "não"};
   return VAZIO;
 }
 
@@ -295,11 +340,15 @@ function lerPar(dados: DadosSistema, campo: CampoPar): Par {
   const ta = comoTexto(a, campo.casas);
   const tb = comoTexto(b, campo.casas);
   if (ta != null && tb != null) {
-    return { texto: `${ta}–${tb}`, sozinho: null, invertido: a.n != null && b.n != null && a.n < b.n };
+    return {
+      texto: `${ta}–${tb}`,
+      sozinho: null,
+      invertido: a.n != null && b.n != null && a.n < b.n
+    };
   }
-  if (ta != null) return { texto: ta, sozinho: "max", invertido: false };
-  if (tb != null) return { texto: tb, sozinho: "min", invertido: false };
-  return { texto: null, sozinho: null, invertido: false };
+  if (ta != null) return {texto: ta, sozinho: "max", invertido: false};
+  if (tb != null) return {texto: tb, sozinho: "min", invertido: false};
+  return {texto: null, sozinho: null, invertido: false};
 }
 
 // ---------------------------------------------------------------------------
@@ -494,7 +543,11 @@ const SELO_BASE: CSSProperties = {
   whiteSpace: "nowrap",
 };
 
-function Selo({ tom, children, titulo }: { tom: "aviso" | "erro"; children: string; titulo: string }): ReactElement {
+function Selo({tom, children, titulo}: {
+  tom: "aviso" | "erro";
+  children: string;
+  titulo: string
+}): ReactElement {
   const cor = tom === "erro" ? "var(--danger)" : "var(--warning)";
   return (
     <span
@@ -513,12 +566,12 @@ function Selo({ tom, children, titulo }: { tom: "aviso" | "erro"; children: stri
 
 /** Celula do instrumento: rotulo em cima, numero mono embaixo. Vazio => travessao. */
 function Celula({
-  rotulo,
-  valor,
-  unidade,
-  titulo,
-  selo,
-}: {
+                  rotulo,
+                  valor,
+                  unidade,
+                  titulo,
+                  selo,
+                }: {
   rotulo: string;
   valor: string | null;
   unidade: string | null;
@@ -527,7 +580,8 @@ function Celula({
 }): ReactElement {
   const vazio = valor == null;
   return (
-    <div title={titulo} style={{ background: "var(--surface-card)", padding: "8px 10px", minWidth: 0 }}>
+    <div title={titulo}
+         style={{background: "var(--surface-card)", padding: "8px 10px", minWidth: 0}}>
       <div style={EYEBROW}>{rotulo}</div>
       <div
         className="tabnum"
@@ -544,7 +598,8 @@ function Celula({
       >
         {valor ?? TRAVESSAO}
         {!vazio && unidade ? (
-          <span style={{ fontSize: "var(--text-xs, 11px)", fontWeight: 600, color: "var(--text-muted)" }}>
+          <span
+            style={{fontSize: "var(--text-xs, 11px)", fontWeight: 600, color: "var(--text-muted)"}}>
             {unidade === "%" ? "" : " "}
             {unidade}
           </span>
@@ -556,9 +611,13 @@ function Celula({
 }
 
 /** Bloco de texto clinico (preserva as quebras escritas pelo medico). */
-function Bloco({ rotulo, valor, titulo }: { rotulo: string; valor: string | null; titulo: string }): ReactElement {
+function Bloco({rotulo, valor, titulo}: {
+  rotulo: string;
+  valor: string | null;
+  titulo: string
+}): ReactElement {
   return (
-    <div title={titulo} style={{ minWidth: 0 }}>
+    <div title={titulo} style={{minWidth: 0}}>
       <span style={EYEBROW}>{rotulo}</span>
       <p
         style={{
@@ -586,7 +645,7 @@ export interface SystemPanelProps {
   unidades?: Readonly<Record<string, string | null>> | null;
 }
 
-export function SystemPanel({ sistema, dados, unidades }: SystemPanelProps): ReactElement {
+export function SystemPanel({sistema, dados, unidades}: SystemPanelProps): ReactElement {
   const e = ESPEC[sistema];
   const idTitulo = `sys-${sistema}`;
   const vazio = sistemaVazio(sistema, dados);
@@ -625,7 +684,12 @@ export function SystemPanel({ sistema, dados, unidades }: SystemPanelProps): Rea
       {vazio ? (
         <p
           title={`evolucoes.${sistema} veio sem nenhum campo nesta evolução — o app não preenche o vazio`}
-          style={{ margin: 0, fontSize: "var(--text-sm, 13px)", fontWeight: 600, color: "var(--text-faint)" }}
+          style={{
+            margin: 0,
+            fontSize: "var(--text-sm, 13px)",
+            fontWeight: 600,
+            color: "var(--text-faint)"
+          }}
         >
           {NAO_AVALIADO}
         </p>
@@ -659,13 +723,18 @@ export function SystemPanel({ sistema, dados, unidades }: SystemPanelProps): Rea
                 if (c.tipo === "par") {
                   const p = lerPar(dados, c);
                   const selo = p.invertido ? (
-                    <Selo tom="erro" titulo={`${c.rotulo}: o banco gravou máximo menor que mínimo — o app não corrige o dado`}>
+                    <Selo tom="erro"
+                          titulo={`${c.rotulo}: o banco gravou máximo menor que mínimo — o app não corrige o dado`}>
                       máx &lt; mín
                     </Selo>
                   ) : p.sozinho === "max" ? (
-                    <Selo tom="aviso" titulo={`${c.rotulo}: só o máximo foi registrado — não há par`}>só máx</Selo>
+                    <Selo tom="aviso"
+                          titulo={`${c.rotulo}: só o máximo foi registrado — não há par`}>só
+                      máx</Selo>
                   ) : p.sozinho === "min" ? (
-                    <Selo tom="aviso" titulo={`${c.rotulo}: só o mínimo foi registrado — não há par`}>só mín</Selo>
+                    <Selo tom="aviso"
+                          titulo={`${c.rotulo}: só o mínimo foi registrado — não há par`}>só
+                      mín</Selo>
                   ) : null;
                   return (
                     <Celula
@@ -692,30 +761,35 @@ export function SystemPanel({ sistema, dados, unidades }: SystemPanelProps): Rea
           ) : null}
 
           {temPar ? (
-            <span style={{ ...EYEBROW, color: "var(--text-faint)" }}>pares em máximo–mínimo</span>
+            <span style={{...EYEBROW, color: "var(--text-faint)"}}>pares em máximo–mínimo</span>
           ) : null}
 
           {/* anotacao livre — so quando existe */}
           {e.rodape.map((c: CampoTexto) => {
             const v = comoTexto(ler(dados, c.id), 0);
-            return v ? <Bloco key={c.id} rotulo={c.rotulo} valor={v} titulo={`evolucoes.${sistema}.${c.id}`} /> : null;
+            return v ? <Bloco key={c.id} rotulo={c.rotulo} valor={v}
+                              titulo={`evolucoes.${sistema}.${c.id}`}/> : null;
           })}
 
           {/* dado gravado fora do contrato — aparece cru, nunca some */}
           {listaExtras.length > 0 ? (
             <div>
-              <span style={{ ...EYEBROW, color: "var(--warning)" }}>outros campos registrados</span>
-              <ul style={{ margin: "2px 0 0", padding: 0, listStyle: "none" }}>
+              <span style={{...EYEBROW, color: "var(--warning)"}}>outros campos registrados</span>
+              <ul style={{margin: "2px 0 0", padding: 0, listStyle: "none"}}>
                 {listaExtras.map(([chave, valor]: [string, string]) => (
                   <li
                     key={chave}
                     title={`evolucoes.${sistema}.${chave} — campo fora do contrato conhecido, exibido como está`}
-                    style={{ fontSize: "var(--text-xs, 11px)", lineHeight: "var(--leading-snug, 1.35)", color: "var(--text-body)" }}
+                    style={{
+                      fontSize: "var(--text-xs, 11px)",
+                      lineHeight: "var(--leading-snug, 1.35)",
+                      color: "var(--text-body)"
+                    }}
                   >
-                    <code className="tabnum" style={{ color: "var(--text-muted)" }}>
+                    <code className="tabnum" style={{color: "var(--text-muted)"}}>
                       {chave}
                     </code>{" "}
-                    <span className="tabnum" style={{ fontWeight: 600 }}>
+                    <span className="tabnum" style={{fontWeight: 600}}>
                       {valor}
                     </span>
                   </li>

@@ -14,10 +14,10 @@
 // Exporta tambem os utilitarios que o INDICE (/patients) reusa, para nao
 // duplicar a escala de gravidade nem a conta de dias de internacao.
 // ============================================================================
-import type { CSSProperties, ReactElement, ReactNode } from "react";
+import type {CSSProperties, ReactElement, ReactNode} from "react";
 import Link from "next/link";
-import type { Isolamento, Paciente, StatusLeito } from "@/types/clinical";
-import { gravityDe, type Gravity } from "@/features/war-room/triage";
+import type {Isolamento, Paciente, StatusLeito} from "@/types/clinical";
+import {type Gravity, gravityDe} from "@/features/war-room/triage";
 
 /** Ausencia de dado. Uma unica forma no app inteiro. */
 export const TRAVESSAO = "—";
@@ -137,7 +137,10 @@ export function rotuloLeito(uti: string, leito: string | null | undefined): stri
 /** Numero formatado pt-BR (virgula decimal) ou travessao. */
 export function fmtNum(v: number | string | null | undefined, casas = 0): string {
   const n = numeroOuNull(v);
-  return n == null ? TRAVESSAO : n.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: casas });
+  return n == null ? TRAVESSAO : n.toLocaleString("pt-BR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: casas
+  });
 }
 
 // Fuso do plantao — mesmo de lib/data/eventos.ts (America/Sao_Paulo).
@@ -212,7 +215,10 @@ const ESTILO_EYEBROW: CSSProperties = {
 };
 
 /** Badge de gravidade (escala estavel → obito). Cor 100% token. */
-export function GravityBadge({ gravity, titulo }: { gravity: Gravity; titulo?: string }): ReactElement {
+export function GravityBadge({gravity, titulo}: {
+  gravity: Gravity;
+  titulo?: string
+}): ReactElement {
   return (
     <span
       title={titulo}
@@ -234,7 +240,13 @@ export function GravityBadge({ gravity, titulo }: { gravity: Gravity; titulo?: s
     >
       <span
         aria-hidden="true"
-        style={{ width: 8, height: 8, borderRadius: "50%", background: `var(--grav-${gravity}-solid)`, flex: "0 0 auto" }}
+        style={{
+          width: 8,
+          height: 8,
+          borderRadius: "50%",
+          background: `var(--grav-${gravity}-solid)`,
+          flex: "0 0 auto"
+        }}
       />
       {ROTULO_GRAVIDADE[gravity]}
     </span>
@@ -243,20 +255,24 @@ export function GravityBadge({ gravity, titulo }: { gravity: Gravity; titulo?: s
 
 /** Chip neutro (isolamento, status do leito, contagens). */
 export function Chip({
-  children,
-  tom = "neutro",
-  titulo,
-}: {
+                       children,
+                       tom = "neutro",
+                       titulo,
+                     }: {
   children: ReactNode;
   tom?: "neutro" | "alerta" | "atencao";
   titulo?: string;
 }): ReactElement {
   const cor =
     tom === "alerta"
-      ? { bg: "var(--grav-critical-bg)", fg: "var(--grav-critical-text)", bd: "var(--grav-critical-solid)" }
+      ? {
+        bg: "var(--grav-critical-bg)",
+        fg: "var(--grav-critical-text)",
+        bd: "var(--grav-critical-solid)"
+      }
       : tom === "atencao"
-        ? { bg: "var(--badge-pend-bg)", fg: "var(--badge-pend-text)", bd: "transparent" }
-        : { bg: "var(--surface-sunken)", fg: "var(--text-muted)", bd: "var(--border-default)" };
+        ? {bg: "var(--badge-pend-bg)", fg: "var(--badge-pend-text)", bd: "transparent"}
+        : {bg: "var(--surface-sunken)", fg: "var(--text-muted)", bd: "var(--border-default)"};
   return (
     <span
       title={titulo}
@@ -285,11 +301,11 @@ export function Chip({
 // Celula da regua de dados (instrumento: rotulo em cima, numero mono embaixo)
 // ---------------------------------------------------------------------------
 function Metrica({
-  rotulo,
-  valor,
-  unidade,
-  titulo,
-}: {
+                   rotulo,
+                   valor,
+                   unidade,
+                   titulo,
+                 }: {
   rotulo: string;
   valor: string;
   unidade?: string;
@@ -297,7 +313,8 @@ function Metrica({
 }): ReactElement {
   const vazio = valor === TRAVESSAO;
   return (
-    <div title={titulo} style={{ background: "var(--surface-card)", padding: "9px 12px", minWidth: 0 }}>
+    <div title={titulo}
+         style={{background: "var(--surface-card)", padding: "9px 12px", minWidth: 0}}>
       <div style={ESTILO_EYEBROW}>{rotulo}</div>
       <div
         className="tabnum"
@@ -314,7 +331,11 @@ function Metrica({
       >
         {valor}
         {!vazio && unidade ? (
-          <span style={{ fontSize: "var(--text-xs, 11px)", fontWeight: 600, color: "var(--text-muted)" }}> {unidade}</span>
+          <span style={{
+            fontSize: "var(--text-xs, 11px)",
+            fontWeight: 600,
+            color: "var(--text-muted)"
+          }}> {unidade}</span>
         ) : null}
       </div>
     </div>
@@ -328,7 +349,7 @@ export interface PatientHeaderProps {
   paciente: Paciente;
 }
 
-export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
+export function PatientHeader({paciente}: PatientHeaderProps): ReactElement {
   const p = paciente;
   const gravity = gravityDoPaciente(p);
   const dias = diasInternacao(p.data_adm);
@@ -366,7 +387,13 @@ export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
           {rotuloLeito(p.uti, p.leito)}
         </span>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: "auto", flexWrap: "wrap" }}>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginLeft: "auto",
+          flexWrap: "wrap"
+        }}>
           {p.status_leito !== "ativo" ? (
             <Chip tom="atencao" titulo="Status do leito (pacientes.status_leito)">
               {ROTULO_STATUS[p.status_leito]}
@@ -377,7 +404,7 @@ export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
               Isolamento · {isolamento}
             </Chip>
           ) : null}
-          <GravityBadge gravity={gravity} titulo="Gravidade (escala do War Room)" />
+          <GravityBadge gravity={gravity} titulo="Gravidade (escala do War Room)"/>
         </div>
       </div>
 
@@ -395,7 +422,8 @@ export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
           {txt(p.nome) ?? TRAVESSAO}
         </h2>
         {problemas.length > 1 ? (
-          <div title="Hipóteses diagnósticas / problemas ativos (pacientes.hd)" style={{ margin: "4px 0 0" }}>
+          <div title="Hipóteses diagnósticas / problemas ativos (pacientes.hd)"
+               style={{margin: "4px 0 0"}}>
             <span style={ESTILO_EYEBROW}>HD</span>
             <ol
               style={{
@@ -418,10 +446,11 @@ export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
                     color: "var(--text-body)",
                   }}
                 >
-                  <span className="tabnum" style={{ flex: "0 0 auto", fontWeight: 700, color: "var(--text-faint)" }}>
+                  <span className="tabnum"
+                        style={{flex: "0 0 auto", fontWeight: 700, color: "var(--text-faint)"}}>
                     {i + 1}.
                   </span>
-                  <span style={{ minWidth: 0 }}>{prob}</span>
+                  <span style={{minWidth: 0}}>{prob}</span>
                 </li>
               ))}
             </ol>
@@ -458,10 +487,19 @@ export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
             color: "var(--grav-critical-text)",
           }}
         >
-          <strong style={{ ...ESTILO_EYEBROW, color: "var(--grav-critical-text)", paddingTop: 2, flex: "0 0 auto" }}>
+          <strong style={{
+            ...ESTILO_EYEBROW,
+            color: "var(--grav-critical-text)",
+            paddingTop: 2,
+            flex: "0 0 auto"
+          }}>
             <span aria-hidden="true">⚠ </span>Alergias
           </strong>
-          <span style={{ fontSize: "var(--text-sm, 13px)", fontWeight: 600, lineHeight: "var(--leading-snug, 1.35)" }}>
+          <span style={{
+            fontSize: "var(--text-sm, 13px)",
+            fontWeight: 600,
+            lineHeight: "var(--leading-snug, 1.35)"
+          }}>
             {alergias}
           </span>
         </div>
@@ -478,7 +516,11 @@ export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
             border: "1px solid var(--border-default)",
           }}
         >
-          <strong style={{ ...ESTILO_EYEBROW, color: "var(--text-muted)", flex: "0 0 auto" }}>Alergias</strong>
+          <strong style={{
+            ...ESTILO_EYEBROW,
+            color: "var(--text-muted)",
+            flex: "0 0 auto"
+          }}>Alergias</strong>
           <span
             style={{
               fontSize: "var(--text-sm, 13px)",
@@ -491,8 +533,8 @@ export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
           </span>
         </div>
       ) : (
-        <div style={{ ...ESTILO_EYEBROW, color: "var(--text-faint)" }}>
-          Alergias {TRAVESSAO} <span style={{ textTransform: "none", letterSpacing: 0 }}>(não informadas)</span>
+        <div style={{...ESTILO_EYEBROW, color: "var(--text-faint)"}}>
+          Alergias {TRAVESSAO} <span style={{textTransform: "none", letterSpacing: 0}}>(não informadas)</span>
         </div>
       )}
 
@@ -508,11 +550,13 @@ export function PatientHeader({ paciente }: PatientHeaderProps): ReactElement {
           overflow: "hidden",
         }}
       >
-        <Metrica rotulo="Idade" valor={fmtNum(p.idade, 0)} unidade="a" titulo="pacientes.idade" />
-        <Metrica rotulo="Peso" valor={fmtNum(p.peso, 1)} unidade="kg" titulo="pacientes.peso" />
-        <Metrica rotulo="Altura" valor={fmtNum(p.altura, 0)} unidade="cm" titulo="pacientes.altura (cm)" />
-        <Metrica rotulo="IMC" valor={fmtNum(p.imc, 1)} titulo="Coluna gerada no banco: peso / altura²" />
-        <Metrica rotulo="Admissão" valor={fmtData(p.data_adm)} titulo="pacientes.data_adm" />
+        <Metrica rotulo="Idade" valor={fmtNum(p.idade, 0)} unidade="a" titulo="pacientes.idade"/>
+        <Metrica rotulo="Peso" valor={fmtNum(p.peso, 1)} unidade="kg" titulo="pacientes.peso"/>
+        <Metrica rotulo="Altura" valor={fmtNum(p.altura, 0)} unidade="cm"
+                 titulo="pacientes.altura (cm)"/>
+        <Metrica rotulo="IMC" valor={fmtNum(p.imc, 1)}
+                 titulo="Coluna gerada no banco: peso / altura²"/>
+        <Metrica rotulo="Admissão" valor={fmtData(p.data_adm)} titulo="pacientes.data_adm"/>
         <Metrica
           rotulo="Internação"
           valor={dias == null ? TRAVESSAO : String(dias)}

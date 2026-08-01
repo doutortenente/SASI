@@ -25,14 +25,14 @@
 //  - Cor so por token; numero em .tabnum.
 // ============================================================================
 import Link from "next/link";
-import { useMemo, useState, type ReactElement } from "react";
-import { ROTULO_GRAVIDADE, type LeitoTriado } from "@/features/beds/components/BedCard";
-import type { Gravity } from "@/features/war-room/triage";
-import type { VwAlertaAberto, VwDiasAtbAtivo } from "@/lib/data";
-import { num } from "@/lib/formatters/br";
-import type { EvolucaoResumo } from "@/lib/formatters/tempo";
-import { ROTULO_UTI, passaFiltroUti, useUiStore } from "@/stores/uiStore";
-import type { Pendencia } from "@/types/clinical";
+import {type ReactElement, useMemo, useState} from "react";
+import {type LeitoTriado, ROTULO_GRAVIDADE} from "@/features/beds/components/BedCard";
+import type {Gravity} from "@/features/war-room/triage";
+import type {VwAlertaAberto, VwDiasAtbAtivo} from "@/lib/data";
+import {num} from "@/lib/formatters/br";
+import type {EvolucaoResumo} from "@/lib/formatters/tempo";
+import {passaFiltroUti, ROTULO_UTI, useUiStore} from "@/stores/uiStore";
+import type {Pendencia} from "@/types/clinical";
 
 // ---------------------------------------------------------------------------
 // Contratos
@@ -40,7 +40,7 @@ import type { Pendencia } from "@/types/clinical";
 
 // Estado da ultima evolucao (JA formatado no servidor). Fonte unica: lib/formatters/tempo.
 // Reexportado para /rounds/page.tsx nao precisar conhecer o modulo de tempo.
-export type { EvolucaoResumo };
+export type {EvolucaoResumo};
 
 /** Uma linha do round: o leito + o que exige decisao agora. */
 export interface LinhaRound {
@@ -135,11 +135,31 @@ function corSofa(s: number | null): string {
   return "var(--sofa-low)";
 }
 
-function delta24h(d: number | null): { texto: string; glifo: string; cor: string; leitura: string } {
-  if (d == null) return { texto: TRAVESSAO, glifo: "", cor: "var(--text-muted)", leitura: "variação do SOFA em 24 horas não disponível" };
-  if (d > 0) return { texto: num(d, 0), glifo: "▲", cor: "var(--danger)", leitura: `SOFA subiu ${num(d, 0)} em 24 horas` };
-  if (d < 0) return { texto: num(Math.abs(d), 0), glifo: "▼", cor: "var(--success)", leitura: `SOFA caiu ${num(Math.abs(d), 0)} em 24 horas` };
-  return { texto: "0", glifo: "=", cor: "var(--text-muted)", leitura: "SOFA estável em 24 horas" };
+function delta24h(d: number | null): {
+  texto: string;
+  glifo: string;
+  cor: string;
+  leitura: string
+} {
+  if (d == null) return {
+    texto: TRAVESSAO,
+    glifo: "",
+    cor: "var(--text-muted)",
+    leitura: "variação do SOFA em 24 horas não disponível"
+  };
+  if (d > 0) return {
+    texto: num(d, 0),
+    glifo: "▲",
+    cor: "var(--danger)",
+    leitura: `SOFA subiu ${num(d, 0)} em 24 horas`
+  };
+  if (d < 0) return {
+    texto: num(Math.abs(d), 0),
+    glifo: "▼",
+    cor: "var(--success)",
+    leitura: `SOFA caiu ${num(Math.abs(d), 0)} em 24 horas`
+  };
+  return {texto: "0", glifo: "=", cor: "var(--text-muted)", leitura: "SOFA estável em 24 horas"};
 }
 
 function corAtb(flag: string): string {
@@ -152,7 +172,11 @@ function corAtb(flag: string): string {
 // ---------------------------------------------------------------------------
 // Chip (cor + texto: a cor nunca carrega o significado sozinha)
 // ---------------------------------------------------------------------------
-function Chip({ cor, children, titulo }: { cor: string; children: string; titulo?: string }): ReactElement {
+function Chip({cor, children, titulo}: {
+  cor: string;
+  children: string;
+  titulo?: string
+}): ReactElement {
   return (
     <span
       className="round-chip"
@@ -171,7 +195,7 @@ function Chip({ cor, children, titulo }: { cor: string; children: string; titulo
 // ---------------------------------------------------------------------------
 // Linha do round
 // ---------------------------------------------------------------------------
-function Linha({ l }: { l: LinhaRound }): ReactElement {
+function Linha({l}: { l: LinhaRound }): ReactElement {
   const b = l.leito;
   const g = b.gravity;
   const d = delta24h(b.delta_sofa_24h ?? null);
@@ -190,13 +214,13 @@ function Linha({ l }: { l: LinhaRound }): ReactElement {
     <Link
       href={`/patients/${b.paciente_id}`}
       className={`round-row${acao ? " round-row--acao" : ""}`}
-      style={{ borderLeft: `var(--gravity-bar, 6px) solid var(--grav-${g}-solid)` }}
+      style={{borderLeft: `var(--gravity-bar, 6px) solid var(--grav-${g}-solid)`}}
       aria-label={`Leito ${b.uti} ${b.leito} — ${b.nome}, ${ROTULO_GRAVIDADE[g].s}`}
     >
       {/* 1. leito + gravidade */}
       <span className="round-row__c round-row__c--leito">
         <span className="round-row__leito tabnum">{leitoRotulo}</span>
-        <span className="round-row__grav" style={{ color: `var(--grav-${g}-text)` }}>
+        <span className="round-row__grav" style={{color: `var(--grav-${g}-text)`}}>
           {ROTULO_GRAVIDADE[g].s}
         </span>
       </span>
@@ -207,7 +231,10 @@ function Linha({ l }: { l: LinhaRound }): ReactElement {
         <span className="round-row__meta tabnum">
           {b.idade == null ? `idade ${TRAVESSAO}` : `${num(b.idade, 0)} anos`} ·{" "}
           {b.dias_internacao == null ? `internação ${TRAVESSAO}` : `${num(b.dias_internacao, 0)} d de UTI`} · evolução{" "}
-          <span style={{ color: l.evolucao.atrasada ? "var(--warning)" : "inherit", fontWeight: l.evolucao.atrasada ? 700 : 400 }}>
+          <span style={{
+            color: l.evolucao.atrasada ? "var(--warning)" : "inherit",
+            fontWeight: l.evolucao.atrasada ? 700 : 400
+          }}>
             {l.evolucao.rotulo}
             {l.evolucao.atrasada ? " · atrasada" : ""}
           </span>
@@ -218,10 +245,11 @@ function Linha({ l }: { l: LinhaRound }): ReactElement {
       {/* 3. SOFA + delta 24 h */}
       <span className="round-row__c round-row__c--sofa">
         <span className="round-row__rot">SOFA</span>
-        <span className="round-row__sofa tabnum" style={{ color: corSofa(b.sofa_total) }} title="SOFA da última evolução (calculado no banco)">
+        <span className="round-row__sofa tabnum" style={{color: corSofa(b.sofa_total)}}
+              title="SOFA da última evolução (calculado no banco)">
           {num(b.sofa_total, 0)}
         </span>
-        <span className="round-row__delta tabnum" style={{ color: d.cor }} title={d.leitura}>
+        <span className="round-row__delta tabnum" style={{color: d.cor}} title={d.leitura}>
           <span aria-hidden="true">{d.glifo}</span> {d.texto}
           <span className="round-row__delta-un"> /24 h</span>
         </span>
@@ -232,12 +260,14 @@ function Linha({ l }: { l: LinhaRound }): ReactElement {
         <span className="round-row__rot">Alertas e ATB</span>
         <span className="round-row__chips">
           {criticos > 0 ? (
-            <Chip cor="var(--danger)" titulo="Alertas críticos não reconhecidos (vw_alertas_abertos)">
+            <Chip cor="var(--danger)"
+                  titulo="Alertas críticos não reconhecidos (vw_alertas_abertos)">
               {`${num(criticos, 0)} crítico${criticos > 1 ? "s" : ""}`}
             </Chip>
           ) : null}
           {warnings > 0 ? (
-            <Chip cor="var(--warning)" titulo="Alertas de aviso não reconhecidos (vw_alertas_abertos)">
+            <Chip cor="var(--warning)"
+                  titulo="Alertas de aviso não reconhecidos (vw_alertas_abertos)">
               {`${num(warnings, 0)} aviso${warnings > 1 ? "s" : ""}`}
             </Chip>
           ) : null}
@@ -263,7 +293,8 @@ function Linha({ l }: { l: LinhaRound }): ReactElement {
           {/* ATB vazio mas HA alerta: diz "sem ATB" depois dos alertas */}
           {semAtb && !semAlerta ? <span className="round-row__vazio">sem ATB</span> : null}
           {/* nada dos dois: uma frase so, sem jargao */}
-          {semAlerta && semAtb ? <span className="round-row__vazio">sem alerta · sem ATB</span> : null}
+          {semAlerta && semAtb ?
+            <span className="round-row__vazio">sem alerta · sem ATB</span> : null}
         </span>
       </span>
 
@@ -297,7 +328,7 @@ function Linha({ l }: { l: LinhaRound }): ReactElement {
 // ---------------------------------------------------------------------------
 // Painel
 // ---------------------------------------------------------------------------
-export function RoundList({ linhas, lidoEm }: RoundListProps): ReactElement {
+export function RoundList({linhas, lidoEm}: RoundListProps): ReactElement {
   const filtro = useUiStore((s) => s.uti);
   const setUti = useUiStore((s) => s.setUti);
   const [soAcao, setSoAcao] = useState(false);
@@ -313,7 +344,7 @@ export function RoundList({ linhas, lidoEm }: RoundListProps): ReactElement {
     const tarefasAltas = naUti.reduce((s: number, l: LinhaRound) => s + altasDe(l), 0);
     const atbRever = naUti.reduce((s: number, l: LinhaRound) => s + atbsEmAtencao(l), 0);
     const semEvolucao = naUti.filter((l: LinhaRound) => l.evolucao.atrasada).length;
-    return { comAcao, comCritico, tarefasAltas, atbRever, semEvolucao };
+    return {comAcao, comCritico, tarefasAltas, atbRever, semEvolucao};
   }, [naUti]);
 
   const visiveis = useMemo(() => (soAcao ? naUti.filter(precisaAcao) : naUti), [naUti, soAcao]);
@@ -322,13 +353,14 @@ export function RoundList({ linhas, lidoEm }: RoundListProps): ReactElement {
   if (linhas.length === 0) {
     return (
       <section className="round" aria-labelledby="round-vazio">
-        <style dangerouslySetInnerHTML={{ __html: CSS_ROUND }} />
+        <style dangerouslySetInnerHTML={{__html: CSS_ROUND}}/>
         <div className="round__vazio">
           <p className="round__vazio-ttl" id="round-vazio">
             Nenhum leito ativo
           </p>
           <p className="round__vazio-txt">
-            A visão <code className="tabnum">vw_dashboard_uti</code> não devolveu nenhum paciente com leito ativo.
+            A visão <code className="tabnum">vw_dashboard_uti</code> não devolveu nenhum paciente
+            com leito ativo.
             Não há round a fazer — cadastre a admissão (ingestão da folha pela skill) e recarregue.
           </p>
         </div>
@@ -338,7 +370,7 @@ export function RoundList({ linhas, lidoEm }: RoundListProps): ReactElement {
 
   return (
     <section className="round" aria-labelledby="round-ttl">
-      <style dangerouslySetInnerHTML={{ __html: CSS_ROUND }} />
+      <style dangerouslySetInnerHTML={{__html: CSS_ROUND}}/>
 
       <header className="round__cab">
         <div className="round__ttl-bloco">
@@ -349,7 +381,8 @@ export function RoundList({ linhas, lidoEm }: RoundListProps): ReactElement {
             <span className="tabnum">{resumo.comAcao}</span> pedindo ação
           </h2>
           <p className="round__eyebrow">
-            ordem: gravidade → alerta crítico → pendência alta → ATB em reavaliação → evolução atrasada
+            ordem: gravidade → alerta crítico → pendência alta → ATB em reavaliação → evolução
+            atrasada
           </p>
         </div>
 
@@ -365,16 +398,18 @@ export function RoundList({ linhas, lidoEm }: RoundListProps): ReactElement {
       </header>
 
       <ul className="round__resumo" aria-label="Resumo de ação">
-        <li className="round__pill" style={{ color: "var(--danger)" }}>
+        <li className="round__pill" style={{color: "var(--danger)"}}>
           <span className="tabnum">{resumo.comCritico}</span> com alerta crítico
         </li>
-        <li className="round__pill" style={{ color: "var(--danger)" }}>
-          <span className="tabnum">{resumo.tarefasAltas}</span> pendência{resumo.tarefasAltas === 1 ? "" : "s"} de prioridade alta
+        <li className="round__pill" style={{color: "var(--danger)"}}>
+          <span
+            className="tabnum">{resumo.tarefasAltas}</span> pendência{resumo.tarefasAltas === 1 ? "" : "s"} de
+          prioridade alta
         </li>
-        <li className="round__pill" style={{ color: "var(--warning)" }}>
+        <li className="round__pill" style={{color: "var(--warning)"}}>
           <span className="tabnum">{resumo.atbRever}</span> ATB em D+{DIAS_ATENCAO} ou mais
         </li>
-        <li className="round__pill" style={{ color: "var(--warning)" }}>
+        <li className="round__pill" style={{color: "var(--warning)"}}>
           <span className="tabnum">{resumo.semEvolucao}</span> sem evolução em 24 h
         </li>
         {lidoEm ? (
@@ -415,7 +450,7 @@ export function RoundList({ linhas, lidoEm }: RoundListProps): ReactElement {
         <ul className="round__lista">
           {visiveis.map((l: LinhaRound) => (
             <li key={l.leito.paciente_id}>
-              <Linha l={l} />
+              <Linha l={l}/>
             </li>
           ))}
         </ul>

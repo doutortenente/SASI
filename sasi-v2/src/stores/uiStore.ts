@@ -7,8 +7,8 @@
 //   const uti = useUiStore((s) => s.uti);
 //   const setUti = useUiStore((s) => s.setUti);
 // ============================================================================
-import { create } from "zustand";
-import type { Uti } from "@/types/clinical";
+import {create} from "zustand";
+import type {Uti} from "@/types/clinical";
 
 /** Tema visual: "clinical" = claro (:root) · "tactical" = escuro (html[data-theme="tactical"]). */
 export type Tema = "clinical" | "tactical";
@@ -85,18 +85,18 @@ export const useUiStore = create<UiState>((set, get) => ({
   setTema: (tema) => {
     aplicarNoDom(tema);
     persistir(tema);
-    set({ tema });
+    set({tema});
   },
   alternarTema: () => get().setTema(get().tema === "tactical" ? "clinical" : "tactical"),
   sincronizarTema: () => {
     const tema = lerPersistido();
     aplicarNoDom(tema);
-    if (tema !== get().tema) set({ tema });
+    if (tema !== get().tema) set({tema});
   },
 
-  setUti: (uti) => set({ uti }),
-  setWarRoom: (warRoom) => set({ warRoom }),
-  alternarWarRoom: () => set((s) => ({ warRoom: !s.warRoom })),
+  setUti: (uti) => set({uti}),
+  setWarRoom: (warRoom) => set({warRoom}),
+  alternarWarRoom: () => set((s) => ({warRoom: !s.warRoom})),
 }));
 
 // ---------------------------------------------------------------------------

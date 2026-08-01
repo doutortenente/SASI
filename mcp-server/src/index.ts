@@ -10,18 +10,18 @@
  * Transport: stdio (Claude Desktop)
  */
 
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
+import {StdioServerTransport} from "@modelcontextprotocol/sdk/server/stdio.js";
 
-import { registerSitrepTools }    from "./tools/sitrep.js";
-import { registerPacienteTools }  from "./tools/pacientes.js";
-import { registerEvolucaoTools }  from "./tools/evolucoes.js";
-import { registerEventoTools }    from "./tools/eventos.js";
-import { registerPendenciaTools } from "./tools/pendencias.js";
-import { registerAtbTools }       from "./tools/atbs.js";
-import { registerCulturaTools }   from "./tools/culturas.js";
-import { registerAlertTools }     from "./tools/alerts.js";
-import { registerIngestDeployTools } from "./tools/ingest-deploy.js";
+import {registerSitrepTools} from "./tools/sitrep.js";
+import {registerPacienteTools} from "./tools/pacientes.js";
+import {registerEvolucaoTools} from "./tools/evolucoes.js";
+import {registerEventoTools} from "./tools/eventos.js";
+import {registerPendenciaTools} from "./tools/pendencias.js";
+import {registerAtbTools} from "./tools/atbs.js";
+import {registerCulturaTools} from "./tools/culturas.js";
+import {registerAlertTools} from "./tools/alerts.js";
+import {registerIngestDeployTools} from "./tools/ingest-deploy.js";
 
 // ── Server ────────────────────────────────────────────────────────────────────
 const server = new McpServer({

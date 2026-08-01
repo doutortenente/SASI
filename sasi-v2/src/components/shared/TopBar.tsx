@@ -5,17 +5,17 @@
 // (uiStore) + modo War Room (so no painel de leitos) + ThemeToggle.
 // Telas client leem o filtro com useUiStore((s) => s.uti).
 // ============================================================================
-import { usePathname } from "next/navigation";
-import type { ReactElement } from "react";
-import { ThemeToggle } from "./ThemeToggle";
-import { OPCOES_UTI, ROTULO_UTI, useUiStore } from "@/stores/uiStore";
+import {usePathname} from "next/navigation";
+import type {ReactElement} from "react";
+import {ThemeToggle} from "./ThemeToggle";
+import {OPCOES_UTI, ROTULO_UTI, useUiStore} from "@/stores/uiStore";
 
 /** Titulo de cada rota do chassi. Sub-rotas herdam pelo prefixo mais longo. */
 const TITULOS: ReadonlyArray<{ href: string; titulo: string }> = [
-  { href: "/beds", titulo: "War Room" },
-  { href: "/patients", titulo: "Pacientes" },
-  { href: "/rounds", titulo: "Round" },
-  { href: "/handoff", titulo: "Passagem de turno" },
+  {href: "/beds", titulo: "War Room"},
+  {href: "/patients", titulo: "Pacientes"},
+  {href: "/rounds", titulo: "Round"},
+  {href: "/handoff", titulo: "Passagem de turno"},
 ];
 
 function tituloDaRota(pathname: string): string {
@@ -36,7 +36,7 @@ export interface TopBarProps {
   titulo?: string;
 }
 
-export function TopBar({ titulo }: TopBarProps = {}): ReactElement {
+export function TopBar({titulo}: TopBarProps = {}): ReactElement {
   const pathname = usePathname() ?? "";
   const uti = useUiStore((s) => s.uti);
   const setUti = useUiStore((s) => s.setUti);
@@ -86,15 +86,15 @@ export function TopBar({ titulo }: TopBarProps = {}): ReactElement {
               strokeLinejoin="round"
               aria-hidden="true"
             >
-              <circle cx="12" cy="12" r="8.2" />
-              <circle cx="12" cy="12" r="3" />
-              <path d="M12 1.6v3.2M12 19.2v3.2M1.6 12h3.2M19.2 12h3.2" />
+              <circle cx="12" cy="12" r="8.2"/>
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1.6v3.2M12 19.2v3.2M1.6 12h3.2M19.2 12h3.2"/>
             </svg>
             <span className="sasi-btn__txt">War Room</span>
           </button>
         ) : null}
 
-        <ThemeToggle />
+        <ThemeToggle/>
       </div>
     </header>
   );

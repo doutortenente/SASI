@@ -26,10 +26,10 @@
 // ZERO ALUCINACAO: dia sem coleta imprime "—" e ponto. A tela nunca arrasta o
 // valor do dia anterior, nunca usa 0 como vazio e nunca chuta unidade.
 // ============================================================================
-import type { ReactElement } from "react";
+import type {ReactElement} from "react";
 import Link from "next/link";
-import { getTipoRef, serieLabs } from "@/lib/data";
-import { TabelaoLabs, TIPOS_FOLHAO } from "@/features/labs/components/TabelaoLabs";
+import {getTipoRef, serieLabs} from "@/lib/data";
+import {TabelaoLabs, TIPOS_FOLHAO} from "@/features/labs/components/TabelaoLabs";
 
 export const dynamic = "force-dynamic";
 
@@ -49,19 +49,22 @@ export interface LabsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function LabsPage({ params, searchParams }: LabsPageProps): Promise<ReactElement> {
-  const [{ id }, sp] = await Promise.all([params, searchParams]);
+export default async function LabsPage({
+                                         params,
+                                         searchParams
+                                       }: LabsPageProps): Promise<ReactElement> {
+  const [{id}, sp] = await Promise.all([params, searchParams]);
   const dias = normalizaDias(sp?.dias);
 
   // O layout ja garantiu que o paciente existe (getPaciente + notFound).
   const [folhao, dimensao] = await Promise.all([
-    serieLabs(id, dias, { tipos: [...TIPOS_FOLHAO] }),
+    serieLabs(id, dias, {tipos: [...TIPOS_FOLHAO]}),
     getTipoRef(),
   ]);
 
   return (
     <section className="labs" aria-labelledby="labs-titulo">
-      <style dangerouslySetInnerHTML={{ __html: CSS_LABS }} />
+      <style dangerouslySetInnerHTML={{__html: CSS_LABS}}/>
 
       <header className="labs__topo">
         <div className="labs__ident">
@@ -69,7 +72,8 @@ export default async function LabsPage({ params, searchParams }: LabsPageProps):
             Folhão de laboratório
           </h2>
           <p className="labs__sub">
-            Uma linha por exame, uma coluna por dia — <strong>mais recente à esquerda</strong>. Rótulo, unidade e
+            Uma linha por exame, uma coluna por dia — <strong>mais recente à esquerda</strong>.
+            Rótulo, unidade e
             faixa fisiológica vêm da dimensão <code className="tabnum">evento_tipo_ref</code>.
           </p>
         </div>
@@ -90,7 +94,7 @@ export default async function LabsPage({ params, searchParams }: LabsPageProps):
         </nav>
       </header>
 
-      <TabelaoLabs folhao={folhao} dimensaoIndisponivel={dimensao.length === 0} />
+      <TabelaoLabs folhao={folhao} dimensaoIndisponivel={dimensao.length === 0}/>
     </section>
   );
 }

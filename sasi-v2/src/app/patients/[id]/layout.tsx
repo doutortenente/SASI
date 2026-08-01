@@ -14,11 +14,11 @@
 // junto da rota que o usa, porque hover/foco/scroll de aba nao cabem em estilo
 // inline. So tokens do design system — zero hex.
 // ============================================================================
-import type { ReactElement, ReactNode } from "react";
-import { notFound } from "next/navigation";
-import { getPaciente } from "@/lib/data";
-import { PatientHeader } from "@/features/patients/components/PatientHeader";
-import { PatientTabs } from "@/features/patients/components/PatientTabs";
+import type {ReactElement, ReactNode} from "react";
+import {notFound} from "next/navigation";
+import {getPaciente} from "@/lib/data";
+import {PatientHeader} from "@/features/patients/components/PatientHeader";
+import {PatientTabs} from "@/features/patients/components/PatientTabs";
 
 export const dynamic = "force-dynamic";
 
@@ -27,17 +27,20 @@ export interface PatientLayoutProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function PatientLayout({ children, params }: PatientLayoutProps): Promise<ReactElement> {
-  const { id } = await params;
+export default async function PatientLayout({
+                                              children,
+                                              params
+                                            }: PatientLayoutProps): Promise<ReactElement> {
+  const {id} = await params;
   const paciente = await getPaciente(id);
   if (!paciente) notFound();
 
   return (
     <div className="pt-shell">
-      <style dangerouslySetInnerHTML={{ __html: CSS_PACIENTE }} />
+      <style dangerouslySetInnerHTML={{__html: CSS_PACIENTE}}/>
 
-      <PatientHeader paciente={paciente} />
-      <PatientTabs pacienteId={paciente.id} />
+      <PatientHeader paciente={paciente}/>
+      <PatientTabs pacienteId={paciente.id}/>
 
       <div className="pt-conteudo">{children}</div>
     </div>

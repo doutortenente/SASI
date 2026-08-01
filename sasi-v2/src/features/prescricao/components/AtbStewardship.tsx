@@ -18,11 +18,11 @@
 //
 // O CSS (CSS_ATB_STEWARDSHIP) e injetado UMA vez pela pagina da aba.
 // ============================================================================
-import type { ReactElement } from "react";
-import type { StewardshipFlag, VwDiasAtbAtivo } from "@/lib/data";
-import type { IntencaoAtb } from "@/types/clinical";
-import { TRAVESSAO, fmtData, txt } from "@/features/patients/components/PatientHeader";
-import { num } from "@/lib/formatters/br";
+import type {ReactElement} from "react";
+import type {StewardshipFlag, VwDiasAtbAtivo} from "@/lib/data";
+import type {IntencaoAtb} from "@/types/clinical";
+import {fmtData, TRAVESSAO, txt} from "@/features/patients/components/PatientHeader";
+import {num} from "@/lib/formatters/br";
 
 // ---------------------------------------------------------------------------
 // Vocabulario e limiares (os mesmos da view — aqui so viram texto/cor)
@@ -89,12 +89,12 @@ function rotuloIntencao(v: IntencaoAtb | string | null | undefined): string | nu
 // ---------------------------------------------------------------------------
 // Regua de dias (0 -> 14). Sem biblioteca: divs + tokens.
 // ---------------------------------------------------------------------------
-function Regua({ dias, cor }: { dias: number; cor: string }): ReactElement {
+function Regua({dias, cor}: { dias: number; cor: string }): ReactElement {
   const pct = Math.max(0, Math.min(1, dias / DIAS_CRITICO)) * 100;
   return (
     <span className="atb-regua" aria-hidden="true">
-      <span className="atb-regua__fill" style={{ width: `${pct}%`, background: cor }} />
-      <span className="atb-regua__marca" style={{ left: `${(DIAS_ATENCAO / DIAS_CRITICO) * 100}%` }} />
+      <span className="atb-regua__fill" style={{width: `${pct}%`, background: cor}}/>
+      <span className="atb-regua__marca" style={{left: `${(DIAS_ATENCAO / DIAS_CRITICO) * 100}%`}}/>
     </span>
   );
 }
@@ -102,7 +102,7 @@ function Regua({ dias, cor }: { dias: number; cor: string }): ReactElement {
 // ---------------------------------------------------------------------------
 // Linha de um antibiotico
 // ---------------------------------------------------------------------------
-function LinhaAtb({ atb }: { atb: VwDiasAtbAtivo }): ReactElement {
+function LinhaAtb({atb}: { atb: VwDiasAtbAtivo }): ReactElement {
   const estilo = estiloDe(atb.stewardship_flag);
   const dias = typeof atb.dias_terapia === "number" && Number.isFinite(atb.dias_terapia) ? atb.dias_terapia : null;
   const droga = txt(atb.droga) ?? TRAVESSAO;
@@ -113,7 +113,7 @@ function LinhaAtb({ atb }: { atb: VwDiasAtbAtivo }): ReactElement {
   const inicio = fmtData(atb.data_inicio);
 
   return (
-    <li className="atb-linha" style={{ borderLeftColor: estilo.cor }}>
+    <li className="atb-linha" style={{borderLeftColor: estilo.cor}}>
       {/* topo — droga, via e o dia de terapia */}
       <div className="atb-linha__topo">
         <span className="atb-linha__droga" title={droga}>
@@ -126,14 +126,18 @@ function LinhaAtb({ atb }: { atb: VwDiasAtbAtivo }): ReactElement {
         ) : null}
         <span
           className="atb-dia tabnum"
-          style={{ color: estilo.cor }}
+          style={{color: estilo.cor}}
           title={`Dia de terapia (D1 = data de início). ${estilo.leitura}.`}
         >
           {dias == null ? `D${TRAVESSAO}` : `D+${num(dias, 0)}`}
         </span>
         <span
           className="atb-flag"
-          style={{ background: estilo.fundo, color: estilo.cor, borderColor: `color-mix(in srgb, ${estilo.cor} 32%, transparent)` }}
+          style={{
+            background: estilo.fundo,
+            color: estilo.cor,
+            borderColor: `color-mix(in srgb, ${estilo.cor} 32%, transparent)`
+          }}
           title={estilo.leitura}
         >
           {estilo.rotulo}
@@ -151,7 +155,7 @@ function LinhaAtb({ atb }: { atb: VwDiasAtbAtivo }): ReactElement {
               : `${num(dias, 0)} dia(s) de terapia — marca em ${DIAS_ATENCAO} d, escala até ${DIAS_CRITICO} d`
           }
         >
-          {dias == null ? null : <Regua dias={dias} cor={estilo.cor} />}
+          {dias == null ? null : <Regua dias={dias} cor={estilo.cor}/>}
           <span className="atb-linha__inicio tabnum">início {inicio}</span>
         </div>
       )}
@@ -160,7 +164,8 @@ function LinhaAtb({ atb }: { atb: VwDiasAtbAtivo }): ReactElement {
       <div className="atb-linha__base">
         <span className="atb-campo">
           <span className="atb-campo__rot">Foco</span>
-          <span className={foco ? "atb-campo__val" : "atb-campo__val atb-campo__val--vazio"}>{foco ?? TRAVESSAO}</span>
+          <span
+            className={foco ? "atb-campo__val" : "atb-campo__val atb-campo__val--vazio"}>{foco ?? TRAVESSAO}</span>
         </span>
         <span className="atb-campo">
           <span className="atb-campo__rot">Intenção</span>
@@ -187,7 +192,7 @@ export interface AtbStewardshipProps {
   atbs: VwDiasAtbAtivo[];
 }
 
-export function AtbStewardship({ atbs }: AtbStewardshipProps): ReactElement {
+export function AtbStewardship({atbs}: AtbStewardshipProps): ReactElement {
   const lista = Array.isArray(atbs) ? atbs : [];
   const emAtencao = lista.filter((a: VwDiasAtbAtivo) => a.stewardship_flag === "warning").length;
   const criticos = lista.filter((a: VwDiasAtbAtivo) => a.stewardship_flag === "critical").length;
@@ -213,29 +218,32 @@ export function AtbStewardship({ atbs }: AtbStewardshipProps): ReactElement {
           {emAtencao + criticos > 0 ? (
             <p className="atb-resumo" role="status">
               {criticos > 0 ? (
-                <span style={{ color: "var(--danger)", fontWeight: 700 }}>
+                <span style={{color: "var(--danger)", fontWeight: 700}}>
                   {num(criticos, 0)} com {DIAS_CRITICO} dias ou mais
                 </span>
               ) : null}
               {criticos > 0 && emAtencao > 0 ? " · " : ""}
               {emAtencao > 0 ? (
-                <span style={{ color: "var(--warning)", fontWeight: 700 }}>
+                <span style={{color: "var(--warning)", fontWeight: 700}}>
                   {num(emAtencao, 0)} com {DIAS_ATENCAO} dias ou mais
                 </span>
               ) : null}
-              <span className="atb-resumo__acao"> — reavaliar indicação, descalonamento e duração.</span>
+              <span
+                className="atb-resumo__acao"> — reavaliar indicação, descalonamento e duração.</span>
             </p>
           ) : null}
 
           <ul className="atb-lista">
             {lista.map((a: VwDiasAtbAtivo) => (
-              <LinhaAtb key={a.atb_id} atb={a} />
+              <LinhaAtb key={a.atb_id} atb={a}/>
             ))}
           </ul>
 
           <p className="atb-rodape">
-            <span className="tabnum">D+n</span> = dia de terapia contando o D1 (data de início), calculado no banco.
-            Dose, duração planejada e motivo de suspensão vivem na tabela <code className="tabnum">atbs</code> e não
+            <span className="tabnum">D+n</span> = dia de terapia contando o D1 (data de início),
+            calculado no banco.
+            Dose, duração planejada e motivo de suspensão vivem na tabela <code
+            className="tabnum">atbs</code> e não
             aparecem nesta view.
           </p>
         </>

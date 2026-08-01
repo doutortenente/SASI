@@ -17,15 +17,16 @@ status: FONTE DA VERDADE ÚNICA
 
 A nota de admissão e a nota de evolução compartilham **a mesma anatomia**. A única diferença operacional:
 
-| Campo | Modo ADMISSÃO (D1) | Modo EVOLUÇÃO (D2+) |
-|---|---|---|
-| Cabeçalho `DH` | `1º DIA` | `Nº DIA` (real) |
-| `Admissão (DD/MM/AA):` | preenchido AGORA (estado de chegada) | **preservado/congelado** da admissão original |
-| Bloco narrativo temporal | **HPMA** (parágrafo cronológico de chegada) | **Intercorrências 24h** (só o Δ do período) |
-| Sinais vitais | da admissão | faixa Max–Min das 24h |
-| Resto (EF, Impressão, Conduta) | estado de chegada | estado atual |
+| Campo                          | Modo ADMISSÃO (D1)                          | Modo EVOLUÇÃO (D2+)                           |
+| ------------------------------ | ------------------------------------------- | --------------------------------------------- |
+| Cabeçalho `DH`                 | `1º DIA`                                    | `Nº DIA` (real)                               |
+| `Admissão (DD/MM/AA):`         | preenchido AGORA (estado de chegada)        | **preservado/congelado** da admissão original |
+| Bloco narrativo temporal       | **HPMA** (parágrafo cronológico de chegada) | **Intercorrências 24h** (só o Δ do período)   |
+| Sinais vitais                  | da admissão                                 | faixa Max–Min das 24h                         |
+| Resto (EF, Impressão, Conduta) | estado de chegada                           | estado atual                                  |
 
-**O conflito histórico (Intercorrências ↔ EF ↔ Impressão) morre aqui.** Cada bloco governa **UM eixo** e só um. Nenhum fato cabe em dois blocos. Redundância vira impossibilidade estrutural, não questão de disciplina.
+**O conflito histórico (Intercorrências ↔ EF ↔ Impressão) morre aqui.** Cada bloco governa **UM eixo** e só um. Nenhum
+fato cabe em dois blocos. Redundância vira impossibilidade estrutural, não questão de disciplina.
 
 ### Tabela de desconflito — LEI DE FERRO
 
@@ -36,7 +37,8 @@ A nota de admissão e a nota de evolução compartilham **a mesma anatomia**. A 
 | Impressão                        | **PROBLEMA ATIVO** | Lista numerada de problemas ativos                                         | Prosa corrida; repetir dado bruto já no EF                                      |
 | Conduta estruturada por sistemas | **AÇÃO**           | Plano 1:1 com cada problema ativo, dose + meta numérica                    | "Ajustar conforme resposta" sem número; ação órfã (sem problema correspondente) |
 
-**Teste de auditoria antes de entregar:** cada problema da Impressão tem uma linha de Conduta? Cada Conduta nasce de um problema? Se não, há ação órfã ou problema sem plano — corrige.
+**Teste de auditoria antes de entregar:** cada problema da Impressão tem uma linha de Conduta? Cada Conduta nasce de um
+problema? Se não, há ação órfã ou problema sem plano — corrige.
 
 ---
 
@@ -116,6 +118,7 @@ Gerado por SASI — Sistema de Auditoria e Síntese Intensiva — TEMPLATE-BASE 
 ## 🔧 REGRAS DE PREENCHIMENTO (valem para AMBAS as skills)
 
 ### Sinais vitais — Max–Min INVIOLÁVEL
+
 - **TODOS** os parâmetros: `[MÁXIMO]–[MÍNIMO]`. Sem exceção. **SpO2 também** (`SpO2 98–89%`, nunca `89–98`).
 - Se a fonte trouxer min > max, **inverta** e adicione tag `(revisar)`.
 - Abreviações sempre MAIÚSCULAS: PAS, PAD, PAM, FC, FR, SpO2, TAX, DX, BH, HB, HT, PLAQ, LEUCO, UR, CR, NA, K.
@@ -123,25 +126,38 @@ Gerado por SASI — Sistema de Auditoria e Síntese Intensiva — TEMPLATE-BASE 
 - Dado ausente → **OMITE a linha inteira**. Nunca `null`, nunca `N/A`, nunca em branco no meio.
 
 ### Flags de absurdo fisiológico (tag `(revisar)`)
-PAS <50 ou >260 · PAM <30 ou >200 · FC <20 ou >250 · FR <4 ou >80 · SpO2 >100 ou <50 · TAX <30 ou >43 · DX <20 ou >800 · BH >±10.000 mL/24h · Nora >2 mcg/kg/min (provável erro de diluição). Flag **não bloqueia** — o dado segue com a tag.
+
+PAS <50 ou >260 · PAM <30 ou >200 · FC <20 ou >250 · FR <4 ou >80 · SpO2 >100 ou <50 · TAX <30 ou >43 · DX <20 ou >800 ·
+BH >±10.000 mL/24h · Nora >2 mcg/kg/min (provável erro de diluição). Flag **não bloqueia** — o dado segue com a tag.
 
 ### Cabeçalho — problemas numerados
+
 Cada problema com **qualificador de gravidade/disfunção**, não diagnóstico nu.
+
 - ✅ `Choque séptico de foco pulmonar com IRpA hipoxêmica, em IOT/VM e DVA`
 - 💀 `Pneumonia` (não identifica a disfunção que justifica a UTI)
 
 ### Conduta — mapeamento 1:1
-Cada linha de conduta corresponde a um problema da Impressão. Metas SEMPRE numéricas: PAM ≥ 65, SpO2 92-96%, glicemia 140-180, lactato em queda, diurese ≥ 0,5 mL/kg/h. Proibido "ajustar conforme evolução" solto.
+
+Cada linha de conduta corresponde a um problema da Impressão. Metas SEMPRE numéricas: PAM ≥ 65, SpO2 92-96%, glicemia
+140-180, lactato em queda, diurese ≥ 0,5 mL/kg/h. Proibido "ajustar conforme evolução" solto.
 
 ### Campos vazios
-Sistema inteiro sem dado → `não avaliado`. Campo isolado sem dado → omite a linha. **Nunca inventa.** Zero alucinação é cláusula pétrea — campo sem fonte legível volta vazio + nota de operação, jamais um valor "razoável".
+
+Sistema inteiro sem dado → `não avaliado`. Campo isolado sem dado → omite a linha. **Nunca inventa.** Zero alucinação é
+cláusula pétrea — campo sem fonte legível volta vazio + nota de operação, jamais um valor "razoável".
 
 ---
 
 ## 🧠 Modo Nerd — por que Ramo C ganha
 
-A estrutura por sistemas (não cronológica) é o padrão UTI-BR porque deixa o plantonista entrante varrer o estado de cada órgão em <30s — o tempo que ele tem por leito num round de 33. Cada sistema é uma variável; o estado do paciente é a interação delas — Meta-Vision do Isagi.
+A estrutura por sistemas (não cronológica) é o padrão UTI-BR porque deixa o plantonista entrante varrer o estado de cada
+órgão em <30s — o tempo que ele tem por leito num round de 33. Cada sistema é uma variável; o estado do paciente é a
+interação delas — Meta-Vision do Isagi.
 
-O conflito que o Dr. Nicolas detectou (3 blocos contando a mesma coisa) era **falha de eixo**, não de conteúdo. A correção não é apagar blocos — é dar a cada um um eixo exclusivo: Tempo (o que mudou), Estado (como está), Problema (o que importa), Ação (o que faço). Quatro vetores ortogonais cobrem o paciente inteiro sem sobreposição. SBAR-UTI com geometria.
+O conflito que o Dr. Nicolas detectou (3 blocos contando a mesma coisa) era **falha de eixo**, não de conteúdo. A
+correção não é apagar blocos — é dar a cada um um eixo exclusivo: Tempo (o que mudou), Estado (como está), Problema (o
+que importa), Ação (o que faço). Quatro vetores ortogonais cobrem o paciente inteiro sem sobreposição. SBAR-UTI com
+geometria.
 
 ΔSOFA obrigatório porque Sepsis-3 (JAMA 2016) exige ΔSOFA ≥ 2 — "SOFA 7" sem baseline é ruído.

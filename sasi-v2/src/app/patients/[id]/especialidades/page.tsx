@@ -19,13 +19,17 @@
 // linha de exemplo. Item sem o campo obrigatorio (especialidade / descricao) e
 // descartado e contado em voz alta pelos componentes.
 // ============================================================================
-import type { ReactElement } from "react";
-import { notFound } from "next/navigation";
-import { getPaciente } from "@/lib/data";
-import type { Interconsulta, PatientSummary, Programacao } from "@/types/clinical";
-import { txt } from "@/features/patients/components/PatientHeader";
-import { InterconsultaList, CSS_ESPECIALIDADES, fmtDataEsp } from "@/features/especialidades/components/InterconsultaList";
-import { ProgramacaoList } from "@/features/especialidades/components/ProgramacaoList";
+import type {ReactElement} from "react";
+import {notFound} from "next/navigation";
+import {getPaciente} from "@/lib/data";
+import type {Interconsulta, PatientSummary, Programacao} from "@/types/clinical";
+import {txt} from "@/features/patients/components/PatientHeader";
+import {
+  CSS_ESPECIALIDADES,
+  fmtDataEsp,
+  InterconsultaList
+} from "@/features/especialidades/components/InterconsultaList";
+import {ProgramacaoList} from "@/features/especialidades/components/ProgramacaoList";
 
 export const dynamic = "force-dynamic";
 
@@ -38,8 +42,8 @@ export interface EspecialidadesPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function EspecialidadesPage({ params }: EspecialidadesPageProps): Promise<ReactElement> {
-  const { id } = await params;
+export default async function EspecialidadesPage({params}: EspecialidadesPageProps): Promise<ReactElement> {
+  const {id} = await params;
   const paciente = await getPaciente(id);
   if (!paciente) notFound();
 
@@ -50,7 +54,7 @@ export default async function EspecialidadesPage({ params }: EspecialidadesPageP
 
   return (
     <section className="esps" aria-labelledby="esps-titulo">
-      <style dangerouslySetInnerHTML={{ __html: CSS_ESPECIALIDADES + CSS_ESPS }} />
+      <style dangerouslySetInnerHTML={{__html: CSS_ESPECIALIDADES + CSS_ESPS}}/>
 
       <header className="esps__topo">
         <div className="esps__ident">
@@ -58,7 +62,8 @@ export default async function EspecialidadesPage({ params }: EspecialidadesPageP
             Especialidades
           </h2>
           <p className="esps__sub">
-            Interconsultas e programação da ficha de admissão (<code className="tabnum">patient_summary</code>),
+            Interconsultas e programação da ficha de admissão (<code
+            className="tabnum">patient_summary</code>),
             agrupadas por status — <strong>pendente primeiro</strong>.
           </p>
         </div>
@@ -70,11 +75,11 @@ export default async function EspecialidadesPage({ params }: EspecialidadesPageP
         ) : null}
       </header>
 
-      <InterconsultaList itens={interconsultas} />
+      <InterconsultaList itens={interconsultas}/>
 
-      <hr className="esps__divisor" />
+      <hr className="esps__divisor"/>
 
-      <ProgramacaoList itens={programacao} />
+      <ProgramacaoList itens={programacao}/>
     </section>
   );
 }

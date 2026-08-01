@@ -12,11 +12,18 @@
 // DOUTRINA: cabecalho conta por gravidade em TEXTO (cor nunca sozinha) e o
 // estado vazio e um convite explicito, nunca uma grade muda.
 // ============================================================================
-import { useMemo, type ReactElement } from "react";
-import { BedCard, CSS_BED_CARD, ORDEM_GRAVIDADE, ROTULO_GRAVIDADE, type LeitoTriado, type ResumoPendencia } from "./BedCard";
-import type { Gravity } from "@/features/war-room/triage";
-import type { EvolucaoResumo } from "@/lib/formatters/tempo";
-import { passaFiltroUti, ROTULO_UTI, useUiStore } from "@/stores/uiStore";
+import {type ReactElement, useMemo} from "react";
+import {
+  BedCard,
+  CSS_BED_CARD,
+  type LeitoTriado,
+  ORDEM_GRAVIDADE,
+  type ResumoPendencia,
+  ROTULO_GRAVIDADE
+} from "./BedCard";
+import type {Gravity} from "@/features/war-room/triage";
+import type {EvolucaoResumo} from "@/lib/formatters/tempo";
+import {passaFiltroUti, ROTULO_UTI, useUiStore} from "@/stores/uiStore";
 
 export interface BedGridProps {
   /** Linhas de vw_dashboard_uti ja passadas por triagem(). */
@@ -31,9 +38,9 @@ export interface BedGridProps {
 
 type Contagem = Record<Gravity, number>;
 
-const ZERO: Contagem = { critical: 0, unstable: 0, watcher: 0, stable: 0, deceased: 0 };
+const ZERO: Contagem = {critical: 0, unstable: 0, watcher: 0, stable: 0, deceased: 0};
 
-export function BedGrid({ leitos, pendencias, evolucoes, lidoEm }: BedGridProps): ReactElement {
+export function BedGrid({leitos, pendencias, evolucoes, lidoEm}: BedGridProps): ReactElement {
   const filtro = useUiStore((s) => s.uti);
   const setUti = useUiStore((s) => s.setUti);
   const compacto = useUiStore((s) => s.warRoom);
@@ -44,7 +51,7 @@ export function BedGrid({ leitos, pendencias, evolucoes, lidoEm }: BedGridProps)
   );
 
   const contagem = useMemo(() => {
-    const c: Contagem = { ...ZERO };
+    const c: Contagem = {...ZERO};
     for (const l of visiveis) c[l.gravity] += 1;
     return c;
   }, [visiveis]);
@@ -53,13 +60,14 @@ export function BedGrid({ leitos, pendencias, evolucoes, lidoEm }: BedGridProps)
   if (leitos.length === 0) {
     return (
       <section className="bedgrid" aria-labelledby="bedgrid-vazio">
-        <style dangerouslySetInnerHTML={{ __html: CSS_BED_GRID + CSS_BED_CARD }} />
+        <style dangerouslySetInnerHTML={{__html: CSS_BED_GRID + CSS_BED_CARD}}/>
         <div className="bedgrid__vazio">
           <p className="bedgrid__vazio-ttl" id="bedgrid-vazio">
             Nenhum leito ativo
           </p>
           <p className="bedgrid__vazio-txt">
-            A visão <code className="tabnum">vw_dashboard_uti</code> não devolveu nenhum paciente com
+            A visão <code className="tabnum">vw_dashboard_uti</code> não devolveu nenhum paciente
+            com
             leito ativo. Isso acontece quando todos receberam alta/óbito/transferência — ou quando a
             leitura do banco falhou.
           </p>
@@ -75,7 +83,7 @@ export function BedGrid({ leitos, pendencias, evolucoes, lidoEm }: BedGridProps)
   if (visiveis.length === 0) {
     return (
       <section className="bedgrid" aria-labelledby="bedgrid-filtro">
-        <style dangerouslySetInnerHTML={{ __html: CSS_BED_GRID + CSS_BED_CARD }} />
+        <style dangerouslySetInnerHTML={{__html: CSS_BED_GRID + CSS_BED_CARD}}/>
         <div className="bedgrid__vazio">
           <p className="bedgrid__vazio-ttl" id="bedgrid-filtro">
             Nenhum leito ativo em {ROTULO_UTI[filtro]}
@@ -95,11 +103,12 @@ export function BedGrid({ leitos, pendencias, evolucoes, lidoEm }: BedGridProps)
   // ---- painel ---------------------------------------------------------------
   return (
     <section className="bedgrid" aria-labelledby="bedgrid-ttl">
-      <style dangerouslySetInnerHTML={{ __html: CSS_BED_GRID + CSS_BED_CARD }} />
+      <style dangerouslySetInnerHTML={{__html: CSS_BED_GRID + CSS_BED_CARD}}/>
 
       <header className="bedgrid__cab">
         <h2 className="bedgrid__ttl" id="bedgrid-ttl">
-          <span className="tabnum">{visiveis.length}</span> leito{visiveis.length > 1 ? "s" : ""} ativo
+          <span
+            className="tabnum">{visiveis.length}</span> leito{visiveis.length > 1 ? "s" : ""} ativo
           {visiveis.length > 1 ? "s" : ""}
           {filtro === "todas" ? "" : ` · ${ROTULO_UTI[filtro]}`}
         </h2>
@@ -109,9 +118,10 @@ export function BedGrid({ leitos, pendencias, evolucoes, lidoEm }: BedGridProps)
             <li
               key={g}
               className="bedgrid__pill"
-              style={{ background: `var(--grav-${g}-bg)`, color: `var(--grav-${g}-text)` }}
+              style={{background: `var(--grav-${g}-bg)`, color: `var(--grav-${g}-text)`}}
             >
-              <span className="bedgrid__ponto" style={{ background: `var(--grav-${g}-solid)` }} aria-hidden="true" />
+              <span className="bedgrid__ponto" style={{background: `var(--grav-${g}-solid)`}}
+                    aria-hidden="true"/>
               <span className="tabnum">{contagem[g]}</span>{" "}
               {contagem[g] > 1 ? ROTULO_GRAVIDADE[g].p : ROTULO_GRAVIDADE[g].s}
             </li>

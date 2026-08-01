@@ -24,9 +24,9 @@
 // "ha quantas horas foi a ultima evolucao" — feita no SERVIDOR, no fuso do
 // plantao, para nao existir data no client.
 // ============================================================================
-import type { ReactElement } from "react";
-import { RoundList, type LinhaRound } from "@/features/rounds/components/RoundList";
-import { triagem } from "@/features/war-room/triage";
+import type {ReactElement} from "react";
+import {type LinhaRound, RoundList} from "@/features/rounds/components/RoundList";
+import {triagem} from "@/features/war-room/triage";
 import {
   listarAtbsAtivos,
   listarLeitosAtivos,
@@ -34,14 +34,18 @@ import {
   mapearPendenciasAbertas,
   type VwDiasAtbAtivo,
 } from "@/lib/data";
-import { resumoEvolucao } from "@/lib/formatters/tempo";
+import {resumoEvolucao} from "@/lib/formatters/tempo";
 
 export const dynamic = "force-dynamic";
 
 /** Fuso do plantao: o servidor pode estar em UTC, o medico nunca esta. */
 const FUSO = "America/Sao_Paulo";
 
-const fmtHora = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: FUSO });
+const fmtHora = new Intl.DateTimeFormat("pt-BR", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: FUSO
+});
 
 export default async function RoundsPage(): Promise<ReactElement> {
   // 1. leitos ativos (view) + triagem: pior primeiro
@@ -72,5 +76,5 @@ export default async function RoundsPage(): Promise<ReactElement> {
     }),
   );
 
-  return <RoundList linhas={linhas} lidoEm={fmtHora.format(agora)} />;
+  return <RoundList linhas={linhas} lidoEm={fmtHora.format(agora)}/>;
 }

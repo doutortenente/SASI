@@ -15,8 +15,16 @@ export const HORAS_EVOLUCAO_ATRASADA = 24;
 
 const TRAVESSAO = "—";
 
-const fmtHora = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: FUSO });
-const fmtDiaMes = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", timeZone: FUSO });
+const fmtHora = new Intl.DateTimeFormat("pt-BR", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: FUSO
+});
+const fmtDiaMes = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "2-digit",
+  timeZone: FUSO
+});
 const fmtDiaCheio = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
   month: "2-digit",
@@ -38,14 +46,14 @@ export interface EvolucaoResumo {
  * exatamente o que exige acao (dado velho nao deve ser confundido com dado novo).
  */
 export function resumoEvolucao(iso: string | null | undefined, agora: Date): EvolucaoResumo {
-  if (!iso) return { rotulo: TRAVESSAO, atrasada: true };
+  if (!iso) return {rotulo: TRAVESSAO, atrasada: true};
   const t = new Date(iso);
-  if (Number.isNaN(t.getTime())) return { rotulo: TRAVESSAO, atrasada: true };
+  if (Number.isNaN(t.getTime())) return {rotulo: TRAVESSAO, atrasada: true};
 
   const horas = (agora.getTime() - t.getTime()) / 3_600_000;
   const rotulo =
     fmtDiaCheio.format(t) === fmtDiaCheio.format(agora)
       ? `hoje ${fmtHora.format(t)}`
       : `${fmtDiaMes.format(t)} ${fmtHora.format(t)}`;
-  return { rotulo, atrasada: horas >= HORAS_EVOLUCAO_ATRASADA };
+  return {rotulo, atrasada: horas >= HORAS_EVOLUCAO_ATRASADA};
 }

@@ -25,17 +25,17 @@
 // banco vivo, de 18-jul). Exame fisico velho apresentado sem data e leitura
 // errada de paciente — entao a tela datilografa a data e grita a defasagem.
 // ============================================================================
-import type { ReactElement } from "react";
-import { getTipoRefMap, getUltimaEvolucao } from "@/lib/data";
+import type {ReactElement} from "react";
+import {getTipoRefMap, getUltimaEvolucao} from "@/lib/data";
 import {
-  SystemPanel,
-  ORDEM_SISTEMAS,
-  ROTULO_PLANTAO,
   diasDesde,
   fmtDataBR,
   mapaUnidades,
-  sistemasDaEvolucao,
+  ORDEM_SISTEMAS,
+  ROTULO_PLANTAO,
   type SistemaId,
+  sistemasDaEvolucao,
+  SystemPanel,
 } from "@/features/evolucao/components/SystemPanel";
 
 export const dynamic = "force-dynamic";
@@ -64,8 +64,8 @@ export interface ExamePageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function ExamePage({ params }: ExamePageProps): Promise<ReactElement> {
-  const { id } = await params;
+export default async function ExamePage({params}: ExamePageProps): Promise<ReactElement> {
+  const {id} = await params;
 
   // O layout ja garantiu que o paciente existe (getPaciente + notFound).
   const [evolucao, refs] = await Promise.all([getUltimaEvolucao(id), getTipoRefMap()]);
@@ -88,10 +88,10 @@ export default async function ExamePage({ params }: ExamePageProps): Promise<Rea
           borderRadius: "var(--radius-lg, 12px)",
         }}
       >
-        <strong style={{ fontSize: "var(--text-md, 17px)", color: "var(--text-heading)" }}>
+        <strong style={{fontSize: "var(--text-md, 17px)", color: "var(--text-heading)"}}>
           Nenhuma evolução registrada
         </strong>
-        <span style={{ fontSize: "var(--text-sm, 13px)", color: "var(--text-muted)" }}>
+        <span style={{fontSize: "var(--text-sm, 13px)", color: "var(--text-muted)"}}>
           O exame físico é lido da última evolução (tabela <code className="tabnum">evolucoes</code>). Este paciente
           ainda não tem nenhuma — e o app não preenche o vazio.
         </span>
@@ -109,13 +109,25 @@ export default async function ExamePage({ params }: ExamePageProps): Promise<Rea
   const dias = diasDesde(evolucao.data_evolucao);
 
   return (
-    <section style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }} aria-labelledby="ex-titulo">
+    <section style={{display: "flex", flexDirection: "column", gap: 14, minWidth: 0}}
+             aria-labelledby="ex-titulo">
       {/* ---- cabecalho da aba ---- */}
-      <header style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 10 }}>
-        <div style={{ flex: "1 1 320px", minWidth: 0 }}>
+      <header style={{
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "flex-end",
+        justifyContent: "space-between",
+        gap: 10
+      }}>
+        <div style={{flex: "1 1 320px", minWidth: 0}}>
           <h2
             id="ex-titulo"
-            style={{ margin: 0, fontSize: "var(--text-lg, 20px)", fontWeight: 700, color: "var(--text-heading)" }}
+            style={{
+              margin: 0,
+              fontSize: "var(--text-lg, 20px)",
+              fontWeight: 700,
+              color: "var(--text-heading)"
+            }}
           >
             Exame físico
           </h2>
@@ -128,21 +140,30 @@ export default async function ExamePage({ params }: ExamePageProps): Promise<Rea
               color: "var(--text-muted)",
             }}
           >
-            Um painel por sistema, lido dos JSONB da <strong>última evolução</strong>. Pares de sinais vitais sempre em{" "}
-            <strong>máximo–mínimo</strong>. Sistema sem nenhum campo aparece como <strong>não avaliado</strong>.
+            Um painel por sistema, lido dos JSONB da <strong>última evolução</strong>. Pares de
+            sinais vitais sempre em{" "}
+            <strong>máximo–mínimo</strong>. Sistema sem nenhum campo aparece como <strong>não
+            avaliado</strong>.
           </p>
         </div>
 
-        <div style={{ textAlign: "right" }}>
+        <div style={{textAlign: "right"}}>
           <div style={EYEBROW}>Evolução</div>
           <div
             className="tabnum"
             title="evolucoes.data_evolucao · evolucoes.plantao"
-            style={{ fontSize: "var(--text-md, 17px)", fontWeight: 700, color: "var(--text-heading)" }}
+            style={{
+              fontSize: "var(--text-md, 17px)",
+              fontWeight: 700,
+              color: "var(--text-heading)"
+            }}
           >
             {data}
           </div>
-          <div style={{ fontSize: "var(--text-xs, 11px)", color: "var(--text-muted)" }}>plantão {plantao}</div>
+          <div style={{
+            fontSize: "var(--text-xs, 11px)",
+            color: "var(--text-muted)"
+          }}>plantão {plantao}</div>
         </div>
       </header>
 
@@ -156,11 +177,13 @@ export default async function ExamePage({ params }: ExamePageProps): Promise<Rea
             borderLeft: "4px solid var(--warning)",
           }}
         >
-          <strong style={{ color: "var(--text-heading)" }}>
-            Este exame não é de hoje: a última evolução é de {data} (há <span className="tabnum">{dias}</span>{" "}
+          <strong style={{color: "var(--text-heading)"}}>
+            Este exame não é de hoje: a última evolução é de {data} (há <span
+            className="tabnum">{dias}</span>{" "}
             {dias === 1 ? "dia" : "dias"}).
           </strong>{" "}
-          Os achados abaixo valem para aquele plantão. Nada nesta tela foi atualizado desde então — o app mostra a
+          Os achados abaixo valem para aquele plantão. Nada nesta tela foi atualizado desde então —
+          o app mostra a
           última evolução gravada, não o estado atual do leito.
         </p>
       ) : null}
@@ -176,25 +199,41 @@ export default async function ExamePage({ params }: ExamePageProps): Promise<Rea
             fontSize: "var(--text-xs, 11px)",
           }}
         >
-          <strong style={{ color: "var(--text-heading)" }}>Unidades não exibidas nesta sessão.</strong> A dimensão{" "}
-          <code className="tabnum">evento_tipo_ref</code> voltou vazia (a única policy de leitura é para o papel{" "}
-          <code className="tabnum">authenticated</code> e o app usa a chave anônima), e é dela que sai a{" "}
-          <code className="tabnum">unidade_padrao</code> de cada parâmetro. Os números saem <strong>pelados</strong> —
-          preferimos isso a exibir unidade chutada. Exceção: campos cujo próprio nome traz a unidade (
+          <strong style={{color: "var(--text-heading)"}}>Unidades não exibidas nesta
+            sessão.</strong> A dimensão{" "}
+          <code className="tabnum">evento_tipo_ref</code> voltou vazia (a única policy de leitura é
+          para o papel{" "}
+          <code className="tabnum">authenticated</code> e o app usa a chave anônima), e é dela que
+          sai a{" "}
+          <code className="tabnum">unidade_padrao</code> de cada parâmetro. Os números
+          saem <strong>pelados</strong> —
+          preferimos isso a exibir unidade chutada. Exceção: campos cujo próprio nome traz a unidade
+          (
           <code className="tabnum">*_ml</code>).
         </p>
       ) : null}
 
       {/* ---- os 7 sistemas, na ordem clinica ---- */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 12 }}>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+        gap: 12
+      }}>
         {ORDEM_SISTEMAS.map((s: SistemaId) => (
-          <SystemPanel key={s} sistema={s} dados={dados[s]} unidades={unidades} />
+          <SystemPanel key={s} sistema={s} dados={dados[s]} unidades={unidades}/>
         ))}
       </div>
 
-      <p style={{ margin: 0, fontSize: "var(--text-xs, 11px)", lineHeight: "var(--leading-snug, 1.35)", color: "var(--text-faint)" }}>
-        Fonte: <code className="tabnum">evolucoes</code> (um JSONB por sistema). Rótulos e unidades vêm do banco;
-        campo gravado fora do contrato conhecido aparece em <strong>outros campos registrados</strong>, cru — dado
+      <p style={{
+        margin: 0,
+        fontSize: "var(--text-xs, 11px)",
+        lineHeight: "var(--leading-snug, 1.35)",
+        color: "var(--text-faint)"
+      }}>
+        Fonte: <code className="tabnum">evolucoes</code> (um JSONB por sistema). Rótulos e unidades
+        vêm do banco;
+        campo gravado fora do contrato conhecido aparece em <strong>outros campos
+        registrados</strong>, cru — dado
         gravado nunca é escondido.
       </p>
     </section>

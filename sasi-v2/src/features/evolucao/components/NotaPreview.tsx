@@ -1,4 +1,5 @@
 "use client";
+import type {ReactElement} from "react";
 // ============================================================================
 // SASI v2 — NotaPreview (nota de evolucao em texto corrido, pronta para colar)
 // ----------------------------------------------------------------------------
@@ -23,9 +24,8 @@
 //     divergencia de fuso entre a marcacao do servidor e a do navegador.
 //  5. Alvo de toque >= 44px, foco visivel, sem animacao infinita.
 // ============================================================================
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { ReactElement } from "react";
-import { parear, type ParImpressaoConduta } from "./ProblemaConduta";
+import {useCallback, useEffect, useRef, useState} from "react";
+import {parear, type ParImpressaoConduta} from "./ProblemaConduta";
 
 const TRAVESSAO = "—";
 /** Marca do item orfao. Vai no texto copiado de proposito. */
@@ -128,7 +128,7 @@ export interface NotaPreviewProps {
 
 type EstadoCopia = "parado" | "copiado" | "selecionado";
 
-export function NotaPreview({ fonte }: NotaPreviewProps): ReactElement {
+export function NotaPreview({fonte}: NotaPreviewProps): ReactElement {
   const nota = montarNota(fonte);
   const [estado, setEstado] = useState<EstadoCopia>("parado");
   const refNota = useRef<HTMLPreElement | null>(null);
@@ -170,15 +170,18 @@ export function NotaPreview({ fonte }: NotaPreviewProps): ReactElement {
             Nota para o prontuário
           </h2>
           <p className="np__sub">
-            Texto corrido montado a partir desta evolução, na ordem do template: cabeçalho, problemas, exame por
-            sistemas, impressão e conduta. <strong>Confira antes de colar</strong> — a nota reproduz o que está gravado,
+            Texto corrido montado a partir desta evolução, na ordem do template: cabeçalho,
+            problemas, exame por
+            sistemas, impressão e conduta. <strong>Confira antes de colar</strong> — a nota reproduz
+            o que está gravado,
             e o que falta aparece como {TRAVESSAO} ou {" "}
             <span className="np__marca">{SEM_PAR}</span>.
           </p>
         </div>
 
         <div className="np__acoes">
-          <button type="button" className="np__btn" onClick={copiar} title="Copiar a nota inteira para a área de transferência">
+          <button type="button" className="np__btn" onClick={copiar}
+                  title="Copiar a nota inteira para a área de transferência">
             Copiar nota
           </button>
           <span className="np__aviso" role="status" aria-live="polite">
@@ -194,12 +197,14 @@ export function NotaPreview({ fonte }: NotaPreviewProps): ReactElement {
       {orfaos > 0 ? (
         <p className="np__alerta">
           A nota abaixo sai com <strong>{orfaos}</strong> marca{orfaos > 1 ? "s" : ""} de{" "}
-          <span className="np__marca">{SEM_PAR}</span>. A marca é intencional: o par impressão ⇄ conduta está quebrado
+          <span className="np__marca">{SEM_PAR}</span>. A marca é intencional: o par impressão ⇄
+          conduta está quebrado
           nesta evolução e o erro precisa viajar junto com o texto, não ficar só na tela.
         </p>
       ) : null}
 
-      <pre className="np__nota tabnum" ref={refNota} tabIndex={0} aria-label="Nota de evolução em texto corrido">
+      <pre className="np__nota tabnum" ref={refNota} tabIndex={0}
+           aria-label="Nota de evolução em texto corrido">
         {nota}
       </pre>
     </section>

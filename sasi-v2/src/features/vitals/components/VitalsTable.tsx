@@ -23,11 +23,10 @@
 // O CSS (CSS_VITALS_TABLE) e injetado UMA vez pela pagina que monta a aba —
 // mesmo padrao de BedGrid/BedCard.
 // ============================================================================
-import type { ReactElement } from "react";
-import type { SerieVital } from "@/lib/data";
-import { num } from "@/lib/formatters/br";
-import { Sparkline, type PontoSparkline } from "./Sparkline";
-import { unidadeSegura } from "@/lib/formatters/br";
+import type {ReactElement} from "react";
+import type {SerieVital} from "@/lib/data";
+import {num, unidadeSegura} from "@/lib/formatters/br";
+import {type PontoSparkline, Sparkline} from "./Sparkline";
 
 const TRAVESSAO = "—";
 
@@ -104,10 +103,10 @@ function resumoLinha(l: LinhaVital, horas: number): string {
 
 /** Valor numerico com sinalizacao de implausivel (cor + title). Ausente => "—". */
 function Valor({
-  v,
-  linha,
-  classe,
-}: {
+                 v,
+                 linha,
+                 classe,
+               }: {
   v: number | null;
   linha: LinhaVital;
   classe?: string;
@@ -117,7 +116,7 @@ function Valor({
   return (
     <span
       className={classe}
-      style={alerta ? { color: "var(--danger)", fontWeight: 700 } : undefined}
+      style={alerta ? {color: "var(--danger)", fontWeight: 700} : undefined}
       title={alerta ? tituloFora(linha.faixa_min, linha.faixa_max, linha.unidade) : undefined}
     >
       {num(v, CASAS)}
@@ -131,7 +130,11 @@ function Valor({
   );
 }
 
-export function VitalsTable({ linhas, horas = 24, semDimensao = false }: VitalsTableProps): ReactElement {
+export function VitalsTable({
+                              linhas,
+                              horas = 24,
+                              semDimensao = false
+                            }: VitalsTableProps): ReactElement {
   // Estado vazio estrutural: nem a lista de parametros existe (dimensao fora do ar
   // E sem fallback). Nao inventamos linhas — dizemos o que aconteceu.
   if (linhas.length === 0) {
@@ -162,126 +165,133 @@ export function VitalsTable({ linhas, horas = 24, semDimensao = false }: VitalsT
       <div className="vt-wrap" role="region" aria-label="Sinais vitais — rolagem horizontal" tabIndex={0}>
         <table className="vt">
           <caption className="vt__cap">
-            Máximo–mínimo por parâmetro nas últimas {horas} h — fonte <code className="tabnum">eventos_clinicos</code>
+            Máximo–mínimo por parâmetro nas últimas {horas} h — fonte <code
+            className="tabnum">eventos_clinicos</code>
           </caption>
           <thead>
-            <tr>
-              <th scope="col" className="vt__th vt__th--param">
-                Parâmetro
-              </th>
-              <th scope="col" className="vt__th vt__th--max">
-                Máximo
-              </th>
-              <th scope="col" className="vt__th vt__th--min">
-                Mínimo
-              </th>
-              <th scope="col" className="vt__th vt__th--dir">
-                Último
-              </th>
-              <th scope="col" className="vt__th">
-                Unidade
-              </th>
-              <th scope="col" className="vt__th vt__th--trend">
-                Tendência {horas} h
-              </th>
-            </tr>
+          <tr>
+            <th scope="col" className="vt__th vt__th--param">
+              Parâmetro
+            </th>
+            <th scope="col" className="vt__th vt__th--max">
+              Máximo
+            </th>
+            <th scope="col" className="vt__th vt__th--min">
+              Mínimo
+            </th>
+            <th scope="col" className="vt__th vt__th--dir">
+              Último
+            </th>
+            <th scope="col" className="vt__th">
+              Unidade
+            </th>
+            <th scope="col" className="vt__th vt__th--trend">
+              Tendência {horas} h
+            </th>
+          </tr>
           </thead>
           <tbody>
-            {linhas.map((l: LinhaVital) => {
-              const semDado = l.n === 0;
-              const unica = l.n === 1;
-              const hora = hhmm(l.ts);
+          {linhas.map((l: LinhaVital) => {
+            const semDado = l.n === 0;
+            const unica = l.n === 1;
+            const hora = hhmm(l.ts);
 
-              return (
-                <tr key={l.tipo} className={semDado ? "vt__tr vt__tr--vazio" : "vt__tr"}>
-                  {/* parametro + quantas medidas sustentam o par + selo de revisao */}
-                  <th scope="row" className="vt__param" title={resumoLinha(l, horas)}>
-                    <span className="vt__nome">{l.rotulo}</span>
-                    {semDado ? (
-                      <span className="vt__n">não avaliado</span>
-                    ) : (
-                      <span className="vt__n tabnum">
+            return (
+              <tr key={l.tipo} className={semDado ? "vt__tr vt__tr--vazio" : "vt__tr"}>
+                {/* parametro + quantas medidas sustentam o par + selo de revisao */}
+                <th scope="row" className="vt__param" title={resumoLinha(l, horas)}>
+                  <span className="vt__nome">{l.rotulo}</span>
+                  {semDado ? (
+                    <span className="vt__n">não avaliado</span>
+                  ) : (
+                    <span className="vt__n tabnum">
                         {l.n} med{l.n > 1 ? "s" : ""}.
                       </span>
-                    )}
-                    {l.requires_review ? (
-                      <span
-                        className="vt__rev"
-                        title="há medida marcada para revisão (requires_review / baixa confiança na extração) — o sistema sinaliza, não corrige"
-                      >
+                  )}
+                  {l.requires_review ? (
+                    <span
+                      className="vt__rev"
+                      title="há medida marcada para revisão (requires_review / baixa confiança na extração) — o sistema sinaliza, não corrige"
+                    >
                         revisar
                       </span>
-                    ) : null}
-                  </th>
+                  ) : null}
+                </th>
 
-                  {/* MAXIMO — sempre a esquerda do minimo (regra de ferro) */}
-                  <td className="vt__max tabnum">
-                    <Valor v={l.max} linha={l} />
-                  </td>
+                {/* MAXIMO — sempre a esquerda do minimo (regra de ferro) */}
+                <td className="vt__max tabnum">
+                  <Valor v={l.max} linha={l}/>
+                </td>
 
-                  {/* MINIMO — colado ao maximo: o par se le "135–88" */}
-                  <td className="vt__min tabnum">
-                    {semDado ? (
-                      <span className="vt__vazio">{TRAVESSAO}</span>
-                    ) : unica ? (
-                      <span className="vt__unica" title="medida única na janela — não há par máximo–mínimo">
+                {/* MINIMO — colado ao maximo: o par se le "135–88" */}
+                <td className="vt__min tabnum">
+                  {semDado ? (
+                    <span className="vt__vazio">{TRAVESSAO}</span>
+                  ) : unica ? (
+                    <span className="vt__unica"
+                          title="medida única na janela — não há par máximo–mínimo">
                         única
                       </span>
-                    ) : (
-                      <>
+                  ) : (
+                    <>
                         <span className="vt__sep" aria-hidden="true">
                           –
                         </span>
-                        <Valor v={l.min} linha={l} />
-                      </>
-                    )}
-                  </td>
+                      <Valor v={l.min} linha={l}/>
+                    </>
+                  )}
+                </td>
 
-                  {/* ULTIMO — onde o paciente esta agora, com a hora da medida */}
-                  <td className="vt__ult tabnum">
-                    <Valor v={l.ultimo} linha={l} />
-                    {hora ? (
-                      <span className="vt__hora tabnum" title="horário da última medida (America/Sao_Paulo)">
+                {/* ULTIMO — onde o paciente esta agora, com a hora da medida */}
+                <td className="vt__ult tabnum">
+                  <Valor v={l.ultimo} linha={l}/>
+                  {hora ? (
+                    <span className="vt__hora tabnum"
+                          title="horário da última medida (America/Sao_Paulo)">
                         {hora}
                       </span>
-                    ) : null}
-                  </td>
+                  ) : null}
+                </td>
 
-                  {/* UNIDADE — de evento_tipo_ref (ou do evento gravado). Nunca chutada. */}
-                  <td className="vt__un">{l.unidade ? unidadeSegura(l.unidade) : <span className="vt__vazio">{TRAVESSAO}</span>}</td>
+                {/* UNIDADE — de evento_tipo_ref (ou do evento gravado). Nunca chutada. */}
+                <td className="vt__un">{l.unidade ? unidadeSegura(l.unidade) :
+                  <span className="vt__vazio">{TRAVESSAO}</span>}</td>
 
-                  {/* TENDENCIA — SVG puro; menos de 2 pontos nao desenha */}
-                  <td className="vt__trend">
-                    {l.pontos.length >= 2 ? (
-                      <Sparkline
-                        pontos={l.pontos}
-                        rotulo={l.rotulo}
-                        unidade={unidadeSegura(l.unidade)}
-                        faixaMin={l.faixa_min}
-                        faixaMax={l.faixa_max}
-                        casas={CASAS}
-                        cor={l.fora_faixa ? "var(--danger)" : "var(--accent)"}
-                      />
-                    ) : (
-                      <span className="vt__vazio" title={`menos de 2 medidas em ${horas} h — sem tendência`}>
+                {/* TENDENCIA — SVG puro; menos de 2 pontos nao desenha */}
+                <td className="vt__trend">
+                  {l.pontos.length >= 2 ? (
+                    <Sparkline
+                      pontos={l.pontos}
+                      rotulo={l.rotulo}
+                      unidade={unidadeSegura(l.unidade)}
+                      faixaMin={l.faixa_min}
+                      faixaMax={l.faixa_max}
+                      casas={CASAS}
+                      cor={l.fora_faixa ? "var(--danger)" : "var(--accent)"}
+                    />
+                  ) : (
+                    <span className="vt__vazio"
+                          title={`menos de 2 medidas em ${horas} h — sem tendência`}>
                         {TRAVESSAO}
                       </span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+                  )}
+                </td>
+              </tr>
+            );
+          })}
           </tbody>
         </table>
       </div>
 
       <ul className="vt-legenda">
         <li>
-          Leitura sempre <strong>máximo–mínimo</strong> (ex.: <span className="tabnum">135–88 mmHg</span>,{" "}
+          Leitura sempre <strong>máximo–mínimo</strong> (ex.: <span
+          className="tabnum">135–88 mmHg</span>,{" "}
           <span className="tabnum">98–89%</span>). Nunca o inverso.
         </li>
         <li>
-          <span className="vt-legenda__danger">Valor em vermelho</span> = fora da faixa fisiológica de{" "}
+          <span className="vt-legenda__danger">Valor em vermelho</span> = fora da faixa fisiológica
+          de{" "}
           <code className="tabnum">evento_tipo_ref</code> — o sistema sinaliza, não corrige.
         </li>
         <li>
@@ -289,12 +299,15 @@ export function VitalsTable({ linhas, horas = 24, semDimensao = false }: VitalsT
           <code className="tabnum">requires_review</code> (baixa confiança na extração).
         </li>
         <li>
-          <span className="vt__vazio">{TRAVESSAO}</span> = não avaliado no período. Ausência de medida nunca vira 0.
+          <span className="vt__vazio">{TRAVESSAO}</span> = não avaliado no período. Ausência de
+          medida nunca vira 0.
         </li>
         {semDimensao ? (
           <li className="vt-legenda__alerta">
-            <code className="tabnum">evento_tipo_ref</code> indisponível para esta sessão: rótulo = código do evento,
-            sem unidade padrão e <strong>sem faixa fisiológica</strong> — nenhum valor é sinalizado como implausível.
+            <code className="tabnum">evento_tipo_ref</code> indisponível para esta sessão: rótulo =
+            código do evento,
+            sem unidade padrão e <strong>sem faixa fisiológica</strong> — nenhum valor é sinalizado
+            como implausível.
           </li>
         ) : null}
       </ul>

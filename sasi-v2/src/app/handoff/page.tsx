@@ -26,14 +26,14 @@
 // features/war-room/triage e o texto vem de HandoffCard.textoDaPassagem().
 // Onde falta dado, sai "—"; onde falta REGISTRO, sai a frase ("não registradas").
 // ============================================================================
-import type { ReactElement } from "react";
-import { gravityDe } from "@/features/war-room/triage";
-import { CSS_EXPORT_ACOES, CopyButton, PrintButton } from "@/features/exports/components/CopyButton";
+import type {ReactElement} from "react";
+import {gravityDe} from "@/features/war-room/triage";
+import {CopyButton, CSS_EXPORT_ACOES, PrintButton} from "@/features/exports/components/CopyButton";
 import {
   CSS_HANDOFF_CARD,
   HandoffCard,
-  textoDaPassagem,
   type HandoffLeito,
+  textoDaPassagem,
 } from "@/features/exports/components/HandoffCard";
 import {
   mapearUltimasEvolucoes,
@@ -43,7 +43,7 @@ import {
   mapearPendenciasAbertas,
   type VwDiasAtbAtivo,
 } from "@/lib/data";
-import type { Evolucao, Paciente, Pendencia, VwDashboardUti } from "@/types/clinical";
+import type {Evolucao, Paciente, Pendencia, VwDashboardUti} from "@/types/clinical";
 
 export const dynamic = "force-dynamic";
 
@@ -96,7 +96,7 @@ export default async function HandoffPage(): Promise<ReactElement> {
     const p = cadastro.get(l.paciente_id) ?? null;
     const evolucao: Evolucao | null = evolucoes.get(l.paciente_id) ?? null;
     return {
-      leito: { ...l, gravity: gravityDe(l) },
+      leito: {...l, gravity: gravityDe(l)},
       evolucao,
       pendencias: pendencias.get(l.paciente_id) ?? [],
       atbs: atbPorPaciente.get(l.paciente_id) ?? [],
@@ -107,7 +107,7 @@ export default async function HandoffPage(): Promise<ReactElement> {
 
   // 3. o texto puro: montado UMA vez, no servidor. E o mesmo que a tela mostra.
   const geradoEm = agoraNoPlantao();
-  const texto = textoDaPassagem(leitos, { geradoEm, fuso: FUSO_ROTULO });
+  const texto = textoDaPassagem(leitos, {geradoEm, fuso: FUSO_ROTULO});
 
   const total = leitos.length;
   const utis = Array.from(new Set(leitos.map((h: HandoffLeito) => h.leito.uti)));
@@ -118,7 +118,7 @@ export default async function HandoffPage(): Promise<ReactElement> {
 
   return (
     <section className="hoff" aria-labelledby="hoff-ttl">
-      <style dangerouslySetInnerHTML={{ __html: CSS_HANDOFF + CSS_HANDOFF_CARD + CSS_EXPORT_ACOES }} />
+      <style dangerouslySetInnerHTML={{__html: CSS_HANDOFF + CSS_HANDOFF_CARD + CSS_EXPORT_ACOES}}/>
 
       <header className="hoff__cab">
         <div className="hoff__ttl-bloco">
@@ -126,7 +126,8 @@ export default async function HandoffPage(): Promise<ReactElement> {
               rotulo fica: e ele que identifica o documento impresso. */}
           <p className="hoff__eyebrow">Passagem de turno · SASI</p>
           <h2 className="hoff__ttl" id="hoff-ttl">
-            <span className="tabnum">{total}</span> leito{total === 1 ? "" : "s"} ativo{total === 1 ? "" : "s"}
+            <span
+              className="tabnum">{total}</span> leito{total === 1 ? "" : "s"} ativo{total === 1 ? "" : "s"}
             {utis.length > 0 ? ` · ${utis.join(" · ")}` : ""}
           </h2>
           <p className="hoff__sub tabnum">
@@ -134,7 +135,7 @@ export default async function HandoffPage(): Promise<ReactElement> {
             {pendAltas > 0 ? (
               <>
                 {" · "}
-                <b style={{ color: "var(--danger)" }}>
+                <b style={{color: "var(--danger)"}}>
                   {pendAltas} pendência{pendAltas > 1 ? "s" : ""} de prioridade alta
                 </b>
               </>
@@ -143,14 +144,16 @@ export default async function HandoffPage(): Promise<ReactElement> {
         </div>
 
         <div className="hoff__acoes">
-          <CopyButton texto={texto} />
-          <PrintButton />
+          <CopyButton texto={texto}/>
+          <PrintButton/>
         </div>
       </header>
 
       <p className="hoff__legenda">
-        3 linhas por leito — <b>1.</b> síntese (leito, nome, idade, HD) · <b>2.</b> o que mudou (SOFA, conduta
-        vigente, suporte, ATB em D+n) · <b>3.</b> pendências e riscos. Campo sem dado no banco aparece como
+        3 linhas por leito — <b>1.</b> síntese (leito, nome, idade, HD) · <b>2.</b> o que mudou
+        (SOFA, conduta
+        vigente, suporte, ATB em D+n) · <b>3.</b> pendências e riscos. Campo sem dado no banco
+        aparece como
         travessão; ausência de registro é dita por extenso.
       </p>
 
@@ -158,15 +161,17 @@ export default async function HandoffPage(): Promise<ReactElement> {
         <div className="hoff__vazio">
           <p className="hoff__vazio-ttl">Nenhum leito ativo</p>
           <p className="hoff__vazio-txt">
-            A visão <code className="tabnum">vw_dashboard_uti</code> não devolveu nenhum paciente com leito ativo —
-            todos receberam alta/óbito/transferência, ou a leitura do banco falhou. Não há passagem a gerar.
+            A visão <code className="tabnum">vw_dashboard_uti</code> não devolveu nenhum paciente
+            com leito ativo —
+            todos receberam alta/óbito/transferência, ou a leitura do banco falhou. Não há passagem
+            a gerar.
           </p>
         </div>
       ) : (
         <ol className="hoff__lista">
           {leitos.map((h: HandoffLeito, i: number) => (
             <li key={h.leito.paciente_id} className="hoff__item">
-              <HandoffCard h={h} ordem={i + 1} />
+              <HandoffCard h={h} ordem={i + 1}/>
             </li>
           ))}
         </ol>
@@ -175,7 +180,9 @@ export default async function HandoffPage(): Promise<ReactElement> {
       {/* Transparencia: o texto EXATO que o botao copia. Serve de saida manual
           se a area de transferencia falhar (rede http, permissao negada). */}
       <details className="hoff__cru">
-        <summary className="hoff__cru-ttl">Texto que será copiado (selecione e copie manualmente, se precisar)</summary>
+        <summary className="hoff__cru-ttl">Texto que será copiado (selecione e copie manualmente, se
+          precisar)
+        </summary>
         <pre className="hoff__cru-txt">{texto}</pre>
       </details>
 

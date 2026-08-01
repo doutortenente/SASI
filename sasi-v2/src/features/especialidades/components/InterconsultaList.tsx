@@ -22,9 +22,9 @@
 // "Especialidades" inteira usa (ProgramacaoList importa daqui) — mesmo padrao de
 // SummaryPanel <- PatientHeader.
 // ============================================================================
-import type { ReactElement } from "react";
-import type { Interconsulta } from "@/types/clinical";
-import { TRAVESSAO, fmtData, txt } from "@/features/patients/components/PatientHeader";
+import type {ReactElement} from "react";
+import type {Interconsulta} from "@/types/clinical";
+import {fmtData, TRAVESSAO, txt} from "@/features/patients/components/PatientHeader";
 
 // ---------------------------------------------------------------------------
 // 1. Status — vocabulario fechado do contrato, com escape para o desconhecido
@@ -101,7 +101,10 @@ export function fmtDataEsp(v: string | null | undefined): string | null {
 }
 
 /** Agrupa preservando a ordem gravada dentro de cada grupo. Grupo vazio nao entra. */
-export function agrupaPorStatus<T>(itens: T[], statusDe: (item: T) => StatusEsp): Array<{ chave: StatusEsp; itens: T[] }> {
+export function agrupaPorStatus<T>(itens: T[], statusDe: (item: T) => StatusEsp): Array<{
+  chave: StatusEsp;
+  itens: T[]
+}> {
   return ORDEM_STATUS.map((chave: StatusEsp) => ({
     chave,
     itens: itens.filter((item: T) => statusDe(item) === chave),
@@ -111,11 +114,15 @@ export function agrupaPorStatus<T>(itens: T[], statusDe: (item: T) => StatusEsp)
 // ---------------------------------------------------------------------------
 // 2. Pecas compartilhadas pela aba
 // ---------------------------------------------------------------------------
-export function ChipStatus({ info }: { info: StatusInfo }): ReactElement {
+export function ChipStatus({info}: { info: StatusInfo }): ReactElement {
   return (
     <span
       className="esp-chip"
-      style={{ background: info.fundo, color: info.cor, borderColor: `color-mix(in srgb, ${info.cor} 30%, transparent)` }}
+      style={{
+        background: info.fundo,
+        color: info.cor,
+        borderColor: `color-mix(in srgb, ${info.cor} 30%, transparent)`
+      }}
       title={info.leitura}
     >
       {info.rotulo}
@@ -123,7 +130,7 @@ export function ChipStatus({ info }: { info: StatusInfo }): ReactElement {
   );
 }
 
-export function EstadoVazio({ titulo, convite }: { titulo: string; convite: string }): ReactElement {
+export function EstadoVazio({titulo, convite}: { titulo: string; convite: string }): ReactElement {
   return (
     <div className="esp-vazio" aria-live="polite">
       <strong className="esp-vazio__titulo">{titulo}</strong>
@@ -133,11 +140,12 @@ export function EstadoVazio({ titulo, convite }: { titulo: string; convite: stri
 }
 
 /** Aviso de registro descartado — a tela nunca esconde lixo, ela declara. */
-export function AvisoIgnorados({ n, onde }: { n: number; onde: string }): ReactElement | null {
+export function AvisoIgnorados({n, onde}: { n: number; onde: string }): ReactElement | null {
   if (n <= 0) return null;
   return (
     <p className="esp-nota" role="status">
-      {n} {n === 1 ? "registro ignorado" : "registros ignorados"} em <code className="tabnum">{onde}</code> — sem texto
+      {n} {n === 1 ? "registro ignorado" : "registros ignorados"} em <code
+      className="tabnum">{onde}</code> — sem texto
       legível no campo obrigatório. Nada foi preenchido no lugar.
     </p>
   );
@@ -164,7 +172,7 @@ export interface InterconsultaListProps {
   itens: Interconsulta[] | null | undefined;
 }
 
-export function InterconsultaList({ itens }: InterconsultaListProps): ReactElement {
+export function InterconsultaList({itens}: InterconsultaListProps): ReactElement {
   const brutos: unknown[] = Array.isArray(itens) ? (itens as unknown[]) : [];
   const validos: Interconsulta[] = brutos.filter(ehInterconsulta);
   const ignorados = brutos.length - validos.length;
@@ -183,7 +191,7 @@ export function InterconsultaList({ itens }: InterconsultaListProps): ReactEleme
         <span className="esp__fonte tabnum">patient_summary.interconsultas[]</span>
       </h3>
 
-      <AvisoIgnorados n={ignorados} onde="interconsultas[]" />
+      <AvisoIgnorados n={ignorados} onde="interconsultas[]"/>
 
       {validos.length === 0 ? (
         <EstadoVazio
@@ -204,12 +212,13 @@ export function InterconsultaList({ itens }: InterconsultaListProps): ReactEleme
                 const data = fmtDataEsp(i.data);
                 const notas = txt(i.notas);
                 return (
-                  <li key={`${g.chave}-${k}-${especialidade}`} className="esp-item" style={{ borderLeftColor: info.cor }}>
+                  <li key={`${g.chave}-${k}-${especialidade}`} className="esp-item"
+                      style={{borderLeftColor: info.cor}}>
                     <div className="esp-item__topo">
                       <span className="esp-item__nome" title={especialidade}>
                         {especialidade}
                       </span>
-                      <ChipStatus info={info} />
+                      <ChipStatus info={info}/>
                       <span className="esp-item__data tabnum" title="interconsultas[].data">
                         {data ?? TRAVESSAO}
                       </span>

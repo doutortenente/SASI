@@ -1,6 +1,6 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import { getDB, handleDBError, fmtTs, semaforo } from "../db.js";
+import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
+import {z} from "zod";
+import {fmtTs, getDB, handleDBError, semaforo} from "../db.js";
 
 export function registerSitrepTools(server: McpServer): void {
 

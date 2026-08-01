@@ -13,10 +13,10 @@
 // ZERO ALUCINACAO: o painel imprime o que esta gravado. Ausente => "—" ou
 // secao oculta. Ficha inteira vazia => estado vazio explicito.
 // ============================================================================
-import type { ReactElement } from "react";
-import { notFound } from "next/navigation";
-import { getPaciente } from "@/lib/data";
-import { SummaryPanel } from "@/features/patients/components/SummaryPanel";
+import type {ReactElement} from "react";
+import {notFound} from "next/navigation";
+import {getPaciente} from "@/lib/data";
+import {SummaryPanel} from "@/features/patients/components/SummaryPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -24,10 +24,10 @@ export interface ResumoPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function ResumoPage({ params }: ResumoPageProps): Promise<ReactElement> {
-  const { id } = await params;
+export default async function ResumoPage({params}: ResumoPageProps): Promise<ReactElement> {
+  const {id} = await params;
   const paciente = await getPaciente(id);
   if (!paciente) notFound();
 
-  return <SummaryPanel resumo={paciente.patient_summary} />;
+  return <SummaryPanel resumo={paciente.patient_summary}/>;
 }

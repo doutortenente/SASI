@@ -168,14 +168,14 @@ Docs clínicas de `docs/` viraram conhecimento do cérebro do Claude — movidas
 (staging) → `~/projetos/rascunhos/sasi-motor-clinico-v2/`. `docs/legado/` → `~/vaults/celebro/_arquivo/sasi-legado/`.
 `docs/JETBRAINS.md` + `docs/idea-runConfigurations/` deletados (duplicata das run configs vivas em
 `~/projetos/.idea/runConfigurations/`). `doctrine/references/06-api-automation-prompts.md` deletado
-(idêntico ao canônico em `claude/skills/sasi-ingest-export/`). `doctrine/casos/VANESSA_v2_PROVA.md`
+(idêntico ao canônico em `../claude/skills-que-prestam/01-pacote-skills-medicas/sasi-ingest-export/`). `doctrine/casos/VANESSA_v2_PROVA.md`
 (PHI) → `~/vaults/celebro/90-PHI-LOCAL/casos-sasi/`. `design-system/` (staging, 75 arquivos nunca
 consumidos pelo app) → `~/projetos/rascunhos/sasi-design-system/`. `docs/AGENTS.md` e `docs/SETUP.md`
 permanecem no repo — não se encaixam com evidência em conhecimento-clínico/staging/duplicata.
 **Fecho da divergência (11-jul-2026):** o restante de `doctrine/` foi resolvido — 6 arquivos
 ancestrais-puros deletados; 4 regras de sanity-check únicas migradas pro canônico
-(`claude/skills/sasi-ingest-export/references/03-clinical-sanity-checks.md`); a skill de admissão
-foi UNIFICADA na canônica `claude/skills/admissao-uti` (base Ramo C + enxertos da v1, aprovado pelo
+(`../claude/skills-que-prestam/01-pacote-skills-medicas/sasi-ingest-export/references/03-clinical-sanity-checks.md`); a skill de admissão
+foi UNIFICADA na canônica `../claude/pacotao-macaroca-de-skills/admissao-uti` (base Ramo C + enxertos da v1, aprovado pelo
 operador). Em `doctrine/` sobra SÓ `_SASI_TEMPLATE_BASE_v2.md` (fonte da verdade compartilhada, §7).
 
 ### 7-B. Faxina estrutural (31-jul-2026) — aposentadoria do app antigo
