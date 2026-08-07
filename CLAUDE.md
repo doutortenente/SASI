@@ -175,7 +175,7 @@ permanecem no repo — não se encaixam com evidência em conhecimento-clínico/
 **Fecho da divergência (11-jul-2026):** o restante de `doctrine/` foi resolvido — 6 arquivos
 ancestrais-puros deletados; 4 regras de sanity-check únicas migradas pro canônico
 (`../claude/skills-que-prestam/01-pacote-skills-medicas/sasi-ingest-export/references/03-clinical-sanity-checks.md`); a skill de admissão
-foi UNIFICADA na canônica `../claude/pacotao-macaroca-de-skills/admissao-uti` (base Ramo C + enxertos da v1, aprovado pelo
+foi UNIFICADA na canônica `../claude/skills-que-prestam/01-pacote-skills-medicas/admissao-uti` (base Ramo C + enxertos da v1, aprovado pelo
 operador). Em `doctrine/` sobra SÓ `_SASI_TEMPLATE_BASE_v2.md` (fonte da verdade compartilhada, §7).
 
 ### 7-B. Faxina estrutural (31-jul-2026) — aposentadoria do app antigo
