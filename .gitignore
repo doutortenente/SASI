@@ -41,5 +41,3 @@ memory/MAPA-SASI.md
 # === Worktrees de sessões background do Claude (rascunho local) ===
 .claude/worktrees/
 
-# === Grafo graphify (regenerável: graphify update .) ===
-graphify-out/

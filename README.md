@@ -24,12 +24,6 @@ cd sasi-v2 && npm install && npm run dev   # app local em http://localhost:3000
 npm run build                              # verificação (Node 20+)
 ```
 
-## Consultar o repo sem abrir arquivo por arquivo
-
-```bash
-graphify query "<pergunta>"       # grafo de conhecimento em graphify-out/ (auto-atualiza a cada commit)
-```
-
 ## Onde mora o resto (fonte única por categoria)
 
 - **Doutrina/conhecimento clínico** (decisões, SOFA-ruleset, Vera, backlog): vault `celebro` → `conhecimento/projetos/sasi-*.md`

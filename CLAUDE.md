@@ -198,7 +198,7 @@ Cópia local de `packages/` entregue em zip ao operador para `~/projetos/rascunh
 **Consertado no mesmo commit:** `.github/workflows/ci.yml` repontado de `frontend` para
 `sasi-v2` (senão toda subida passaria a falhar — a automação só sabia compilar o app antigo);
 `README.md`, este arquivo (§3, §4, §6), `memory/MEMORY.md`, `docs/PLANO-SASI-v3.{md,html}`,
-`sasi-v2/src/features/README.md`, `.env.example`, `.gitignore` e `.graphifyignore`.
+`sasi-v2/src/features/README.md`, `.env.example` e `.gitignore`.
 
 **Regra para sessões futuras:** o repo tem **UM app** (`sasi-v2/`). Não recriar `frontend/`
 nem `packages/`; staging vai para `~/projetos/rascunhos/`, fora do repositório.
@@ -241,13 +241,3 @@ Terso, operacional, com inflexão militar (SITREP tático). **Chain-of-draft** q
 1. `mkdir -p /mnt/user-data/outputs/SASI_BACKUP/`.
 1. Fazer backup de arquivos-fonte antes de transformar.
    1. Tratar `_HANDOFF_BRIEFING.md` (23-Abr-2026) como STALE — este `CLAUDE.md` e os artefatos entregues prevalecem em qualquer conflito.
-
-## graphify
-
-Este repo tem um grafo de conhecimento em `graphify-out/` (nós centrais, comunidades, relações entre arquivos). Instalado 03-jul-2026; regenerável (`graphify update .`), fora do git. Exclusões de ruído em `.graphifyignore`.
-
-Regras:
-- Pergunta sobre o código? Rode primeiro `graphify query "<pergunta>"` (existindo `graphify-out/graph.json`). Relações entre dois pontos: `graphify path "<A>" "<B>"`. Conceito focado: `graphify explain "<conceito>"`. Devolvem um subgrafo pequeno — muito mais barato que GRAPH_REPORT.md ou grep cru.
-- Ler `graphify-out/GRAPH_REPORT.md` só pra revisão ampla de arquitetura ou quando query/path/explain não bastarem.
-- Depois de modificar código, rode `graphify update .` pra manter o grafo atual (só AST, custo zero de API).
-- Automático desde 03-jul-2026: existe um hook local `.git/hooks/post-commit` (não versionado — recriar se o repo for clonado do zero) que roda `graphify update .` em segundo plano após cada commit. O mesmo hook existe no vault celebro.

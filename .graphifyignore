@@ -1,6 +1,0 @@
-# Exclusões do grafo graphify (sintaxe = .gitignore; o .gitignore do repo já é respeitado)
-# bundle gerado por máquina — não é código-fonte manual
-# staging não-integrado (imports quebrados de propósito) — poluía os god nodes
-docs/motor-clinico-v2/
-# configs de compilador — chave repetida virava "abstração central" falsa
-tsconfig*.json
