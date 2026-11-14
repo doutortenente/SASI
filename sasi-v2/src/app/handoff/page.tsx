@@ -246,16 +246,17 @@ const CSS_HANDOFF = `
 @page{size:A4 portrait;margin:12mm}
 
 @media print{
-  :root,[data-theme="tactical"]{
+  :root,:root:not([data-theme="clinical"]),:root[data-theme="clinical"]{
     --surface-app:#ffffff;--surface-card:#ffffff;--surface-raised:#ffffff;--surface-sunken:#ffffff;
     --text-heading:#000000;--text-body:#000000;--text-muted:#222222;--text-faint:#444444;
     --border-subtle:#bbbbbb;--border-default:#888888;--border-strong:#555555;
     --shadow-card:none;--shadow-raised:none;--shadow-pop:none;
   }
   html,body{background:#ffffff;color:#000000}
-  .sasi-rail,.sasi-topbar,.sasi-skip,.hoff__acoes,.hoff__cru{display:none !important}
-  .sasi-shell__col{margin-left:0 !important}
-  .sasi-content{max-width:none !important;padding:0 !important}
+  .sasi-rail,.sasi-rail ~ div > header,.sasi-rail ~ div footer,.hoff__acoes,.hoff__cru{display:none !important}
+  .h-screen{height:auto !important}
+  .overflow-hidden,.overflow-y-auto{overflow:visible !important}
+  main{padding:0 !important}
   .hoff{gap:8px}
   .hoff__ttl{font-size:14pt}
   .hoff__sub,.hoff__legenda,.hoff__rodape{font-size:8pt}
