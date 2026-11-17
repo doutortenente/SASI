@@ -62,7 +62,9 @@ function getProblemas(row: DashboardRow): ProblemaDisplay[] {
 // que merece vigilância) — o valor cru do banco fica só nas classes CSS.
 const GRAVIDADE_LABEL: Record<string, string> = {
   estavel: 'Estável',
+  watcher: 'Watcher',
   moderado: 'Watcher',
+  instavel: 'Instável',
   grave: 'Instável',
   critico: 'Crítico',
   obito: 'Óbito',
