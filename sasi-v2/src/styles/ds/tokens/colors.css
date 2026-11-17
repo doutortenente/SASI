@@ -60,17 +60,17 @@
   /* ======================================================================
      SEMANTIC — Clinical theme (light executive). Override in themes.css.
      ====================================================================== */
-  --surface-app: #eef1f6; /* page canvas (cool light gray) */
-  --surface-card: #ffffff; /* primary card surface */
-  --surface-raised: #f4f6fa; /* nested / striped / inset surface */
+  --surface-app: #ffffff; /* v1.0 clinical: --app-bg */
+  --surface-card: #f8fafc; /* v1.0 clinical: --app-card (slate-50) */
+  --surface-raised: #e2e8f0; /* v1.0 clinical: --app-tertiary (slate-200) */
   --surface-sunken: #e8edf3; /* track, well, table header */
 
   --border-subtle: #e7ecf2; /* hairlines inside cards */
-  --border-default: #dbe3ec; /* card & control borders */
+  --border-default: #cbd5e1; /* v1.0 clinical: --app-border (slate-300) */
   --border-strong: #c4cdd9; /* emphasized dividers */
 
   --text-heading: #0f172a; /* slate-900 — titles, big numbers */
-  --text-body: #334155; /* slate-700 — body copy */
+  --text-body: #475569; /* v1.0 clinical: --app-text-2 (slate-600) */
   --text-muted: #64748b; /* slate-500 — labels, captions */
   --text-faint: #94a3b8; /* slate-400 — disabled, placeholders */
   --text-on-accent: #ffffff;

@@ -19,7 +19,9 @@ export type Json =
 // 1. ENUMS (vocabulários fechados — espelham os enums nativos do Postgres)
 // ---------------------------------------------------------------------------
 export type Uti = 'UTI2' | 'UTI3' | 'UTI4';
-export type Gravidade = 'estavel' | 'moderado' | 'grave' | 'critico' | 'obito';
+// gravidade_enum VIVO (producao, 14-nov-2026): estavel | watcher | instavel | critico.
+// 'moderado' | 'grave' | 'obito' = vocabulario antigo, mantido para linhas historicas.
+export type Gravidade = 'estavel' | 'watcher' | 'instavel' | 'critico' | 'moderado' | 'grave' | 'obito';
 export type StatusLeito = 'ativo' | 'alta' | 'obito' | 'transferencia';
 export type Isolamento = 'none' | 'contact' | 'droplet' | 'aerosol';
 export type SeveridadeVisual = 'red' | 'yellow' | 'green';
