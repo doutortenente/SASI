@@ -18,6 +18,7 @@ export const NAV_ITENS: readonly NavLinkProps[] = [
   },
   {href: "/rounds", label: "Round", icone: "round", descricao: "Round clinico do plantao"},
   {href: "/handoff", label: "Passagem", icone: "passagem", descricao: "Passagem de turno"},
+  {href: "/design", label: "Design", icone: "design", descricao: "Design System — protótipo"},
 ] as const;
 
 export function Sidebar(): ReactElement {

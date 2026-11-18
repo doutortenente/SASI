@@ -16,6 +16,7 @@ const TITULOS: ReadonlyArray<{ href: string; titulo: string }> = [
   {href: "/patients", titulo: "Pacientes"},
   {href: "/rounds", titulo: "Round"},
   {href: "/handoff", titulo: "Passagem de turno"},
+  {href: "/design", titulo: "Design System"},
 ];
 
 function tituloDaRota(pathname: string): string {

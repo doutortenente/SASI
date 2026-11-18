@@ -10,7 +10,7 @@ import {usePathname} from "next/navigation";
 import type {ReactElement} from "react";
 
 /** Icones disponiveis (SVG inline — sem dependencia externa). */
-export type NavIcone = "leitos" | "pacientes" | "round" | "passagem";
+export type NavIcone = "leitos" | "pacientes" | "round" | "passagem" | "design";
 
 export interface NavLinkProps {
   /** Rota destino, ex.: "/beds". */
@@ -64,6 +64,15 @@ const ICONES: Record<NavIcone, ReactElement> = {
       <path d="M3.5 12h10.5"/>
       <path d="M10.8 8.7 14.1 12l-3.3 3.3"/>
       <path d="M15.5 4.2h3.3a2 2 0 0 1 2 2v11.6a2 2 0 0 1-2 2h-3.3"/>
+    </svg>
+  ),
+  // Design System — paleta de amostras
+  design: (
+    <svg {...svgProps}>
+      <rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.5"/>
+      <path d="M15 3.5h3A2.5 2.5 0 0 1 20.5 6v3a2.5 2.5 0 0 1-2.5 2.5h-3A2.5 2.5 0 0 1 12.5 9V6A2.5 2.5 0 0 1 15 3.5Z"/>
+      <path d="M3.5 15h7.5v5.5h-7.5Z"/>
+      <path d="M16.5 12.5 20.5 20h-8Z"/>
     </svg>
   ),
 };
