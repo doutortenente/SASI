@@ -58,6 +58,8 @@ python3 ~/projetos/scripts/sasi/audit_eventos.py                   # fila evento
 
 ## Schema (30-jul-2026 — modelo v3)
 
+> Defasado desde ago-2026: o banco vivo tem 17 tabelas e 34 migrações. Ver a nota de 22-nov-2026 em `CLAUDE.md` §4 e o retrato em `supabase/schema-live-dump.sql`.
+
 Baseline `20260626000000_baseline.sql` + formalização v3 (`20260730120000/120100/120200`), **aplicada em produção**. Referência completa: `supabase/schema-producao-v3.sql` · runbook: `docs/RUNBOOK-migracao-v3.md` · plano: `docs/PLANO-SASI-v3.md`.
 13 tabelas (nova: `evento_tipo_ref`, 56 códigos) · 8 views · 14 enums nativos · FKs de vocabulário em `eventos_clinicos`/`alert_rules`/`trend_rules`. Config: `alert_rules` (25), `trend_rules` (3). Alertas vivos via trigger. Limiares clínicos: `~/vaults/celebro/conhecimento/projetos/sasi-decisoes-clinicas.md`.
 

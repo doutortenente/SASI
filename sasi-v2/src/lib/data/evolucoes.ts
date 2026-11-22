@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 // ZERO ALUCINACAO: erro => vazio/null + console.error. sofa_total null continua null
 // (hoje 0/16 evolucoes tem os 6 componentes — a tela mostra "—").
-// Colunas conferidas em supabase/schema-producao-v3.sql.
+// Colunas conferidas em supabase/schema-live-dump.sql (retrato do banco de 22-nov-2026).
 // ============================================================================
 
 import { getSupabaseServer } from "@/lib/supabase/server";
@@ -18,7 +18,7 @@ const LIMITE_MAX = 1000;
  * Manter como UMA string literal — o tipador do supabase-js so parseia literais.
  */
 const COLS =
-  "id,paciente_id,user_id,data_evolucao,plantao,neuro,resp,hemo,tgi,renal,hemato,infecto,dvas,sedativos,impressao,conduta,problemas_ativos,condutas_sistemas,riscos,prescricao,sofa_snapshot,sofa_total,created_at,updated_at";
+  "id,paciente_id,user_id,data_evolucao,plantao,neuro,resp,hemo,tgi,renal,hemato,infecto,dvas,sedativos,impressao,conduta,problemas_ativos,condutas_sistemas,riscos,prescricao,sofa_snapshot,sofa_total,created_at,updated_at,internacao_id,tipo_nota,data_plantao,turno,autor_crm,autor_nome,illness_severity,finalizada_em,intercorrencias";
 
 // ---------------------------------------------------------------------------
 

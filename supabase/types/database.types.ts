@@ -10,14 +10,14 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.18"
   }
   public: {
     Tables: {
       alert_rules: {
         Row: {
           ativo: boolean
-          comparador: string
+          comparador: Database["public"]["Enums"]["comparador_enum"]
           created_at: string
           fonte: string | null
           id: string
@@ -25,12 +25,12 @@ export type Database = {
           mensagem: string
           ordem: number
           rotulo: string
-          severidade: string
+          severidade: Database["public"]["Enums"]["severidade_alerta_enum"]
           tipo_evento: string
         }
         Insert: {
           ativo?: boolean
-          comparador: string
+          comparador: Database["public"]["Enums"]["comparador_enum"]
           created_at?: string
           fonte?: string | null
           id?: string
@@ -38,12 +38,12 @@ export type Database = {
           mensagem: string
           ordem?: number
           rotulo: string
-          severidade: string
+          severidade: Database["public"]["Enums"]["severidade_alerta_enum"]
           tipo_evento: string
         }
         Update: {
           ativo?: boolean
-          comparador?: string
+          comparador?: Database["public"]["Enums"]["comparador_enum"]
           created_at?: string
           fonte?: string | null
           id?: string
@@ -51,7 +51,7 @@ export type Database = {
           mensagem?: string
           ordem?: number
           rotulo?: string
-          severidade?: string
+          severidade?: Database["public"]["Enums"]["severidade_alerta_enum"]
           tipo_evento?: string
         }
         Relationships: [
@@ -76,7 +76,7 @@ export type Database = {
           mensagem: string
           paciente_id: string
           payload: Json | null
-          severidade: string
+          severidade: Database["public"]["Enums"]["severidade_alerta_enum"]
           tipo: string
           user_id: string | null
         }
@@ -91,7 +91,7 @@ export type Database = {
           mensagem: string
           paciente_id: string
           payload?: Json | null
-          severidade?: string
+          severidade?: Database["public"]["Enums"]["severidade_alerta_enum"]
           tipo: string
           user_id?: string | null
         }
@@ -106,7 +106,7 @@ export type Database = {
           mensagem?: string
           paciente_id?: string
           payload?: Json | null
-          severidade?: string
+          severidade?: Database["public"]["Enums"]["severidade_alerta_enum"]
           tipo?: string
           user_id?: string | null
         }
@@ -148,7 +148,7 @@ export type Database = {
           created_at: string
           cultura_id: string
           id: string
-          resultado: string
+          resultado: Database["public"]["Enums"]["antibiograma_resultado_enum"]
         }
         Insert: {
           antibiotico: string
@@ -156,7 +156,7 @@ export type Database = {
           created_at?: string
           cultura_id: string
           id?: string
-          resultado: string
+          resultado: Database["public"]["Enums"]["antibiograma_resultado_enum"]
         }
         Update: {
           antibiotico?: string
@@ -164,7 +164,7 @@ export type Database = {
           created_at?: string
           cultura_id?: string
           id?: string
-          resultado?: string
+          resultado?: Database["public"]["Enums"]["antibiograma_resultado_enum"]
         }
         Relationships: [
           {
@@ -188,12 +188,13 @@ export type Database = {
           foco: string | null
           frequencia: string | null
           id: string
-          intencao: string | null
+          intencao: Database["public"]["Enums"]["intencao_atb_enum"] | null
+          internacao_id: string | null
           motivo_suspensao: string | null
           paciente_id: string
           updated_at: string
           user_id: string | null
-          via: string | null
+          via: Database["public"]["Enums"]["via_atb_enum"] | null
         }
         Insert: {
           agente_alvo?: string | null
@@ -206,12 +207,13 @@ export type Database = {
           foco?: string | null
           frequencia?: string | null
           id?: string
-          intencao?: string | null
+          intencao?: Database["public"]["Enums"]["intencao_atb_enum"] | null
+          internacao_id?: string | null
           motivo_suspensao?: string | null
           paciente_id: string
           updated_at?: string
           user_id?: string | null
-          via?: string | null
+          via?: Database["public"]["Enums"]["via_atb_enum"] | null
         }
         Update: {
           agente_alvo?: string | null
@@ -224,14 +226,22 @@ export type Database = {
           foco?: string | null
           frequencia?: string | null
           id?: string
-          intencao?: string | null
+          intencao?: Database["public"]["Enums"]["intencao_atb_enum"] | null
+          internacao_id?: string | null
           motivo_suspensao?: string | null
           paciente_id?: string
           updated_at?: string
           user_id?: string | null
-          via?: string | null
+          via?: Database["public"]["Enums"]["via_atb_enum"] | null
         }
         Relationships: [
+          {
+            foreignKeyName: "atbs_internacao_id_fkey"
+            columns: ["internacao_id"]
+            isOneToOne: false
+            referencedRelation: "internacoes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "atbs_paciente_id_fkey"
             columns: ["paciente_id"]
@@ -248,6 +258,30 @@ export type Database = {
           },
         ]
       }
+      avisos_agentes: {
+        Row: {
+          corpo: string
+          criado_em: string
+          id: number
+          resolvido: boolean
+          titulo: string
+        }
+        Insert: {
+          corpo: string
+          criado_em?: string
+          id?: number
+          resolvido?: boolean
+          titulo: string
+        }
+        Update: {
+          corpo?: string
+          criado_em?: string
+          id?: number
+          resolvido?: boolean
+          titulo?: string
+        }
+        Relationships: []
+      }
       culturas: {
         Row: {
           agente: string | null
@@ -255,8 +289,9 @@ export type Database = {
           created_at: string
           crescimento: boolean
           id: string
+          internacao_id: string | null
           laudo_ts: string | null
-          material: string
+          material: Database["public"]["Enums"]["material_cultura_enum"]
           observacoes: string | null
           paciente_id: string
           ufc_por_ml: number | null
@@ -269,8 +304,9 @@ export type Database = {
           created_at?: string
           crescimento?: boolean
           id?: string
+          internacao_id?: string | null
           laudo_ts?: string | null
-          material: string
+          material: Database["public"]["Enums"]["material_cultura_enum"]
           observacoes?: string | null
           paciente_id: string
           ufc_por_ml?: number | null
@@ -283,8 +319,9 @@ export type Database = {
           created_at?: string
           crescimento?: boolean
           id?: string
+          internacao_id?: string | null
           laudo_ts?: string | null
-          material?: string
+          material?: Database["public"]["Enums"]["material_cultura_enum"]
           observacoes?: string | null
           paciente_id?: string
           ufc_por_ml?: number | null
@@ -292,6 +329,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "culturas_internacao_id_fkey"
+            columns: ["internacao_id"]
+            isOneToOne: false
+            referencedRelation: "internacoes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "culturas_paciente_id_fkey"
             columns: ["paciente_id"]
@@ -301,6 +345,82 @@ export type Database = {
           },
           {
             foreignKeyName: "culturas_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
+      }
+      dispositivo_episodios: {
+        Row: {
+          created_at: string
+          data_fim: string | null
+          data_inicio: string
+          id: string
+          internacao_id: string | null
+          motivo_fim:
+            | Database["public"]["Enums"]["dispositivo_motivo_fim_enum"]
+            | null
+          observacoes: string | null
+          paciente_id: string
+          sitio: string | null
+          source_text: string | null
+          tipo: Database["public"]["Enums"]["dispositivo_tipo_enum"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio: string
+          id?: string
+          internacao_id?: string | null
+          motivo_fim?:
+            | Database["public"]["Enums"]["dispositivo_motivo_fim_enum"]
+            | null
+          observacoes?: string | null
+          paciente_id: string
+          sitio?: string | null
+          source_text?: string | null
+          tipo: Database["public"]["Enums"]["dispositivo_tipo_enum"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string
+          id?: string
+          internacao_id?: string | null
+          motivo_fim?:
+            | Database["public"]["Enums"]["dispositivo_motivo_fim_enum"]
+            | null
+          observacoes?: string | null
+          paciente_id?: string
+          sitio?: string | null
+          source_text?: string | null
+          tipo?: Database["public"]["Enums"]["dispositivo_tipo_enum"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispositivo_episodios_internacao_id_fkey"
+            columns: ["internacao_id"]
+            isOneToOne: false
+            referencedRelation: "internacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispositivo_episodios_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispositivo_episodios_paciente_id_fkey"
             columns: ["paciente_id"]
             isOneToOne: false
             referencedRelation: "vw_dashboard_uti"
@@ -349,8 +469,9 @@ export type Database = {
           confidence: number | null
           created_at: string
           evolucao_id: string | null
-          fonte: string
+          fonte: Database["public"]["Enums"]["fonte_evento_enum"]
           id: string
+          internacao_id: string | null
           paciente_id: string
           requires_review: boolean
           source_text: string | null
@@ -365,8 +486,9 @@ export type Database = {
           confidence?: number | null
           created_at?: string
           evolucao_id?: string | null
-          fonte: string
+          fonte: Database["public"]["Enums"]["fonte_evento_enum"]
           id?: string
+          internacao_id?: string | null
           paciente_id: string
           requires_review?: boolean
           source_text?: string | null
@@ -381,8 +503,9 @@ export type Database = {
           confidence?: number | null
           created_at?: string
           evolucao_id?: string | null
-          fonte?: string
+          fonte?: Database["public"]["Enums"]["fonte_evento_enum"]
           id?: string
+          internacao_id?: string | null
           paciente_id?: string
           requires_review?: boolean
           source_text?: string | null
@@ -409,6 +532,13 @@ export type Database = {
             referencedColumns: ["evolucao_id"]
           },
           {
+            foreignKeyName: "eventos_clinicos_internacao_id_fkey"
+            columns: ["internacao_id"]
+            isOneToOne: false
+            referencedRelation: "internacoes"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "eventos_clinicos_paciente_id_fkey"
             columns: ["paciente_id"]
             isOneToOne: false
@@ -433,19 +563,26 @@ export type Database = {
       }
       evolucoes: {
         Row: {
+          autor_crm: string | null
+          autor_nome: string | null
           conduta: string[]
           condutas_sistemas: Json
           created_at: string
           data_evolucao: string
+          data_plantao: string
           dvas: Json
+          finalizada_em: string | null
           hemato: Json
           hemo: Json
           id: string
+          illness_severity: Database["public"]["Enums"]["gravidade_enum"] | null
           impressao: string[]
           infecto: Json
+          intercorrencias: string[]
+          internacao_id: string | null
           neuro: Json
           paciente_id: string
-          plantao: string
+          plantao: Database["public"]["Enums"]["plantao_enum"]
           prescricao: Json | null
           problemas_ativos: Json
           renal: Json
@@ -455,23 +592,34 @@ export type Database = {
           sofa_snapshot: Json | null
           sofa_total: number | null
           tgi: Json
+          tipo_nota: Database["public"]["Enums"]["tipo_nota_enum"]
+          turno: Database["public"]["Enums"]["turno_enum"]
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          autor_crm?: string | null
+          autor_nome?: string | null
           conduta?: string[]
           condutas_sistemas?: Json
           created_at?: string
           data_evolucao?: string
+          data_plantao: string
           dvas?: Json
+          finalizada_em?: string | null
           hemato?: Json
           hemo?: Json
           id?: string
+          illness_severity?:
+            | Database["public"]["Enums"]["gravidade_enum"]
+            | null
           impressao?: string[]
           infecto?: Json
+          intercorrencias?: string[]
+          internacao_id?: string | null
           neuro?: Json
           paciente_id: string
-          plantao?: string
+          plantao?: Database["public"]["Enums"]["plantao_enum"]
           prescricao?: Json | null
           problemas_ativos?: Json
           renal?: Json
@@ -481,23 +629,34 @@ export type Database = {
           sofa_snapshot?: Json | null
           sofa_total?: number | null
           tgi?: Json
+          tipo_nota?: Database["public"]["Enums"]["tipo_nota_enum"]
+          turno: Database["public"]["Enums"]["turno_enum"]
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          autor_crm?: string | null
+          autor_nome?: string | null
           conduta?: string[]
           condutas_sistemas?: Json
           created_at?: string
           data_evolucao?: string
+          data_plantao?: string
           dvas?: Json
+          finalizada_em?: string | null
           hemato?: Json
           hemo?: Json
           id?: string
+          illness_severity?:
+            | Database["public"]["Enums"]["gravidade_enum"]
+            | null
           impressao?: string[]
           infecto?: Json
+          intercorrencias?: string[]
+          internacao_id?: string | null
           neuro?: Json
           paciente_id?: string
-          plantao?: string
+          plantao?: Database["public"]["Enums"]["plantao_enum"]
           prescricao?: Json | null
           problemas_ativos?: Json
           renal?: Json
@@ -507,10 +666,19 @@ export type Database = {
           sofa_snapshot?: Json | null
           sofa_total?: number | null
           tgi?: Json
+          tipo_nota?: Database["public"]["Enums"]["tipo_nota_enum"]
+          turno?: Database["public"]["Enums"]["turno_enum"]
           updated_at?: string
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "evolucoes_internacao_id_fkey"
+            columns: ["internacao_id"]
+            isOneToOne: false
+            referencedRelation: "internacoes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "evolucoes_paciente_id_fkey"
             columns: ["paciente_id"]
@@ -587,6 +755,200 @@ export type Database = {
           },
         ]
       }
+      internacoes: {
+        Row: {
+          created_at: string
+          desfecho:
+            | Database["public"]["Enums"]["desfecho_internacao_enum"]
+            | null
+          desfecho_data: string | null
+          destino_especialidade: string | null
+          destino_setor: string | null
+          id: string
+          int_origem_data: string | null
+          int_uti_data: string
+          internacao_prev_id: string | null
+          observacoes: string | null
+          paciente_id: string
+          reinternacao: boolean
+          updated_at: string
+          user_id: string | null
+          uti: Database["public"]["Enums"]["uti_enum"] | null
+        }
+        Insert: {
+          created_at?: string
+          desfecho?:
+            | Database["public"]["Enums"]["desfecho_internacao_enum"]
+            | null
+          desfecho_data?: string | null
+          destino_especialidade?: string | null
+          destino_setor?: string | null
+          id?: string
+          int_origem_data?: string | null
+          int_uti_data: string
+          internacao_prev_id?: string | null
+          observacoes?: string | null
+          paciente_id: string
+          reinternacao?: boolean
+          updated_at?: string
+          user_id?: string | null
+          uti?: Database["public"]["Enums"]["uti_enum"] | null
+        }
+        Update: {
+          created_at?: string
+          desfecho?:
+            | Database["public"]["Enums"]["desfecho_internacao_enum"]
+            | null
+          desfecho_data?: string | null
+          destino_especialidade?: string | null
+          destino_setor?: string | null
+          id?: string
+          int_origem_data?: string | null
+          int_uti_data?: string
+          internacao_prev_id?: string | null
+          observacoes?: string | null
+          paciente_id?: string
+          reinternacao?: boolean
+          updated_at?: string
+          user_id?: string | null
+          uti?: Database["public"]["Enums"]["uti_enum"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internacoes_internacao_prev_id_fkey"
+            columns: ["internacao_prev_id"]
+            isOneToOne: false
+            referencedRelation: "internacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internacoes_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internacoes_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
+      }
+      janelas_24h: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          evolucao_id: string | null
+          fonte: Database["public"]["Enums"]["fonte_evento_enum"]
+          id: string
+          internacao_id: string | null
+          janela_fim: string
+          janela_inicio: string
+          limiar_alto: number | null
+          limiar_baixo: number | null
+          n_fora_alto: number | null
+          n_fora_baixo: number | null
+          n_total: number
+          paciente_id: string
+          requires_review: boolean
+          source_text: string | null
+          tipo: string
+          user_id: string | null
+          valor_max: number | null
+          valor_min: number | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          evolucao_id?: string | null
+          fonte?: Database["public"]["Enums"]["fonte_evento_enum"]
+          id?: string
+          internacao_id?: string | null
+          janela_fim: string
+          janela_inicio: string
+          limiar_alto?: number | null
+          limiar_baixo?: number | null
+          n_fora_alto?: number | null
+          n_fora_baixo?: number | null
+          n_total?: number
+          paciente_id: string
+          requires_review?: boolean
+          source_text?: string | null
+          tipo: string
+          user_id?: string | null
+          valor_max?: number | null
+          valor_min?: number | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          evolucao_id?: string | null
+          fonte?: Database["public"]["Enums"]["fonte_evento_enum"]
+          id?: string
+          internacao_id?: string | null
+          janela_fim?: string
+          janela_inicio?: string
+          limiar_alto?: number | null
+          limiar_baixo?: number | null
+          n_fora_alto?: number | null
+          n_fora_baixo?: number | null
+          n_total?: number
+          paciente_id?: string
+          requires_review?: boolean
+          source_text?: string | null
+          tipo?: string
+          user_id?: string | null
+          valor_max?: number | null
+          valor_min?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "janelas_24h_evolucao_id_fkey"
+            columns: ["evolucao_id"]
+            isOneToOne: false
+            referencedRelation: "evolucoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "janelas_24h_evolucao_id_fkey"
+            columns: ["evolucao_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["evolucao_id"]
+          },
+          {
+            foreignKeyName: "janelas_24h_internacao_id_fkey"
+            columns: ["internacao_id"]
+            isOneToOne: false
+            referencedRelation: "internacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "janelas_24h_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "janelas_24h_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+          {
+            foreignKeyName: "janelas_24h_tipo_fkey"
+            columns: ["tipo"]
+            isOneToOne: false
+            referencedRelation: "evento_tipo_ref"
+            referencedColumns: ["codigo"]
+          },
+        ]
+      }
       memorias: {
         Row: {
           conteudo: string
@@ -621,24 +983,24 @@ export type Database = {
           created_at: string
           data_adm: string
           dispositivos: Json
-          gravidade: string
+          gravidade: Database["public"]["Enums"]["gravidade_enum"]
           hd: string | null
           id: string
           idade: number | null
           imc: number | null
-          isolation: string
+          isolation: Database["public"]["Enums"]["isolamento_enum"]
           leito: string
           nome: string
           out_of_range_count: number
           patient_summary: Json | null
           peso: number | null
           riscos_flags: Json
-          severidade_visual: string
+          severidade_visual: Database["public"]["Enums"]["severidade_visual_enum"]
           sofa_baseline: number | null
-          status_leito: string
+          status_leito: Database["public"]["Enums"]["status_leito_enum"]
           updated_at: string
           user_id: string | null
-          uti: string
+          uti: Database["public"]["Enums"]["uti_enum"]
         }
         Insert: {
           alergias?: string | null
@@ -646,24 +1008,24 @@ export type Database = {
           created_at?: string
           data_adm?: string
           dispositivos?: Json
-          gravidade?: string
+          gravidade?: Database["public"]["Enums"]["gravidade_enum"]
           hd?: string | null
           id?: string
           idade?: number | null
           imc?: number | null
-          isolation?: string
+          isolation?: Database["public"]["Enums"]["isolamento_enum"]
           leito: string
           nome: string
           out_of_range_count?: number
           patient_summary?: Json | null
           peso?: number | null
           riscos_flags?: Json
-          severidade_visual?: string
+          severidade_visual?: Database["public"]["Enums"]["severidade_visual_enum"]
           sofa_baseline?: number | null
-          status_leito?: string
+          status_leito?: Database["public"]["Enums"]["status_leito_enum"]
           updated_at?: string
           user_id?: string | null
-          uti: string
+          uti: Database["public"]["Enums"]["uti_enum"]
         }
         Update: {
           alergias?: string | null
@@ -671,24 +1033,24 @@ export type Database = {
           created_at?: string
           data_adm?: string
           dispositivos?: Json
-          gravidade?: string
+          gravidade?: Database["public"]["Enums"]["gravidade_enum"]
           hd?: string | null
           id?: string
           idade?: number | null
           imc?: number | null
-          isolation?: string
+          isolation?: Database["public"]["Enums"]["isolamento_enum"]
           leito?: string
           nome?: string
           out_of_range_count?: number
           patient_summary?: Json | null
           peso?: number | null
           riscos_flags?: Json
-          severidade_visual?: string
+          severidade_visual?: Database["public"]["Enums"]["severidade_visual_enum"]
           sofa_baseline?: number | null
-          status_leito?: string
+          status_leito?: Database["public"]["Enums"]["status_leito_enum"]
           updated_at?: string
           user_id?: string | null
-          uti?: string
+          uti?: Database["public"]["Enums"]["uti_enum"]
         }
         Relationships: []
       }
@@ -699,6 +1061,7 @@ export type Database = {
           created_at: string
           evolucao_id: string | null
           id: string
+          internacao_id: string | null
           paciente_id: string
           prioridade: number
           tarefa: string
@@ -710,6 +1073,7 @@ export type Database = {
           created_at?: string
           evolucao_id?: string | null
           id?: string
+          internacao_id?: string | null
           paciente_id: string
           prioridade?: number
           tarefa: string
@@ -721,6 +1085,7 @@ export type Database = {
           created_at?: string
           evolucao_id?: string | null
           id?: string
+          internacao_id?: string | null
           paciente_id?: string
           prioridade?: number
           tarefa?: string
@@ -740,6 +1105,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_dashboard_uti"
             referencedColumns: ["evolucao_id"]
+          },
+          {
+            foreignKeyName: "pendencias_internacao_id_fkey"
+            columns: ["internacao_id"]
+            isOneToOne: false
+            referencedRelation: "internacoes"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "pendencias_paciente_id_fkey"
@@ -766,10 +1138,10 @@ export type Database = {
           janela_max_horas: number | null
           limiar: number
           mensagem: string
-          modo: string
+          modo: Database["public"]["Enums"]["trend_modo_enum"]
           ordem: number
           rotulo: string
-          severidade: string
+          severidade: Database["public"]["Enums"]["severidade_alerta_enum"]
           tipo_evento: string
         }
         Insert: {
@@ -780,10 +1152,10 @@ export type Database = {
           janela_max_horas?: number | null
           limiar: number
           mensagem: string
-          modo: string
+          modo: Database["public"]["Enums"]["trend_modo_enum"]
           ordem?: number
           rotulo: string
-          severidade: string
+          severidade: Database["public"]["Enums"]["severidade_alerta_enum"]
           tipo_evento: string
         }
         Update: {
@@ -794,10 +1166,10 @@ export type Database = {
           janela_max_horas?: number | null
           limiar?: number
           mensagem?: string
-          modo?: string
+          modo?: Database["public"]["Enums"]["trend_modo_enum"]
           ordem?: number
           rotulo?: string
-          severidade?: string
+          severidade?: Database["public"]["Enums"]["severidade_alerta_enum"]
           tipo_evento?: string
         }
         Relationships: [
@@ -820,7 +1192,7 @@ export type Database = {
           nome: string | null
           paciente_id: string | null
           total: number | null
-          uti: string | null
+          uti: Database["public"]["Enums"]["uti_enum"] | null
           warnings: number | null
         }
         Relationships: [
@@ -873,10 +1245,10 @@ export type Database = {
           dispositivos: Json | null
           dvas: Json | null
           evolucao_id: string | null
-          gravidade: string | null
+          gravidade: Database["public"]["Enums"]["gravidade_enum"] | null
           hd: string | null
           idade: number | null
-          isolation: string | null
+          isolation: Database["public"]["Enums"]["isolamento_enum"] | null
           leito: string | null
           nome: string | null
           out_of_range_count: number | null
@@ -884,13 +1256,15 @@ export type Database = {
           pendencias_abertas: number | null
           peso: number | null
           sedativos: Json | null
-          severidade_visual: string | null
+          severidade_visual:
+            | Database["public"]["Enums"]["severidade_visual_enum"]
+            | null
           sofa_snapshot: Json | null
           sofa_total: number | null
-          status_leito: string | null
+          status_leito: Database["public"]["Enums"]["status_leito_enum"] | null
           ultima_evolucao: string | null
           user_id: string | null
-          uti: string | null
+          uti: Database["public"]["Enums"]["uti_enum"] | null
         }
         Relationships: []
       }
@@ -903,10 +1277,10 @@ export type Database = {
           droga: string | null
           foco: string | null
           frequencia: string | null
-          intencao: string | null
+          intencao: Database["public"]["Enums"]["intencao_atb_enum"] | null
           paciente_id: string | null
           stewardship_flag: string | null
-          via: string | null
+          via: Database["public"]["Enums"]["via_atb_enum"] | null
         }
         Insert: {
           agente_alvo?: string | null
@@ -916,10 +1290,10 @@ export type Database = {
           droga?: string | null
           foco?: string | null
           frequencia?: string | null
-          intencao?: string | null
+          intencao?: Database["public"]["Enums"]["intencao_atb_enum"] | null
           paciente_id?: string | null
           stewardship_flag?: never
-          via?: string | null
+          via?: Database["public"]["Enums"]["via_atb_enum"] | null
         }
         Update: {
           agente_alvo?: string | null
@@ -929,10 +1303,10 @@ export type Database = {
           droga?: string | null
           foco?: string | null
           frequencia?: string | null
-          intencao?: string | null
+          intencao?: Database["public"]["Enums"]["intencao_atb_enum"] | null
           paciente_id?: string | null
           stewardship_flag?: never
-          via?: string | null
+          via?: Database["public"]["Enums"]["via_atb_enum"] | null
         }
         Relationships: [
           {
@@ -951,12 +1325,64 @@ export type Database = {
           },
         ]
       }
+      vw_dispositivos_ativos: {
+        Row: {
+          data_inicio: string | null
+          dias_em_uso: number | null
+          episodio_id: string | null
+          internacao_id: string | null
+          paciente_id: string | null
+          sitio: string | null
+          tipo: Database["public"]["Enums"]["dispositivo_tipo_enum"] | null
+        }
+        Insert: {
+          data_inicio?: string | null
+          dias_em_uso?: never
+          episodio_id?: string | null
+          internacao_id?: string | null
+          paciente_id?: string | null
+          sitio?: string | null
+          tipo?: Database["public"]["Enums"]["dispositivo_tipo_enum"] | null
+        }
+        Update: {
+          data_inicio?: string | null
+          dias_em_uso?: never
+          episodio_id?: string | null
+          internacao_id?: string | null
+          paciente_id?: string | null
+          sitio?: string | null
+          tipo?: Database["public"]["Enums"]["dispositivo_tipo_enum"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispositivo_episodios_internacao_id_fkey"
+            columns: ["internacao_id"]
+            isOneToOne: false
+            referencedRelation: "internacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispositivo_episodios_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispositivo_episodios_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+        ]
+      }
       vw_eventos_pendentes_revisao: {
         Row: {
           confidence: number | null
           created_at: string | null
           evolucao_id: string | null
-          fonte: string | null
+          fonte: Database["public"]["Enums"]["fonte_evento_enum"] | null
           id: string | null
           paciente_id: string | null
           requires_review: boolean | null
@@ -972,7 +1398,7 @@ export type Database = {
           confidence?: number | null
           created_at?: string | null
           evolucao_id?: string | null
-          fonte?: string | null
+          fonte?: Database["public"]["Enums"]["fonte_evento_enum"] | null
           id?: string | null
           paciente_id?: string | null
           requires_review?: boolean | null
@@ -988,7 +1414,7 @@ export type Database = {
           confidence?: number | null
           created_at?: string | null
           evolucao_id?: string | null
-          fonte?: string | null
+          fonte?: Database["public"]["Enums"]["fonte_evento_enum"] | null
           id?: string | null
           paciente_id?: string | null
           requires_review?: boolean | null
@@ -1073,6 +1499,79 @@ export type Database = {
           },
         ]
       }
+      vw_janelas_24h_render: {
+        Row: {
+          confidence: number | null
+          created_at: string | null
+          evolucao_id: string | null
+          excursoes_txt: string | null
+          faixa_txt: string | null
+          fonte: Database["public"]["Enums"]["fonte_evento_enum"] | null
+          id: string | null
+          internacao_id: string | null
+          janela_fim: string | null
+          janela_inicio: string | null
+          limiar_alto: number | null
+          limiar_baixo: number | null
+          n_fora_alto: number | null
+          n_fora_baixo: number | null
+          n_total: number | null
+          paciente_id: string | null
+          render: string | null
+          requires_review: boolean | null
+          rotulo: string | null
+          source_text: string | null
+          tipo: string | null
+          unidade_padrao: string | null
+          user_id: string | null
+          valor_max: number | null
+          valor_min: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "janelas_24h_evolucao_id_fkey"
+            columns: ["evolucao_id"]
+            isOneToOne: false
+            referencedRelation: "evolucoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "janelas_24h_evolucao_id_fkey"
+            columns: ["evolucao_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["evolucao_id"]
+          },
+          {
+            foreignKeyName: "janelas_24h_internacao_id_fkey"
+            columns: ["internacao_id"]
+            isOneToOne: false
+            referencedRelation: "internacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "janelas_24h_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "pacientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "janelas_24h_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_dashboard_uti"
+            referencedColumns: ["paciente_id"]
+          },
+          {
+            foreignKeyName: "janelas_24h_tipo_fkey"
+            columns: ["tipo"]
+            isOneToOne: false
+            referencedRelation: "evento_tipo_ref"
+            referencedColumns: ["codigo"]
+          },
+        ]
+      }
       vw_sofa_diario: {
         Row: {
           componentes_faltantes: string[] | null
@@ -1139,9 +1638,53 @@ export type Database = {
       }
     }
     Functions: {
+      admitir_paciente: {
+        Args: {
+          p_alergias?: string
+          p_altura?: number
+          p_gravidade?: Database["public"]["Enums"]["gravidade_enum"]
+          p_hd?: string
+          p_idade?: number
+          p_int_origem_data?: string
+          p_int_uti_data?: string
+          p_isolation?: Database["public"]["Enums"]["isolamento_enum"]
+          p_leito: string
+          p_nome: string
+          p_observacoes?: string
+          p_paciente_id?: string
+          p_peso?: number
+          p_uti: Database["public"]["Enums"]["uti_enum"]
+        }
+        Returns: string
+      }
+      dar_alta_paciente: {
+        Args: {
+          p_desfecho: Database["public"]["Enums"]["desfecho_internacao_enum"]
+          p_desfecho_data?: string
+          p_destino_especialidade?: string
+          p_destino_setor?: string
+          p_observacoes?: string
+          p_paciente_id: string
+        }
+        Returns: string
+      }
+      fmt_num: { Args: { n: number }; Returns: string }
       fn_alert_hash: {
         Args: { p_paciente_id: string; p_payload: Json; p_tipo: string }
         Returns: string
+      }
+      fn_hoje_local: { Args: never; Returns: string }
+      fn_internacao_atual: { Args: { p_paciente: string }; Returns: string }
+      fn_refresh_dispositivos: {
+        Args: { p_paciente: string }
+        Returns: undefined
+      }
+      fn_valida_leito: {
+        Args: {
+          p_leito: string
+          p_uti: Database["public"]["Enums"]["uti_enum"]
+        }
+        Returns: undefined
       }
       match_memorias: {
         Args: {
@@ -1166,12 +1709,45 @@ export type Database = {
         }
         Returns: string
       }
-      show_limit: { Args: never; Returns: number }
-      show_trgm: { Args: { "": string }; Returns: string[] }
+      transferir_leito: {
+        Args: {
+          p_leito: string
+          p_paciente_id: string
+          p_uti: Database["public"]["Enums"]["uti_enum"]
+        }
+        Returns: string
+      }
     }
     Enums: {
       antibiograma_resultado_enum: "S" | "I" | "R"
       comparador_enum: "lt" | "lte" | "gt" | "gte"
+      desfecho_internacao_enum:
+        | "alta_uti"
+        | "alta_hospitalar"
+        | "obito"
+        | "transferencia"
+      dispositivo_motivo_fim_enum:
+        | "eletivo"
+        | "infeccao"
+        | "troca"
+        | "disfuncao"
+        | "alta"
+        | "obito"
+        | "outro"
+      dispositivo_tipo_enum:
+        | "iot"
+        | "traqueo"
+        | "cvc"
+        | "picc"
+        | "arterial"
+        | "svd"
+        | "sne"
+        | "sng"
+        | "dreno"
+        | "gtt"
+        | "trr"
+        | "marca_passo"
+        | "outro"
       fonte_evento_enum:
         | "manual"
         | "gemini_ocr"
@@ -1180,7 +1756,7 @@ export type Database = {
         | "auto_trigger"
         | "edge_function"
         | "api_import"
-      gravidade_enum: "estavel" | "moderado" | "grave" | "critico" | "obito"
+      gravidade_enum: "estavel" | "watcher" | "instavel" | "critico"
       intencao_atb_enum: "empirica" | "dirigida" | "profilatica"
       isolamento_enum: "none" | "contact" | "droplet" | "aerosol"
       material_cultura_enum:
@@ -1197,7 +1773,9 @@ export type Database = {
       severidade_alerta_enum: "info" | "warning" | "critical"
       severidade_visual_enum: "red" | "yellow" | "green"
       status_leito_enum: "ativo" | "alta" | "obito" | "transferencia"
+      tipo_nota_enum: "admissao" | "seriada" | "alta" | "andar"
       trend_modo_enum: "subida_abs" | "subida_rel" | "queda_abs"
+      turno_enum: "diurna" | "noturna"
       uti_enum: "UTI2" | "UTI3" | "UTI4"
       via_atb_enum: "EV" | "VO" | "IM" | "SC" | "SNE" | "SNG" | "IT" | "Tópico"
     }
@@ -1212,27 +1790,28 @@ type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
-  DefaultSchemaTableNameOrOptions extends | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-      schema: keyof DatabaseWithoutInternals
-    }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-      DefaultSchema["Views"])
+        DefaultSchema["Views"])
     ? (DefaultSchema["Tables"] &
-      DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1240,16 +1819,17 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends | keyof DefaultSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-      schema: keyof DatabaseWithoutInternals
-    }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
@@ -1264,16 +1844,17 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends | keyof DefaultSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-      schema: keyof DatabaseWithoutInternals
-    }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
@@ -1288,32 +1869,34 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  DefaultSchemaEnumNameOrOptions extends | keyof DefaultSchema["Enums"]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-      schema: keyof DatabaseWithoutInternals
-    }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends | keyof DefaultSchema["CompositeTypes"]
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-      schema: keyof DatabaseWithoutInternals
-    }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
@@ -1324,6 +1907,36 @@ export const Constants = {
     Enums: {
       antibiograma_resultado_enum: ["S", "I", "R"],
       comparador_enum: ["lt", "lte", "gt", "gte"],
+      desfecho_internacao_enum: [
+        "alta_uti",
+        "alta_hospitalar",
+        "obito",
+        "transferencia",
+      ],
+      dispositivo_motivo_fim_enum: [
+        "eletivo",
+        "infeccao",
+        "troca",
+        "disfuncao",
+        "alta",
+        "obito",
+        "outro",
+      ],
+      dispositivo_tipo_enum: [
+        "iot",
+        "traqueo",
+        "cvc",
+        "picc",
+        "arterial",
+        "svd",
+        "sne",
+        "sng",
+        "dreno",
+        "gtt",
+        "trr",
+        "marca_passo",
+        "outro",
+      ],
       fonte_evento_enum: [
         "manual",
         "gemini_ocr",
@@ -1333,7 +1946,7 @@ export const Constants = {
         "edge_function",
         "api_import",
       ],
-      gravidade_enum: ["estavel", "moderado", "grave", "critico", "obito"],
+      gravidade_enum: ["estavel", "watcher", "instavel", "critico"],
       intencao_atb_enum: ["empirica", "dirigida", "profilatica"],
       isolamento_enum: ["none", "contact", "droplet", "aerosol"],
       material_cultura_enum: [
@@ -1351,7 +1964,9 @@ export const Constants = {
       severidade_alerta_enum: ["info", "warning", "critical"],
       severidade_visual_enum: ["red", "yellow", "green"],
       status_leito_enum: ["ativo", "alta", "obito", "transferencia"],
+      tipo_nota_enum: ["admissao", "seriada", "alta", "andar"],
       trend_modo_enum: ["subida_abs", "subida_rel", "queda_abs"],
+      turno_enum: ["diurna", "noturna"],
       uti_enum: ["UTI2", "UTI3", "UTI4"],
       via_atb_enum: ["EV", "VO", "IM", "SC", "SNE", "SNG", "IT", "Tópico"],
     },
