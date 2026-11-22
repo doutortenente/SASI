@@ -12,7 +12,7 @@
 | Design | "Comando UTI · Folha de plantão" (https://claude.ai/artifact/DfrYNmPhnsB5VS3m4hdR4T): folha de estilos, fontes e ícones copiados do design |
 | Publicação | Vercel, projeto ligado a `doutortenente/SASI`, Root Directory vazio (raiz); cada merge na `main` publica |
 | Banco | Supabase; uso pessoal e solo, sem login (decisão do operador) |
-| Ingest | Skill `sasi-ingest-export` → JSON → MCP `sasi_deploy_ingest`; as telas Exames e Evolução também gravam |
+| Ingest | Skill `sasi-ingest-export` → JSON → MCP `sasi_deploy_ingest` (grava também intercorrências, prescrição, tipo de nota, gravidade, turno e data do plantão); as telas Exames e Evolução também gravam |
 
 ## 2. Telas
 
