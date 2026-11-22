@@ -47,6 +47,14 @@ export const PayloadSchema = z.object({
   pendencias: z.array(PendenciaSchema).optional(),
 }).strict();
 
+/** 7h00 a 18h59 em São Paulo = "manha"; o resto = "noite". Data ilegível: usa a hora atual. */
+function plantaoPelaHora(iso: string): "manha" | "noite" {
+  const t = Date.parse(iso);
+  const d = Number.isNaN(t) ? new Date() : new Date(t);
+  const h = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "America/Sao_Paulo", hour: "2-digit", hourCycle: "h23" }).format(d));
+  return h >= 7 && h < 19 ? "manha" : "noite";
+}
+
 type PayloadV1 = z.infer<typeof PayloadSchema>;
 
 async function audit(
@@ -88,7 +96,7 @@ sistema da conduta com o nome do quadro ("Cardio-hemodinâmica", não "hemo"). O
 mas o texto novo deve nascer certo.
 
 A evolução grava também intercorrencias, prescricao, tipo_nota, illness_severity, turno e data_plantao (os de valor fixo só se válidos).
-Sem plantao válido, envia nulo e o banco decide o turno pela hora.
+Sem plantao válido, a ferramenta decide: turno válido (noturna = noite; diurna = manha) ou a hora de data_evolucao em São Paulo (7h às 18h59 = manha; o resto = noite). Nunca envia plantao nulo.
 
 Args:
   - payload (object): JSON completo com $schema "sasi-ocr-ingest/v1"
@@ -158,8 +166,6 @@ Retorna: paciente_id, evolucao_id, eventos_inseridos, warnings.`,
         if (payload.evolucao_snapshot) {
           const snap = payload.evolucao_snapshot;
           const plantaoRaw = snap.plantao as string | undefined;
-          // Sem plantão válido: null, para o banco decidir o turno pela hora (gatilho fn_evolucao_relogios).
-          const plantao = PLANTAO_ENUM.safeParse(plantaoRaw).data ?? null;
           const intercorrencias = Array.isArray(snap.intercorrencias)
             ? snap.intercorrencias.filter((t): t is string => typeof t === "string")
             : [];
@@ -167,11 +173,15 @@ Retorna: paciente_id, evolucao_id, eventos_inseridos, warnings.`,
           const illness_severity = SEVERIDADE_ENUM.safeParse(snap.illness_severity).data;
           const turno = TURNO_ENUM.safeParse(snap.turno).data;
           const data_plantao = DATA_ISO.safeParse(snap.data_plantao).data;
+          const data_evolucao = (snap.data_evolucao as string | undefined) ?? payload.extracted_at;
+          // plantao é obrigatório no banco: válido > turno válido > hora de data_evolucao em São Paulo.
+          const plantao = PLANTAO_ENUM.safeParse(plantaoRaw).data
+            ?? (turno === "noturna" ? "noite" : turno === "diurna" ? "manha" : plantaoPelaHora(data_evolucao));
 
           const evolucaoBody: Record<string, unknown> = {
             paciente_id,
             user_id,
-            data_evolucao: snap.data_evolucao ?? payload.extracted_at,
+            data_evolucao,
             plantao,
             neuro: snap.neuro ?? {},
             resp: snap.resp ?? {},
