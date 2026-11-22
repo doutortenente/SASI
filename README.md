@@ -15,6 +15,7 @@ src/
                 comando-uti.css (copiado do design: não editar à mão) e globals.css (o que o app acrescenta)
   components/   peças do design, menu, ícones, busca, caixa de feito
   lib/          termos.ts (nomes e contas do design) · uti.ts (leitura do banco) · supabase/ · erros.ts
+e2e/            conferência automática com banco de mentira (falso.cjs, confere.cjs, fotos.cjs); fotos saem em e2e/saida/ (fora do git)
 public/fonts/   Atkinson Hyperlegible
 docs/           MEMORY.md (decisões e débitos), STATUS.md (estado atual), template clínico
 supabase/       migrations/ (histórico do banco), snippets/ (consultas e molde), functions/, config.toml
@@ -29,6 +30,16 @@ npm install
 cp .env.example .env.local   # preencher a chave pública do Supabase
 npm run dev                  # http://localhost:3000
 npm run typecheck && npm run build   # conferência (Node 20+)
+```
+
+Conferência das telas (só dados fictícios, nunca toca o banco real; precisa do Playwright, que já vem no ambiente de nuvem do Claude):
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=chave-de-teste npm run build
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=chave-de-teste npx next start -p 3111 &
+node e2e/falso.cjs &       # banco de mentira na porta 54321
+npm run test:e2e           # sai com 0 se tudo conferiu
+node e2e/fotos.cjs         # opcional: fotos das telas em e2e/saida/
 ```
 
 ## Onde está cada coisa

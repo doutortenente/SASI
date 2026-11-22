@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Busca } from "@/components/Busca";
+import { Icone } from "@/components/Icone";
+import { NovoLeito } from "@/components/NovoLeito";
 import { Avisos, Flags, Selo, Topo, Traco } from "@/components/ds";
-import { hdItens } from "@/lib/termos";
+import { hdItens, plantaoAtual } from "@/lib/termos";
 import { carregarLeitos, filtra, maxMin, pilulas, suporteDe, type Leito } from "@/lib/uti";
 
 export const dynamic = "force-dynamic";
@@ -34,16 +36,23 @@ function Cartao({ l }: { l: Leito }) {
   );
 }
 
-export default async function Cards({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const { q } = await searchParams;
+export default async function Cards({ searchParams }: { searchParams: Promise<{ q?: string; novo?: string }> }) {
+  const { q, novo } = await searchParams;
   const leitos = await carregarLeitos();
   return (
     <>
-      <Topo titulo="Cards" leitos={leitos}><Busca /></Topo>
+      <Topo titulo="Cards" leitos={leitos}>
+        <Busca />
+        <Link className="ds-btn ds-btn--primario" href="/cards?novo=sim"><Icone n="mais" />Novo leito</Link>
+      </Topo>
       <main className="ds-conteudo">
+        {novo ? <NovoLeito key={novo} vagos={leitos.filter((l) => !l.p).map((l) => l.n)} leito={novo.length <= 2 ? novo.padStart(2, "0") : null} hoje={plantaoAtual().hoje} /> : null}
         <div className="ds-grade">
           {filtra(leitos, q).map((l) => l.p ? <Cartao key={l.n} l={l} /> : (
-            <article key={l.n} className="ds-leito ds-leito--vago"><div><span className="ds-leito__n">{l.n}</span><p>Leito vago</p></div></article>
+            <article key={l.n} className="ds-leito ds-leito--vago">
+              <div><span className="ds-leito__n">{l.n}</span><p>Leito vago</p></div>
+              <Link className="ds-btn ds-btn--p" href={`/cards?novo=${l.n}`}><Icone n="mais" />Novo leito</Link>
+            </article>
           ))}
         </div>
       </main>

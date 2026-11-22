@@ -78,6 +78,11 @@ export function registerIngestDeployTools(server: McpServer): void {
 
 Use após a skill sasi-ingest-export gerar JSON validado. Equivalente operacional ao Edge Function ocr-ingest, via service role MCP.
 
+Termos do design (use estes): eventos pas, pad, dx, cai, uf_trs (não pa_sys, pa_dia, glicemia, ca em mmol/L, uf_dialise);
+quadros da evolução com pas_*, pad_*, temp_*, notas, diurese_ml + diurese_h (não pa_sys_*, tax_*, tmax, obs, diurese_24h_ml);
+sistema da conduta com o nome do quadro ("Cardio-hemodinâmica", não "hemo"). O banco ainda troca o termo antigo na entrada,
+mas o texto novo deve nascer certo.
+
 Args:
   - payload (object): JSON completo com $schema "sasi-ocr-ingest/v1"
 

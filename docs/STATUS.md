@@ -24,11 +24,10 @@ Cards · Round · Tabela · Passagem · Exames · Evolução (UTI 2, 13 leitos).
 
 ## 3. O que ainda não faz (em relação ao design)
 
-- "Novo leito" (admissão pela tela) não existe.
+- "Novo leito": o design mostra só o botão (no topo dos Cards e no cartão de leito vago), não o formulário. O formulário é escolha nossa, montado com as peças da ficha: leito vago, nome, idade, sexo, peso, altura, HD, data de admissão e gravidade (nome e gravidade são obrigatórios; vazio grava null). Grava em `pacientes` e o banco abre a internação sozinho. Não define isolamento nem alergias na admissão.
 - Na Prescrição vigente do Round, os itens por sistema vêm do campo de prescrição gravado na evolução; "Hematológico" e o preparo das ampolas ("8 amp/250 mL") não têm fonte no banco e aparecem como travessão ou ficam de fora.
 - Antimicrobianos e culturas: o antibiograma continua só para leitura na ficha; o isolamento é do paciente (não da cultura) e a ficha não o edita.
-- O tema claro ou escuro segue o do aparelho (não há botão).
-- Os gráficos pequenos do Round e de Exames são barras simples, não o desenho exato do design.
+- Tema claro ou escuro: o design não tem botão; o app segue o aparelho (decisão fechada, nada a fazer).
 
 ## 4. Banco
 

@@ -3,7 +3,7 @@ import { Icone } from "@/components/Icone";
 import { AtbCulturas, FichaPaciente, LinhaDoTempo, ListaCondutas, ListaPendencias, Mini, Painel, Topo, Traco, metaCurta } from "@/components/ds";
 import { leitoPedido } from "@/components/Leito";
 import { GRAVIDADE, ddmm, diasEntre, nf, num, plantaoAtual, sinal, txt, type Infusao } from "@/lib/termos";
-import { carregarDetalhe, maxMin, nivelDe, pilulas, serieDe, type Detalhe, type Janela } from "@/lib/uti";
+import { carregarDetalhe, linhaDe, maxMin, nivelDe, pilulas, serieDe, type Detalhe, type Janela } from "@/lib/uti";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +58,7 @@ export default async function Round({ searchParams }: { searchParams: Promise<{ 
                   {SINAIS.map(([k, nome, un, ic]) => {
                     const js = janelasDe(d, k);
                     return <Mini key={k} ic={ic} titulo={nome} un={un} valor={maxMin(l.janelas[k])} flags={pilulas(l.janelas[k])}
-                      barras={js.map((j) => ({ r: ddmm(j.janela_fim), a: Number(j.valor_max), b: Number(j.valor_min) }))} />;
+                      grafico={{ tipo: "faixas", alto: js.at(-1)?.limiar_alto ?? null, baixo: js.at(-1)?.limiar_baixo ?? null, pontos: js.map((j) => ({ r: ddmm(j.janela_fim), a: Number(j.valor_max), b: Number(j.valor_min) })) }} />;
                   })}
                   <Mini ic="renal" titulo="Diurese" un="mL/kg/h" valor={debito != null ? nf(debito, 2) : null} nota={diurese != null ? `${nf(diurese)} mL${horas ? ` em ${nf(horas)} h` : ""}` : undefined} />
                   <Mini ic="renal" titulo="Balanço" un="mL" valor={bh != null ? sinal(bh) : null} nota={acum != null ? `acumulado ${sinal(acum)}` : undefined} />
@@ -71,7 +71,7 @@ export default async function Round({ searchParams }: { searchParams: Promise<{ 
                     const s = serieDe(d, k);
                     const ult = s.at(-1);
                     return <Mini key={k} ic={ic} titulo={nome} un={un} valor={ult ? nf(ult.v) : null} nivel={ult ? nivelDe(d.regras, k, ult.v) : null}
-                      nota={s.length > 1 ? `em ${ddmm(s[0].iso)}: ${nf(s[0].v)}` : undefined} barras={s.map((x) => ({ r: ddmm(x.iso), a: x.v, b: x.v }))} />;
+                      nota={s.length > 1 ? `em ${ddmm(s[0].iso)}: ${nf(s[0].v)}` : undefined} grafico={linhaDe(d, k)} />;
                   })}
                 </div>
               </section>

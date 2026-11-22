@@ -5,7 +5,7 @@ require('fs').mkdirSync(dir, { recursive: true });
 (async () => {
   const b = await chromium.launch();
   const erros = [];
-  const telas = [['cards', '/cards', 'light', 1440], ['round', '/round?leito=03', 'light', 1440], ['tabela', '/tabela', 'light', 1440], ['passagem', '/passagem', 'light', 1440], ['exames', '/exames?leito=03', 'light', 1440], ['evolucao', '/evolucao?leito=03', 'light', 1440], ['evolucao-escuro', '/evolucao?leito=03', 'dark', 1440], ['evolucao-tablet', '/evolucao?leito=03', 'light', 1194], ['evolucao-ontem', '/evolucao?leito=05', 'light', 1440]];
+  const telas = [['cards', '/cards', 'light', 1440], ['round', '/round?leito=03', 'light', 1440], ['tabela', '/tabela', 'light', 1440], ['passagem', '/passagem', 'light', 1440], ['exames', '/exames?leito=03', 'light', 1440], ['evolucao', '/evolucao?leito=03', 'light', 1440], ['evolucao-escuro', '/evolucao?leito=03', 'dark', 1440], ['evolucao-tablet', '/evolucao?leito=03', 'light', 1194], ['evolucao-ontem', '/evolucao?leito=05', 'light', 1440], ['cards-novo', '/cards?novo=04', 'light', 1440], ['cards-novo-escuro', '/cards?novo=04', 'dark', 1194], ['round-graficos', '/round?leito=03', 'dark', 1440], ['exames-graficos', '/exames?leito=03', 'light', 1194]];
   for (const [nome, rota, tema, w] of telas) {
     const ctx = await b.newContext({ viewport: { width: w, height: 900 }, colorScheme: tema, deviceScaleFactor: 1 });
     const p = await ctx.newPage();

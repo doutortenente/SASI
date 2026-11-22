@@ -33,3 +33,5 @@ a.ds-leito:hover { border-color: var(--borda-forte); }
 }
 @media (max-width: 520px) { .ds-grade { --colunas: 1; } }
 @media print { .ds-menu, .ds-topo__acoes { display: none; } .ds-app { display: block; } }
+/* painel Novo leito: o design mostra o botão, não o formulário; usa as peças da ficha */
+.ds-novo__acoes { padding-top: 12px; }

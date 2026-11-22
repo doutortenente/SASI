@@ -77,6 +77,52 @@ async function fluxos(b, erros) {
   ok(/Drogas vasoativas[\s\S]*Noradrenalina[\s\S]*Sedação e analgesia[\s\S]*Fentanil[\s\S]*Antimicrobianos[\s\S]*Meropeném 1 g EV/.test(presc), 'infusões e antimicrobianos aparecem na Prescrição');
   ok(/Hidrocortisona 50 mg EV 6\/6 h/.test(presc) && /Pantoprazol/.test(presc) && /Paracetamol/.test(presc), 'itens por sistema vêm da prescrição gravada');
   ok(/Hematológico\s*\n?\s*—/.test(presc), 'item sem fonte no banco aparece como travessão');
+  // 8) Novo leito: botão no topo e no cartão vago; o corpo enviado a "pacientes"
+  console.log('novo leito:');
+  await p.goto('http://localhost:3111/cards', { waitUntil: 'networkidle' });
+  ok(await p.locator('.ds-leito--vago .ds-btn--p').count() > 0, 'cartão de leito vago traz o botão "Novo leito" do design');
+  await p.getByRole('link', { name: 'Novo leito' }).first().click(); await p.waitForSelector('.ds-novo');
+  const vagosTela = await p.getByRole('radiogroup', { name: 'Leito' }).getByRole('radio').allInnerTexts();
+  ok(vagosTela.join(',') === '02,04,06,07,08,09,11,12,13', 'só os leitos vagos aparecem para escolher', vagosTela);
+  ok(await p.getByRole('radio', { name: '02', checked: true }).count() === 0, 'sem escolha, nenhum leito vem marcado');
+  await limparEscritas();
+  await p.getByRole('button', { name: 'Admitir paciente' }).click();
+  ok(await p.locator('.ds-novo .ds-ev__msg').count() === 1 && !(await lerEscritas()).length, 'sem leito, nome e gravidade: avisa e não grava nada');
+  await p.getByRole('radio', { name: '02', exact: true }).click();
+  await p.getByLabel('Nome do paciente').fill('Paciente Teste Ficticio');
+  await p.getByRole('radio', { name: 'Feminino' }).click();
+  await p.getByLabel('Idade', { exact: true }).fill('71'); await p.getByLabel('Peso', { exact: true }).fill('68,5'); await p.getByLabel('Altura', { exact: true }).fill('160');
+  await p.getByLabel('Hipótese diagnóstica').fill('Choque séptico de foco urinário');
+  await p.getByRole('radio', { name: 'Watcher' }).click();
+  await p.getByRole('button', { name: 'Admitir paciente' }).click(); await p.waitForURL(/\/round|\/cards/, { timeout: 8000 }); await new Promise((r) => setTimeout(r, 500));
+  es = await lerEscritas(); const adm = de(es, 'pacientes', 'POST')[0];
+  ok(adm && JSON.stringify(adm.corpo) === JSON.stringify({ uti: 'UTI2', leito: 'UTI2-L02', status_leito: 'ativo', nome: 'Paciente Teste Ficticio', idade: 71, sexo: 'feminino', peso: 68.5, altura: 160, hd: 'Choque séptico de foco urinário', data_adm: HOJE, gravidade: 'watcher' }), 'a admissão grava o paciente no leito escolhido, com os valores digitados', adm && adm.corpo);
+  ok(!es.some((x) => x.tabela === 'internacoes'), 'a internação não é gravada pela tela (o banco abre sozinho)');
+  await limparEscritas();
+  await p.goto('http://localhost:3111/cards?novo=04', { waitUntil: 'networkidle' });
+  ok(await p.getByRole('radio', { name: '04', checked: true }).count() === 1, 'vindo do cartão vago, o leito já vem marcado');
+  await p.getByLabel('Nome do paciente').fill('Outro Paciente Ficticio'); await p.getByRole('radio', { name: 'Crítico' }).click();
+  await p.getByRole('button', { name: 'Admitir paciente' }).click(); await new Promise((r) => setTimeout(r, 800));
+  es = await lerEscritas(); const adm2 = de(es, 'pacientes', 'POST')[0];
+  ok(adm2 && adm2.corpo.idade === null && adm2.corpo.sexo === null && adm2.corpo.peso === null && adm2.corpo.altura === null && adm2.corpo.hd === null && adm2.corpo.leito === 'UTI2-L04' && adm2.corpo.gravidade === 'critico', 'campo vazio grava null (nada de valor padrão)', adm2 && adm2.corpo);
+  await p.goto('http://localhost:3111/cards?novo=06', { waitUntil: 'networkidle' }); await limparEscritas();
+  await p.getByLabel('Nome do paciente').fill('Teste Ficticio'); await p.getByRole('radio', { name: 'Estável' }).click(); await p.getByLabel('Idade', { exact: true }).fill('200');
+  await p.getByRole('button', { name: 'Admitir paciente' }).click();
+  ok((await p.locator('.ds-novo .ds-ev__msg').innerText()).includes('idade') && !(await lerEscritas()).length, 'idade fora da faixa: avisa e não grava');
+
+  // 9) Tema: sem botão no design; segue o aparelho, claro ou escuro, já na primeira pintura
+  const cEsc = await b.newContext({ colorScheme: 'dark' }); const pe = await cEsc.newPage(); await pe.goto('http://localhost:3111/cards', { waitUntil: 'domcontentloaded' });
+  const cClaro = await b.newContext({ colorScheme: 'light' }); const pc = await cClaro.newPage(); await pc.goto('http://localhost:3111/cards', { waitUntil: 'domcontentloaded' });
+  ok((await pe.evaluate(() => document.documentElement.dataset.theme)) === 'escuro' && (await pc.evaluate(() => document.documentElement.dataset.theme)) === 'claro', 'o tema segue o aparelho (escuro e claro)');
+  await cEsc.close(); await cClaro.close();
+
+  // 10) Gráficos pequenos do design: faixas nos sinais, linha nos exames
+  await p.goto('http://localhost:3111/round?leito=03', { waitUntil: 'networkidle' });
+  const g = await p.evaluate(() => { const s = [...document.querySelectorAll('.ds-mini svg:not(.ds-icone)')]; const fc = s.find((x) => /^FC/.test(x.getAttribute('aria-label'))); const lac = s.find((x) => /^Lactato/.test(x.getAttribute('aria-label')));
+    return { fc: fc && { vb: fc.getAttribute('viewBox'), barras: fc.querySelectorAll('.ds-g-barra').length, alerta: fc.querySelectorAll('.ds-g-alerta').length, limiar: fc.querySelectorAll('.ds-g-limiar').length, alvos: fc.querySelectorAll('.ds-g-alvo title').length }, lac: lac && { linha: lac.querySelectorAll('polyline.ds-g-linha').length, pontos: lac.querySelectorAll('circle.ds-g-ponto').length, limiares: lac.querySelectorAll('.ds-g-limiar').length } }; });
+  ok(g.fc && g.fc.vb === '0 0 240 92' && g.fc.barras >= 3 && g.fc.alerta >= 1 && g.fc.limiar === 1 && g.fc.alvos === g.fc.barras, 'sinal: faixas com a parte fora do limiar, linha do limiar e dica por janela', g.fc);
+  ok(g.lac && g.lac.linha === 1 && g.lac.pontos >= 2, 'exame: linha com pontos pelas últimas coletas', g.lac);
+
   await ctx.close();
   return falhas;
 }

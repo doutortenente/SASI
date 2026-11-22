@@ -33,7 +33,7 @@ docs/
 
 1. 🔴 **SEGREDOS EXPOSTOS (30-jul)** — o cofre `.env` foi colado num chat. **Rotacionar**: token GitHub, `service_role` + senha do banco Supabase, senha-mestra do Vaultwarden, senhas de e-mail. Prioridade máxima.
 2. **Skill de ingest com os termos antigos** — `sasi-ingest-export` (repo `claude-workspace` + cópia no claude.ai) ainda escreve `pa_sys`, `tax_max`, `obs`… O banco troca na entrada (gatilho `trg_00_termos_design`), mas a skill precisa passar a LER pelos nomes novos. Mapa em `CLAUDE.md` §4.
-3. **"Novo leito" não existe na tela.** Antimicrobianos e culturas já se incluem, suspendem e apagam pela ficha.
+3. **Ficha e admissão:** antimicrobianos e culturas já se incluem, suspendem e apagam pela ficha; "Novo leito" já admite pela tela. Faltam: antibiograma editável, isolamento da cultura e isolamento/alergias na admissão.
 4. **eventos_clinicos** — fila de revisão (`vw_eventos_pendentes_revisao`).
 5. **SOFA bloqueado por dado** — bilirrubina e PaO2 raramente lançadas; a tela mostra "—", nunca inventa.
 6. **Limiares das janelas antigas** — as janelas de 27-set foram contadas com FR > 20, PAD < 50, SpO2 < 92 e T > 37,8. O design usa FR > 25, PAD < 45, SpO2 < 88 e T > 38: a skill `controles-vitais-janela` precisa contar com os limiares do design. A tela mostra o limiar gravado em cada linha.

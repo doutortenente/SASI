@@ -191,3 +191,14 @@ export function montarFolhao(d: Detalhe, hoje: string): Folhao {
 export function serieDe(d: Detalhe, codigo: string): { iso: string; v: number }[] {
   return [...(porDia(d.eventos).get(codigo)?.entries() ?? [])].map(([iso, v]) => ({ iso, v })).sort((a, b) => a.iso.localeCompare(b.iso));
 }
+
+/** Gráfico pequeno do design: faixas do mínimo ao máximo por janela (sinais) ou linha pelas últimas coletas (exames). */
+export type Grafico =
+  | { tipo: "faixas"; pontos: { r: string; a: number; b: number }[]; alto: number | null; baixo: number | null }
+  | { tipo: "linha"; pontos: { r: string; v: number; nivel: "a" | "c" | null }[]; limites: number[] };
+
+/** Linha de um exame: os pontos das últimas coletas e as linhas de limiar das regras de alerta. */
+export function linhaDe(d: Detalhe, codigo: string): Grafico {
+  const limites = [...new Set(d.regras.filter((r) => r.tipo_evento === codigo).map((r) => r.limiar))].sort((a, b) => a - b);
+  return { tipo: "linha", limites, pontos: serieDe(d, codigo).slice(-5).map((x) => ({ r: ddmm(x.iso), v: x.v, nivel: nivelDe(d.regras, codigo, x.v) })) };
+}

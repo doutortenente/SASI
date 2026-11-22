@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Icone } from "@/components/Icone";
+import { Area, G, Linha, M, Num, Seg, Txt, U, tecla } from "@/components/controles";
 import type { NomeIcone } from "@/components/icones";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import {
@@ -70,15 +71,6 @@ const rassTxt = (v: unknown): string => { const n = num(v); return n == null ? "
 const lista = (v: unknown): string[] => (Array.isArray(v) ? (v as string[]) : []);
 
 // ---- controles do design -------------------------------------------------------
-const tecla = (fn: () => void) => (e: React.KeyboardEvent) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); fn(); } };
-/** Escolha única em botões emendados. Tocar de novo no marcado desmarca. */
-function Seg({ r, ops, v, on, numero, cls }: { r: string; ops: readonly string[]; v: unknown; on: (v: string | null) => void; numero?: boolean; cls?: string }) {
-  return (
-    <span className={"ds-seg" + (numero ? " ds-seg--num" : "") + (cls ? " " + cls : "")} role="radiogroup" aria-label={r}>
-      {ops.map((o) => <span key={o} role="radio" aria-checked={v === o} tabIndex={0} className={v === o ? "ds-seg--on" : undefined} onClick={() => on(v === o ? null : o)} onKeyDown={tecla(() => on(v === o ? null : o))}>{o}</span>)}
-    </span>
-  );
-}
 /** Marcar vários, em blocos soltos. */
 function Blocos({ r, ops, v, on }: { r: string; ops: readonly string[]; v: unknown; on: (v: string[]) => void }) {
   const a = lista(v);
@@ -88,20 +80,6 @@ function Blocos({ r, ops, v, on }: { r: string; ops: readonly string[]; v: unkno
         return <span key={o} role="checkbox" aria-checked={m} tabIndex={0} className={"ds-bloco" + (m ? " ds-bloco--on" : "")} onClick={troca} onKeyDown={tecla(troca)}>{m ? <Icone n="feito" /> : null}{o}</span>; })}
     </span>
   );
-}
-function Num({ r, v, on, larg }: { r: string; v: unknown; on: (v: string) => void; larg?: number }) {
-  const t = txt(v);
-  return <label className="ds-f" style={{ "--larg": `${Math.max(larg ?? 58, Math.round(t.length * 9.8) + 18)}px` } as CSSProperties}><input aria-label={r} inputMode="decimal" value={t} onChange={(e) => on(e.target.value)} /></label>;
-}
-function Txt({ r, v, on, larg }: { r: string; v: unknown; on: (v: string) => void; larg?: number }) {
-  return <label className="ds-f ds-f--t" style={larg ? { flex: `0 1 ${larg}px` } : undefined}><input aria-label={r} value={txt(v)} onChange={(e) => on(e.target.value)} /></label>;
-}
-/** Caixa de texto que cresce: o texto longo quebra a linha, nada fica escondido. */
-function Area({ r, v, on }: { r: string; v: unknown; on: (v: string) => void }) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-  const t = txt(v);
-  useEffect(() => { const e = ref.current; if (e) { e.style.height = "auto"; e.style.height = `${e.scrollHeight}px`; } }, [t]);
-  return <label className="ds-f ds-f--t"><textarea ref={ref} rows={1} aria-label={r} value={t} onChange={(e) => on(e.target.value)} /></label>;
 }
 function Sel({ r, ops, v, on, numero }: { r: string; ops: readonly (string | readonly [string, string])[]; v: unknown; on: (v: string | null) => void; numero?: boolean }) {
   const atual = txt(v);
@@ -117,12 +95,6 @@ function Sel({ r, ops, v, on, numero }: { r: string; ops: readonly (string | rea
     </label>
   );
 }
-const M = ({ children }: { children: ReactNode }) => <span className="ds-ev__m">{children}</span>;
-const U = ({ children, fixa }: { children: ReactNode; fixa?: boolean }) => <span className={"ds-ev__u" + (fixa ? " ds-ev__u--fixa" : "")}>{children}</span>;
-const G = ({ children, cls }: { children: ReactNode; cls?: string }) => <span className={"ds-ev__g" + (cls ? " " + cls : "")}>{children}</span>;
-const Linha = ({ r, o, children }: { r: string; o?: boolean; children: ReactNode }) => (
-  <div className={"ds-ev__l" + (o ? " ds-de-ontem" : "")}><span className="ds-ev__r">{r}</span><div className="ds-ev__v">{children}{o ? <span className="ds-ev__ontem">ontem</span> : null}</div></div>
-);
 const Sub = ({ o, children }: { o?: boolean; children: ReactNode }) => <div className={"ds-ev__sub" + (o ? " ds-de-ontem" : "")}>{children}</div>;
 const SubL = ({ children }: { children: ReactNode }) => <div className="ds-ev__v">{children}</div>;
 function Sis({ nome, ic, igual, children }: { nome: string; ic: NomeIcone; igual?: () => void; children: ReactNode }) {
