@@ -4,6 +4,7 @@
 @import "./ds/tokens/typography.css";
 @import "./ds/tokens/spacing.css";
 @import "./ds/tokens/animations.css";
+@import "./ds/components.css";
 
 @tailwind base;
 @tailwind components;

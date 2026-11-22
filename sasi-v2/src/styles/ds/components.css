@@ -1,0 +1,215 @@
+/* ============================================================================
+   SASI · Comando UTI — Component CSS do design system (reescrita Next.js)
+
+   Porta o CSS que o DS original (packages/design-system, aposentado na faxina
+   de 31-jul-2026) injetava via <style> por componente. No App Router isso
+   quebraria no SSR/hidratacao — aqui vive UMA folha importada em globals.css.
+
+   Ordem de especificidade: variantes de .sasi-btn e .sasi-seg usam classe
+   dobrada (.sasi-btn.sasi-btn--primary) para vencer o CSS do chassi definido
+   em src/app/layout.tsx, que carrega depois deste arquivo.
+   ============================================================================ */
+
+/* ---------- Button ---------- */
+.sasi-btn.sasi-btn--primary { background: var(--accent); color: var(--text-on-accent); border-color: transparent; }
+.sasi-btn.sasi-btn--primary:hover:not(:disabled) { background: var(--accent-hover); color: var(--text-on-accent); }
+
+.sasi-btn.sasi-btn--secondary { background: var(--surface-raised); color: var(--text-body); border-color: var(--border-default); }
+.sasi-btn.sasi-btn--secondary:hover:not(:disabled) { background: var(--surface-sunken); color: var(--text-heading); }
+
+.sasi-btn.sasi-btn--ghost { background: transparent; color: var(--text-muted); border-color: transparent; }
+.sasi-btn.sasi-btn--ghost:hover:not(:disabled) { background: var(--surface-raised); color: var(--text-heading); }
+
+.sasi-btn.sasi-btn--soft { background: var(--accent-soft); color: var(--accent-text); border-color: transparent; }
+.sasi-btn.sasi-btn--soft:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+
+.sasi-btn.sasi-btn--danger { background: var(--danger); color: #fff; border-color: transparent; }
+.sasi-btn.sasi-btn--danger:hover:not(:disabled) { filter: brightness(0.92); }
+
+.sasi-btn.sasi-btn--success { background: var(--success); color: #fff; border-color: transparent; }
+.sasi-btn.sasi-btn--success:hover:not(:disabled) { filter: brightness(0.94); }
+
+.sasi-btn.sasi-btn--sm { min-height: 32px; padding: 0 11px; font-size: var(--text-2xs); }
+.sasi-btn.sasi-btn--md { min-height: 38px; padding: 0 15px; font-size: var(--text-sm); }
+.sasi-btn.sasi-btn--lg { min-height: 44px; padding: 0 20px; font-size: var(--text-base); }
+
+.sasi-btn.sasi-btn--block { width: 100%; }
+.sasi-btn:active { transform: translateY(0.5px) scale(0.99); }
+.sasi-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sasi-btn:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.sasi-btn svg { width: 1em; height: 1em; }
+
+/* ---------- Badge ---------- */
+.sasi-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-sans); font-weight: var(--weight-bold);
+  text-transform: uppercase; letter-spacing: var(--tracking-wide);
+  border-radius: var(--radius-sm); white-space: nowrap; line-height: 1;
+  border: 1px solid transparent;
+}
+.sasi-badge svg { width: 1em; height: 1em; }
+.sasi-badge--sm { font-size: 9px; padding: 3px 7px; }
+.sasi-badge--md { font-size: var(--text-2xs); padding: 4px 9px; }
+.sasi-badge--solid { color: #fff; }
+.sasi-badge--outline { background: transparent; }
+
+/* ---------- Card ---------- */
+.sasi-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  position: relative;
+}
+.sasi-card--pad { padding: var(--space-5); }
+.sasi-card--interactive {
+  cursor: pointer;
+  transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+.sasi-card--interactive:hover { box-shadow: var(--shadow-raised); transform: translateY(-1px); }
+.sasi-card--interactive:active { transform: translateY(0) scale(0.995); }
+
+.sasi-card__grav { border-left-width: var(--gravity-bar); border-left-style: solid; }
+.sasi-card__head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--space-3); margin-bottom: var(--space-3);
+}
+.sasi-card__title {
+  font-size: var(--text-md); font-weight: var(--weight-semibold);
+  color: var(--text-heading); line-height: var(--leading-tight);
+}
+.sasi-card__eyebrow {
+  font-size: var(--text-2xs); font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-eyebrow); text-transform: uppercase;
+  color: var(--text-muted);
+}
+.sasi-card__num-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: var(--radius-sm);
+  background: var(--accent); color: #fff; font-weight: var(--weight-bold);
+  font-size: var(--text-xs); font-family: var(--font-mono); flex-shrink: 0;
+}
+
+/* ---------- Field / Input ---------- */
+.sasi-field { display: flex; flex-direction: column; gap: 5px; }
+.sasi-field__label {
+  font-size: var(--text-2xs); font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide); text-transform: uppercase;
+  color: var(--text-muted);
+}
+.sasi-field__hint { font-size: var(--text-xs); color: var(--text-faint); }
+.sasi-input-wrap { position: relative; display: flex; align-items: center; }
+.sasi-input-wrap > svg.lead {
+  position: absolute; left: 10px; width: 15px; height: 15px;
+  color: var(--text-faint); pointer-events: none;
+}
+.sasi-input {
+  width: 100%; box-sizing: border-box;
+  font-family: var(--font-sans); font-size: var(--text-sm); color: var(--text-heading);
+  background: var(--surface-card); border: 1px solid var(--border-default);
+  border-radius: var(--radius-md); padding: 9px 12px;
+  transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+.sasi-input.has-lead { padding-left: 32px; }
+.sasi-input::placeholder { color: var(--text-faint); }
+.sasi-input:hover { border-color: var(--border-strong); }
+.sasi-input:focus { outline: none; border-color: var(--accent); box-shadow: var(--shadow-focus); }
+.sasi-input:disabled { background: var(--surface-raised); color: var(--text-faint); cursor: not-allowed; }
+textarea.sasi-input { resize: vertical; min-height: 64px; line-height: var(--leading-snug); }
+.sasi-input--invalid { border-color: var(--danger); }
+.sasi-input--invalid:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 30%, transparent); }
+
+/* ---------- SegmentedControl (variante box; o chassi usa a pill .sasi-seg) ---------- */
+.sasi-seg.sasi-seg--box {
+  display: inline-flex; gap: 2px; padding: 3px;
+  background: var(--surface-sunken); border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+.sasi-seg__btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-sans); font-size: var(--text-xs); font-weight: var(--weight-semibold);
+  color: var(--text-muted); background: transparent; border: none; cursor: pointer;
+  padding: 6px 12px; border-radius: var(--radius-sm);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.sasi-seg__btn svg { width: 14px; height: 14px; }
+.sasi-seg__btn:hover:not(.is-active) {
+  color: var(--text-heading); background: color-mix(in srgb, var(--surface-card) 60%, transparent);
+}
+.sasi-seg__btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sasi-seg__btn.is-active { background: var(--accent); color: var(--text-on-accent); box-shadow: var(--shadow-card); }
+
+/* ---------- StatPill ---------- */
+.sasi-stat {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-sans); font-size: var(--text-xs); color: var(--text-muted);
+}
+.sasi-stat--btn {
+  background: none; border: none; cursor: pointer; padding: 2px 4px;
+  border-radius: var(--radius-sm); transition: background var(--dur-fast) var(--ease-out);
+}
+.sasi-stat--btn:hover { background: var(--surface-raised); }
+.sasi-stat--active { color: var(--accent-text); text-decoration: underline; text-underline-offset: 2px; }
+.sasi-stat__num {
+  font-family: var(--font-mono); font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums; color: var(--text-heading);
+}
+.sasi-stat svg { width: 14px; height: 14px; }
+.sasi-stat__delta { font-family: var(--font-mono); font-weight: var(--weight-bold); font-size: var(--text-2xs); }
+
+/* ---------- GravityBadge ---------- */
+.sasi-grav {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-sans); font-weight: var(--weight-bold); line-height: 1;
+  text-transform: uppercase; letter-spacing: var(--tracking-wide);
+  border-radius: var(--radius-sm); border: 1px solid transparent; white-space: nowrap;
+}
+.sasi-grav svg { width: 1em; height: 1em; }
+.sasi-grav--sm { font-size: 9px; padding: 3px 7px; }
+.sasi-grav--md { font-size: var(--text-2xs); padding: 4px 9px; }
+.sasi-grav--lg { font-size: var(--text-xs); padding: 5px 11px; }
+.sasi-grav__dot { width: 7px; height: 7px; border-radius: 50%; }
+
+/* ---------- SofaBadge ---------- */
+.sasi-sofa {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-sans); font-weight: var(--weight-bold); line-height: 1;
+  border-radius: var(--radius-sm); padding: 4px 8px; white-space: nowrap;
+  background: var(--surface-raised);
+}
+.sasi-sofa--hi { background: color-mix(in srgb, var(--sofa-high) 14%, var(--surface-card)); }
+.sasi-sofa svg { width: 11px; height: 11px; opacity: 0.8; }
+.sasi-sofa__lbl {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
+}
+.sasi-sofa__val { font-family: var(--font-mono); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
+.sasi-sofa__delta { font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: var(--weight-bold); }
+
+/* ---------- TherapyBadge ---------- */
+.sasi-tx {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--font-sans); font-weight: var(--weight-bold); font-size: var(--text-2xs);
+  line-height: 1; padding: 4px 8px; border-radius: var(--radius-sm); white-space: nowrap;
+}
+.sasi-tx svg { width: 12px; height: 12px; }
+
+/* ---------- VitalStat ---------- */
+.sasi-vital {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 1px;
+  padding: 6px 11px; border-radius: var(--radius-md); min-width: 52px;
+  background: var(--surface-raised);
+}
+.sasi-vital--high { background: color-mix(in srgb, var(--danger) 12%, var(--surface-card)); color: var(--grav-critical-solid); }
+.sasi-vital--low { background: color-mix(in srgb, var(--sys-resp-bar) 12%, var(--surface-card)); color: var(--sys-resp); }
+.sasi-vital--ok { color: var(--text-body); }
+.sasi-vital--pos { background: color-mix(in srgb, var(--warning) 12%, var(--surface-card)); color: var(--grav-watcher-text); }
+.sasi-vital--neg { background: color-mix(in srgb, var(--sys-resp-bar) 12%, var(--surface-card)); color: var(--sys-resp); }
+.sasi-vital__lbl {
+  font-size: 8px; font-weight: var(--weight-bold); text-transform: uppercase;
+  letter-spacing: 0.05em; opacity: 0.75;
+}
+.sasi-vital__val {
+  font-family: var(--font-mono); font-weight: var(--weight-bold); font-size: var(--text-md);
+  font-variant-numeric: tabular-nums; line-height: 1.1;
+}
+.sasi-vital__unit { font-size: 0.6em; font-weight: var(--weight-medium); opacity: 0.7; }
