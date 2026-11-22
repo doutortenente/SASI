@@ -48,11 +48,12 @@ async function fluxos(b, erros) {
   await p.getByLabel('Antimicrobiano', { exact: true }).fill('Amicacina');
   await p.getByLabel('Dose do antimicrobiano novo').fill('1 g EV 24/24 h');
   await p.getByLabel('Dias previstos de Amicacina').fill('5');
+  await p.getByLabel('Data de início de Amicacina').fill(HOJE_DDMM);
   await salvar(); es = await lerEscritas();
   const atbPatch = de(es, 'atbs', 'PATCH'), atbPost = de(es, 'atbs', 'POST'), atbDel = de(es, 'atbs', 'DELETE');
   ok(atbPatch.length === 1 && atbPatch[0].filtro.includes('id=eq.a2') && JSON.stringify(atbPatch[0].corpo) === JSON.stringify({ data_fim: HOJE }), 'suspender manda só o fim (hoje) da vancomicina', atbPatch);
   ok(atbDel.length === 1 && atbDel[0].filtro.includes('id=eq.a1'), 'apagar manda a exclusão do meropeném', atbDel);
-  ok(atbPost.length === 1 && JSON.stringify(atbPost[0].corpo) === JSON.stringify({ paciente_id: 'p03', droga: 'Amicacina', dose: '1 g', via: 'EV', frequencia: '24/24 h', duracao_planejada_dias: 5, data_inicio: null }), 'incluir sem início manda data_inicio null (nada de hoje por padrão)', atbPost);
+  ok(atbPost.length === 1 && JSON.stringify(atbPost[0].corpo) === JSON.stringify({ paciente_id: 'p03', droga: 'Amicacina', dose: '1 g', via: 'EV', frequencia: '24/24 h', duracao_planejada_dias: 5, data_inicio: HOJE }), 'incluir com o início preenchido manda a data do início', atbPost);
   ok(!es.some((x) => x.tabela === 'pacientes'), 'nada é escrito em pacientes (dispositivos é derivado)');
 
   // 4) culturas: mudar resultado, incluir, apagar
@@ -88,10 +89,17 @@ async function fluxos(b, erros) {
   await p.getByLabel('Dose do antimicrobiano novo').fill('1 g EV');
   await tenta();
   ok(/Antimicrobiano sem nome/.test(await topo()) && !(await lerEscritas()).length, 'antimicrobiano sem nome: recusa e não envia nada', await topo());
+  // antimicrobiano novo sem início: é recusado com aviso e nada é enviado
+  await p.goto('http://localhost:3111/evolucao?leito=03', { waitUntil: 'networkidle' }); await limparEscritas();
+  await p.getByRole('button', { name: 'Adicionar antimicrobiano' }).click();
+  await p.getByLabel('Antimicrobiano', { exact: true }).fill('Linezolida');
+  await tenta();
+  ok(/Antimicrobiano sem data de início/.test(await topo()) && !(await lerEscritas()).length, 'antimicrobiano novo sem início: é recusado com aviso e nada é enviado', await topo());
   // salvar duas vezes seguidas não envia a mesma inclusão duas vezes
   await p.goto('http://localhost:3111/evolucao?leito=03', { waitUntil: 'networkidle' }); await limparEscritas();
   await p.getByRole('button', { name: 'Adicionar antimicrobiano' }).click();
   await p.getByLabel('Antimicrobiano', { exact: true }).fill('Linezolida');
+  await p.getByLabel('Data de início de Linezolida').fill(HOJE_DDMM);
   await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => /Salvar evolução/.test(x.textContent || '')); b.click(); b.click(); });
   await p.waitForFunction(() => /Salvo às/.test(document.querySelector('.ds-topo__estado')?.textContent || ''), null, { timeout: 8000 }); await p.waitForTimeout(500);
   es = await lerEscritas();

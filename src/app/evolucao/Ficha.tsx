@@ -228,7 +228,8 @@ export function Ficha(props: Props) {
       if (a.x) continue;
       if (!a.id) {
         if (!a.droga.trim()) { if (a.esquema.trim() || a.previstos.trim()) falha("Antimicrobiano sem nome: escreva o nome ou apague a linha"); continue; }
-        if (a.inicio.trim() && !isoDeDdMm(a.inicio, hoje)) falha(`Início inválido em ${a.droga.trim()}`);
+        if (!a.inicio.trim()) falha("Antimicrobiano sem data de início");
+        if (!isoDeDdMm(a.inicio, hoje)) falha(`Início inválido em ${a.droga.trim()}`);
         try { diasPrevistos(a.previstos); } catch { falha(`Dias previstos inválidos em ${a.droga.trim()}`); }
         continue;
       }
@@ -267,13 +268,13 @@ export function Ficha(props: Props) {
         const snap = { esquema: a.esquema, inicio: a.inicio, previstos: a.previstos, fim: a.fim };
         if (!a.id) {
           if (!a.droga.trim()) { agora = agora.filter((x) => x.k !== a.k); continue; }
-          const ini = a.inicio.trim() ? isoDeDdMm(a.inicio, hoje) : null;
-          if (a.inicio.trim() && !ini) throw new Error("início inválido");
+          const ini = isoDeDdMm(a.inicio, hoje);
+          if (!ini) throw new ErroDeFicha("Antimicrobiano sem data de início"); // já barrado por validaAntes
           const campos: Record<string, unknown> = { paciente_id: pacienteId, droga: a.droga.trim(), ...esquemaEmColunas(a.esquema), duracao_planejada_dias: diasPrevistos(a.previstos) };
-          campos.data_inicio = ini; // vazio grava null
+          campos.data_inicio = ini; // obrigatório: nunca null, nunca omitido
           const { data, error } = await sb.from("atbs").insert(campos).select("id").single();
           if (error) throw error;
-          troca(a.k, { id: (data as { id: string }).id, orig: { ...snap, inicioIso: ini ?? "" } });
+          troca(a.k, { id: (data as { id: string }).id, orig: { ...snap, inicioIso: ini } });
           continue;
         }
         const o = a.orig;
