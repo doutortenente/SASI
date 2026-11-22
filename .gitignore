@@ -30,3 +30,6 @@ supabase/.branches
 
 # memória local do Claude (fora do git)
 memory/
+
+# conferência: fotos geradas (e2e)
+/e2e/saida/

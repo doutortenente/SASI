@@ -53,7 +53,7 @@ Retorna: SOAP por sistemas + SOFA + prescrição vigente.`,
           `**SOFA**: ${e.sofa_total ?? "—"} | **ID**: \`${e.id}\`\n`,
           fmtSystem("NEURO", e.neuro as Record<string, unknown>),
           fmtSystem("RESP", e.resp as Record<string, unknown>),
-          fmtSystem("HEMO", e.hemo as Record<string, unknown>),
+          fmtSystem("CARDIO-HEMODINÂMICA", e.hemo as Record<string, unknown>),
           fmtSystem("RENAL", e.renal as Record<string, unknown>),
           fmtSystem("TGI", e.tgi as Record<string, unknown>),
           fmtSystem("HEMATO", e.hemato as Record<string, unknown>),
@@ -88,7 +88,9 @@ Args:
   - paciente_id (string): UUID do paciente
   - plantao ('manha'|'tarde'|'noite'|'plantao_24h'): Turno
   - sofa_total (number): Score SOFA total 0–24 (opcional)
-  - neuro, resp, hemo, renal, tgi, hemato, infecto (object): Dados por sistema — estrutura livre JSONB
+  - neuro, resp, hemo, renal, tgi, hemato, infecto (object): Dados por sistema — estrutura livre JSONB,
+    com as chaves do design em minúsculas (pas_max, pad_min, temp_max, diurese_ml + diurese_h, notas…).
+    "hemo" é o quadro Cardio-hemodinâmica. Não use as chaves antigas (pa_sys_*, tax_*, tmax, obs, diurese_24h_ml)
   - impressao (array de strings): Lista de impressões diagnósticas
   - conduta (array de strings): Lista de condutas
   - prescricao (object): Kardex por categoria — {cardiovascular, snc, gastro_endocrino, infeccioso_resp, sintomaticos_sn, solucoes_diureticos, nutricao} — cada um array de strings

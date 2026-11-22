@@ -134,5 +134,34 @@ export const DROGAS_VASOATIVAS: readonly (readonly [string, string, string])[] =
   ["Noradrenalina", "128 mcg/mL", "mcg/kg/min"], ["Vasopressina", "0,4 UI/mL", "UI/min"], ["Adrenalina", "", "mcg/kg/min"],
   ["Dobutamina", "4 mg/mL", "mcg/kg/min"], ["Nitroprussiato", "", ""], ["Nitroglicerina", "", ""], ["Esmolol", "", ""],
 ];
+/** Lista de diluições do design (a mesma para qualquer droga em infusão). */
+export const DILUICOES = ["50 mcg/mL", "128 mcg/mL", "1 mg/mL", "10 mg/mL", "4 mg/mL", "0,4 UI/mL"] as const;
+
+// ---- antimicrobianos e culturas ------------------------------------------------
+/** Vias aceitas pelo banco (enum via_atb_enum). */
+export const VIAS_ATB = ["EV", "VO", "IM", "SC", "SNE", "SNG", "IT", "Tópico"] as const;
+/** O design tem uma caixa só para dose, via e frequência ("1 g EV 8/8 h"). Junta as três colunas do banco. */
+export const esquemaDe = (dose: string | null, via: string | null, frequencia: string | null): string => [dose, via, frequencia].filter(Boolean).join(" ");
+/** Desfaz o texto da caixa nas três colunas: a via é a palavra da lista de vias; o que vem antes é a dose e o que vem depois é a frequência. */
+export function esquemaEmColunas(texto: string): { dose: string | null; via: string | null; frequencia: string | null } {
+  const t = texto.trim();
+  if (!t) return { dose: null, via: null, frequencia: null };
+  const p = t.split(/\s+/);
+  const i = p.findIndex((x) => (VIAS_ATB as readonly string[]).includes(x));
+  if (i < 0) return { dose: t, via: null, frequencia: null };
+  return { dose: p.slice(0, i).join(" ") || null, via: p[i], frequencia: p.slice(i + 1).join(" ") || null };
+}
+export const RESULTADOS_CULTURA = ["Em andamento", "Positiva", "Negativa"] as const;
+/** "dd/mm" digitado vira a data completa: o ano é o de hoje (ou o anterior, se a data cairia no futuro). Inválida: null. */
+export function isoDeDdMm(texto: string, hoje: string): string | null {
+  const m = texto.trim().match(/^(\d{1,2})\/(\d{1,2})$/);
+  if (!m) return null;
+  const d = Number(m[1]), mes = Number(m[2]);
+  const f = (a: number) => `${a}-${String(mes).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  let iso = f(Number(hoje.slice(0, 4)));
+  if (iso > hoje) iso = f(Number(hoje.slice(0, 4)) - 1);
+  const dt = new Date(iso + "T12:00:00Z");
+  return Number.isNaN(dt.getTime()) || dt.getUTCDate() !== d || dt.getUTCMonth() + 1 !== mes ? null : iso;
+}
 export const ABREV_DROGA: Record<string, string> = { Noradrenalina: "Nor", Vasopressina: "Vaso", Dobutamina: "Dobuta", Adrenalina: "Adr" };
 export const SUPORTES = ["Ar ambiente", "Cateter O2", "Máscara", "CNAF", "VNI", "VM"] as const;

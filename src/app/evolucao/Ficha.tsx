@@ -6,10 +6,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Icone } from "@/components/Icone";
+import { Area, G, Linha, M, Num, Seg, Txt, U, tecla } from "@/components/controles";
 import type { NomeIcone } from "@/components/icones";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import {
-  DROGAS_SEDACAO, DROGAS_VASOATIVAS, QUADROS, SUPORTES, TURNO, ddmmaaaa, diasEntre, doseDe, nf, num, pesoPredito, sinal, txt,
+  DILUICOES, DROGAS_SEDACAO, DROGAS_VASOATIVAS, MATERIAL, QUADROS, RESULTADOS_CULTURA, SUPORTES, TURNO, ddmmaaaa, ddmm, diasEntre, doseDe, esquemaEmColunas, horaSP, isoDeDdMm, nf, num, pesoPredito, sinal, txt,
   type Conduta, type Dados, type Infusao, type Quadro, type Turno,
 } from "@/lib/termos";
 
@@ -19,6 +20,24 @@ export interface Estado {
   neuro: Dados; resp: Dados; hemo: Dados; tgi: Dados; renal: Dados; hemato: Dados; infecto: Dados;
   dvas: Infusao[]; sedativos: Infusao[]; intercorrencias: Item[]; impressao: Item[]; condutas: (Conduta & { x?: boolean })[]; pend: PendLocal[];
 }
+interface AtbLocal {
+  k: string; id?: string; droga: string; esquema: string; inicio: string; previstos: string; fim: string | null; x?: boolean;
+  orig?: { esquema: string; inicio: string; inicioIso: string; previstos: string; fim: string | null };
+}
+interface CulturaLocal {
+  k: string; id?: string; material: string; coleta: string; resultado: string; germe: string; ufc: number | null; s: string; r: string; x?: boolean;
+  coletaTs?: string; laudoTs?: string | null; orig?: { material: string; coleta: string; resultado: string; germe: string };
+}
+const MATERIAIS = Object.values(MATERIAL);
+const CODIGO_MATERIAL: Record<string, string> = Object.fromEntries(Object.entries(MATERIAL).map(([c, t]) => [t, c]));
+class ErroDeFicha extends Error {}
+/** Dias previstos: inteiro a partir de 1; vazio fica vazio (null). */
+function diasPrevistos(t: string): number | null {
+  if (!t.trim()) return null;
+  const n = num(t);
+  if (n == null || !Number.isInteger(n) || n < 1) throw new Error("dias previstos inválidos");
+  return n;
+}
 interface Props {
   pacienteId: string; leito: string; dataPlantao: string; turno: Turno; evolucaoId: string | null; salvoEm: string | null;
   inicial: Estado; ontem: Partial<Record<Quadro, Dados>>;
@@ -26,8 +45,9 @@ interface Props {
   labs: Record<string, { hoje: string; antes: string[] }>;
   peso: number | null; altura: number | null; sexo: string | null;
   dispositivos: { nome: string; d: number }[]; viaAerea: { via: string; desde: string; d: number } | null; viaEnteral: string | null; svd: boolean;
-  atbs: { id: string; droga: string; esquema: string; d: number; previstos: number | null }[];
-  culturas: { id: string; material: string; coleta: string; resultado: string; germe: string | null; s: string; r: string }[];
+  hoje: string;
+  atbs: { id: string; droga: string; esquema: string; inicio: string; fim: string | null; previstos: number | null }[];
+  culturas: { id: string; material: string; coleta: string; coletaTs: string; laudoTs: string | null; resultado: string; germe: string; ufc: number | null; s: string; r: string }[];
   bhAcumulado: number | null; children: ReactNode;
 }
 
@@ -52,15 +72,6 @@ const rassTxt = (v: unknown): string => { const n = num(v); return n == null ? "
 const lista = (v: unknown): string[] => (Array.isArray(v) ? (v as string[]) : []);
 
 // ---- controles do design -------------------------------------------------------
-const tecla = (fn: () => void) => (e: React.KeyboardEvent) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); fn(); } };
-/** Escolha única em botões emendados. Tocar de novo no marcado desmarca. */
-function Seg({ r, ops, v, on, numero, cls }: { r: string; ops: readonly string[]; v: unknown; on: (v: string | null) => void; numero?: boolean; cls?: string }) {
-  return (
-    <span className={"ds-seg" + (numero ? " ds-seg--num" : "") + (cls ? " " + cls : "")} role="radiogroup" aria-label={r}>
-      {ops.map((o) => <span key={o} role="radio" aria-checked={v === o} tabIndex={0} className={v === o ? "ds-seg--on" : undefined} onClick={() => on(v === o ? null : o)} onKeyDown={tecla(() => on(v === o ? null : o))}>{o}</span>)}
-    </span>
-  );
-}
 /** Marcar vários, em blocos soltos. */
 function Blocos({ r, ops, v, on }: { r: string; ops: readonly string[]; v: unknown; on: (v: string[]) => void }) {
   const a = lista(v);
@@ -70,20 +81,6 @@ function Blocos({ r, ops, v, on }: { r: string; ops: readonly string[]; v: unkno
         return <span key={o} role="checkbox" aria-checked={m} tabIndex={0} className={"ds-bloco" + (m ? " ds-bloco--on" : "")} onClick={troca} onKeyDown={tecla(troca)}>{m ? <Icone n="feito" /> : null}{o}</span>; })}
     </span>
   );
-}
-function Num({ r, v, on, larg }: { r: string; v: unknown; on: (v: string) => void; larg?: number }) {
-  const t = txt(v);
-  return <label className="ds-f" style={{ "--larg": `${Math.max(larg ?? 58, Math.round(t.length * 9.8) + 18)}px` } as CSSProperties}><input aria-label={r} inputMode="decimal" value={t} onChange={(e) => on(e.target.value)} /></label>;
-}
-function Txt({ r, v, on, larg }: { r: string; v: unknown; on: (v: string) => void; larg?: number }) {
-  return <label className="ds-f ds-f--t" style={larg ? { flex: `0 1 ${larg}px` } : undefined}><input aria-label={r} value={txt(v)} onChange={(e) => on(e.target.value)} /></label>;
-}
-/** Caixa de texto que cresce: o texto longo quebra a linha, nada fica escondido. */
-function Area({ r, v, on }: { r: string; v: unknown; on: (v: string) => void }) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-  const t = txt(v);
-  useEffect(() => { const e = ref.current; if (e) { e.style.height = "auto"; e.style.height = `${e.scrollHeight}px`; } }, [t]);
-  return <label className="ds-f ds-f--t"><textarea ref={ref} rows={1} aria-label={r} value={t} onChange={(e) => on(e.target.value)} /></label>;
 }
 function Sel({ r, ops, v, on, numero }: { r: string; ops: readonly (string | readonly [string, string])[]; v: unknown; on: (v: string | null) => void; numero?: boolean }) {
   const atual = txt(v);
@@ -99,12 +96,6 @@ function Sel({ r, ops, v, on, numero }: { r: string; ops: readonly (string | rea
     </label>
   );
 }
-const M = ({ children }: { children: ReactNode }) => <span className="ds-ev__m">{children}</span>;
-const U = ({ children, fixa }: { children: ReactNode; fixa?: boolean }) => <span className={"ds-ev__u" + (fixa ? " ds-ev__u--fixa" : "")}>{children}</span>;
-const G = ({ children, cls }: { children: ReactNode; cls?: string }) => <span className={"ds-ev__g" + (cls ? " " + cls : "")}>{children}</span>;
-const Linha = ({ r, o, children }: { r: string; o?: boolean; children: ReactNode }) => (
-  <div className={"ds-ev__l" + (o ? " ds-de-ontem" : "")}><span className="ds-ev__r">{r}</span><div className="ds-ev__v">{children}{o ? <span className="ds-ev__ontem">ontem</span> : null}</div></div>
-);
 const Sub = ({ o, children }: { o?: boolean; children: ReactNode }) => <div className={"ds-ev__sub" + (o ? " ds-de-ontem" : "")}>{children}</div>;
 const SubL = ({ children }: { children: ReactNode }) => <div className="ds-ev__v">{children}</div>;
 function Sis({ nome, ic, igual, children }: { nome: string; ic: NomeIcone; igual?: () => void; children: ReactNode }) {
@@ -118,16 +109,31 @@ function Sis({ nome, ic, igual, children }: { nome: string; ic: NomeIcone; igual
 const semEstilo: CSSProperties = { border: 0, outline: 0, padding: 0, margin: 0, background: "none", font: "inherit", color: "inherit", appearance: "none" };
 
 export function Ficha(props: Props) {
-  const { pacienteId, leito, dataPlantao, turno, registro, labs, peso, altura, sexo, dispositivos, viaAerea, viaEnteral, svd, atbs, culturas, bhAcumulado } = props;
+  const { pacienteId, leito, dataPlantao, turno, registro, labs, peso, altura, sexo, dispositivos, viaAerea, viaEnteral, svd, hoje, bhAcumulado } = props;
   const rota = useRouter();
   const [st, setSt] = useState<Estado>(props.inicial);
   const [ont, setOnt] = useState(props.ontem);
   const [id, setId] = useState(props.evolucaoId);
   const [sujo, setSujo] = useState(false);
   const [estado, setEstado] = useState<"" | "salvando" | "erro" | "copiado">("");
+  const [erroMsg, setErroMsg] = useState("");
+  const salvandoRef = useRef(false);
   const [hora, setHora] = useState(props.salvoEm);
   const [glasgowAberto, setGlasgowAberto] = useState(false);
   const [popAberto, setPopAberto] = useState<"dvas" | "sedativos" | null>(null);
+  const [diluAberta, setDiluAberta] = useState<string | null>(null);
+  const [atbL, setAtbL] = useState<AtbLocal[]>(() => props.atbs.map((a) => {
+    const o = { esquema: a.esquema, inicio: ddmm(a.inicio), inicioIso: a.inicio, previstos: a.previstos != null ? String(a.previstos) : "", fim: a.fim ? ddmm(a.fim) : null };
+    return { k: a.id, id: a.id, droga: a.droga, esquema: o.esquema, inicio: o.inicio, previstos: o.previstos, fim: o.fim, orig: o };
+  }));
+  const [inicioAberto, setInicioAberto] = useState<string | null>(null);
+  const [fimAberto, setFimAberto] = useState<string | null>(null);
+  const [cultL, setCultL] = useState<CulturaLocal[]>(() => props.culturas.map((c) => ({
+    k: c.id, id: c.id, material: c.material, coleta: c.coleta, resultado: c.resultado, germe: c.germe, ufc: c.ufc, s: c.s, r: c.r, coletaTs: c.coletaTs, laudoTs: c.laudoTs,
+    orig: { material: c.material, coleta: c.coleta, resultado: c.resultado, germe: c.germe },
+  })));
+  const proximaChave = useRef(0);
+  const novaChave = () => `novo${++proximaChave.current}`;
 
   // o que veio de ontem aparece em cinza até ser confirmado; mexer num campo do quadro confirma o quadro
   const v = (q: Quadro): Dados => ({ ...(ont[q] ?? {}), ...st[q] });
@@ -207,9 +213,132 @@ export function Ficha(props: Props) {
     };
   }
 
-  async function salvar(): Promise<boolean> {
-    setEstado("salvando");
+  // ---- antimicrobianos e culturas: só grava o que mudou; linha em branco não vai ao banco ----------
+  const inicioIso = (a: AtbLocal): string | null => (a.orig && a.inicio === a.orig.inicio ? a.orig.inicioIso : isoDeDdMm(a.inicio, hoje));
+  const diaDoAtb = (a: AtbLocal): number | null => {
+    const ini = inicioIso(a);
+    const ate = a.fim != null ? isoDeDdMm(a.fim, hoje) : hoje;
+    return ini && ate ? diasEntre(ini, ate) + 1 : null;
+  };
+  type Sb = ReturnType<typeof getSupabaseBrowser>;
+  /** Confere tudo ANTES da primeira gravação: se algo está errado, nada é gravado e o médico vê o que corrigir. */
+  function validaAntes() {
+    const falha = (m: string) => { throw new ErroDeFicha(m); };
+    for (const a of atbL) {
+      if (a.x) continue;
+      if (!a.id) {
+        if (!a.droga.trim()) { if (a.esquema.trim() || a.previstos.trim()) falha("Antimicrobiano sem nome: escreva o nome ou apague a linha"); continue; }
+        if (a.inicio.trim() && !isoDeDdMm(a.inicio, hoje)) falha(`Início inválido em ${a.droga.trim()}`);
+        try { diasPrevistos(a.previstos); } catch { falha(`Dias previstos inválidos em ${a.droga.trim()}`); }
+        continue;
+      }
+      const o = a.orig; if (!o) continue;
+      if (a.inicio !== o.inicio && !isoDeDdMm(a.inicio, hoje)) falha(`Início inválido em ${a.droga}`);
+      if (a.previstos !== o.previstos) { try { diasPrevistos(a.previstos); } catch { falha(`Dias previstos inválidos em ${a.droga}`); } }
+      if (a.fim !== o.fim && a.fim != null && !isoDeDdMm(a.fim, hoje)) falha(`Data de fim inválida em ${a.droga}`);
+    }
+    for (const c of cultL) {
+      if (c.x) continue;
+      if (!c.id) {
+        if (!c.material && !c.coleta.trim() && !c.resultado) continue;
+        if (!c.material || !CODIGO_MATERIAL[c.material]) falha("Cultura sem material: escolha o material ou apague a linha");
+        if (!isoDeDdMm(c.coleta, hoje)) falha("Cultura sem data de coleta válida (dia/mês)");
+        if (!c.resultado) falha("Cultura sem resultado: marque Em andamento, Positiva ou Negativa");
+        continue;
+      }
+      const o = c.orig; if (!o || !c.coletaTs) continue;
+      if (c.coleta !== o.coleta) {
+        const iso = isoDeDdMm(c.coleta, hoje);
+        if (!iso) falha("Data de coleta inválida na cultura");
+        else if (c.laudoTs && Date.parse(`${iso}T${horaSP(c.coletaTs)}:00-03:00`) > Date.parse(c.laudoTs)) falha("A coleta não pode ser depois do laudo da cultura");
+      }
+    }
+  }
+  async function gravaAtbs(sb: Sb) {
+    let agora = atbL;
+    const troca = (k: string, m: Partial<AtbLocal>) => { agora = agora.map((x) => (x.k === k ? { ...x, ...m } : x)); };
     try {
+      for (const a of atbL) {
+        if (a.x) {
+          if (a.id) { const { error } = await sb.from("atbs").delete().eq("id", a.id); if (error) throw error; }
+          agora = agora.filter((x) => x.k !== a.k);
+          continue;
+        }
+        const snap = { esquema: a.esquema, inicio: a.inicio, previstos: a.previstos, fim: a.fim };
+        if (!a.id) {
+          if (!a.droga.trim()) { agora = agora.filter((x) => x.k !== a.k); continue; }
+          const ini = a.inicio.trim() ? isoDeDdMm(a.inicio, hoje) : null;
+          if (a.inicio.trim() && !ini) throw new Error("início inválido");
+          const campos: Record<string, unknown> = { paciente_id: pacienteId, droga: a.droga.trim(), ...esquemaEmColunas(a.esquema), duracao_planejada_dias: diasPrevistos(a.previstos) };
+          if (ini) campos.data_inicio = ini;
+          const { data, error } = await sb.from("atbs").insert(campos).select("id").single();
+          if (error) throw error;
+          troca(a.k, { id: (data as { id: string }).id, orig: { ...snap, inicioIso: ini ?? hoje } });
+          continue;
+        }
+        const o = a.orig;
+        if (!o) continue;
+        const campos: Record<string, unknown> = {};
+        if (a.esquema !== o.esquema) Object.assign(campos, esquemaEmColunas(a.esquema));
+        if (a.inicio !== o.inicio) { const iso = isoDeDdMm(a.inicio, hoje); if (!iso) throw new Error("início inválido"); campos.data_inicio = iso; }
+        if (a.previstos !== o.previstos) campos.duracao_planejada_dias = diasPrevistos(a.previstos);
+        if (a.fim !== o.fim) { const iso = a.fim == null ? null : isoDeDdMm(a.fim, hoje); if (a.fim != null && !iso) throw new Error("fim inválido"); campos.data_fim = iso; }
+        if (!Object.keys(campos).length) continue;
+        const { error } = await sb.from("atbs").update(campos).eq("id", a.id); if (error) throw error;
+        troca(a.k, { orig: { ...snap, inicioIso: (campos.data_inicio as string | undefined) ?? o.inicioIso } });
+      }
+    } finally { setAtbL(agora); }
+  }
+  async function gravaCulturas(sb: Sb) {
+    let agora = cultL;
+    const troca = (k: string, m: Partial<CulturaLocal>) => { agora = agora.map((x) => (x.k === k ? { ...x, ...m } : x)); };
+    const laudoAgora = (coletaTs: string) => { const n = new Date().toISOString(); return Date.parse(n) >= Date.parse(coletaTs) ? n : coletaTs; };
+    try {
+      for (const c of cultL) {
+        if (c.x) {
+          if (c.id) { const { error } = await sb.from("culturas").delete().eq("id", c.id); if (error) throw error; } // o antibiograma sai junto (cascata do banco)
+          agora = agora.filter((x) => x.k !== c.k);
+          continue;
+        }
+        const snap = { material: c.material, coleta: c.coleta, resultado: c.resultado, germe: c.germe };
+        const agente = c.resultado === "Positiva" && c.germe.trim() ? c.germe.trim() : null;
+        if (!c.id) {
+          if (!c.material && !c.coleta.trim() && !c.resultado) { agora = agora.filter((x) => x.k !== c.k); continue; }
+          const iso = isoDeDdMm(c.coleta, hoje);
+          if (!c.material || !CODIGO_MATERIAL[c.material] || !iso) throw new ErroDeFicha("Cultura incompleta"); // já barrado por validaAntes
+          const coletaTs = iso === hoje ? new Date().toISOString() : `${iso}T12:00:00-03:00`;
+          const laudoTs = c.resultado === "Negativa" ? laudoAgora(coletaTs) : null;
+          const { data, error } = await sb.from("culturas").insert({ paciente_id: pacienteId, material: CODIGO_MATERIAL[c.material], coleta_ts: coletaTs, laudo_ts: laudoTs, crescimento: c.resultado === "Positiva", agente }).select("id").single();
+          if (error) throw error;
+          troca(c.k, { id: (data as { id: string }).id, coletaTs, laudoTs, orig: snap });
+          continue;
+        }
+        const o = c.orig;
+        if (!o || !c.coletaTs) continue;
+        const campos: Record<string, unknown> = {};
+        let laudoTs = c.laudoTs ?? null, coletaTs = c.coletaTs;
+        if (c.material !== o.material) { if (!CODIGO_MATERIAL[c.material]) throw new Error("material inválido"); campos.material = CODIGO_MATERIAL[c.material]; }
+        if (c.coleta !== o.coleta) { const iso = isoDeDdMm(c.coleta, hoje); if (!iso) throw new Error("coleta inválida"); coletaTs = `${iso}T${horaSP(c.coletaTs)}:00-03:00`; campos.coleta_ts = coletaTs; }
+        if (c.resultado !== o.resultado) {
+          campos.crescimento = c.resultado === "Positiva";
+          if (c.resultado === "Em andamento") { laudoTs = null; campos.laudo_ts = null; }
+          else if (c.resultado === "Negativa") { laudoTs = laudoTs ?? laudoAgora(coletaTs); campos.laudo_ts = laudoTs; }
+        }
+        if (c.resultado === "Positiva" && c.germe !== o.germe) campos.agente = agente;
+        if (c.resultado !== o.resultado && c.resultado !== "Positiva") campos.agente = null; // saiu de Positiva: o germe antigo não vale mais
+        if (!Object.keys(campos).length) continue;
+        const { error } = await sb.from("culturas").update(campos).eq("id", c.id); if (error) throw error;
+        troca(c.k, { coletaTs, laudoTs, orig: snap });
+      }
+    } finally { setCultL(agora); }
+  }
+
+  async function salvar(): Promise<boolean> {
+    if (salvandoRef.current) return false; // já está salvando: não grava duas vezes
+    salvandoRef.current = true;
+    setEstado("salvando"); setErroMsg("");
+    try {
+      validaAntes();
       const sb = getSupabaseBrowser();
       const linha = linhaDoBanco();
       let evoId = id;
@@ -231,6 +360,9 @@ export function Ficha(props: Props) {
           pend.push({ ...p, id: (data as { id: string }).id, mudou: false });
         }
       }
+      setSt((s) => ({ ...s, pend })); // guarda já os ids das pendências novas: se o passo seguinte falhar, o "tentar de novo" não duplica
+      await gravaAtbs(sb);
+      await gravaCulturas(sb);
       setSt((s) => ({
         ...s, pend, dvas: s.dvas.filter((d) => !d.x), sedativos: s.sedativos.filter((d) => !d.x),
         intercorrencias: s.intercorrencias.filter((i) => !i.x && i.t.trim()), impressao: s.impressao.filter((i) => !i.x && i.t.trim()), condutas: s.condutas.filter((c) => !c.x && c.texto.trim()),
@@ -239,12 +371,15 @@ export function Ficha(props: Props) {
       setHora(new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" }));
       rota.refresh();
       return true;
-    } catch { setEstado("erro"); return false; }
+    } catch (e) { setErroMsg(e instanceof ErroDeFicha ? e.message : ""); setEstado("erro"); return false; }
+    finally { salvandoRef.current = false; }
   }
 
   // ---- texto da evolução, para copiar --------------------------------------------
   function textoDaEvolucao(): string {
     const b = linhaDoBanco();
+    const emUso = atbL.filter((a) => !a.x && a.fim == null && a.droga.trim());
+    const cultVal = cultL.filter((x) => !x.x && x.material && x.coleta.trim());
     const mm = (d: Dados, k: string, r: string, un: string) => (d[`${k}_max`] != null || d[`${k}_min`] != null ? `${r} ${txt(d[`${k}_max`])}–${txt(d[`${k}_min`])} ${un}${registro[k]?.pilulas.length ? ` (${registro[k].pilulas.join("; ")})` : ""}` : "");
     const c = (r: string, x: unknown, un = "") => (x == null || x === "" ? "" : `${r} ${Array.isArray(x) ? x.join(", ") : txt(x)}${un ? " " + un : ""}`);
     const ex = (cod: string, r: string, un = "") => (labs[cod] && labs[cod].hoje !== "—" ? `${r} ${labs[cod].hoje}${un ? " " + un : ""}` : "");
@@ -268,8 +403,8 @@ export function Ficha(props: Props) {
         c("TRS", b.renal.trs), c("UF líquida", b.renal.uf_ml_h, "mL/h"), c("UF", b.renal.uf_ml, "mL"), c("última sessão", b.renal.trs_ultima_sessao)],
       hemato: [ex("hb", "Hb", "g/dL"), ex("ht", "Ht", "%"), ex("plaq", "Plaq", "×10³/µL"), c("profilaxia de TVP:", b.hemato.profilaxia_tvp), c("profilaxia de LAMG:", b.hemato.profilaxia_lamg)],
       infecto: [mm(b.infecto, "temp", "temperatura", "°C"), ex("leuco", "leucócitos", "×10³/µL"), c("Seg", b.infecto.seg, "%"), c("Bast", b.infecto.bast, "%"), c("foco", b.infecto.foco),
-        dispositivos.length ? `dispositivos: ${dispositivos.map((d) => `${d.nome} D${d.d}`).join(", ")}` : "", atbs.length ? `antimicrobianos: ${atbs.map((a) => `${a.droga} ${a.esquema} D${a.d}${a.previstos ? ` de ${a.previstos}` : ""}`).join("; ")}` : "",
-        culturas.length ? `culturas: ${culturas.map((x) => `${x.material} ${x.coleta} ${x.resultado.toLowerCase()}${x.germe ? ` (${x.germe})` : ""}`).join("; ")}` : ""],
+        dispositivos.length ? `dispositivos: ${dispositivos.map((d) => `${d.nome} D${d.d}`).join(", ")}` : "", emUso.length ? `antimicrobianos: ${emUso.map((a) => `${a.droga} ${a.esquema} D${diaDoAtb(a) ?? "—"}${a.previstos ? ` de ${a.previstos}` : ""}`.replace(/\s+/g, " ")).join("; ")}` : "",
+        cultVal.length ? `culturas: ${cultVal.map((x) => `${x.material} ${x.coleta} ${x.resultado.toLowerCase()}${x.resultado === "Positiva" && x.germe ? ` (${x.germe})` : ""}`).join("; ")}` : ""],
     };
     const blocos: string[] = [`Evolução de ${ddmmaaaa(dataPlantao)}, ${TURNO[turno]} · leito ${leito}`];
     if (b.intercorrencias.length) blocos.push("Intercorrências 24 h\n" + b.intercorrencias.map((t) => `- ${t}`).join("\n"));
@@ -330,15 +465,26 @@ export function Ficha(props: Props) {
         <div className="ds-ev__drogas">
           {l.map((d, i) => {
             const dose = doseDe(d.diluicao, d.vazao_ml_h, d.unidade, peso);
+            const chave = `${campo}:${d.droga}`;
+            const opcoes: string[] = [...(d.diluicao && !(DILUICOES as readonly string[]).includes(d.diluicao) ? [d.diluicao] : []), ...DILUICOES];
             return (
-              <div key={d.droga} className={"ds-ev__droga" + (d.x ? " ds-removido" : "")} onClick={d.x ? () => muda(i, { x: false }) : undefined}>
-                <span className="ds-ev__dn"><b>{d.droga}</b>
-                  <label className="ds-ev__dil"><input style={{ ...semEstilo, width: "11ch" }} aria-label={`Diluição de ${d.droga}`} placeholder="diluição" value={d.diluicao ?? ""} onChange={(e) => muda(i, { diluicao: e.target.value })} /></label>
-                </span>
-                <G><Num r={`Vazão de ${d.droga}`} v={d.vazao_ml_h} on={(x) => muda(i, { vazao_ml_h: x })} /><U>mL/h</U></G>
-                <span className="ds-ev__dose"><b>{dose != null ? nf(dose) : ""}</b> {d.unidade ?? ""}</span>
-                <button className="ds-lista__x" type="button" aria-label={d.x ? `Trazer ${d.droga} de volta` : `Tirar ${d.droga}`} onClick={(e) => { e.stopPropagation(); muda(i, { x: !d.x }); }}><Icone n={d.x ? "desfazer" : "x"} /></button>
-              </div>
+              <Fragment key={d.droga}>
+                <div className={"ds-ev__droga" + (d.x ? " ds-removido" : "")} onClick={d.x ? () => muda(i, { x: false }) : undefined}>
+                  <span className="ds-ev__dn"><b>{d.droga}</b>
+                    <button className="ds-ev__dil" type="button" aria-label={`Diluição de ${d.droga}: ${d.diluicao || "não definida"}. Trocar`} aria-expanded={diluAberta === chave}
+                      onClick={(e) => { e.stopPropagation(); if (!d.x) setDiluAberta(diluAberta === chave ? null : chave); }}>{d.diluicao || "diluição"}<Icone n="abre" /></button>
+                  </span>
+                  <G><Num r={`Vazão de ${d.droga}`} v={d.vazao_ml_h} on={(x) => muda(i, { vazao_ml_h: x })} /><U>mL/h</U></G>
+                  <span className="ds-ev__dose"><b>{dose != null ? nf(dose) : ""}</b> {d.unidade ?? ""}</span>
+                  <button className="ds-lista__x" type="button" aria-label={d.x ? `Trazer ${d.droga} de volta` : `Tirar ${d.droga}`} onClick={(e) => { e.stopPropagation(); muda(i, { x: !d.x }); }}><Icone n={d.x ? "desfazer" : "x"} /></button>
+                </div>
+                {diluAberta === chave && !d.x ? (
+                  <span className="ds-pop" role="listbox" aria-label={`Diluições de ${d.droga}`} style={{ gridColumn: "1 / -1", justifySelf: "start" }}>
+                    {opcoes.map((o) => { const escolhe = () => { muda(i, { diluicao: o }); setDiluAberta(null); };
+                      return <span key={o} role="option" aria-selected={o === d.diluicao} tabIndex={0} className={o === d.diluicao ? "ds-pop--on" : undefined} style={{ cursor: "pointer" }} onClick={escolhe} onKeyDown={tecla(escolhe)}>{o}</span>; })}
+                  </span>
+                ) : null}
+              </Fragment>
             );
           })}
           {popAberto === campo ? (
@@ -378,7 +524,7 @@ export function Ficha(props: Props) {
         <h1>Evolução</h1>
         <div className="ds-topo__acoes">
           <span className="ds-topo__estado" role="status">
-            {estado === "erro" ? <>Não salvo, sem conexão<button className="ds-link" type="button" onClick={() => void salvar()}>Tentar de novo</button></>
+            {estado === "erro" ? <>{erroMsg ? `Não salvo: ${erroMsg}` : "Não salvo, sem conexão ou recusado pelo banco"}<button className="ds-link" type="button" onClick={() => void salvar()}>Tentar de novo</button></>
               : estado === "salvando" ? "Salvando" : sujo ? "Alterações não salvas" : hora ? `Salvo às ${hora}` : ""}
           </span>
           <button className="ds-btn" type="button" onClick={async () => { await navigator.clipboard.writeText(textoDaEvolucao()); setEstado("copiado"); setTimeout(() => setEstado((e) => (e === "copiado" ? "" : e)), 2000); }}>
@@ -556,28 +702,76 @@ export function Ficha(props: Props) {
                   <div className="ds-ev__bloco">
                     <span className="ds-ev__r">Antimicrobianos</span>
                     <div className="ds-ev__lista ds-ev__lista--atb">
-                      {atbs.map((a) => (
-                        <Fragment key={a.id}>
-                          <span className="ds-ev__nome">{a.droga}</span><span style={{ color: "var(--texto)", fontSize: 15 }}>{a.esquema}</span>
-                          <span className="ds-ev__dia"><b>D{a.d}</b>{a.previstos ? <>de <b>{a.previstos}</b></> : null}</span><span /><span />
-                        </Fragment>
-                      ))}
+                      {atbL.filter((a) => a.fim == null).map((a) => {
+                        const novo = !a.id;
+                        const nome = a.droga || "antimicrobiano novo";
+                        const n = diaDoAtb(a);
+                        const muda = (m: Partial<AtbLocal>) => { setAtbL((l) => l.map((x) => (x.k === a.k ? { ...x, ...m } : x))); setSujo(true); };
+                        const linha = (
+                          <>
+                            {novo ? <Txt r="Antimicrobiano" v={a.droga} on={(x) => muda({ droga: x })} larg={100} /> : <span className="ds-ev__nome">{a.droga}</span>}
+                            <Txt r={novo ? "Dose do antimicrobiano novo" : `Dose de ${a.droga}`} v={a.esquema} on={(x) => muda({ esquema: x })} />
+                            <span className="ds-ev__dia">
+                              {novo ? <><M>início</M><Num r={`Data de início de ${nome}`} v={a.inicio} on={(x) => muda({ inicio: x })} larg={58} /></> : null}
+                              <button className="ds-ev__dbtn" type="button" aria-label={`Dia ${n ?? "sem data"} de ${nome}. Tocar para ver e corrigir a data de início`} onClick={(e) => { e.stopPropagation(); setInicioAberto(inicioAberto === a.k ? null : a.k); }}><b>D{n ?? "—"}</b></button>
+                              de<Num r={`Dias previstos de ${nome}`} v={a.previstos} on={(x) => muda({ previstos: x })} larg={36} />
+                            </span>
+                            {novo ? <span /> : <button className="ds-link ds-link--p" type="button" aria-label={`Suspender ${a.droga}`} onClick={(e) => { e.stopPropagation(); muda({ fim: ddmm(hoje) }); }}>Suspender</button>}
+                            <button className="ds-lista__x" type="button" aria-label={a.x ? `Trazer ${a.droga} de volta` : novo ? "Apagar o antimicrobiano novo" : `Apagar ${a.droga}, lançado por engano`}
+                              onClick={(e) => { e.stopPropagation(); if (novo) { setAtbL((l) => l.filter((x) => x.k !== a.k)); setSujo(true); } else muda({ x: !a.x }); }}><Icone n={a.x ? "desfazer" : "x"} /></button>
+                          </>
+                        );
+                        return (
+                          <Fragment key={a.k}>
+                            {a.x ? <span className="ds-removido" role="button" tabIndex={0} aria-label="Removido. Tocar para trazer de volta" onClick={() => muda({ x: false })} onKeyDown={tecla(() => muda({ x: false }))}>{linha}</span> : linha}
+                            {inicioAberto === a.k && !novo && !a.x ? (
+                              <div className="ds-ev__sub"><div className="ds-ev__v"><G><M>Início</M><Num r={`Data de início de ${a.droga}`} v={a.inicio} on={(x) => muda({ inicio: x })} larg={58} /></G><span className="ds-ev__c">D1 é o dia do início</span></div></div>
+                            ) : null}
+                          </Fragment>
+                        );
+                      })}
+                      {atbL.filter((a) => a.fim != null).map((a) => {
+                        const muda = (m: Partial<AtbLocal>) => { setAtbL((l) => l.map((x) => (x.k === a.k ? { ...x, ...m } : x))); setSujo(true); };
+                        const quando = a.fim === ddmm(hoje) ? "hoje" : a.fim;
+                        return (
+                          <span key={a.k} className="ds-ev__ro ds-ev__susp">Suspensos: {a.droga} (D{diaDoAtb(a) ?? "—"}),
+                            {fimAberto === a.k
+                              ? <Num r={`Data do fim de ${a.droga}, dia e mês`} v={a.fim} on={(x) => muda({ fim: x.trim() ? x : null })} larg={58} />
+                              : <button className="ds-link ds-link--p" type="button" aria-label={`Fim: ${quando}. Corrigir a data de fim`} onClick={() => setFimAberto(a.k)}>{quando}</button>}
+                          </span>
+                        );
+                      })}
+                      <button className="ds-link" type="button" onClick={() => { setAtbL((l) => [...l, { k: novaChave(), droga: "", esquema: "", inicio: ddmm(hoje), previstos: "", fim: null }]); setSujo(true); }}><Icone n="mais" />Adicionar antimicrobiano</button>
                     </div>
                   </div>
                   <div className="ds-ev__bloco">
                     <span className="ds-ev__r">Culturas</span>
                     <div className="ds-ev__lista ds-ev__lista--cult">
-                      {culturas.map((c) => (
-                        <Fragment key={c.id}>
-                          <span className="ds-ev__nome">{c.material}</span><span className="ds-mono" style={{ color: "var(--texto)", fontWeight: 700 }}>{c.coleta}</span><span style={{ color: "var(--texto)", fontSize: 15, fontWeight: 600 }}>{c.resultado}</span><span />
-                          {c.germe ? (
-                            <div className="ds-ev__sub">
-                              <div className="ds-ev__v"><M>Germe</M><span style={{ color: "var(--texto)", fontSize: 15 }}>{c.germe}</span></div>
-                              {c.s || c.r ? <div className="ds-ev__v"><span className="ds-ev__ro">{c.s ? <><b>S:</b> {c.s}</> : null}{c.s && c.r ? " · " : null}{c.r ? <><b>R:</b> {c.r}</> : null}</span></div> : null}
-                            </div>
-                          ) : null}
-                        </Fragment>
-                      ))}
+                      {cultL.map((c) => {
+                        const nome = c.material || "cultura nova";
+                        const muda = (m: Partial<CulturaLocal>) => { setCultL((l) => l.map((x) => (x.k === c.k ? { ...x, ...m } : x))); setSujo(true); };
+                        const linha = (
+                          <>
+                            <Sel r="Material da cultura" ops={MATERIAIS} v={c.material} on={(x) => muda({ material: x ?? "" })} />
+                            <Num r={`Data da coleta de ${nome}`} v={c.coleta} on={(x) => muda({ coleta: x })} larg={58} />
+                            <Sel r={`Resultado de ${nome}`} ops={RESULTADOS_CULTURA} v={c.resultado} on={(x) => muda({ resultado: x ?? "" })} />
+                            <button className="ds-lista__x" type="button" aria-label={c.x ? `Trazer ${nome} de ${c.coleta} de volta` : `Tirar ${nome} de ${c.coleta}`}
+                              onClick={(e) => { e.stopPropagation(); if (!c.id) { setCultL((l) => l.filter((x) => x.k !== c.k)); setSujo(true); } else muda({ x: !c.x }); }}><Icone n={c.x ? "desfazer" : "x"} /></button>
+                          </>
+                        );
+                        return (
+                          <Fragment key={c.k}>
+                            {c.x ? <span className="ds-removido" role="button" tabIndex={0} aria-label="Removido. Tocar para trazer de volta" onClick={() => muda({ x: false })} onKeyDown={tecla(() => muda({ x: false }))}>{linha}</span> : linha}
+                            {c.resultado === "Positiva" && !c.x ? (
+                              <div className="ds-ev__sub">
+                                <div className="ds-ev__v"><M>Germe</M><Txt r={`Germe de ${nome}`} v={c.germe} on={(x) => muda({ germe: x })} />{c.ufc != null ? <span className="ds-ev__c">{nf(c.ufc)} UFC/mL</span> : null}</div>
+                                {c.s || c.r ? <div className="ds-ev__v"><span className="ds-ev__ro">{c.s ? <><b>S:</b> {c.s}</> : null}{c.s && c.r ? " · " : null}{c.r ? <><b>R:</b> {c.r}</> : null}</span></div> : null}
+                              </div>
+                            ) : null}
+                          </Fragment>
+                        );
+                      })}
+                      <button className="ds-link" type="button" onClick={() => { setCultL((l) => [...l, { k: novaChave(), material: "", coleta: "", resultado: "", germe: "", ufc: null, s: "", r: "" }]); setSujo(true); }}><Icone n="mais" />Adicionar cultura</button>
                     </div>
                   </div>
                   {notas("infecto", "Infecto")}

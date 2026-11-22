@@ -4,7 +4,7 @@ import { Icone } from "@/components/Icone";
 import { AtbCulturas, Faixa, FichaPaciente, Mini, Painel, Topo, metaCurta } from "@/components/ds";
 import { leitoPedido } from "@/components/Leito";
 import { ddmm, nf, plantaoAtual } from "@/lib/termos";
-import { carregarDetalhe, montarFolhao, nivelDe, serieDe } from "@/lib/uti";
+import { carregarDetalhe, linhaDe, montarFolhao, nivelDe, serieDe } from "@/lib/uti";
 import { Folhao } from "./Folhao";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +35,7 @@ export default async function Exames({ searchParams }: { searchParams: Promise<{
                       const s = serieDe(d, k);
                       const ult = s.at(-1);
                       return <Mini key={k} ic={ic} titulo={nome} un={un} valor={ult ? nf(ult.v) : null} nivel={ult ? nivelDe(d.regras, k, ult.v) : null}
-                        nota={s.length > 1 ? `em ${ddmm(s[0].iso)}: ${nf(s[0].v)}` : undefined} barras={s.map((x) => ({ r: ddmm(x.iso), a: x.v, b: x.v }))} />;
+                        nota={s.length > 1 ? `em ${ddmm(s[0].iso)}: ${nf(s[0].v)}` : undefined} grafico={linhaDe(d, k)} />;
                     })}
                   </div>
                 </section>

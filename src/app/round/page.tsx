@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Icone } from "@/components/Icone";
 import { AtbCulturas, FichaPaciente, LinhaDoTempo, ListaCondutas, ListaPendencias, Mini, Painel, Topo, Traco, metaCurta } from "@/components/ds";
 import { leitoPedido } from "@/components/Leito";
-import { GRAVIDADE, ddmm, nf, num, plantaoAtual, sinal, txt } from "@/lib/termos";
-import { carregarDetalhe, maxMin, nivelDe, pilulas, serieDe, type Detalhe, type Janela } from "@/lib/uti";
+import { GRAVIDADE, ddmm, diasEntre, nf, num, plantaoAtual, sinal, txt, type Infusao } from "@/lib/termos";
+import { carregarDetalhe, linhaDe, maxMin, nivelDe, pilulas, serieDe, type Detalhe, type Janela } from "@/lib/uti";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +58,7 @@ export default async function Round({ searchParams }: { searchParams: Promise<{ 
                   {SINAIS.map(([k, nome, un, ic]) => {
                     const js = janelasDe(d, k);
                     return <Mini key={k} ic={ic} titulo={nome} un={un} valor={maxMin(l.janelas[k])} flags={pilulas(l.janelas[k])}
-                      barras={js.map((j) => ({ r: ddmm(j.janela_fim), a: Number(j.valor_max), b: Number(j.valor_min) }))} />;
+                      grafico={{ tipo: "faixas", alto: js.at(-1)?.limiar_alto ?? null, baixo: js.at(-1)?.limiar_baixo ?? null, pontos: js.map((j) => ({ r: ddmm(j.janela_fim), a: Number(j.valor_max), b: Number(j.valor_min) })) }} />;
                   })}
                   <Mini ic="renal" titulo="Diurese" un="mL/kg/h" valor={debito != null ? nf(debito, 2) : null} nota={diurese != null ? `${nf(diurese)} mL${horas ? ` em ${nf(horas)} h` : ""}` : undefined} />
                   <Mini ic="renal" titulo="Balanço" un="mL" valor={bh != null ? sinal(bh) : null} nota={acum != null ? `acumulado ${sinal(acum)}` : undefined} />
@@ -71,7 +71,7 @@ export default async function Round({ searchParams }: { searchParams: Promise<{ 
                     const s = serieDe(d, k);
                     const ult = s.at(-1);
                     return <Mini key={k} ic={ic} titulo={nome} un={un} valor={ult ? nf(ult.v) : null} nivel={ult ? nivelDe(d.regras, k, ult.v) : null}
-                      nota={s.length > 1 ? `em ${ddmm(s[0].iso)}: ${nf(s[0].v)}` : undefined} barras={s.map((x) => ({ r: ddmm(x.iso), a: x.v, b: x.v }))} />;
+                      nota={s.length > 1 ? `em ${ddmm(s[0].iso)}: ${nf(s[0].v)}` : undefined} grafico={linhaDe(d, k)} />;
                   })}
                 </div>
               </section>
@@ -81,18 +81,48 @@ export default async function Round({ searchParams }: { searchParams: Promise<{ 
               </div>
               <Painel titulo="Prescrição vigente" nota="sem horário de administração">
                 {(() => {
-                  const inf = [...(evo?.dvas ?? []), ...(evo?.sedativos ?? [])].filter((x) => x?.droga);
-                  if (!inf.length) return <Traco />;
+                  const inf = (l: Infusao[] | null | undefined) => (l ?? []).filter((x) => x?.droga);
+                  const atbsAtivos = d.atbs.filter((a) => !a.data_fim);
+                  const presc = evo?.prescricao && typeof evo.prescricao === "object" && !Array.isArray(evo.prescricao) ? (evo.prescricao as Record<string, unknown>) : {};
+                  const itens = (k: string): string[] => (Array.isArray(presc[k]) ? (presc[k] as unknown[]).filter((t): t is string => typeof t === "string" && t.trim() !== "") : []);
+                  const infusoes = (titulo: string, cls: string, l: Infusao[]) => (
+                    <>
+                      <div className={`ds-presc__classe ${cls}`}>{titulo}</div>
+                      {l.length === 0 ? <div className="ds-presc__item"><Traco /></div> : l.map((x, i) => (
+                        <div key={i} className="ds-presc__item">
+                          <div className="ds-presc__droga">{x.droga}{x.diluicao ? <small>{x.diluicao}</small> : null}</div>
+                          <div className="ds-presc__dose">{x.dose != null ? `${nf(x.dose)} ${x.unidade ?? ""}` : ""}{txt(x.vazao_ml_h) ? <small>{txt(x.vazao_ml_h)} mL/h</small> : null}</div>
+                        </div>
+                      ))}
+                    </>
+                  );
+                  const porSistema = (titulo: string, cls: string, k: string) => (
+                    <>
+                      <div className={`ds-presc__classe ${cls}`}>{titulo}</div>
+                      {itens(k).length === 0 ? <div className="ds-presc__item"><Traco /></div> : itens(k).map((t, i) => <div key={i} className="ds-presc__item"><div className="ds-presc__droga">{t}</div></div>)}
+                    </>
+                  );
                   return (
                     <div className="ds-presc" style={{ "--colunas": 2 } as React.CSSProperties}>
                       <div className="ds-presc__bloco">
-                        <div className="ds-presc__titulo">Infusões em uso</div>
-                        {inf.map((x, i) => (
-                          <div key={i} className="ds-presc__item">
-                            <div className="ds-presc__droga">{x.droga}{x.diluicao ? <small>{x.diluicao}</small> : null}</div>
-                            <div className="ds-presc__dose">{x.dose != null ? `${nf(x.dose)} ${x.unidade ?? ""}` : ""}{txt(x.vazao_ml_h) ? <small>{txt(x.vazao_ml_h)} mL/h</small> : null}</div>
+                        <div className="ds-presc__titulo">1 · Infusões e terapias</div>
+                        {infusoes("Drogas vasoativas", "ds-s-hemo", inf(evo?.dvas))}
+                        {infusoes("Sedação e analgesia", "ds-s-neuro", inf(evo?.sedativos))}
+                        <div className="ds-presc__classe ds-s-infecto">Antimicrobianos</div>
+                        {atbsAtivos.length === 0 ? <div className="ds-presc__item"><Traco /></div> : atbsAtivos.map((a) => (
+                          <div key={a.id} className="ds-presc__item">
+                            <div className="ds-presc__droga">{[a.droga, a.dose, a.via].filter(Boolean).join(" ")}</div>
+                            <div className="ds-presc__dose">{a.frequencia ?? ""}<small>D{diasEntre(a.data_inicio, hoje) + 1}{a.duracao_planejada_dias ? ` de ${a.duracao_planejada_dias}` : ""}</small></div>
                           </div>
                         ))}
+                      </div>
+                      <div className="ds-presc__bloco">
+                        <div className="ds-presc__titulo">2 · Por sistema</div>
+                        {porSistema("Cardiovascular", "ds-s-hemo", "cardiovascular")}
+                        {porSistema("Gastro e endócrino", "ds-s-tgi", "gastro_endocrino")}
+                        <div className="ds-presc__classe ds-s-hemato">Hematológico</div>
+                        <div className="ds-presc__item"><Traco /></div>
+                        {porSistema("Sintomáticos, se necessário", "", "sintomaticos_sn")}
                       </div>
                     </div>
                   );

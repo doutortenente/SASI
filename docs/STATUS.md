@@ -24,12 +24,10 @@ Cards · Round · Tabela · Passagem · Exames · Evolução (UTI 2, 13 leitos).
 
 ## 3. O que ainda não faz (em relação ao design)
 
-- Na ficha, antimicrobianos e culturas aparecem só para leitura (incluir, suspender e apagar ainda é pelo ingest).
-- "Novo leito" (admissão pela tela) não existe.
-- A diluição da droga é digitada (no design é uma lista).
-- A Prescrição vigente do Round mostra só as infusões da evolução (não há prescrição estruturada no banco).
-- O tema claro ou escuro segue o do aparelho (não há botão).
-- Os gráficos pequenos do Round e de Exames são barras simples, não o desenho exato do design.
+- "Novo leito": o design mostra só o botão (no topo dos Cards e no cartão de leito vago), não o formulário. O formulário é escolha nossa, montado com as peças da ficha: leito vago, nome, idade, sexo, peso, altura, HD, data de admissão e gravidade (nome e gravidade são obrigatórios; vazio grava null). Grava em `pacientes` e o banco abre a internação sozinho. Não define isolamento nem alergias na admissão.
+- Na Prescrição vigente do Round, os itens por sistema vêm do campo de prescrição gravado na evolução; "Hematológico" e o preparo das ampolas ("8 amp/250 mL") não têm fonte no banco e aparecem como travessão ou ficam de fora.
+- Antimicrobianos e culturas: o antibiograma continua só para leitura na ficha; o isolamento é do paciente (não da cultura) e a ficha não o edita.
+- Tema claro ou escuro: o design não tem botão; o app segue o aparelho (decisão fechada, nada a fazer).
 
 ## 4. Banco
 
@@ -44,3 +42,7 @@ Ver `CLAUDE.md` §4. Migrações em `supabase/migrations/` (36), fonte única do
 2. A skill `sasi-ingest-export` (repo `claude-workspace` e a cópia do claude.ai) ainda escreve os termos antigos. O banco aceita e troca na entrada, mas o texto da skill precisa ser atualizado para LER pelos nomes novos.
 3. O projeto Vercel antigo (`sasi`, ligado a `doutortenente/SASI-V3`) deixou de responder por `sasi-uti.vercel.app` em 22/11/2026, por ordem do operador.
 4. `save_ficha` no banco: não usar (apaga campos do paciente quando a chave não vem).
+
+## Conferência automática
+
+`npm run test:e2e` roda `e2e/confere.cjs` contra um banco falso (`node e2e/falso.cjs`, só dados fictícios) com o app em `localhost:3111`; `node e2e/fotos.cjs` tira as fotos das telas em `e2e/saida/` (fora do git).

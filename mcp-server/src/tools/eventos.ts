@@ -36,10 +36,12 @@ Args:
   - confidence (number): Confiança 0–1, se origem OCR
   - requires_review (boolean): Flagar para revisão (default: false)
 
-Tipos disponíveis: sofa_total, pam, spo2, fr, fc, temp, lactato, ph, pco2, po2,
-hco3, be, diurese_h, bh_h, bh_acumulado, hb, ht, plaq, leuco, cr, ur, na, k,
-mg, ca, p, bb, inr, pcr, procalcitonina, nor_dose, adr_dose, gcs, rass,
-cam_icu, glicemia, custom (e outros — use o tipo exato do schema)`,
+Tipos disponíveis (nomes do design): sofa_total, pas, pad, pam, spo2, fr, fc, temp,
+dx (glicemia capilar), lactato, ph, pco2, po2, hco3, be, diurese_h, bh_h, bh_acumulado,
+hb, ht, plaq, leuco (plaquetas e leucócitos em ×10³/µL), cr, ur, na, k, mg,
+ca (cálcio total), cai (cálcio iônico, mmol/L), p, bb, inr, pcr, uf_trs (ultrafiltração da TRS),
+nor_dose, adr_dose, gcs, rass, cam_icu, custom (e outros — use o tipo exato do schema).
+Nomes antigos (pa_sys, pa_dia, glicemia, uf_dialise) não valem mais aqui.`,
       inputSchema: z.object({
         paciente_id: z.string().uuid(),
         tipo: TIPO_EVENTO,

@@ -1,6 +1,6 @@
 import { Faixa, FichaPaciente, Topo } from "@/components/ds";
 import { leitoPedido } from "@/components/Leito";
-import { DISPOSITIVO, MATERIAL, SUPORTES, TURNO, ddmm, ddmmaaaa, diasEntre, hdItens, horaSP, nf, plantaoAtual, somaDias, type Dados, type Quadro } from "@/lib/termos";
+import { DISPOSITIVO, MATERIAL, SUPORTES, TURNO, ddmm, ddmmaaaa, diaSP, diasEntre, esquemaDe, hdItens, horaSP, nf, plantaoAtual, somaDias, type Dados, type Quadro } from "@/lib/termos";
 import { carregarDetalhe, pilulas, porDia } from "@/lib/uti";
 import { Ficha, type Estado } from "./Ficha";
 
@@ -86,11 +86,12 @@ export default async function Evolucao({ searchParams }: { searchParams: Promise
         .map((x) => ({ nome: [DISPOSITIVO[x.tipo] ?? x.tipo, x.sitio].filter(Boolean).join(" "), d: diasEntre(x.data_inicio, pl.hoje) }))}
       viaAerea={via ? { via: via.tipo === "iot" ? "IOT" : "TQT", desde: ddmm(via.data_inicio), d: diasEntre(via.data_inicio, pl.hoje) } : null}
       viaEnteral={enteral ? DISPOSITIVO[enteral.tipo] : null} svd={ativos.some((x) => x.tipo === "svd")}
-      atbs={d.atbs.filter((a) => !a.data_fim).map((a) => ({ id: a.id, droga: a.droga, esquema: [a.dose, a.via, a.frequencia].filter(Boolean).join(" "), d: diasEntre(a.data_inicio, pl.hoje) + 1, previstos: a.duracao_planejada_dias }))}
+      hoje={pl.hoje}
+      atbs={d.atbs.filter((a) => !a.data_fim || a.data_fim === pl.hoje).map((a) => ({ id: a.id, droga: a.droga, esquema: esquemaDe(a.dose, a.via, a.frequencia), inicio: a.data_inicio, fim: a.data_fim, previstos: a.duracao_planejada_dias }))}
       culturas={d.culturas.map((c) => ({
-        id: c.id, material: MATERIAL[c.material] ?? c.material, coleta: ddmm(c.coleta_ts),
+        id: c.id, material: MATERIAL[c.material] ?? c.material, coleta: ddmm(diaSP(c.coleta_ts)), coletaTs: c.coleta_ts, laudoTs: c.laudo_ts,
         resultado: c.crescimento ? "Positiva" : c.laudo_ts ? "Negativa" : "Em andamento",
-        germe: c.crescimento ? [c.agente, c.ufc_por_ml != null ? `${nf(Number(c.ufc_por_ml))} UFC/mL` : ""].filter(Boolean).join(" · ") || null : null,
+        germe: c.crescimento ? c.agente ?? "" : "", ufc: c.ufc_por_ml != null ? Number(c.ufc_por_ml) : null,
         s: (c.antibiograma ?? []).filter((x) => x.resultado === "S").map((x) => x.antibiotico).join(", "),
         r: (c.antibiograma ?? []).filter((x) => x.resultado === "R").map((x) => x.antibiotico).join(", "),
       }))}

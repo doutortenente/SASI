@@ -5,10 +5,10 @@ import { Icone } from "./Icone";
 import type { NomeIcone } from "./icones";
 import { Check } from "./Check";
 import {
-  DISPOSITIVO, GRAVIDADE, GRAVIDADES, INTENCAO, ISOLAMENTO, MATERIAL, QUADROS, alergiaDe, ddmm, diasEntre, hdItens, nf, somaDias,
+  DISPOSITIVO, GRAVIDADE, GRAVIDADES, INTENCAO, ISOLAMENTO, MATERIAL, QUADROS, alergiaDe, ddmm, diaSP, diasEntre, hdItens, nf, somaDias,
   type Conduta, type Pendencia,
 } from "@/lib/termos";
-import { contaGravidade, type Atb, type Cultura, type Dispositivo, type Leito, type Paciente } from "@/lib/uti";
+import { contaGravidade, type Grafico, type Atb, type Cultura, type Dispositivo, type Leito, type Paciente } from "@/lib/uti";
 
 const PLURAL = { critico: ["crítico", "críticos"], instavel: ["instável", "instáveis"], watcher: ["watcher", "watcher"], estavel: ["estável", "estáveis"] } as const;
 
@@ -99,40 +99,72 @@ export function ListaCondutas({ c }: { c: Conduta[] }) {
   return <ul className="ds-itens">{c.map((x, i) => <li key={i}><span className="ds-itens__sis">{curto(x.sistema)}</span><span className="ds-itens__t">{x.texto}</span></li>)}</ul>;
 }
 
-/** Gráfico pequeno: barras do mínimo ao máximo de cada dia (sinais) ou do valor do dia (exames). */
-export function Mini({ ic, titulo, un, valor, flags, nota, barras, nivel }: {
-  ic: NomeIcone; titulo: string; un?: string; valor: string | null; flags?: string[]; nota?: string;
-  barras?: { r: string; a: number; b: number }[]; nivel?: "a" | "c" | null;
-}) {
-  const W = 240, H = 66, base = H - 15;
-  let svg: ReactNode = null;
-  if (barras && barras.length) {
-    const lo = Math.min(...barras.map((x) => Math.min(x.a, x.b)));
-    const hi = Math.max(...barras.map((x) => Math.max(x.a, x.b)));
-    const y = (v: number) => (hi === lo ? base - 24 : base - 6 - ((v - lo) / (hi - lo)) * (base - 12));
-    const passo = W / Math.max(barras.length, 6);
-    svg = (
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${titulo}: ${barras.map((x) => `${x.r} ${x.a === x.b ? nf(x.a) : `${nf(x.a)} a ${nf(x.b)}`}`).join("; ")}`}>
-        <line className="ds-g-base" x1={0} x2={W} y1={base} y2={base} />
-        {barras.map((x, i) => {
-          const cx = passo * i + passo / 2;
-          const y1 = y(Math.max(x.a, x.b));
-          const y2 = x.a === x.b ? base : y(Math.min(x.a, x.b));
+/** Gráfico pequeno do design: faixas do mínimo ao máximo de cada janela (sinais) ou linha pelas últimas coletas (exames). */
+function Desenho({ titulo, un, g }: { titulo: string; un?: string; g: Grafico }) {
+  const u = un ? ` ${un}` : "";
+  const id = "c" + titulo.replace(/\W/g, "");
+  if (g.tipo === "faixas") {
+    const pts = g.pontos.slice(-4);
+    if (!pts.length) return null;
+    const lo = Math.min(...pts.map((x) => Math.min(x.a, x.b))), hi = Math.max(...pts.map((x) => Math.max(x.a, x.b)));
+    const y = (v: number) => (hi === lo ? 41 : 67.6 - ((v - lo) / (hi - lo)) * 53.2);
+    const dentro = (v: number | null): v is number => v != null && v > lo && v < hi;
+    return (
+      <svg viewBox="0 0 240 92" role="img" aria-label={`${titulo} nas últimas janelas de 24 h`}>
+        <line className="ds-g-base" x1={2} x2={210} y1={74} y2={74} />
+        {pts.map((x, i) => {
+          const slot = 4 - pts.length + i, x0 = 2 + 52 * slot, bx = x0 + 17;
+          const mx = Math.max(x.a, x.b), mn = Math.min(x.a, x.b);
+          const topo = y(mx), fundo = hi === lo ? topo + 3 : y(mn);
           return (
-            <g key={x.r}>
-              <rect className="ds-g-barra" x={cx - 8} y={y1} width={16} height={Math.max(y2 - y1, 3)} rx={2} />
-              <text className={"ds-g-rot" + (i === barras.length - 1 ? " ds-g-rot--hoje" : "")} x={cx} y={H - 3} textAnchor="middle">{x.r}</text>
+            <g key={x.r + i}>
+              <clipPath id={`${id}${i}`}><rect x={bx} y={topo} width={18} height={Math.max(fundo - topo, 3)} rx={4} /></clipPath>
+              <g clipPath={`url(#${id}${i})`}>
+                <rect className="ds-g-barra" x={bx} y={topo} width={18} height={Math.max(fundo - topo, 3)} />
+                {g.alto != null && mx > g.alto ? <rect className="ds-g-alerta" x={bx} y={topo - 4} width={18} height={Math.max(Math.min(y(g.alto), fundo) - topo + 4, 0)} /> : null}
+                {g.baixo != null && mn < g.baixo ? <rect className="ds-g-alerta" x={bx} y={Math.max(y(g.baixo), topo)} width={18} height={Math.max(fundo + 4 - Math.max(y(g.baixo), topo), 0)} /> : null}
+              </g>
+              <text className={"ds-g-rot" + (i === pts.length - 1 ? " ds-g-rot--hoje" : "")} x={bx + 9} y={89} textAnchor="middle">{x.r}</text>
+              <rect className="ds-g-alvo" x={x0} y={8} width={52} height={66}><title>{`${x.r}: ${nf(mx)}–${nf(mn)}${u}`}</title></rect>
             </g>
           );
         })}
+        {[g.alto, g.baixo].filter(dentro).map((v) => (
+          <g key={v}><line className="ds-g-limiar" x1={2} x2={213} y1={y(v)} y2={y(v)} /><text className="ds-g-rot ds-g-rot--lim" x={216} y={y(v) + 3.5}>{nf(v)}</text></g>
+        ))}
       </svg>
     );
   }
+  const pts = g.pontos;
+  if (!pts.length) return null;
+  const lo = Math.min(...pts.map((x) => x.v)), hi = Math.max(...pts.map((x) => x.v));
+  const y = (v: number) => (hi === lo ? 42 : 67 - ((v - lo) / (hi - lo)) * 50);
+  const px = (i: number) => (pts.length === 1 ? 110 : 16 + (188 * i) / (pts.length - 1));
+  return (
+    <svg viewBox="0 0 240 92" role="img" aria-label={`${titulo} nas últimas coletas`}>
+      <line className="ds-g-base" x1={16} x2={204} y1={74} y2={74} />
+      {g.limites.filter((v) => v > lo && v < hi).map((v) => (
+        <g key={v}><line className="ds-g-limiar" x1={16} x2={207} y1={y(v)} y2={y(v)} /><text className="ds-g-rot ds-g-rot--lim" x={210} y={y(v) + 3.5}>{nf(v)}</text></g>
+      ))}
+      {pts.length > 1 ? <polyline className="ds-g-linha" points={pts.map((x, i) => `${px(i).toFixed(1)},${y(x.v).toFixed(1)}`).join(" ")} /> : null}
+      {pts.map((x, i) => (
+        <g key={x.r + i}>
+          <text className={"ds-g-rot" + (i === pts.length - 1 ? " ds-g-rot--hoje" : "")} x={px(i)} y={89} textAnchor="middle">{x.r}</text>
+          <circle className={"ds-g-ponto " + (x.nivel === "c" ? "ds-g-critico" : x.nivel === "a" ? "ds-g-alerta" : "ds-g-barra")} cx={px(i)} cy={y(x.v)} r={i === pts.length - 1 ? 5 : 4.5}><title>{`${x.r}: ${nf(x.v)}${u}`}</title></circle>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+export function Mini({ ic, titulo, un, valor, flags, nota, grafico, nivel }: {
+  ic: NomeIcone; titulo: string; un?: string; valor: string | null; flags?: string[]; nota?: string; grafico?: Grafico; nivel?: "a" | "c" | null;
+}) {
   return (
     <div className="ds-mini">
       <div className="ds-mini__cab"><Icone n={ic} />{titulo}{un ? <small>{un}</small> : null}</div>
       <div className="ds-mini__ult"><b className={nivel === "c" ? "ds-vc" : nivel === "a" ? "ds-va" : undefined}>{valor ?? "—"}</b><Flags f={flags ?? []} />{nota ? <span>{nota}</span> : null}</div>
-      {svg}
+      {grafico ? <Desenho titulo={titulo} un={un} g={grafico} /> : null}
     </div>
   );
 }
@@ -164,7 +196,7 @@ export function AtbCulturas({ atbs, culturas, hoje }: { atbs: Atb[]; culturas: C
           {culturas.map((c) => (
             <tr key={c.id}>
               <td><b>{MATERIAL[c.material] ?? c.material}</b>{c.observacoes ? <small>{c.observacoes}</small> : null}</td>
-              <td className="ds-mono">{ddmm(c.coleta_ts)}</td>
+              <td className="ds-mono">{ddmm(diaSP(c.coleta_ts))}</td>
               {c.crescimento ? (
                 <td><b>{c.agente ?? "positiva"}</b>{c.ufc_por_ml != null ? <small>{nf(Number(c.ufc_por_ml))} UFC/mL</small> : null}
                   {c.antibiograma?.length ? (
