@@ -32,7 +32,7 @@ Cards · Round · Tabela · Passagem · Exames · Evolução (UTI 2, 13 leitos).
 
 ## 4. Banco
 
-Ver `CLAUDE.md` §4. Migrações em `supabase/migrations/` (41 arquivos, iguais aos 41 registros de migração do banco), fonte única do esquema.
+Ver `CLAUDE.md` §4. Migrações em `supabase/migrations/` (42 arquivos, iguais aos 42 registros de migração do banco), fonte única do esquema.
 
 - 22/11/2026: termos do banco iguais aos do design (`20261122040931_termos_do_design`) e `pacientes.sexo` (`20261122052449_paciente_sexo_do_design`).
 - Gravação testada ao vivo no banco real em 22-nov-2026, com paciente fictício e tudo desfeito no fim: admissão com alergias e isolamento, internação aberta pelo gatilho, recusa de segundo paciente no mesmo leito, evolução (incluir e alterar), conversão dos termos antigos, pendência, antimicrobiano com data, cultura e exame.
@@ -40,7 +40,7 @@ Ver `CLAUDE.md` §4. Migrações em `supabase/migrations/` (41 arquivos, iguais 
 - 22/11/2026: `save_ficha` corrigida (`20261122112751_save_ficha_nao_apaga_campo_ausente`): campo que não vem não é mais apagado. O app continua sem usar.
 - 22/11/2026: limpeza pedida pelo operador (`20261122115156_limpeza_janelas_set_exames_marcados_copia_seguranca`): apagadas as 48 janelas de 27-set, os 27 exames antigos marcados para revisão e a cópia de segurança da troca de termos (esquema `arquivo`).
 - 22/11/2026: manual de gravação dentro do banco e três travas (`20261122135919_manual_do_banco_e_travas_de_gravacao`): leito fora do padrão ou ocupado, campo ou opção de evolução fora da ficha (só para quem grava por fora do app) e limiar de sinal vital diferente do design. Testado ao vivo no banco real, com paciente fictício e tudo desfeito no fim: os exemplos do manual gravam; `L06`, `7`, `pam1`/`pam2`, suporte "IOT + VM", infusão com `diluicao_mg` e FR com limiar 20 são recusados com a instrução do que corrigir; o app (papel `anon`) grava evolução, troca de leito e alta como antes.
-- 22/11/2026: apagados, por ordem do operador, os 7 pacientes antigos que ocupavam leito (`20261122140945_apaga_pacientes_antigos_ativos`), com internações, evoluções, exames, antimicrobianos, culturas, dispositivos, pendências e alertas deles. Ficaram 14 pacientes com alta.
+- 22/11/2026: apagados, por ordem do operador, todos os pacientes antigos, com internações, evoluções, exames, antimicrobianos, culturas, dispositivos, pendências e alertas deles: os 7 que ocupavam leito (`20261122140945_apaga_pacientes_antigos_ativos`) e os 14 com alta, mais os 17 registros antigos de auditoria de ingest (`20261122142152_apaga_pacientes_antigos_restantes`). O banco ficou sem nenhum paciente.
 
 ## 5. Pendências
 
