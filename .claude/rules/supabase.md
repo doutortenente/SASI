@@ -19,6 +19,7 @@ paths:
 - Nome: `YYYYMMDDHHmmss_descricao.sql`.
 - Comentar todo comando destrutivo (drop/alter/delete).
 - Uma migração por mudança lógica. Aplicar com uma única chamada `apply_migration`.
+- Mudança de estrutura do banco só por migração (arquivo em `supabase/migrations/` aplicado com `apply_migration`), nunca por SQL solto.
 
 ## Edge Functions
 

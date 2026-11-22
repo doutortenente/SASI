@@ -36,6 +36,7 @@ Ver `CLAUDE.md` §4. Migrações em `supabase/migrations/` (37 arquivos; o banco
 
 - 22/11/2026: termos do banco iguais aos do design (`20261122040931_termos_do_design`) e `pacientes.sexo` (`20261122052449_paciente_sexo_do_design`).
 - Gravação testada ao vivo no banco real em 22-nov-2026, com paciente fictício e tudo desfeito no fim: admissão com alergias e isolamento, internação aberta pelo gatilho, recusa de segundo paciente no mesmo leito, evolução (incluir e alterar), conversão dos termos antigos, pendência, antimicrobiano com data, cultura e exame.
+- Alta e troca de leito também foram testadas ao vivo no banco real em 22-nov-2026, com paciente fictício e tudo desfeito no fim: troca para leito vago, recusa de troca para leito ocupado, recusa de alta com data futura, alta e nova admissão no leito liberado.
 
 ## 5. Pendências
 

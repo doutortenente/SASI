@@ -68,7 +68,7 @@ O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmP
 ## 4. Banco (estado vivo em 22-nov-2026)
 
 Fonte única do esquema: `supabase/migrations/` (37 arquivos; o banco registra 36 migrações). 34 arquivos batem com o banco em carimbo e nome; 3, de 30-jul, não têm registro com esse nome (ver `docs/MEMORY.md`). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
-**17 tabelas · 10 views · 19 enums · 80 códigos de evento.** RLS ligada com `dev_bypass` (uso solo, decisão do operador).
+**17 tabelas · 10 views · 19 enums · 80 códigos de evento.** RLS (regras de acesso por linha, do banco) ligada com `dev_bypass` (uso solo, decisão do operador).
 
 **Os termos do banco são os do design** (migração `20261122040931_termos_do_design`):
 
@@ -116,7 +116,7 @@ Estado atual, o que o app ainda não faz e pendências: `docs/STATUS.md`. Débit
 
 ## 7. Doutrina clínica (skills + templates)
 
-Fonte da verdade: **`docs/_SASI_TEMPLATE_BASE_v2.md`** (Ramo C) — o template deste repositório é a fonte da verdade. A anatomia é idêntica nas skills `sasi-ingest-export` e `admissao-uti` (que moram em `doutortenente/claude-workspace`): quem mudar a anatomia numa delas atualiza a outra e o template na mesma entrega (divergência = bug clínico-legal).
+Fonte da verdade: **`docs/_SASI_TEMPLATE_BASE_v2.md`** (Ramo C). A anatomia é idêntica nas skills `sasi-ingest-export` e `admissao-uti` (que moram em `doutortenente/claude-workspace`): quem mudar a anatomia numa delas atualiza a outra e o template na mesma entrega (divergência = bug clínico-legal).
 
 **Skills:** moram no repositório `doutortenente/claude-workspace`, pasta `skills-que-prestam/01-pacote-skills-medicas/`. Ler o `SKILL.md` da skill antes de processar. Em 22-nov-2026 `sasi-ingest-export` e `controles-vitais-janela` passaram a usar os termos e os limiares do design.
 
@@ -126,7 +126,7 @@ Fonte da verdade: **`docs/_SASI_TEMPLATE_BASE_v2.md`** (Ramo C) — o template d
 
 **References** de `sasi-ingest-export`: `00-estilo-texto-clinico`, `01-schema-eventos-clinicos`, `02-extraction-dictionary`, `03-clinical-sanity-checks`, `04-export-evolucao-template`, `05-export-passagem-turno`, `06-api-automation-prompts`, `07-export-prescricao-ordenada`, `08-p0-banco-10ago`.
 
-**Espelhos** (Notion, Obsidian/Drive): não conferidos em 22-nov-2026; podem estar desatualizados.
+**Espelhos antigos** (não conferidos em 22-nov-2026; podem estar desatualizados): Notion, espaço SASI, página “Doutrina SASI — SKILLs & Templates”; Drive “SASI — Arquivo de Operação” (`SASI_OBSIDIAN_doutrina.zip`).
 
 ### Estrutura do repositório
 
@@ -153,6 +153,7 @@ package.json  next.config.ts  tsconfig.json  README.md  THIRD_PARTY_LICENSES.md
 
 - **Saída clínica:** duas partes — (1) SITREP de triagem rankeado por acuidade, depois (2) notas de evolução completas, prontas pro prontuário.
 - **Planos de manejo:** blocos numerados com título de sistema, mapeamento 1:1 com problemas ativos.
+- **Documentos:** `.docx` em Times New Roman 10pt, A4.
 - **Comando “deploy”:** grava sem pedir confirmação adicional (ver §2, item 7).
 
 -----
@@ -165,5 +166,6 @@ Terso, operacional, com inflexão militar (SITREP tático). **Chain-of-draft** q
 
 ## 10. Aprendizados de engenharia (anti-armadilha)
 
-- **Views:** `security_invoker = true` (a view respeita as regras de acesso de quem consulta, não as do dono) previne bypass de RLS.
+- **Views:** `security_invoker = true` (a view respeita as regras de acesso de quem consulta, não as do dono) impede que a view fure a RLS.
 - **Alertas:** o registro `alerts_log` usa a coluna `hash_key` para não repetir o mesmo alerta (evita fadiga de alarme).
+- **Arquivos disfarçados:** `.pdf` pode ser um container ZIP/Office — identificar pelos bytes iniciais `PK\x03\x04` (`xxd`) e extrair com `unzip`.
