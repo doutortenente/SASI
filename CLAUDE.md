@@ -33,7 +33,19 @@ Toda documentação clínica é em **Português do Brasil**.
 1. **Conduta 1:1** com a Impressão, metas sempre numéricas.
 1. **Flags gritam, não consertam** — o sistema sinaliza o implausível; o médico decide.
 1. **Prosa limpa e juridicamente sólida** dentro dos blocos de prontuário. Comentário tático isolado em `// Comando Tático`.
-1. **Ingest = Claude → JSON → Supabase** — a skill `sasi-ingest-export` lê foto/PDF/texto, valida e entrega payload JSON. Gravação: **“deploy”** / **“salvar no Supabase”** → MCP tool **`sasi_deploy_ingest`**. Sem pipeline automático, sem AppSheet, sem atalho iOS.
+1. **Ingest = Claude → JSON → Supabase** — a skill `sasi-ingest-export` lê foto/PDF/texto, valida e entrega payload JSON. Gravação só por ordem do operador: **“deploy”**, **“salvar no Supabase”** ou **“admite”**. Com a ferramenta **`sasi_deploy_ingest`** (servidor MCP do repositório) na sessão, usar a ferramenta. **Sem ela** (sessão na nuvem ou claude.ai, que só têm o conector do Supabase), gravar por SQL, seguindo o manual do banco (§2.1). Sem pipeline automático, sem AppSheet, sem atalho iOS.
+
+## 2.1 Gravar no banco (vale para qualquer sessão de Claude)
+
+Quem recebe o pedido faz o serviço inteiro: não devolve etapa ao operador nem pede que ele repita a ordem.
+
+1. **Antes de gravar, ler o manual do banco** (projeto Supabase `idswehsvvqczzkiatuzu`): `select corpo from public.avisos_agentes where titulo like 'MANUAL DO BANCO%';`. Ele traz os comandos exatos, os nomes de campo da ficha e os limiares. Se a skill carregada na sessão disser outra coisa, vale o manual.
+2. **“Admite” (ou “admitir leito”, “admissão”) é ordem de gravação.** Fazer as duas coisas na mesma resposta: (a) a nota de admissão, pela skill `admissao-uti`; (b) o cadastro no banco: função `admitir_paciente` no leito informado, o sexo e, do que a fonte trouxer com data ou valor, os dispositivos, antimicrobianos, culturas, exames e a evolução de admissão (`tipo_nota = 'admissao'`). O que a fonte não traz fica de fora.
+3. **“Deploy” ou “salvar no Supabase”** grava o que foi extraído (evolução, exames, janelas de sinais vitais, pendências): pela ferramenta `sasi_deploy_ingest` quando ela existir na sessão; sem ela, por SQL, como o manual manda. Não devolver o JSON para o operador gravar.
+4. **Leito ocupado:** o banco recusa. Não gravar por cima nem reaproveitar a linha do paciente anterior: perguntar ao operador o desfecho e a data dele, dar a alta (`dar_alta_paciente`) e então admitir.
+5. **Erro do banco em português é instrução:** corrigir o dado e gravar de novo. Não contornar a trava nem mudar a estrutura do banco.
+6. **No fim, ler de volta o que gravou** e dizer ao operador, em lista curta, o que entrou em cada leito e o que ficou de fora por falta de fonte.
+7. **Skills com o prefixo `anthropic-skills:`** (ex.: `anthropic-skills:sasi-ingest-export`) são as cópias instaladas no claude.ai. Para nome de campo, limiar e gravação valem o manual do banco e a versão do repositório `doutortenente/claude-workspace`. Para o formato da nota de admissão vale a `admissao-uti` instalada no claude.ai, que é a mais nova (reescrita depois de 10-out-2026, entrega em Word).
 
 -----
 
@@ -67,7 +79,7 @@ O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmP
 
 ## 4. Banco (estado vivo em 22-nov-2026)
 
-Fonte única do esquema: `supabase/migrations/` (40 arquivos, iguais aos 40 registros de migração do banco, com o mesmo carimbo e nome; conferido em 22-nov-2026). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
+Fonte única do esquema: `supabase/migrations/` (41 arquivos, iguais aos 41 registros de migração do banco, com o mesmo carimbo e nome; conferido em 22-nov-2026). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
 **17 tabelas · 10 views · 19 enums · 80 códigos de evento.** RLS (regras de acesso por linha, do banco) ligada com `dev_bypass` (uso solo, decisão do operador).
 
 **Os termos do banco são os do design** (migração `20261122040931_termos_do_design`):
@@ -96,6 +108,7 @@ Fonte única do esquema: `supabase/migrations/` (40 arquivos, iguais aos 40 regi
 - `janelas_24h` está vazia: as janelas de 27-set-2026 foram apagadas em 22-nov-2026, por ordem do operador. A pílula volta quando entrar janela nova.
 - SOFA: fora do projeto desde 22-nov-2026, por ordem do operador; talvez volte no futuro. As telas não mostram. As peças do banco (`vw_sofa_diario`, `sofa_baseline`, `sofa_snapshot`) e as menções no servidor MCP ficaram como estavam.
 - Migração: uma única chamada `apply_migration`.
+- Pacientes: em 22-nov-2026 os 7 pacientes antigos que ocupavam leito (admitidos de junho a setembro) foram apagados por ordem do operador, com tudo que era deles (`20261122140945_apaga_pacientes_antigos_ativos`). Ficaram 14 pacientes com alta; nenhum leito ocupado naquele momento.
 
 **Manual e travas para quem grava por fora do app** (migração `20261122135919_manual_do_banco_e_travas_de_gravacao`):
 - **Manual de gravação dentro do banco:** `select corpo from public.avisos_agentes where titulo like 'MANUAL DO BANCO%';`. Ensina qualquer Claude ou ferramenta (claude.ai com o conector do Supabase, servidor MCP antigo) a admitir, dar alta e gravar evolução, exames, janelas, antimicrobianos, culturas, dispositivos e pendências. O comentário das tabelas de gravação aponta para ele e aparece em qualquer listagem de tabelas.
