@@ -104,6 +104,8 @@ interface CampoNum {
   casas: number;
   /** Mostra "+" no positivo (balanco hidrico: +98 mL e -140 mL sao coisas diferentes). */
   sinal?: boolean;
+  /** So entra na grade quando o banco gravou valor (campo que a ingestao deixou de gravar, ou que nem toda linha tem). */
+  seExistir?: boolean;
 }
 
 /** Texto livre. `abrev` vazia => no texto corrido sai so o valor. */
@@ -191,9 +193,12 @@ const ESPEC: Readonly<Record<SistemaId, EspecSistema>> = {
     metricas: [
       {tipo: "num", id: "cr", rotulo: "Creatinina", abrev: "Cr", casas: 2},
       {tipo: "num", id: "ur", rotulo: "Ureia", abrev: "U", casas: 1},
+      {tipo: "num", id: "diurese_24h_ml", rotulo: "Diurese 24 h", abrev: "diurese 24 h", casas: 0},
+      {tipo: "num", id: "bh_24h_ml", rotulo: "BH 24 h", abrev: "BH 24 h", casas: 0, sinal: true},
       {
         tipo: "num",
         id: "diurese_6_18h_ml",
+        seExistir: true,
         rotulo: "Diurese 6–18 h",
         abrev: "diurese 6–18 h",
         casas: 0
@@ -201,6 +206,7 @@ const ESPEC: Readonly<Record<SistemaId, EspecSistema>> = {
       {
         tipo: "num",
         id: "bh_6_18h_ml",
+        seExistir: true,
         rotulo: "BH 6–18 h",
         abrev: "BH 6–18 h",
         casas: 0,
@@ -222,6 +228,7 @@ const ESPEC: Readonly<Record<SistemaId, EspecSistema>> = {
     topo: [{tipo: "texto", id: "atb", rotulo: "Antibiótico", abrev: "ATB"}],
     metricas: [
       {tipo: "num", id: "tmax", rotulo: "T máx", abrev: "T máx", casas: 1},
+      {tipo: "num", id: "tax_min", rotulo: "T mín", abrev: "T mín", casas: 1, seExistir: true},
       {tipo: "num", id: "leuco", rotulo: "Leucócitos", abrev: "leucócitos", casas: 0},
     ],
     rodape: [OBS],
@@ -257,6 +264,7 @@ export const CODIGO_EVENTO_POR_CAMPO: Readonly<Record<string, string>> = {
   hb: "hb",
   ht: "ht",
   tmax: "temp",
+  tax_min: "temp",
   rass: "rass",
 };
 
@@ -301,8 +309,25 @@ interface Valor {
 
 const VAZIO: Valor = {n: null, s: null};
 
+/**
+ * Duas grafias convivem nas linhas guardadas (medido no banco em 22-nov-2026): ate jul-2026 a ingestao
+ * gravava pa_sys_*, pa_dia_* e tmax; desde ago-2026 grava pas_*, pad_* e tax_max. O contrato desta tela
+ * usa a antiga como nome do campo; `ler` procura na outra quando a primeira nao veio.
+ */
+const OUTRA_GRAFIA: Readonly<Record<string, string>> = {
+  pa_sys_max: "pas_max",
+  pa_sys_min: "pas_min",
+  pa_dia_max: "pad_max",
+  pa_dia_min: "pad_min",
+  tmax: "tax_max",
+};
+
 function ler(dados: DadosSistema, chave: string): Valor {
-  const v = dados ? dados[chave] : undefined;
+  let v = dados ? dados[chave] : undefined;
+  if (dados && (v === undefined || v === null || (typeof v === "string" && v.trim().length === 0))) {
+    const outra = OUTRA_GRAFIA[chave];
+    if (outra) v = dados[outra];
+  }
   if (typeof v === "number") return Number.isFinite(v) ? {n: v, s: null} : VAZIO;
   if (typeof v === "string") {
     const t = v.trim();
@@ -366,6 +391,10 @@ function chavesConhecidas(sistema: SistemaId): Set<string> {
     } else {
       set.add(c.id);
     }
+  }
+  for (const k of Array.from(set)) {
+    const outra = OUTRA_GRAFIA[k];
+    if (outra) set.add(outra);
   }
   return set;
 }
@@ -651,6 +680,9 @@ export function SystemPanel({sistema, dados, unidades}: SystemPanelProps): React
   const vazio = sistemaVazio(sistema, dados);
   const listaExtras = extras(sistema, dados);
   const temPar = e.metricas.some((c: CampoPar | CampoNum) => c.tipo === "par");
+  const metricas = e.metricas.filter(
+    (c: CampoPar | CampoNum) => c.tipo === "par" || c.seExistir !== true || temValor(ler(dados, c.id)),
+  );
 
   return (
     <section
@@ -706,7 +738,7 @@ export function SystemPanel({sistema, dados, unidades}: SystemPanelProps): React
           ))}
 
           {/* instrumento — pares em MAXIMO–MINIMO, sempre visiveis */}
-          {e.metricas.length > 0 ? (
+          {metricas.length > 0 ? (
             <div
               style={{
                 display: "grid",
@@ -718,7 +750,7 @@ export function SystemPanel({sistema, dados, unidades}: SystemPanelProps): React
                 overflow: "hidden",
               }}
             >
-              {e.metricas.map((c: CampoPar | CampoNum) => {
+              {metricas.map((c: CampoPar | CampoNum) => {
                 const un = unidadeDoCampo(c.id, unidades);
                 if (c.tipo === "par") {
                   const p = lerPar(dados, c);
