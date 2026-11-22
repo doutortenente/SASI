@@ -21,7 +21,7 @@ Este checklist evita que mudanças entrem sem que outras sessões fiquem sabendo
 
 ### Multi-Claude sync
 
-- [ ] Atualizei `STATUS.md` se a mudança afeta deploy, schema, auth, ou arquitetura
+- [ ] Atualizei `docs/STATUS.md` se a mudança afeta deploy, schema, auth, ou arquitetura
 - [ ] Adicionei linha em "Histórico de decisões" se for decisão importante
 - [ ] Não introduzi caminhos novos com caracteres não-ASCII
 
@@ -60,7 +60,7 @@ Este checklist evita que mudanças entrem sem que outras sessões fiquem sabendo
 
 ## 🔗 Links relevantes
 
-<!-- STATUS.md sections afetadas, issues, decisões prévias. -->
+<!-- docs/STATUS.md sections afetadas, issues, decisões prévias. -->
 
 ---
 

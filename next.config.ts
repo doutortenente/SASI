@@ -7,9 +7,8 @@ import type { NextConfig } from "next";
 //  - nosniff / Referrer-Policy / Permissions-Policy: higiene padrao de PHI.
 //  - HSTS: so HTTPS depois da primeira visita.
 //  - poweredByHeader off: nao anunciar a tecnologia num host com dado clinico.
-// CSP (Content-Security-Policy) ficou de fora POR ORA: os componentes injetam
-// <style> inline (19 pontos) e ha 1 <script> inline do tema — CSP estrita exige
-// nonce em todos; fazer errado = tela branca. Registrado como debito.
+// CSP (Content-Security-Policy) ficou de fora POR ORA: ha 1 <script> inline do
+// tema (src/app/layout.tsx) — CSP estrita exige nonce nele; fazer errado = tela branca. Registrado como debito.
 // ============================================================================
 const nextConfig: NextConfig = {
   poweredByHeader: false,

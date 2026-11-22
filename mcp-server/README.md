@@ -44,6 +44,8 @@ antibiograma, alerts_log).
 
 ### 1. Variáveis de ambiente
 
+Copie `mcp-server/.env.example` para `mcp-server/.env` e preencha.
+
 Encontre em: **Supabase Dashboard → Settings → API**
 
 ```

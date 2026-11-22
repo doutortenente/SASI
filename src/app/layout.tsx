@@ -1,6 +1,6 @@
 // Moldura do app: menu lateral do design à esquerda e a tela à direita.
-import "@/styles/comando-uti.css";
-import "@/styles/app.css";
+import "./comando-uti.css";
+import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Suspense, type ReactNode } from "react";
 import { Menu } from "@/components/Menu";

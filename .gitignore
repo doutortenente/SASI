@@ -1,42 +1,32 @@
-# === Segredos / ambiente (NUNCA commitar) ===
-.env
-.env.*
-!.env.example
-chaves_secretas.txt
-**/.env
-**/.env.local
+# dependências
+/node_modules
+/mcp-server/node_modules
 
-# === Dependências ===
-node_modules/
-vendor/
-
-# === Build / artefatos ===
-dist/
-build/
+# build do Next.js (gerado — nunca versionar)
+/.next/
+/out/
+/mcp-server/dist
+next-env.d.ts
 *.tsbuildinfo
-*.map
 
-# === Supabase local ===
-supabase/.temp/
-supabase/.branches/
+# ambiente (segredos — nunca versionar)
+.env*
+!.env.example
 
-# === Logs / temporários do SO ===
-*.log
+# Vercel
+.vercel
+
+# Supabase local
+supabase/.temp
+supabase/.branches
+
+# sistema e logs
 .DS_Store
-*.bak
+*.log
 
-# === Design system — cache de ferramenta ===
-.thumbnail
-
-# === Config local de IA (scratch) ===
-**/.claude/settings.local.json
-
-# === Índice do repo (regenerável) ===
-memory/sasi_index.db
-memory/sasi_index.db.bak
-memory/MAPA-SASI.md
-.worktrees/
-
-# === Worktrees de sessões background do Claude (rascunho local) ===
+# Claude Code (rascunho local)
+.claude/settings.local.json
 .claude/worktrees/
 
+# memória local do Claude (fora do git)
+memory/
