@@ -1,0 +1,35 @@
+/* O que o app acrescenta ao design system: campos de digitar de verdade dentro das caixas do design e telas estreitas. */
+html, body { margin: 0; min-height: 100%; }
+html { background: var(--fundo); }
+.ds-app { min-height: 100vh; }
+.ds-menu { position: sticky; top: 0; align-self: start; height: 100vh; }
+a.ds-leito:hover { border-color: var(--borda-forte); }
+.ds-f input, .ds-f select, .ds-f textarea, .ds-busca input, .ds-celula input { flex: 1; min-width: 0; width: 100%; border: 0; outline: 0; margin: 0; padding: 0; background: transparent; color: inherit; font: inherit; }
+.ds-f:not(.ds-f--t):not(.ds-f--sel) { width: var(--larg, 58px); }
+.ds-f:not(.ds-f--t):not(.ds-f--sel) input, .ds-celula input { text-align: right; }
+.ds-f select { appearance: none; cursor: pointer; }
+.ds-f textarea { display: block; resize: none; overflow: hidden; line-height: 22px; }
+/* linha do tempo na meia largura do Round: a coluna do nome cede espaço para caberem as seis datas */
+.ds-lt { grid-template-columns: 120px minmax(0, 1fr) 48px; }
+.ds-lt__datas span { padding-left: 3px; }
+.ds-f:focus-within, .ds-celula:focus-within { border-bottom-color: var(--acento); box-shadow: inset 0 -1px 0 var(--acento); outline: 2px solid var(--acento); outline-offset: 2px; }
+.ds-busca { color: var(--texto); }
+.ds-busca .ds-icone { color: var(--texto-4); }
+.ds-busca input::placeholder { color: var(--texto-4); }
+.ds-seg > span, .ds-bloco, .ds-check[role="checkbox"], .ds-prio[role="button"] { user-select: none; cursor: pointer; }
+.ds-lista__x { cursor: pointer; }
+.ds-riscado .ds-f, .ds-riscado .ds-lista__sisr { color: var(--texto-4); text-decoration: line-through; border-bottom-style: dashed; background: transparent; }
+.ds-ev__corr { font-size: 13px; color: var(--texto-4); }
+@media (max-width: 860px) {
+  .ds-app { grid-template-columns: minmax(0, 1fr); }
+  .ds-menu { position: static; height: auto; flex-direction: row; align-items: center; gap: 12px; padding: 8px 12px; border-right: 0; border-bottom: 1px solid var(--borda); overflow-x: auto; }
+  .ds-nav { flex-direction: row; }
+  .ds-grade { --colunas: 2; }
+  .ds-col2, .ds-col3, .ds-round, .ds-exames { grid-template-columns: minmax(0, 1fr); }
+  .ds-tendencias { --colunas: 2 !important; }
+  .ds-topo { flex-wrap: wrap; height: auto; min-height: var(--topo); padding: 8px 0; gap: 8px 16px; margin: 0 12px; }
+  .ds-conteudo { padding: 12px; }
+  .ds-tabela-wrap { overflow-x: auto; }
+}
+@media (max-width: 520px) { .ds-grade { --colunas: 1; } }
+@media print { .ds-menu, .ds-topo__acoes { display: none; } .ds-app { display: block; } }

@@ -7,7 +7,7 @@
 - Proibido: sigla crua sem expandir, jargão solto, "é só rodar X" sem dizer em palavras o que X faz e por quê.
 
 > Briefing operacional do projeto. Lido pelo Claude Code ao abrir o repo.
-> **Última atualização:** 30-Jul-2026 — deploy canônico Vercel; paths `~/projetos/`; docs alinhados.
+> **Última atualização:** 22-nov-2026 — design "Comando UTI" no app; termos do banco iguais aos do design; pasta `app/`.
 > Este arquivo substitui qualquer `_HANDOFF_BRIEFING.md` (datado 23-Abr-2026, **STALE** — não é fonte da verdade).
 > **Memória persistente do projeto:** @memory/MEMORY.md
 
@@ -40,82 +40,63 @@ Toda documentação clínica é em **Português do Brasil**.
 
 ## 3. Stack
 
-- **Frontend:** **`sasi-v2/`** — Next.js 15 (App Router) + React 19 + TypeScript strict + Zustand → **Vercel** (Root Directory = `sasi-v2`). *(O app antigo React+Vite em `frontend/` foi aposentado na faxina de 31-jul-2026 — ver §7-B.)*
-- **Backend:** Supabase (PostgreSQL 17, projeto `idswehsvvqczzkiatuzu`, região `sa-east-1`).
-- **Ingest clínico:** Claude (skill `sasi-ingest-export`) → JSON → MCP ou frontend.
+- **App:** **`app/`** — Next.js 15 (App Router) + React 19 + TypeScript strict → **Vercel** (Root Directory = `app`), produção em **https://sasi-uti.vercel.app**. É o ÚNICO app do repositório. *(A pasta se chamava `sasi-v2/` até 22-nov-2026.)*
+- **Banco:** Supabase (PostgreSQL 17, projeto `idswehsvvqczzkiatuzu`, região `sa-east-1`).
+- **Ingest clínico:** Claude (skill `sasi-ingest-export`) → JSON → MCP. As telas Exames e Evolução também gravam.
 - **Edge Functions:** `ocr-ingest` legado no repo — **não** é fluxo operacional.
 - **Operador:** uso **pessoal e solo** (Dr. Nicolas). Não é produto multi-usuário nem deploy hospitalar.
-- **Ferramentas de IA:** Claude Code (refactor), Claude.ai (plantão), MCP local (`mcp-server/`).
 
-### Direção estética do frontend (doutrina de design)
+### Design: "Comando UTI · Folha de plantão" (fonte única)
 
-Estado ATUAL implementado (mergeado): **2 temas co-iguais** — **Tactical** (escuro/vermelho, default, `:root`) ⇄ **Clinical** (claro/azul, `[data-theme="clinical"]`), tipografia **IBM Plex Sans/Mono**, tokens `--app-*` + classes semânticas `.tx-*` / `.stat-*` / `.gravidade-*` (jamais hex hardcoded em componente). Cada cor é um sinal, não decoração.
+O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmPhnsB5VS3m4hdR4T. **O design manda; o app copia.**
 
-Direção ASPIRACIONAL para telas novas — **“Monitor de UTI Tático / HUD”** (assimilada 19-Jun-2026, ainda não codada). Equipamento clínico de comando, não página web genérica. Aplicar como evolução do tema Tactical, sempre via CSS vars:
-
-- **Paleta** (significado FIXO entre telas): âmbar `#F5A623` = produção/ação/alerta · teal `#2DD4BF` = ok/confirmado · vermelho `#F0506E` = pendência/risco · violeta `#8B80F9` = noturno/secundário. Base OLED `#080B12`; painel `#141E2D→#0E1622`; hairline `rgba(255,255,255,.08)` (nunca cinza chapado); texto `#EAF0F7` / apagado `#8694A8`.
-- **Tipografia**: Chakra Petch (display/labels/HUD, UPPERCASE, tracking largo) · **JetBrains Mono `tabular-nums` em TODO número/dado** · Inter (corpo). Proibido número em fonte de corpo; qualquer serif.
-- **Assinatura** (gastar a ousadia em UM lugar/tela): leitura grande mono com glow pelo estado (teal positivo / vermelho negativo), faixa de ECG sobre grid milimetrado, colchetes de canto (reticle HUD). Resto quieto e disciplinado.
-- **Regras duras**: cantos 10–16px; estados sempre desenhados (hover, foco visível, vazio = convite, erro = causa + saída); `prefers-reduced-motion` respeitado; mobile-first ≥360px, alvos ≥44px; ZERO “AI slop” (proibido Inter+gradiente roxo+card genérico). Copy pt-BR tática; botão = comando (“Adicionar plantão”, não “Submit”), nome estável do início ao fim do fluxo.
-- Fonte: `Downloads/Melhorias_Desing_Claude/CLAUDE-tema-monitor-uti.md`.
+- **Onde está no app:** `app/src/styles/comando-uti.css` (variáveis e folha de estilos do design, copiadas do artefato: **não editar à mão**), `app/src/components/icones.ts` (ícones), `app/public/fonts/` (Atkinson Hyperlegible) e `app/src/lib/termos.ts` (nomes e opções).
+- **Telas (menu, nesta ordem):** Cards · Round · Tabela · Passagem · Exames · Evolução. UTI 2, 13 leitos (no banco existe `UTI2-L13`); computador (1440 px) e tablet (1194 px); tema claro ou escuro pelo tema do aparelho.
+- **Regras fixas do médico (nenhuma mudança pode quebrá-las):**
+  1. Número nunca muda de cor. Valor fora do limiar aparece só como pílula vermelha com a contagem (`5x < 65`).
+  2. O quadro se chama "Cardio-hemodinâmica". O nome não muda.
+  3. CAM-ICU tem três opções: Positivo, Negativo, Não aplicável.
+  4. Cada quadro de sistema termina na linha Notas.
+  5. Sistemas em duas colunas: Neuro, Resp e Cardio-hemodinâmica à esquerda; TGI, Renal, Hemato e Infecto à direita.
+  6. Limiares da pílula: PAS < 90 ou > 180; PAD < 45 ou > 120; PAM < 65 ou > 130; FC > 100; FR > 25; SpO2 < 88 %; temperatura > 38 °C; Dx > 180. A contagem vem pronta de `janelas_24h`, com o limiar gravado na linha.
+  7. Sinais vitais sempre em máximo–mínimo, SpO2 incluída.
+  8. Sem caixa alta. Diálise é TRS. Não coletado é travessão. Campo sem valor fica vazio. Número em pt-BR, com vírgula.
+  9. Zero invenção: a ficha não supõe valor nem corrige sozinha; a conta fica em branco quando falta dado.
+- **Mudou o design?** Copiar de novo a folha de estilos do artefato para `comando-uti.css` e ajustar as telas. Não criar cor, fonte nem componente fora do design.
 
 -----
 
-## 4. Schema do banco (estado VIVO — 30-Jul-2026, **modelo v3**)
+## 4. Banco (estado vivo em 22-nov-2026)
 
-> ⚠️ **Atualização de 22-nov-2026 — o resto desta seção descreve o banco de 30-jul e está defasado.**
-> O banco vivo recebeu 22 migrações depois dela (aplicadas pelo projeto SASI-V3) e hoje tem
-> **17 tabelas, 10 views, 19 enums, 79 códigos de evento e 34 migrações**.
-> Retrato fiel: `supabase/schema-live-dump.sql`. Histórico: `supabase/migrations/` (as 22 que faltavam
-> foram recuperadas do próprio banco, com o mesmo carimbo). O que mudou de mais importante:
-> - `gravidade`: `estavel | watcher | instavel | critico` (moderado→watcher, grave→instavel; óbito saiu: o desfecho mora em `status_leito` e em `internacoes.desfecho`).
-> - `internacoes` (episódios de UTI) e `internacao_id` carimbado por gatilho em evoluções, ATBs, culturas, eventos e pendências.
-> - `dispositivo_episodios`: `pacientes.dispositivos` virou DERIVADO, proibido escrever à mão; `vw_dispositivos_ativos` dá os dias de uso.
-> - `evolucoes`: `tipo_nota`, `data_plantao`, `turno` (diurna | noturna), `autor_crm`, `autor_nome`, `illness_severity`, `finalizada_em`, `intercorrencias`; `plantao` virou legado.
-> - `janelas_24h`: máximo, mínimo e nº de medidas fora do limiar por sinal (de onde sai "5x < 65").
-> - Os enums foram ADOTADOS nas colunas (08-ago) e `dev_bypass` foi reaberta em 27-set, por ordem do operador.
-> - Nas linhas de `evolucoes` convivem duas grafias: até jul `pa_sys_*`, `pa_dia_*`, `tmax`; desde ago `pas_*`, `pad_*`, `tax_*`.
-> - **Pendente:** `save_ficha` não grava as colunas novas e apaga HD, idade, peso, altura e alergias quando o campo não vem no envio. Corrigir antes de o app gravar por ela.
+Retrato: `supabase/schema-live-dump.sql` (somar as duas migrações de 22-nov). Histórico: `supabase/migrations/` (36 arquivos, com o mesmo carimbo do banco).
+**17 tabelas · 10 views · 19 enums · 80 códigos de evento.** RLS ligada com `dev_bypass` (uso solo, decisão do operador).
 
-Fonte fiel: **migration baseline** `20260626000000_baseline.sql` + **formalização v3** (`20260730120000_enums_e_dimensao_eventos`, `20260730120100_eventos_tipo_fk`, `20260730120200_memorias_dono_e_severidade_insert`), aplicada em produção em 30-jul-2026. Schema de referência completo: `supabase/schema-producao-v3.sql`. RAG (`protocolos`/`protocolo_chunks`, migration `06`) **congelado, não aplicado**. RLS habilitado (`dev_bypass` ainda ativo — remoção é passo *gated*, ver abaixo).
+**Os termos do banco são os do design** (migração `20261122040931_termos_do_design`):
 
-**O que o modelo v3 trouxe (30-jul):**
-- **14 enums nativos** (`uti_enum`, `gravidade_enum`, `status_leito_enum`, `isolamento_enum`, `severidade_visual_enum`, `plantao_enum`, `via_atb_enum`, `intencao_atb_enum`, `material_cultura_enum`, `antibiograma_resultado_enum`, `severidade_alerta_enum`, `fonte_evento_enum`, `comparador_enum`, `trend_modo_enum`). As colunas ainda são `text` — a adoção (`text→enum`) é passo *gated*.
-- **`evento_tipo_ref`** (13ª tabela): dimensão que governa o vocabulário de `eventos_clinicos.tipo` — 56 códigos com `rotulo`, `unidade_padrao`, `faixa_min`/`faixa_max` (flags de absurdo fisiológico, de `03-clinical-sanity-checks`) e `loinc_code` (FHIR; só os 5 vitais verificados preenchidos — resto null por ZERO ALUCINAÇÃO). **Tipo novo = nova LINHA, não mexe em código.**
-- **FKs**: `eventos_clinicos.tipo`, `alert_rules.tipo_evento` e `trend_rules.tipo_evento` → `evento_tipo_ref(codigo)`. O CHECK antigo de 56 valores foi removido.
-- **`memorias`** ganhou `user_id` + 4 policies de dono (antes: RLS ligada sem policy nenhuma).
-- **`trg_severidade_on_insert`**: o semáforo de gravidade passa a valer também no INSERT (antes só no UPDATE).
-- **Extensão do vocabulário** (eco/hemodinâmica/imagem/cultura): `tipo='custom'` + `valor_json {dominio, subtipo, unidade}`. Não inflar `evento_tipo_ref` com isso.
+- **Vocabulário de eventos (`evento_tipo_ref`):** `pas`, `pad`, `pam`, `fc`, `fr`, `spo2`, `temp`, `dx`, `cai` (cálcio iônico), `uf_trs`… com `rotulo` (nome da tela Exames) e `sigla` (nome curto da ficha). Tipo novo = nova LINHA, não mexe em código.
+- **`evolucoes`:** uma coluna JSON por quadro (`neuro`, `resp`, `hemo` = Cardio-hemodinâmica, `tgi`, `renal`, `hemato`, `infecto`). A chave é o nome do campo no design, em minúsculas (`pas_max`, `temp_max`, `diurese_ml` + `diurese_h`, `notas`…); a escolha guarda o texto do botão ("Não aplicável"). Contrato completo: `app/src/app/evolucao/Ficha.tsx`.
+- **Termo antigo ainda é aceito na ENTRADA** e trocado pelo do design por gatilho (`trg_00_termos_design`): `pa_sys`→`pas`, `pa_dia`→`pad`, `glicemia`→`dx`, `uf_dialise`→`uf_trs`, `ca` em mmol/L→`cai`; nas evoluções, `pa_sys_*`→`pas_*`, `pa_dia_*`→`pad_*`, `tmax`/`tax_*`→`temp_*`, `obs`→`notas`, `diurese_24h_ml`→`diurese_ml` + `diurese_h`; sistema da conduta `hemo`→`Cardio-hemodinâmica`. Leucócitos e plaquetas ficam em ×10³/µL.
+- **O "antes" da troca** está no esquema `arquivo` (tabelas `termos_20261122_*`), para desfazer.
+- **Códigos internos que NÃO mudaram** (o nome do design está no comentário do tipo ou da coluna): `isolamento_enum` (`contact` = contato…), `dispositivo_tipo_enum` (`arterial` = PAI, `trr` = Shiley, `traqueo` = TQT) e a coluna `hemo`.
 
-**⛔ Passos GATED (em `supabase/migrations/_gated/`, NÃO rodam sozinhos):** `10_adocao_enums.sql` (converter `text→enum`, branch-first) e `20_rls_producao.sql` (policies por comando + remover `dev_bypass` — **só depois do login real**, senão trava o app). Ordem obrigatória em `docs/RUNBOOK-migracao-v3.md`.
+| Tabela | Função |
+|---|---|
+| `pacientes` | Cadastro, leito (`UTI2-L03`), gravidade (`estavel` · `watcher` · `instavel` · `critico`), `sexo`, isolamento. `dispositivos` é DERIVADO: proibido escrever à mão |
+| `internacoes` | Episódios de UTI; dia de UTI = hoje − `int_uti_data` |
+| `evolucoes` | A ficha: uma linha por paciente + `data_plantao` + `turno` (diurna · noturna) |
+| `janelas_24h` | Máximo, mínimo e nº de medidas fora do limiar por sinal (de onde sai a pílula) |
+| `eventos_clinicos` | Série de exames e medidas; `evento_tipo_ref` é o vocabulário |
+| `dispositivo_episodios` | Um registro por dispositivo por período de uso |
+| `atbs` · `culturas` · `antibiograma` | Antimicrobianos e microbiologia |
+| `pendencias` | Pendências / riscos (P1 a P3) |
+| `alert_rules` · `trend_rules` · `alerts_log` | Regras e registro de alertas (a tela Exames pinta a célula por `alert_rules`) |
+| `ingest_audit_log` · `memorias` · `avisos_agentes` | Auditoria de ingest, memória e avisos para agentes |
 
-|Tabela            |Função                                                             |Linhas (23-jun-2026)|
-|------------------|-------------------------------------------------------------------|--------------------:|
-|`pacientes`       |Cadastro + status do leito + severidade visual + `riscos_flags`    |16                   |
-|`evento_tipo_ref` |**Dimensão** do vocabulário de eventos (unidade, faixa, LOINC)     |56                   |
-|`evolucoes`       |Snapshot por sistema (JSONB) + SOFA + conduta                      |16                   |
-|`eventos_clinicos`|**Timeseries** — núcleo de tendências/alertas                      |130                  |
-|`atbs`            |Antibiotic stewardship (D-ATB + `duracao_planejada_dias`)          |12                   |
-|`culturas`        |Microbiologia                                                      |3                    |
-|`antibiograma`    |S/I/R por cultura                                                  |2                    |
-|`pendencias`      |Tarefas por paciente                                               |7                    |
-|`alerts_log`      |Alertas (produtor VIVO: trigger + dedupe SHA-256)                  |0 (dispara no ingest)|
-|`ingest_audit_log`|Auditoria de ingest                                                |0                    |
-|`alert_rules`     |Config alertas por valor (25 regras; `fonte`=DOI Vera)             |25                   |
-|`trend_rules`     |Config alertas de tendência/Δ (AKI creatinina, GCS)                |3                    |
-
-**Views (8):** `vw_dashboard_uti`, `vw_sofa_diario` (motor de SOFA/dia sobre eventos), `vw_sofa_trend_72h`, `vw_bh_acumulado`, `vw_dias_atb_ativo`, `vw_alertas_abertos`, `vw_eventos_pendentes_revisao`, `vw_eventos_tendencia`.
-**Funções:** `fn_updated_at`, `fn_invalidate_sofa_cache`, `sync_severidade_visual`, `fn_set_severidade_on_insert` (v3), `fn_alert_hash`, `fn_eval_alert` (produtor de alerta), `fn_eval_trend` (tendência/Δ), `fn_autoflag_lowconf`, `save_ficha` (RPC escrita atômica ficha). `match_protocolos` só na migration 06 (não aplicada).
-**Edge Functions (sasi):** `ocr-ingest` e `ingest-patient` — **legado**, não usar no fluxo diário.
-**Extensões:** `pgcrypto`, `pg_trgm`, `vector` (pgvector 0.8). *(Advisor pede mover `pg_trgm`/`vector` de `public` para `extensions` — pendente.)*
-
-> 🖥️ **App (`sasi-v2/`, Next.js 15) — ÚNICO app do repo desde 31-jul-2026:** verificado em 30-jul — build verde e lendo os 7 leitos reais da `vw_dashboard_uti`. Camada de dados em `src/lib/data/`, telas em `src/app/`, domínios em `src/features/`. O **cálculo clínico não mora na tela**: SOFA e tendências vêm prontos do banco (`vw_sofa_diario`/`evolucoes.sofa_total`). O motor v2 e o design system saíram do repo na faxina (§7-B) — recuperáveis pela tag `pre-faxina-2026-07-31`.
-
-> ⚠️ **`eventos_clinicos` (130) com débito de qualidade:** ingest manual via Claude; ~27 na fila `vw_eventos_pendentes_revisao`. O trigger `trg_autoflag_lowconf` força `requires_review` em `confidence<0.7`.
->
-> ⛔ **SOFA bloqueado por DADO:** 0/16 evoluções têm os 6 componentes (bilirrubina e PaO2/FiO2 **nunca** capturadas). Calcular SOFA hoje = null pra todos. Fix é a montante (skill capturar os componentes).
-
-> 📌 **Onde vivem Interconsultas / Programação / Pendências (View 2):** `interconsultas[]` e `programacao[]` no JSONB **`pacientes.patient_summary`**. **Pendências** na tabela **`pendencias`**.
+**Atenção:**
+- `save_ficha` (função antiga) apaga HD, idade, peso, altura e alergias quando o campo não vem. O app NÃO usa; não chamar.
+- As janelas de 27-set-2026 foram contadas com limiares antigos (FR > 20, SpO2 < 92…): a pílula mostra o limiar gravado na linha.
+- SOFA: o cálculo mora no banco (`vw_sofa_diario`); falta dado (bilirrubina e PaO2 raramente lançadas). Nunca estimar.
+- Migração: uma única chamada `apply_migration`; passos em `supabase/migrations/_gated/` NÃO rodam sozinhos.
 
 -----
 
@@ -123,36 +104,14 @@ Fonte fiel: **migration baseline** `20260626000000_baseline.sql` + **formalizaç
 
 **Operador único:** Dr. Nicolas. Ferramenta pessoal de plantão, **não** app hospitalar multi-usuário.
 
-**Configuração atual (intencional):**
-- Frontend entra direto no Dashboard (`MOCK_SESSION`, sem login).
-- Policies `dev_bypass` ativas — simplifica acesso solo com anon key.
-- **Sem plano de OAuth, magic link, MFA ou multi-tenant.** `Login.tsx` existe mas não é usado.
-
-Reativar auth só se o escopo mudar (outros usuários). Hoje: **não é backlog.**
+- O app abre direto, sem login. Policies `dev_bypass` ativas de propósito.
+- **Sem plano de login, OAuth, MFA nem multi-tenant.** Decisão do operador: não propor e não mencionar login nem trava de acesso.
 
 -----
 
-## 6. Status das fases
+## 6. Estado e próximos passos
 
-- **FASE ALPHA** — ⏸️ Suspensa pela faxina de 31-jul (§7-B). O frontend modular vivia em `frontend/src/lib/` e os testes Vitest (parseBR, SOFA display) em `packages/clinical-engine` — ambos saíram do repo. O cálculo clínico hoje vem do banco (views `vw_*`), não de pacote local. Retomar só se o motor voltar do arquivo.
-- **FASE BRAVO** — ✅ Entregue e deployada. Schema Supabase, `smoke.sql`, `useClinicalAlerts.ts`, views vivas.
-- **FASE CHARLIE** — 🔄 Em andamento. Timeseries (`eventos_clinicos` 93 linhas, ingest Claude→JSON) + stewardship (`atbs`/`culturas` vazios).
-- **FASE DELTA** — ⬜ Backlog. Automação clínica no app.
-
-### Backlog FASE DELTA (prioridades)
-
-1. Cálculo automático de day-of-therapy (D-ATB).
-1. Balanço hídrico cumulativo.
-1. Handoff PDF em um clique.
-
-### Frontend (Planos Alpha/Bravo)
-
-War Room · toggle de visão compacta · SmartPaste · abas por UTI · chips de dispositivo · UI serial completa de labs · UI de prescrição por sistema · senior safety check.
-
-### Outras frentes
-
-- Integração Figma: auditoria UX com screenshots anotados, design tokens SASI → Tailwind, master components com variantes.
-- ✅ (resolvido 26-jun) Alertas: hook estava OK, faltava **produtor** — criados `fn_eval_alert` (valor) + `fn_eval_trend` (tendência/Δ), config em `alert_rules`/`trend_rules` (mesa do médico em `~/vaults/celebro/conhecimento/projetos/sasi-decisoes-clinicas.md`, movida do repo em 10-jul-2026).
+Estado atual, o que o app ainda não faz e pendências: `memory/notes/STATUS.md`. Débitos e decisões que não se reabrem: `memory/MEMORY.md`.
 
 -----
 
@@ -196,7 +155,7 @@ operador). Em `doctrine/` sobra SÓ `_SASI_TEMPLATE_BASE_v2.md` (fonte da verdad
 
 Metade do repositório (187 de 375 arquivos) era código que ninguém consumia. Saíram:
 
-- **`frontend/`** (86 arquivos) — app React+Vite, substituído por `sasi-v2/` em 30-jul-2026 e
+- **`frontend/`** (86 arquivos) — app React+Vite, substituído por `sasi-v2/` (hoje `app/`) em 30-jul-2026 e
   nunca aposentado. Levava junto `frontend/vercel.json`, que era armadilha de deploy: com a
   Vercel apontada pra raiz, publicava o app **errado**.
 - **`packages/`** (101 arquivos) — `clinical-engine` (SOFA, parse pt-BR, testes Vitest) e
@@ -210,11 +169,11 @@ Metade do repositório (187 de 375 arquivos) era código que ninguém consumia. 
 Cópia local de `packages/` entregue em zip ao operador para `~/projetos/rascunhos/`.
 
 **Consertado no mesmo commit:** `.github/workflows/ci.yml` repontado de `frontend` para
-`sasi-v2` (senão toda subida passaria a falhar — a automação só sabia compilar o app antigo);
+`sasi-v2`, hoje `app` (senão toda subida passaria a falhar — a automação só sabia compilar o app antigo);
 `README.md`, este arquivo (§3, §4, §6), `memory/MEMORY.md`, `docs/PLANO-SASI-v3.{md,html}`,
-`sasi-v2/src/features/README.md`, `.env.example` e `.gitignore`.
+`.env.example` e `.gitignore`.
 
-**Regra para sessões futuras:** o repo tem **UM app** (`sasi-v2/`). Não recriar `frontend/`
+**Regra para sessões futuras:** o repo tem **UM app** (`app/`; a pasta se chamava `sasi-v2/` até 22-nov-2026). Não recriar `frontend/`
 nem `packages/`; staging vai para `~/projetos/rascunhos/`, fora do repositório.
 
 -----

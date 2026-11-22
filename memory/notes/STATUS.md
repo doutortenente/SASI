@@ -1,314 +1,46 @@
-# STATUS — SASI (Sistema de Auditoria e Síntese Intensiva)
-**Comando UTI Alpha — 33 leitos (UTI 2/3/4)**
+# STATUS — SASI (Comando UTI)
 
-**Data desta revisão:** 30/07/2026
-**Produção:** https://sasi-uti.vercel.app  
-**Operador:** Dr. Nicolas Tenente (dr.tenente@nagaitaltda.com)  
-**Supabase:** idswehsvvqczzkiatuzu (Postgres 17.6)
+**Revisão:** 22/11/2026 · **Produção:** https://sasi-uti.vercel.app · **Banco:** Supabase `idswehsvvqczzkiatuzu` (Postgres 17)
 
-> **Este é o documento autoritativo de estado atual.**  
-> Substitui os antigos `MEMORY.md` (removidos em 11/06/2026).  
-> Briefing operacional para IA: [CLAUDE.md](CLAUDE.md).  
-> Sempre atualize este arquivo em mudanças importantes de arquitetura, deploy, auth ou schema.
+> Documento de estado atual. Briefing para IA: `CLAUDE.md`. Atualize aqui em mudança de arquitetura, publicação ou banco.
 
-> ⚠️ **22/11/2026 — schema:** o banco vivo está à frente do que este documento descreve (17 tabelas, 34 migrações;
-> 22 entraram entre 08-ago e 27-set pelo projeto SASI-V3). O repositório foi sincronizado com o banco nesta data:
-> ver a nota em `CLAUDE.md` §4 e o retrato em `supabase/schema-live-dump.sql`.
+## 1. O que está no ar
 
----
-
-## 1. Stack e Arquitetura Atual
-
-| Camada          | Tecnologia                                      | Observações |
-|-----------------|--------------------------------------------------|-------------|
-| Frontend        | **Next.js 15 + React 19 + TypeScript + Zustand** | `sasi-v2/` — único app do repo desde a faxina de 31-jul-2026 |
-| Estilo          | Tailwind 3.4 + CSS vars — **BAYES.OPS 2 temas** | Tactical (escuro OLED) ⇄ Clinical (claro); toggle `lib/theme.tsx`; tokens `--app-*`; nunca hex hardcoded |
-| Backend         | Supabase (Postgres + Auth + Realtime + Edge Functions) | Única fonte de dados |
-| Deploy          | Vercel (CI em `main`)                            | **root directory = `sasi-v2`** (era `frontend`; mudou na faxina de 31-jul-2026) |
-| PDF             | jsPDF + jspdf-autotable (lazy)                   | Export de passagem de turno |
-| Ícones          | lucide-react                                     | — |
-| Ingest clínico  | Skill `sasi-ingest-export` → JSON → MCP `sasi_deploy_ingest` | Claude lê foto/PDF/texto; **sem** pipeline OCR automático |
-| Edge Function   | `ocr-ingest` legado (não usar) | Ingest real: Claude → JSON → MCP |
-| Índice do repo  | `~/projetos/scripts/indices/build_sasi_index.py` → SQLite | Ver `memory/MEMORY.md` |
-
-**Princípio arquitetural:**  
-Ingest = **Claude extrai → JSON validado → grava no Supabase** (MCP com `deploy`, ou edição no frontend). Uso **pessoal solo** — um operador, sem OAuth.
-
-**2 Temas BAYES.OPS (27/06/2026):** `tactical` (OLED `#000`, glow teal, camadas blueprint/scanlines/vinheta, reticle HUD em crítico/séptico — padrão) ⇄ `clinical` (claro `#F4F6F9`, sem camadas, legível 12h). Toggle em `lib/theme.tsx`, persistido em `localStorage sasi.theme`. Tri-tipografia: Chakra Petch (display) · Lexend (corpo) · JetBrains Mono (dados). Lei: zero animação `infinite` decorativa.  
-**5 Janelas (redesign 11/06/2026):**
-
-| # | Janela | Atalho | Conteúdo |
-|---|--------|--------|----------|
-| 1 | Leitos | `1` | Cards por gravidade (Estável/Watcher/Instável/Crítico) + filtros smart |
-| 2 | Eixo Tempo | `2` | HPMA, tabelão labs seriais, interconsultas, programação/pendências |
-| 3 | Eixo Estado | `3` | Terapias vigentes, vitais+BH, labs do dia, exame físico |
-| 4 | Problema→Ação | `4` | Pares 1:1 problema/conduta com meta numérica |
-| 5 | Passagem | `5` | Lista 3-linhas por paciente + copiar/PDF |
-
-Navegação: `JanelaNav` no header · `j`/`k` troca paciente · seleção persistida em `localStorage`.
-
----
-
-## 1b. Estado dos dados em produção (auditoria 23-jun-2026)
-
-| Tabela | Linhas | Nota |
-|--------|-------:|------|
-| `pacientes` | 9 | Cadastro ativo |
-| `evolucoes` | 9 | 1 snapshot por paciente |
-| `eventos_clinicos` | 93 | 100% fonte `claude_ocr`; 24/93 `requires_review`; 18/93 `confidence<0.7` |
-| `atbs` / `culturas` / `pendencias` | 0 | Stewardship e tarefas ainda vazios |
-
-Último ingest (Claude→JSON): **21-jun-2026**. Queries de plantão: `supabase/queries/plantao_queries.sql`.
-
----
-
-## 2. Acesso (uso pessoal — sem auth)
-
-**Operador único:** Dr. Nicolas. Ferramenta pessoal de plantão, não produto hospitalar.
-
-**Configuração atual (intencional, desde `fc8cd75`):**
-- App carrega direto no Dashboard (`MOCK_SESSION`, `dev@sasi-uti.local`).
-- Header: **"Modo dev — sem auth"**.
-- `Login.tsx` existe mas **não é renderizado**.
-- `dev_bypass` RLS ativo (migration `03_dev_bypass_rls.sql`) — acesso solo simplificado.
-
-**Sem OAuth, MFA, magic link nem multi-usuário.** Não é dívida técnica para o escopo atual.
-
----
-
-## 3. Funcionalidades Implementadas (Produção)
-
-| # | Funcionalidade                              | Commit     | Status     | Observação |
-|---|---------------------------------------------|------------|------------|----------|
-| 1 | 3 temas (dark/clinical/light) + tokens UI   | 6020c0e    | ✅ Ativo   | `lib/theme.tsx` |
-| 2 | 5 janelas de navegação (Leitos/Tempo/Estado/Problema/Passagem) | redesign-11jun | ✅ Ativo | Substitui plantão/round/editor |
-| 3 | Calculadora de infusão (DVA + Sedação)      | 6020c0e    | ✅ Ativo   | `lib/drugs.ts` + `InfusionEditor.tsx` |
-| 4 | Error Boundary global                       | 327f318    | ✅ Ativo   | — |
-| 5 | Skeletons + Empty States                    | 0cb1a2a    | ✅ Ativo   | — |
-| 6 | Novo Leito (admissão manual)                | 0cb1a2a    | ✅ Ativo   | `NovoLeitoModal.tsx` |
-| 7 | Toasts + feedback Realtime                  | 0cb1a2a    | ✅ Ativo   | — |
-| 8 | Atalhos de teclado globais                  | 0cb1a2a    | ✅ Ativo   | — |
-| 9 | Timeline Drawer (SOFA + eventos)            | 0cb1a2a    | ✅ Ativo   | `TimelineDrawer.tsx` |
-|10 | Export PDF Passagem de Turno (lazy)         | 0cb1a2a    | ✅ Ativo   | `exportPDF.ts` |
-|11 | tsconfig strict                             | ffb6523    | ✅ Ativo   | `noUnusedLocals/Params` |
-|12 | Trigger `updated_at` no Postgres            | ffb6523    | ✅ Ativo   | — |
-|13 | Acesso solo (mock + dev_bypass RLS)         | fc8cd75    | ✅ Ativo   | Uso pessoal — sem auth |
-|14 | Redesign Gemini-style + FichaCompleta       | d8a648c + 760b52d | ✅ Ativo | Replica exata do protótipo Gemini (edição inline 7 sistemas) |
-|15 | Sinais vitais + labs estruturados           | b3c82eb    | ✅ Ativo   | Import de planilhas Excel |
-|16 | LeitoCard com border-l por gravidade        | c780f71    | ✅ Ativo   | — |
-|17 | Plantão Board: shell Sidebar/TopBar/FiltersBar | e526bad | ✅ Ativo   | PR #12 |
-|18 | View Pacientes (índice + página-prontuário) | 12/06/2026 | ✅ Ativo   | `PacientesIndex` + `PacientePage` (reusa FichaCompleta/TimelineDrawer); botão "Prontuário" no modal |
-|19 | Ficha ↔ Supabase síntese (problemas/condutas/riscos) | 24/06/2026 | ✅ Ativo   | Migration `07` + fixes `FichaCompleta`/`SasiSynthesis` |
-|20 | MCP `sasi_deploy_ingest` (bulk payload v1) | 24/06/2026 | ✅ Ativo   | `mcp-server/src/tools/ingest-deploy.ts` |
-|21 | Realtime dashboard em `pendencias` | 24/06/2026 | ✅ Ativo   | `useSupabasePatients.ts` |
-|22 | `clinical-engine` — 7 testes Vitest (parseBR, SOFA display) | 24/06/2026 | 📦 Arquivado 31/07/2026 | saiu do repo na faxina (tag `pre-faxina-2026-07-31`); cálculo hoje vem das views `vw_*` |
-|23 | Auditoria `eventos_clinicos` (script + query plantão) | 24/06/2026 | ✅ Ativo   | `~/projetos/scripts/sasi/audit_eventos.py`, `supabase/queries/plantao_queries.sql` §11b |
-|24 | Design BAYES.OPS — 2 temas Tactical/Clinical        | 27/06/2026 | ✅ Ativo   | `src/index.css` + `tailwind.config.js` + LeitoCard/TopBar/Dashboard; commits `acce2c7`+`f185ab8` |
-
-**Funcionalidades em destaque recentes (maio/2026):**  
-- `FichaCompleta.tsx` — edição completa de todos os sistemas (neuro, resp, hemo, tgi, renal, hemato, infecto) + DVA/sedativos + impressão/conduta/pendências.  
-- Export de passagem de turno com dados estruturados.
-
----
-
-## 4. Schema Real em Produção vs Migrations Locais
-
-**Schema em produção (Supabase):**
-- 9 tabelas principais com RLS (`auth.uid() = user_id`):
-  - `pacientes`, `evolucoes` (JSONB por sistema + `sofa_snapshot`), `eventos_clinicos`, `pendencias`, `atbs`, `culturas`, `antibiograma`, `alerts_log`, `ingest_audit_log`.
-- 5 views `security_invoker`: `vw_dashboard_uti`, `vw_sofa_trend_72h`, `vw_bh_acumulado`, `vw_dias_atb_ativo`, `vw_alertas_abertos`.
-- Constraint forte: `pacientes.uti IN ('UTI2','UTI3','UTI4')`.
-
-**Migrations locais no repo (`supabase/migrations/`):**
-- `01` — schema legado (4 tabelas antigas, referência histórica).
-- `02–05` — triggers, dev_bypass, hardening, `patient_summary`.
-- `06_protocolos_rag.sql` — RAG pgvector (`protocolos`, `protocolo_chunks`, `match_protocolos`). **Versionado 24-jun; aplicar manualmente no Supabase.**
-- `07_evolucoes_synthesis_columns.sql` — `problemas_ativos`, `condutas_sistemas`, `riscos` (JSONB). **Aplicada no Postgres remoto 24-jun** (`dc45f4f`).
-
-**Dívida:** `schema-live-dump.sql` ainda **não** reflete migration `07` — regenerar via dump remoto.
-
-**Tipos TypeScript oficiais:** `src/lib/supabaseClient.ts` (da pasta ativa) — fonte da verdade para o frontend.
-
----
-
-## 5. Mapa do Repositório (Jun 2026)
-
-**Código ATIVO (repo `doutortenente/SASI`):**
-```
-sasi-v2/                            ← Next.js 15 (deploy Vercel, root directory)
-├── src/
-├── next.config.ts
-└── package.json
-
-mcp-server/                         ← MCP local (.mcp.json)
-supabase/                           ← migrations + Edge Functions + queries/
-├── functions/ocr-ingest (legado)
-├── queries/plantao_queries.sql
-└── types/database.types.ts
-
-doctrine/                           ← template-base clínico
-memory/                             ← sasi_index.db + STATUS
-docs/                               ← SETUP, AGENTS
-CLAUDE.md · .mcp.json
-```
-
-Workspace irmão: `~/projetos/` (Claude, memory, scripts). `comando-uti` **arquivado**.
-
-**Faxina 16/06/2026 (organização):**
-- Mapa do workspace: `~/projetos/memory/MAPA-DEV.md` (pós-split; `comando-uti` descontinuado).
-- Fundido `CONFIGURAÇÕES_CLAUDE_JB.idea/` → `.idea/` canônico; removida run config `raiz: lint` (sem package.json raiz).
-- Removido `node_modules/` órfão na raiz (423 MB, sem `package.json`).
-- `.sasi-session-backup/` movido para gitignore (scratch de sessão IA).
-
-**Faxina 11/06/2026 (conclusão):**
-- Removido scaffold Vite morto na raiz (`package.json`, `index.html`, configs Tailwind v4).
-- Removido VSIX Tailwind + pasta extraída.
-- Removidos `MEMORY.md`, `sasi/MEMORY.md`, `sasi/CLAUDE_CODE_GUIDE.md` (consolidados em `STATUS.md` + `CLAUDE.md`).
-- Removidas skills IA duplicadas (`.agents/`, `.claude/skills/` — 78 arquivos).
-- Removido `skills-lock.json` (legado irrelevante).
-- Unificado Supabase: `sasi/supabase/` fundido em `supabase/` na raiz (`ocr-ingest` + migration `05_add_patient_summary.sql`).
-- Sanitizado `AGENTS.md`: JWTs substituídos por env vars (`SASI_SERVICE_ROLE_KEY`, `SASI_SUPABASE_ANON_KEY`).
-
-**Governança:**
-- `.github/PULL_REQUEST_TEMPLATE.md` — exige update de `STATUS.md`, typecheck, build, RLS safety.
-
----
-
-## 6. Dívida Técnica e Backlog Priorizado
-
-### Prioridade CRÍTICA
-- [x] MCP `sasi_deploy_ingest` — bulk ingest payload v1 (24-jun-2026)
-- [x] Colunas síntese `evolucoes` (problemas_ativos, condutas_sistemas, riscos) — migration `07`
-- [ ] Versionar migrations do schema atual (9 tabelas + views) no repositório
-
-### Definition of Done — plantão (smoke manual)
-- [ ] Ingest folha → `sasi_deploy_ingest` → eventos na timeline
-- [ ] Ficha → síntese → save → reload mostra JSONB
-- [ ] Passagem 3 linhas + PDF com dados do DB
-- [ ] `python3 ~/projetos/scripts/sasi/audit_eventos.py` — fila review < 10 itens críticos
-
-### Prioridade MÉDIA
-- [x] Consolidar cópias duplicadas (faxina 11/06/2026)
-- [x] Atualizar contagens reais em `STATUS.md` + `CLAUDE.md` (24-jun-2026)
-- [x] Versionar migration RAG protocolos (`06_protocolos_rag.sql`)
-- [ ] Aplicar migration 06 no Supabase + Edge `protocolo-ingest`
-- [ ] Revisar qualidade dos 93 `eventos_clinicos` (requires_review / confidence)
-- [ ] Modal "Novo Leito" completo no frontend (atualmente depende de skill/edge)
-- [ ] Drawer detalhado com timeline SOFA + eventos (já existe esqueleto)
-- [ ] Error tracking (Sentry ou similar)
-- [ ] 1 teste E2E (Playwright)
-
-### Prioridade BAIXA
-- [ ] Renomear caminho do projeto para `sasi/` simples (breaking change — avaliar impacto na Vercel)
-- [ ] Code splitting + lazy loading mais agressivo (FichaCompleta + exportPDF já são lazy)
-- [ ] Logger estruturado (substituir console.log)
-
----
-
-## 7. Comandos para Desenvolvimento (Pasta Ativa)
-
-```bash
-# Local canônico após faxina (09/05/2026)
-cd sasi
-
-npm install
-npm run typecheck     # deve sair limpo (0 erros)
-npm run build         # deve gerar dist/ com sucesso
-npm run dev           # http://localhost:5173 (abre direto no Dashboard com mock)
-```
-
-**Smoke test no Supabase (SQL Editor):**
-```sql
-SELECT count(*) FROM information_schema.tables WHERE table_schema='public';  -- deve ser 9+
-SELECT count(*) FROM pg_views WHERE schemaname='public' AND viewname LIKE 'vw_%'; -- 5
-```
-
----
-
-## 8. Regras Clínicas SASI (Obrigatórias)
-
-Ver arquivo completo: [AGENTS.md](AGENTS.md)
-
-- Usar sempre o template SASI v2.0 (Ramo C) com ortogonalidade de eixos.
-- Toda nota deve ter: **Impressão (problemas ativos)** + **Conduta 1:1 com metas numéricas**.
-- Ao gerar nota SASI via skill/IA → inserir automaticamente na tabela `evolucoes`.
-- Manter Max–Min em todos os sinais vitais (incluindo SpO2).
-- **Nunca inventar dados** (zero alucinação).
-
----
-
-## 9. Histórico de Decisões Importantes
-
-| Data       | Decisão                                      | Commit / Motivo |
-|------------|----------------------------------------------|-----------------|
-| 27-Abr     | Setup inicial Vite + React + Supabase        | Stack definida |
-| 30-Abr     | Deploy CI no Netlify + renomeio para sasi-uti.netlify.app | Fase A faxina (migrado p/ Vercel jul/2026) |
-| 30-Abr     | Implementação do bundle de design (3 temas + 3 views + calculadora) | 6020c0e |
-| 06-Mai     | **Acesso solo** (mock + dev_bypass RLS) | fc8cd75 — uso pessoal sem auth |
-| 06-09-Mai  | Port de features do protótipo Gemini (FichaCompleta, LeitoCard, labs estruturados) | d8a648c, 760b52d, b3c82eb |
-| 11-Jun     | **Faxina final do repo** — scaffold raiz, skills IA, docs duplicados, Supabase unificado | chore/faxina-11jun |
-| 11-Jun     | **Redesign 5 Janelas** — severity/Watcher, clinicalExtract, Passagem 3-linhas | feat/5-janelas |
-| 24-Jun     | **SASI executável (sessão agentes)** — Ficha↔Supabase, MCP deploy, clinical-engine, bundle ingest | `779741a`…`19586a8`; handoff `docs/SECRETARIA-2026-06-24.md` |
-| 24-Jun     | **Skill template evolução D2+ v2** promovido no repo `claude` | `35df460` |
-| 27-Jun     | **Design BAYES.OPS deployado** — 2 temas Tactical/Clinical; reticle HUD; bugs de token corrigidos; 2 animações `infinite` removidas | `f185ab8` |
-| 30-Jul     | **Deploy canônico → Vercel** (`sasi-uti.vercel.app`); `netlify.toml` removido; paths `~/dev/` → `~/projetos/` | Faxina docs |
-
----
-
-## 10. Próximos passos
-
-1. **Regenerar `schema-live-dump.sql`** pós-migration `07`.
-2. ~~**CI ampliado** — jobs mcp-server + clinical-engine~~ **obsoleto 31-jul-2026**: o `clinical-engine` saiu do repo na faxina; a CI hoje compila o `sasi-v2`. Um job para o `mcp-server` continua possível, se fizer falta.
-3. **Smoke plantão** — checklist Definition of Done (§6).
-4. **Qualidade ingest** — 24 `eventos_clinicos` em fila review (`~/projetos/scripts/sasi/audit_eventos.py`).
-5. **Rotacionar JWTs** se ainda não fez (histórico `AGENTS.md`).
-
----
-
-**Status resumido (11/06/2026):**  
-**Produção estável** com bypass de auth. *(Histórico de 11/06/2026 — o app de 5 janelas era o `frontend/`, aposentado em 31-jul-2026.)* Repo hoje: `sasi-v2/` + `supabase/` + `mcp-server/`. Maior risco residual = drift de schema + bypass de autenticação.
-
----
-
-## Infra (pós-split 24-Jun-2026)
-
-| Item | Status |
+| Camada | O que é |
 |---|---|
-| Vercel | Repo `doutortenente/SASI`; **root directory = `sasi-v2`** (atualizado 31-jul-2026) |
-| VPS Hermes | `/opt/data/projects/jarvis` + `sasi`; `comando-uti` arquivado |
-| JARVIS CI | Secret `VPS_SSH_PRIVATE_KEY` configurado |
+| App | `app/` — Next.js 15 + React 19 + TypeScript. Único app do repositório |
+| Design | "Comando UTI · Folha de plantão" (https://claude.ai/artifact/DfrYNmPhnsB5VS3m4hdR4T): folha de estilos, fontes e ícones copiados do design |
+| Publicação | Vercel, projeto ligado a `doutortenente/SASI`, Root Directory `app`; cada merge na `main` publica |
+| Banco | Supabase; uso pessoal e solo, sem login (decisão do operador) |
+| Ingest | Skill `sasi-ingest-export` → JSON → MCP `sasi_deploy_ingest`; as telas Exames e Evolução também gravam |
 
-### Rotacionar keys (se ainda não fez)
-JWTs antigos vazaram no histórico do git via `AGENTS.md`. Rotacione no Supabase e atualize `.env` local.
+## 2. Telas
 
----
+Cards · Round · Tabela · Passagem · Exames · Evolução (UTI 2, 13 leitos).
 
-*Referências rápidas (atualizado após faxina):*  
-- Código ativo: `sasi-v2/`  
-- Deploy: Vercel `sasi-uti` — https://sasi-uti.vercel.app
-- Supabase: projeto `idswehsvvqczzkiatuzu`  
-- Plano de auth: Google Drive (documento "Plano de ação login e autenticação SASI")
+- **Evolução** grava a ficha em `evolucoes` (uma linha por paciente, data do plantão e turno) e as pendências em `pendencias`. Copia a evolução em texto. Trocar de leito ou de tela com alteração não salva grava antes de sair.
+- **Exames** lança a coleta de hoje em `eventos_clinicos` (só acrescenta, nunca apaga).
+- **Passagem** copia o texto e imprime (PDF pelo navegador). Marcar pendência como feita grava na hora.
 
----
+## 3. O que ainda não faz (em relação ao design)
 
-## 30-jul-2026 — F0 modelo de dados v3 APLICADO no banco vivo (branch `feat/modelo-dados-v3`)
+- Na ficha, antimicrobianos e culturas aparecem só para leitura (incluir, suspender e apagar ainda é pelo ingest).
+- "Novo leito" (admissão pela tela) não existe.
+- A diluição da droga é digitada (no design é uma lista).
+- A Prescrição vigente do Round mostra só as infusões da evolução (não há prescrição estruturada no banco).
+- O tema claro ou escuro segue o do aparelho (não há botão).
+- Os gráficos pequenos do Round e de Exames são barras simples, não o desenho exato do design.
 
-Sessão Cowork. Formalização do modelo de dados **aplicada em produção** via `apply_migration`
-(migrations `modelo_dados_v3_formalizacao` + `fix_enums_por_tipo`):
-- **14 enums nativos** (12 novos + os 2 que já existiam), dimensão **`evento_tipo_ref`** (56 tipos,
-  com faixa fisiológica de `03-clinical-sanity-checks` + LOINC dos 5 vitais verificados).
-- **`eventos_clinicos.tipo` → FK** para `evento_tipo_ref` (CHECK de 56 valores removido). Idem `alert_rules`/`trend_rules`.
-- **`memorias`** ganhou `user_id` + 4 policies de dono (antes: RLS sem policy — advisor resolvido).
-- **Semáforo** passa a valer no INSERT de `pacientes` (`trg_severidade_on_insert`).
-- 76 eventos intactos; nenhuma perda de dado. Bug de enum (do-block único) corrigido → per-tipo.
+## 4. Banco
 
-**GATED (não aplicado; `supabase/migrations/_gated/`):** adoção texto→enum (branch-first) e RLS de
-produção + remover `dev_bypass` (só pós-login real — senão trava o app).
+Ver `CLAUDE.md` §4. Migrações em `supabase/migrations/` (36). Retrato em `supabase/schema-live-dump.sql`.
 
-**Novos no repo:** `supabase/schema-producao-v3.sql`, `supabase/types/sasi.types.ts`,
-`docs/{PLANO-SASI-v3.md,PLANO-SASI-v3.html,RUNBOOK-migracao-v3.md}`,
-`sasi-v2/` (esqueleto Next.js 15 com o design system real integrado),
-*(`packages/design-system/` e `packages/clinical-engine/` saíram do repo na faxina de 31-jul-2026 — ver `CLAUDE.md` §7-B.)*
+- 22/11/2026: termos do banco iguais aos do design (`20261122040931_termos_do_design`) e `pacientes.sexo` (`20261122052449_paciente_sexo_do_design`).
+- Os dados clínicos estão parados desde 27/09/2026 (último ingest).
 
-**Dívida:** `dev_bypass` segue ativo (gated, pós-auth). ⚠️ **Rotacionar segredos** — o cofre `.env`
-foi colado no chat em 30-jul (Supabase service_role, PATs GitHub, Vaultwarden master, e-mails).
+## 5. Pendências
+
+1. Rotacionar os segredos expostos em 30/07/2026 (ver `memory/MEMORY.md`).
+2. A skill `sasi-ingest-export` (repo `claude-workspace` e a cópia do claude.ai) ainda escreve os termos antigos. O banco aceita e troca na entrada, mas o texto da skill precisa ser atualizado para LER pelos nomes novos.
+3. O projeto Vercel antigo (`sasi`, ligado a `doutortenente/SASI-V3`) deixou de responder por `sasi-uti.vercel.app` em 22/11/2026, por ordem do operador.
+4. `save_ficha` no banco: não usar (apaga campos do paciente quando a chave não vem).

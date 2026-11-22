@@ -5,66 +5,41 @@
 ```
 memory/
 ├── MEMORY.md          ← este arquivo (hub)
-├── MAPA-SASI.md       ← inventário auto-gerado (não editar)
-├── sasi_index.db      ← SQLite local (gitignored)
-└── notes/
-    └── STATUS.md      ← estado autoritativo do projeto
-```
-
-## Comandos
-
-```bash
-cd ~/projetos/sasi
-python3 ~/projetos/scripts/indices/build_sasi_index.py
-python3 ~/projetos/scripts/indices/query_sasi_index.py categorias
-python3 ~/projetos/scripts/indices/query_sasi_index.py find FichaCompleta
-python3 ~/projetos/scripts/indices/push_repo_index_to_postgres.py   # SUPABASE_DB_URL no .env
-python3 ~/projetos/scripts/sasi/audit_eventos.py                   # fila eventos_clinicos
+├── MAPA-SASI.md       ← inventário auto-gerado (não editar; fora do git)
+└── notes/STATUS.md    ← estado autoritativo do projeto
 ```
 
 ## Mapa
 
-- [**MAPA-SASI.md**](MAPA-SASI.md) — inventário por categoria (regenera com build).
-- [**notes/STATUS.md**](notes/STATUS.md) — deploy, schema, backlog, histórico.
-
 | Área | Caminho | Papel |
 |---|---|---|
-| App | `sasi-v2/src/` | UI plantão (Next.js 15) — **único app do repo** desde a faxina de 31-jul |
+| App | `app/src/` | Telas do plantão (Next.js 15), no design "Comando UTI" — **único app do repo** |
+| Design | `app/src/styles/comando-uti.css`, `app/src/lib/termos.ts` | Folha de estilos e termos copiados do design system |
+| Banco | `supabase/migrations/`, `supabase/schema-live-dump.sql` | Histórico e retrato do banco vivo |
 | MCP | `mcp-server/src/` | skills → Supabase |
-| Edge | `supabase/functions/` | ocr-ingest legado (não usar) |
 | Ingest | skill + MCP | Claude → JSON → deploy |
 | Motor | banco (views `vw_sofa_diario`, `vw_eventos_tendencia`) | SOFA/tendências — **não** há pacote local |
 | Doutrina | `doctrine/` | template-base Ramo C |
 | Queries plantão | `supabase/queries/plantao_queries.sql` | SQL ad-hoc no DataGrip |
 
+## Decisões do operador (não reabrir)
+
+- **Sem login.** Uso pessoal e solo; `dev_bypass` fica ativo de propósito (31-jul e 27-set-2026). NÃO propor nem mencionar login, RLS de produção, trava de acesso da Vercel, OCR-no-app ou FHIR.
+- **O design manda.** O app copia o design system "Comando UTI · Folha de plantão"; os termos do banco são os do design (22-nov-2026).
+- **Um app só**, em `app/`. Não recriar `frontend/`, `packages/` nem pasta com "v2" no nome.
+- **Produção é `sasi-uti.vercel.app`**, servindo este repositório (22-nov-2026).
+
 ## Débitos
 
 1. 🔴 **SEGREDOS EXPOSTOS (30-jul)** — o cofre `.env` foi colado num chat. **Rotacionar**: token GitHub, `service_role` + senha do banco Supabase, senha-mestra do Vaultwarden, senhas de e-mail. Prioridade máxima.
-2. ~~`dev_bypass`~~ **DECISÃO 31-jul: fica ativo de propósito** — F3/F4/F5 riscadas do plano por ordem do operador (uso pessoal solo, `CLAUDE.md` §5). NÃO propor login/RLS/OCR-no-app/FHIR de novo. O gated `_gated/20_rls_producao.sql` fica arquivado caso o escopo um dia mude. Exposição pública do app: mitigar na Vercel (Deployment Protection), não com auth.
-3. **rag-protocolos** — migration `06` versionada; falta aplicar no Supabase + Edge `protocolo-ingest`
-4. **eventos_clinicos** — ~27 na fila `vw_eventos_pendentes_revisao` (revisar)
-5. **SOFA bloqueado por dado** — 0/16 evoluções têm os 6 componentes (bilirrubina/PaO2 nunca capturados); fix = skill `sasi-ingest-export` capturar a montante. *(Confirmado 30-jul: os 7 leitos vivos mostram SOFA null — a tela exibe "—", nunca inventa.)*
-6. **evolucoes JSONB 2 schemas** — ingest usa `pa_sys_max`/`cr1`, ficha grava `pas1`. Decisão v3: o **canônico Máx–Mín é a fonte única**; a ficha adapta na entrada/saída (aposentar `fichaSchema.ts` aos poucos).
-7. **regras eng-default** (glicemia/K/Na/temp) em `alert_rules` sem evidência — pendente Vera; oligúria precisa de tipo `diurese`
-8. **extensões em `public`** — advisor pede mover `pg_trgm`/`vector` para o schema `extensions`
-9. **adoção `text→enum`** — os 14 enums existem, mas as colunas seguem `text`; conversão *gated* (`_gated/10_adocao_enums.sql`), branch-first
-10. ~~alerts_log vazia~~ **resolvido 26-jun**: produtor criado (`fn_eval_alert`/`fn_eval_trend`, config `alert_rules`/`trend_rules`)
-11. ~~memorias sem policy~~ **resolvido 30-jul**: ganhou `user_id` + 4 policies de dono (advisor limpo)
-12. ~~vocabulário de eventos chumbado em CHECK~~ **resolvido 30-jul**: virou a dimensão `evento_tipo_ref` (FK)
-13. **Revisão de código 31-jul (3 lentes) — consertados os críticos**: erro de banco agora GRITA (`falhaBanco` → `app/error.tsx`) em vez de fingir "sem dados"; corte de 1000 linhas preservava o rabo VELHO da série (agora preserva o recente); óbito não ranqueia acima de crítico; dose numérica não some mais da passagem; "Nega" sem chip vermelho também no índice; µg banido dos 3 últimos pontos; cabeçalhos de segurança HTTP ligados; 7 arquivos mortos removidos.
-14. **CSP pendente** — Content-Security-Policy exige nonce nos 19 `<style>` inline + 1 `<script>` do tema; fazer com calma (errado = tela branca). Fontes IBM Plex ainda vêm do CDN do Google (auto-hospedar via `next/font` quando mexer).
-15. **Consolidação anti-drift** — travessão "—" declarado em 8 módulos; helpers duplicados (`corSofa`, `delta24h`, `rotuloInfusao` ×3, `txt` ×5, rótulo de leito ×4, vocabulários). O drift JÁ causou 3 bugs reais (dose sumida, µg cru, alergia no índice). Unificar em `lib/formatters`.
-16. **`select("*")` nas tabelas largas** — `pacientes`/`vw_dashboard_uti` puxam JSONB inteiro (ficha, sofa_snapshot) em telas que usam 2 campos; estreitar colunas por chamador.
-
-## Schema (30-jul-2026 — modelo v3)
-
-> Defasado desde ago-2026: o banco vivo tem 17 tabelas e 34 migrações. Ver a nota de 22-nov-2026 em `CLAUDE.md` §4 e o retrato em `supabase/schema-live-dump.sql`.
-
-Baseline `20260626000000_baseline.sql` + formalização v3 (`20260730120000/120100/120200`), **aplicada em produção**. Referência completa: `supabase/schema-producao-v3.sql` · runbook: `docs/RUNBOOK-migracao-v3.md` · plano: `docs/PLANO-SASI-v3.md`.
-13 tabelas (nova: `evento_tipo_ref`, 56 códigos) · 8 views · 14 enums nativos · FKs de vocabulário em `eventos_clinicos`/`alert_rules`/`trend_rules`. Config: `alert_rules` (25), `trend_rules` (3). Alertas vivos via trigger. Limiares clínicos: `~/vaults/celebro/conhecimento/projetos/sasi-decisoes-clinicas.md`.
-
-## App (`sasi-v2/`) — o único do repo
-
-Next.js 15 + React 19 + TypeScript strict + Zustand, mesmo Supabase. Verificado 30-jul: build verde, lendo os 7 leitos reais. `src/lib/data/` (consultas) · `src/app/` (telas) · `src/features/` (domínios de UI) · `src/types/clinical.ts` (contratos JSONB). Cálculo clínico **não** mora na tela: vem das views.
-
-**Faxina 31-jul-2026:** `frontend/` (app React+Vite antigo) e `packages/` (clinical-engine + design-system) saíram do repositório — 375 → 188 arquivos. O clinical-engine só era consumido pelo próprio `frontend/`, por isso os dois saíram juntos. Recuperáveis pela tag `pre-faxina-2026-07-31` e pela branch `archive/frontend-e-packages`. Detalhes em `CLAUDE.md` §7-B.
+2. **Skill de ingest com os termos antigos** — `sasi-ingest-export` (repo `claude-workspace` + cópia no claude.ai) ainda escreve `pa_sys`, `tax_max`, `obs`… O banco troca na entrada (gatilho `trg_00_termos_design`), mas a skill precisa passar a LER pelos nomes novos. Mapa em `CLAUDE.md` §4.
+3. **Ficha: antimicrobianos e culturas só para leitura** — incluir, suspender e apagar ainda é pelo ingest. "Novo leito" não existe na tela.
+4. **eventos_clinicos** — fila de revisão (`vw_eventos_pendentes_revisao`).
+5. **SOFA bloqueado por dado** — bilirrubina e PaO2 raramente lançadas; a tela mostra "—", nunca inventa.
+6. **Limiares das janelas antigas** — as janelas de 27-set foram contadas com FR > 20, PAD < 50, SpO2 < 92 e T > 37,8. O design usa FR > 25, PAD < 45, SpO2 < 88 e T > 38: a skill `controles-vitais-janela` precisa contar com os limiares do design. A tela mostra o limiar gravado em cada linha.
+7. **regras eng-default** em `alert_rules` (Dx/K/Na/temperatura) sem evidência — pendente Vera.
+8. **extensões em `public`** — mover `pg_trgm`/`vector` para o schema `extensions`.
+9. **rag-protocolos** — migration `06` versionada, não aplicada.
+10. **CSP pendente** — há 1 `<script>` em linha (tema) em `app/src/app/layout.tsx`; CSP estrita exige nonce.
+11. **`save_ficha` no banco** — função antiga que apaga campos do paciente quando a chave não vem. O app não usa. Corrigir ou remover.
+12. **Esquema `arquivo`** — cópias do "antes" da troca de termos (22-nov). Apagar quando não for mais preciso desfazer.
