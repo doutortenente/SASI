@@ -67,7 +67,7 @@ O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmP
 
 ## 4. Banco (estado vivo em 22-nov-2026)
 
-Fonte única do esquema: `supabase/migrations/` (38 arquivos, iguais aos 38 registros de migração do banco, com o mesmo carimbo e nome; conferido em 22-nov-2026). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
+Fonte única do esquema: `supabase/migrations/` (39 arquivos, iguais aos 39 registros de migração do banco, com o mesmo carimbo e nome; conferido em 22-nov-2026). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
 **17 tabelas · 10 views · 19 enums · 80 códigos de evento.** RLS (regras de acesso por linha, do banco) ligada com `dev_bypass` (uso solo, decisão do operador).
 
 **Os termos do banco são os do design** (migração `20261122040931_termos_do_design`):
@@ -75,7 +75,7 @@ Fonte única do esquema: `supabase/migrations/` (38 arquivos, iguais aos 38 regi
 - **Vocabulário de eventos (`evento_tipo_ref`):** `pas`, `pad`, `pam`, `fc`, `fr`, `spo2`, `temp`, `dx`, `cai` (cálcio iônico), `uf_trs`… com `rotulo` (nome da tela Exames) e `sigla` (nome curto da ficha). Tipo novo = nova LINHA, não mexe em código.
 - **`evolucoes`:** uma coluna JSON por quadro (`neuro`, `resp`, `hemo` = Cardio-hemodinâmica, `tgi`, `renal`, `hemato`, `infecto`). A chave é o nome do campo no design, em minúsculas (`pas_max`, `temp_max`, `diurese_ml` + `diurese_h`, `notas`…); a escolha guarda o texto do botão ("Não aplicável"). Contrato completo: `src/app/evolucao/Ficha.tsx`.
 - **Termo antigo ainda é aceito na ENTRADA** e trocado pelo do design por gatilho (`trg_00_termos_design`): `pa_sys`→`pas`, `pa_dia`→`pad`, `glicemia`→`dx`, `uf_dialise`→`uf_trs`, `ca` em mmol/L→`cai`; nas evoluções, `pa_sys_*`→`pas_*`, `pa_dia_*`→`pad_*`, `tmax`/`tax_*`→`temp_*`, `obs`→`notas`, `diurese_24h_ml`→`diurese_ml` + `diurese_h`; sistema da conduta `hemo`→`Cardio-hemodinâmica`. Leucócitos e plaquetas ficam em ×10³/µL.
-- **O "antes" da troca** está no esquema `arquivo` (tabelas `termos_20261122_*`), para desfazer.
+- **A cópia do "antes" da troca** (esquema `arquivo`) foi apagada em 22-nov-2026, por ordem do operador. A troca não se desfaz mais.
 - **Códigos internos que NÃO mudaram** (o nome do design está no comentário do tipo ou da coluna): `isolamento_enum` (`contact` = contato…), `dispositivo_tipo_enum` (`arterial` = PAI, `trr` = Shiley, `traqueo` = TQT) e a coluna `hemo`.
 
 | Tabela | Função |
@@ -93,7 +93,7 @@ Fonte única do esquema: `supabase/migrations/` (38 arquivos, iguais aos 38 regi
 
 **Atenção:**
 - `save_ficha` (função antiga, sem uso pelo app): corrigida em 22-nov-2026; campo que não vem não é mais apagado.
-- As janelas de 27-set-2026 foram contadas com limiares antigos (FR > 20, SpO2 < 92…): a pílula mostra o limiar gravado na linha.
+- `janelas_24h` está vazia: as janelas de 27-set-2026 foram apagadas em 22-nov-2026, por ordem do operador. A pílula volta quando entrar janela nova.
 - SOFA: fora do projeto desde 22-nov-2026, por ordem do operador; talvez volte no futuro. As telas não mostram. As peças do banco (`vw_sofa_diario`, `sofa_baseline`, `sofa_snapshot`) e as menções no servidor MCP ficaram como estavam.
 - Migração: uma única chamada `apply_migration`.
 
@@ -118,7 +118,7 @@ Estado atual, o que o app ainda não faz e pendências: `docs/STATUS.md`. Débit
 
 Fonte da verdade: **`docs/_SASI_TEMPLATE_BASE_v2.md`** (Ramo C). A anatomia é idêntica nas skills `sasi-ingest-export` e `admissao-uti` (que moram em `doutortenente/claude-workspace`): quem mudar a anatomia numa delas atualiza a outra e o template na mesma entrega (divergência = bug clínico-legal).
 
-**Skills:** moram no repositório `doutortenente/claude-workspace`, pasta `skills-que-prestam/01-pacote-skills-medicas/`. Ler o `SKILL.md` da skill antes de processar. Em 22-nov-2026 `sasi-ingest-export` e `controles-vitais-janela` passaram a usar os termos e os limiares do design.
+**Skills:** moram no repositório `doutortenente/claude-workspace`, pasta `skills-que-prestam/01-pacote-skills-medicas/`. Ler o `SKILL.md` da skill antes de processar. Em 22-nov-2026 `sasi-ingest-export` e `controles-vitais-janela` passaram a usar os termos e os limiares do design. A cópia instalada no claude.ai não é atualizada por este repositório e ainda usa os termos antigos; o banco converte na entrada (§4).
 
 - `sasi-ingest-export` — extrai dados de fotos/PDFs/laudos → payload JSON validado; gera “Exportar Evolução” e “Exportar Turno”.
 - `admissao-uti` — nota de admissão (modo D1).
