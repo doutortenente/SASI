@@ -32,17 +32,17 @@ Cards · Round · Tabela · Passagem · Exames · Evolução (UTI 2, 13 leitos).
 
 ## 4. Banco
 
-Ver `CLAUDE.md` §4. Migrações em `supabase/migrations/` (37 arquivos, iguais aos 37 registros de migração do banco), fonte única do esquema.
+Ver `CLAUDE.md` §4. Migrações em `supabase/migrations/` (38 arquivos, iguais aos 38 registros de migração do banco), fonte única do esquema.
 
 - 22/11/2026: termos do banco iguais aos do design (`20261122040931_termos_do_design`) e `pacientes.sexo` (`20261122052449_paciente_sexo_do_design`).
 - Gravação testada ao vivo no banco real em 22-nov-2026, com paciente fictício e tudo desfeito no fim: admissão com alergias e isolamento, internação aberta pelo gatilho, recusa de segundo paciente no mesmo leito, evolução (incluir e alterar), conversão dos termos antigos, pendência, antimicrobiano com data, cultura e exame.
 - Alta e troca de leito também foram testadas ao vivo no banco real em 22-nov-2026, com paciente fictício e tudo desfeito no fim: troca para leito vago, recusa de troca para leito ocupado, recusa de alta com data futura, alta e nova admissão no leito liberado.
+- 22/11/2026: `save_ficha` corrigida (`20261122112751_save_ficha_nao_apaga_campo_ausente`): campo que não vem não é mais apagado. O app continua sem usar.
 
 ## 5. Pendências
 
 1. Rotacionar os segredos expostos em 30/07/2026 (ver `docs/MEMORY.md`).
 2. A cópia da skill `sasi-ingest-export` no claude.ai ainda escreve os termos antigos (a do repositório `claude-workspace` foi atualizada em 22-nov-2026). O banco aceita e troca na entrada.
-3. `save_ficha` no banco: não usar (apaga campos do paciente quando a chave não vem).
 
 ## Conferência automática
 
