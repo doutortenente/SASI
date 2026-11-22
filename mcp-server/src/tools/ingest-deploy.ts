@@ -4,6 +4,10 @@ import {getDB, handleDBError} from "../db.js";
 
 const UTI_ENUM = z.enum(["UTI2", "UTI3", "UTI4"]);
 const PLANTAO_ENUM = z.enum(["manha", "tarde", "noite", "plantao_24h"]);
+const TIPO_NOTA_ENUM = z.enum(["admissao", "seriada", "alta", "andar"]);
+const SEVERIDADE_ENUM = z.enum(["estavel", "watcher", "instavel", "critico"]);
+const TURNO_ENUM = z.enum(["diurna", "noturna"]);
+const DATA_ISO = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
 const EventoSchema = z.object({
   ts: z.string(),
@@ -83,6 +87,9 @@ quadros da evolução com pas_*, pad_*, temp_*, notas, diurese_ml + diurese_h (n
 sistema da conduta com o nome do quadro ("Cardio-hemodinâmica", não "hemo"). O banco ainda troca o termo antigo na entrada,
 mas o texto novo deve nascer certo.
 
+A evolução grava também intercorrencias, prescricao, tipo_nota, illness_severity, turno e data_plantao (os de valor fixo só se válidos).
+Sem plantao válido, envia nulo e o banco decide o turno pela hora.
+
 Args:
   - payload (object): JSON completo com $schema "sasi-ocr-ingest/v1"
 
@@ -151,7 +158,15 @@ Retorna: paciente_id, evolucao_id, eventos_inseridos, warnings.`,
         if (payload.evolucao_snapshot) {
           const snap = payload.evolucao_snapshot;
           const plantaoRaw = snap.plantao as string | undefined;
-          const plantao = PLANTAO_ENUM.safeParse(plantaoRaw)?.data ?? "manha";
+          // Sem plantão válido: null, para o banco decidir o turno pela hora (gatilho fn_evolucao_relogios).
+          const plantao = PLANTAO_ENUM.safeParse(plantaoRaw).data ?? null;
+          const intercorrencias = Array.isArray(snap.intercorrencias)
+            ? snap.intercorrencias.filter((t): t is string => typeof t === "string")
+            : [];
+          const tipo_nota = TIPO_NOTA_ENUM.safeParse(snap.tipo_nota).data;
+          const illness_severity = SEVERIDADE_ENUM.safeParse(snap.illness_severity).data;
+          const turno = TURNO_ENUM.safeParse(snap.turno).data;
+          const data_plantao = DATA_ISO.safeParse(snap.data_plantao).data;
 
           const evolucaoBody: Record<string, unknown> = {
             paciente_id,
@@ -174,6 +189,12 @@ Retorna: paciente_id, evolucao_id, eventos_inseridos, warnings.`,
             riscos: snap.riscos ?? [],
             sofa_snapshot: snap.sofa_snapshot ?? null,
             sofa_total: snap.sofa_total ?? null,
+            intercorrencias,
+            ...(snap.prescricao !== undefined ? { prescricao: snap.prescricao } : {}),
+            ...(tipo_nota ? { tipo_nota } : {}),
+            ...(illness_severity ? { illness_severity } : {}),
+            ...(turno ? { turno } : {}),
+            ...(data_plantao ? { data_plantao } : {}),
           };
 
           const { data: evol, error: evolErr } = await getDB()

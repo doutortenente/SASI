@@ -97,6 +97,12 @@ async function fluxos(b, erros) {
   es = await lerEscritas();
   ok(de(es, 'atbs', 'POST').length === 1 && (de(es, 'evolucoes', 'PATCH').length + de(es, 'evolucoes', 'POST').length) === 1, 'dois cliques seguidos em Salvar enviam a inclusão uma vez só', es.map((x) => x.metodo + ' ' + x.tabela));
 
+  // 4c) inclusão da evolução (leito sem evolução): plantao "noite" se e somente se o turno é noturno
+  await p.goto('http://localhost:3111/evolucao?leito=01', { waitUntil: 'networkidle' }); await limparEscritas();
+  await p.getByLabel('Notas de Renal').fill('x'); await salvar(); es = await lerEscritas();
+  const evoNova = de(es, 'evolucoes', 'POST')[0];
+  ok(!!evoNova && (evoNova.corpo.turno === 'noturna') === (evoNova.corpo.plantao === 'noite') && (evoNova.corpo.turno === 'noturna' || !('plantao' in evoNova.corpo)), 'inclusão da evolução leva plantao "noite" se e somente se o turno é noturno', evoNova && { turno: evoNova.corpo.turno, plantao: evoNova.corpo.plantao });
+
   // 5) Round: Prescrição vigente com os dois blocos do design
   await p.goto('http://localhost:3111/round?leito=03', { waitUntil: 'networkidle' });
   const presc = await p.locator('.ds-presc').innerText();

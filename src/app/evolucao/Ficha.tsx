@@ -344,7 +344,7 @@ export function Ficha(props: Props) {
       let evoId = id;
       if (evoId) { const { error } = await sb.from("evolucoes").update(linha).eq("id", evoId); if (error) throw error; }
       else {
-        const { data, error } = await sb.from("evolucoes").insert({ paciente_id: pacienteId, data_plantao: dataPlantao, turno, tipo_nota: "seriada", ...linha }).select("id").single();
+        const { data, error } = await sb.from("evolucoes").insert({ paciente_id: pacienteId, data_plantao: dataPlantao, turno, ...(turno === "noturna" ? { plantao: "noite" } : {}), tipo_nota: "seriada", ...linha }).select("id").single();
         if (error) throw error;
         evoId = (data as { id: string }).id; setId(evoId);
       }
