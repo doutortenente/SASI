@@ -1,25 +1,26 @@
 # sasi-mcp-server
 
 MCP Server do **SASI — Sistema de Auditoria e Síntese Intensiva**  
-Comando UTI Alpha | UTI2 (12) · UTI3 (13) · UTI4 (8 leitos)
+Banco: UTI2 (13) · UTI3 (13) · UTI4 (8 leitos)
 
-Conecta o Claude Desktop diretamente ao banco Supabase do SASI via stdio. Inclui **`sasi_deploy_ingest`** — persiste
+Conecta o Claude (Desktop ou Claude Code) diretamente ao banco Supabase do SASI via stdio. Inclui **`sasi_deploy_ingest`** — persiste
 payload `sasi-ocr-ingest/v1` completo (equivalente operacional ao Edge Function `ocr-ingest`). A evolução grava também `intercorrencias`, `prescricao`, `tipo_nota`, `illness_severity`, `turno` e `data_plantao`; sem `plantao` válido a ferramenta decide (pelo `turno`, ou pela hora de `data_evolucao` em São Paulo); nunca envia `plantao` nulo.
 
-Todas as 23 tools operam sobre o schema real (pacientes, evolucoes, eventos_clinicos, pendencias, atbs, culturas,
+As tools operam sobre o schema real (pacientes, evolucoes, eventos_clinicos, pendencias, atbs, culturas,
 antibiograma, alerts_log).
 
 ---
 
-## Tools disponíveis (22)
+## Tools disponíveis (23)
 
 | Tool                    | Descrição                                                                                          |
 | ----------------------- | -------------------------------------------------------------------------------------------------- |
 | `sasi_sitrep`           | Snapshot tático completo da UTI — tabela com todos os leitos, gravidade, SOFA, alertas, pendências |
+| `sasi_deploy_ingest`    | Grava o payload `sasi-ocr-ingest/v1` (paciente, evolução, eventos, pendências) e registra em `ingest_audit_log` |
 | `sasi_list_patients`    | Lista pacientes com filtros por UTI / gravidade / status                                           |
 | `sasi_get_patient`      | Ficha completa: última evolução + ATBs ativos + culturas pendentes + alertas abertos               |
-| `sasi_admit_patient`    | Admite novo paciente (leito, HD, dispositivos, SOFA baseline)                                      |
-| `sasi_update_patient`   | Atualiza gravidade, status, dispositivos, isolamento                                               |
+| `sasi_admit_patient`    | Admite novo paciente (leito, HD, SOFA baseline)                                      |
+| `sasi_update_patient`   | Atualiza gravidade, status, isolamento                                               |
 | `sasi_get_evolution`    | Última evolução (ou histórico) por sistemas + prescrição vigente                                   |
 | `sasi_create_evolution` | Registra nova evolução SOAP + SOFA + kardex                                                        |
 | `sasi_insert_event`     | Insere evento clínico pontual na série temporal (PAM, lactato, pH, etc.)                           |
@@ -38,13 +39,16 @@ antibiograma, alerts_log).
 | `sasi_ack_alert`        | Reconhece alerta individual                                                                        |
 | `sasi_ack_all_alerts`   | Reconhece todos os alertas ativos (paciente ou UTI inteira)                                        |
 
+
+As ferramentas `sasi_admit_patient` e `sasi_update_patient` aceitam `dispositivos`, mas no banco esse campo é derivado: não preencher à mão (ver `CLAUDE.md` §4).
+
 ---
 
 ## Setup
 
 ### 1. Variáveis de ambiente
 
-Copie `mcp-server/.env.example` para `mcp-server/.env` e preencha.
+O servidor não lê o arquivo `.env` sozinho: ele só enxerga as duas variáveis abaixo se elas estiverem no ambiente de quem o inicia. O `.mcp.json` da raiz já passa as duas na hora de iniciar. `mcp-server/.env.example` serve de molde para anotar os nomes.
 
 Encontre em: **Supabase Dashboard → Settings → API**
 
@@ -53,7 +57,9 @@ SUPABASE_URL=https://idswehsvvqczzkiatuzu.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
 ```
 
-> ⚠️ **Service Role Key bypassa RLS.** Use apenas localmente — nunca exponha em frontend.
+Opcional: `SASI_OPERATOR_USER_ID` (gravado como `user_id` no registro de auditoria do ingest).
+
+> **A chave `service_role` ignora o RLS (as regras de acesso por linha).** Use só localmente; nunca no app.
 
 ### 2. Build
 
@@ -63,7 +69,11 @@ npm install
 npm run build
 ```
 
-### 3. Claude Desktop (`claude_desktop_config.json`)
+### 3. Ligar ao Claude
+
+Claude Code: o `.mcp.json` da raiz já aponta para `mcp-server/dist/index.js` e lê a chave da variável de ambiente `SASI_SERVICE_ROLE_KEY`.
+
+Claude Desktop (`claude_desktop_config.json`):
 
 ```json
 {
@@ -86,7 +96,7 @@ npm run build
 
 ```
 sasi_sitrep                     → visão geral da UTI
-sasi_get_patient leito=L03      → ficha completa do leito
+sasi_get_patient uti=UTI2 leito=L03 → ficha completa do leito
 sasi_create_evolution           → registra evolução do turno
 sasi_insert_event tipo=lactato  → atualiza série temporal
 sasi_list_alerts                → confere alertas críticos

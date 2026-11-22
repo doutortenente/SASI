@@ -28,17 +28,18 @@ docs/
 - **O design manda.** O app copia o design system "Comando UTI · Folha de plantão"; os termos do banco são os do design (22-nov-2026).
 - **Um app só**, na raiz do repositório. Não recriar `app/`, `frontend/`, `packages/` nem pasta com "v2" no nome.
 - **Produção é `sasi-uti.vercel.app`**, servindo este repositório (22-nov-2026).
+- **Tema claro por padrão**, com a escolha Claro | Escuro no pé do menu (pedido do operador, 22-nov-2026; o design system não tem esse botão).
 
 ## Débitos
 
 1. 🔴 **SEGREDOS EXPOSTOS (30-jul)** — o cofre `.env` foi colado num chat. **Rotacionar**: token GitHub, `service_role` + senha do banco Supabase, senha-mestra do Vaultwarden, senhas de e-mail. Prioridade máxima.
-2. **Skill de ingest com os termos antigos** — `sasi-ingest-export` (repo `claude-workspace` + cópia no claude.ai) ainda escreve `pa_sys`, `tax_max`, `obs`… O banco troca na entrada (gatilho `trg_00_termos_design`), mas a skill precisa passar a LER pelos nomes novos. Mapa em `CLAUDE.md` §4.
-3. **Ficha e admissão:** antimicrobianos e culturas já se incluem, suspendem e apagam pela ficha; "Novo leito" já admite pela tela; "Alta" e "Trocar de leito" já funcionam pela Evolução; o nome do antimicrobiano sugere os nomes já usados no banco. A admissão já pede alergias e isolamento. O antibiograma fica só para leitura (é assim no design) e a hora da coleta não existe no design.
-4. **eventos_clinicos** — fila de revisão (`vw_eventos_pendentes_revisao`).
-5. **SOFA bloqueado por dado** — bilirrubina e PaO2 raramente lançadas; a tela mostra "—", nunca inventa.
-6. **Limiares das janelas antigas** — as janelas de 27-set foram contadas com FR > 20, PAD < 50, SpO2 < 92 e T > 37,8. O design usa FR > 25, PAD < 45, SpO2 < 88 e T > 38: a skill `controles-vitais-janela` precisa contar com os limiares do design. A tela mostra o limiar gravado em cada linha.
-7. **regras eng-default** em `alert_rules` (Dx/K/Na/temperatura) sem evidência — pendente Vera.
-8. **extensões em `public`** — mover `pg_trgm`/`vector` para o schema `extensions`.
-9. **CSP pendente** — há 1 `<script>` em linha (tema) em `src/app/layout.tsx`; CSP estrita exige nonce.
-10. **`save_ficha` no banco** — função antiga que apaga campos do paciente quando a chave não vem. O app não usa. Corrigir ou remover.
-11. **Esquema `arquivo`** — cópias do "antes" da troca de termos (22-nov). Apagar quando não for mais preciso desfazer.
+2. **Cópia da skill de ingest no claude.ai desatualizada** — a skill `sasi-ingest-export` do repositório `claude-workspace` passou a usar os termos do design em 22-nov-2026 (commit `9144948` daquele repositório); a cópia instalada no claude.ai ainda escreve `pa_sys`, `tax_max`, `obs`… O banco converte na entrada (gatilho `trg_00_termos_design`; mapa em `CLAUDE.md` §4).
+3. **eventos_clinicos** — fila de revisão (`vw_eventos_pendentes_revisao`).
+4. **SOFA bloqueado por dado** — bilirrubina e PaO2 raramente lançadas; a tela mostra "—", nunca inventa.
+5. **Janelas de 27-set** — foram contadas com os limiares antigos (FR > 20, PAD < 50, SpO2 < 92 e T > 37,8); o design usa FR > 25, PAD < 45, SpO2 < 88 e T > 38. A tela mostra o limiar gravado em cada linha. A skill `controles-vitais-janela` já conta com os do design.
+6. **CSP pendente** — CSP é a regra do navegador que limita quais scripts podem rodar. Há 1 `<script>` em linha (tema) em `src/app/layout.tsx`; CSP estrita exige nonce (código de uso único no script).
+7. **`save_ficha` no banco** — função antiga que apaga campos do paciente quando a chave não vem. O app não usa. Corrigir ou remover.
+8. **Esquema `arquivo`** — cópias do "antes" da troca de termos (22-nov). Apagar quando não for mais preciso desfazer.
+9. **Migrações de 30-jul sem registro correspondente** — os arquivos `20260730120000_enums_e_dimensao_eventos.sql`, `20260730120100_eventos_tipo_fk.sql` e `20260730120200_memorias_dono_e_severidade_insert.sql` não têm registro com esse nome no banco; no lugar deles o banco registra `20260730065335_modelo_dados_v3_formalizacao` e `20260730065515_fix_enums_por_tipo`. O conteúdo não foi comparado.
+10. **Skills médicas sobrepostas** — o operador disse em 22-nov-2026 que `controles-vitais-janela` é redundante com as outras. Fica para a próxima; sem plano.
+11. **Skill `admissao-uti` com caminho velho** — ela manda ler `~/src/sasi/doctrine/_SASI_TEMPLATE_BASE_v2.md`, que não existe; o template fica em `docs/_SASI_TEMPLATE_BASE_v2.md` neste repositório. Corrigir em `claude-workspace`.

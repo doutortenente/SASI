@@ -7,15 +7,14 @@
 - Proibido: sigla crua sem expandir, jargão solto, "é só rodar X" sem dizer em palavras o que X faz e por quê.
 
 > Briefing operacional do projeto. Lido pelo Claude Code ao abrir o repo.
-> **Última atualização:** 22-nov-2026 — app na raiz do repositório, no padrão do Next.js.
-> Este arquivo substitui qualquer `_HANDOFF_BRIEFING.md` (datado 23-Abr-2026, **STALE** — não é fonte da verdade).
+> **Última atualização:** 22-nov-2026.
 > **Memória persistente do projeto:** @docs/MEMORY.md
 
 -----
 
 ## 1. Missão
 
-Sistema de gestão clínica para a operação solo de UTI do Dr. Nicolas Nagaita (intensivista, “Tenente”) — **33 leitos** distribuídos em **UTI 2 (L01–L12, 12 leitos)**, **UTI 3 (13 leitos)**, **UTI 4 (L01–L08, 8 leitos)**. Padrão de referência de leito: `UTI#-L##`.
+Sistema de gestão clínica para a operação solo de UTI do Dr. Nicolas Nagaita (intensivista, “Tenente”). O banco aceita **UTI 2 (13 leitos)**, **UTI 3 (13)** e **UTI 4 (8)**; o app mostra a UTI 2. Padrão de leito: `UTI#-L##`.
 
 Dupla frente:
 
@@ -51,7 +50,7 @@ Toda documentação clínica é em **Português do Brasil**.
 O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmPhnsB5VS3m4hdR4T. **O design manda; o app copia.**
 
 - **Onde está no app:** `src/app/comando-uti.css` (variáveis e folha de estilos do design, copiadas do artefato: **não editar à mão**), `src/components/icones.ts` (ícones), `public/fonts/` (Atkinson Hyperlegible) e `src/lib/termos.ts` (nomes e opções).
-- **Telas (menu, nesta ordem):** Cards · Round · Tabela · Passagem · Exames · Evolução. UTI 2, 13 leitos (no banco existe `UTI2-L13`); computador (1440 px) e tablet (1194 px); tema claro ou escuro pelo tema do aparelho.
+- **Telas (menu, nesta ordem):** Cards · Round · Tabela · Passagem · Exames · Evolução. UTI 2, 13 leitos (no banco existe `UTI2-L13`); computador (1440 px) e tablet (1194 px). Tema: o app abre no claro; no pé do menu há a escolha Claro | Escuro (controle segmentado do design), guardada no aparelho. Foi pedido do operador em 22-nov-2026: o design system não tem esse botão.
 - **Regras fixas do médico (nenhuma mudança pode quebrá-las):**
   1. Número nunca muda de cor. Valor fora do limiar aparece só como pílula vermelha com a contagem (`5x < 65`).
   2. O quadro se chama "Cardio-hemodinâmica". O nome não muda.
@@ -68,7 +67,7 @@ O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmP
 
 ## 4. Banco (estado vivo em 22-nov-2026)
 
-Fonte única do esquema: `supabase/migrations/` (37 arquivos, com o mesmo carimbo do banco). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
+Fonte única do esquema: `supabase/migrations/` (37 arquivos; o banco registra 36 migrações). 34 arquivos batem com o banco em carimbo e nome; 3, de 30-jul, não têm registro com esse nome (ver `docs/MEMORY.md`). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
 **17 tabelas · 10 views · 19 enums · 80 códigos de evento.** RLS ligada com `dev_bypass` (uso solo, decisão do operador).
 
 **Os termos do banco são os do design** (migração `20261122040931_termos_do_design`):
@@ -117,31 +116,31 @@ Estado atual, o que o app ainda não faz e pendências: `docs/STATUS.md`. Débit
 
 ## 7. Doutrina clínica (skills + templates)
 
-Fonte da verdade: **`docs/_SASI_TEMPLATE_BASE_v2.md`** (Ramo C) — anatomia idêntica nas duas skills; alterou em uma, replica na outra no mesmo commit (divergência = bug clínico-legal).
+Fonte da verdade: **`docs/_SASI_TEMPLATE_BASE_v2.md`** (Ramo C) — o template deste repositório é a fonte da verdade. A anatomia é idêntica nas skills `sasi-ingest-export` e `admissao-uti` (que moram em `doutortenente/claude-workspace`): quem mudar a anatomia numa delas atualiza a outra e o template na mesma entrega (divergência = bug clínico-legal).
 
-**Skills** (fonte única: `~/projetos/claude/skills/` · symlink `~/.claude/skills` · commit `582f117`):
+**Skills:** moram no repositório `doutortenente/claude-workspace`, pasta `skills-que-prestam/01-pacote-skills-medicas/`. Ler o `SKILL.md` da skill antes de processar. Em 22-nov-2026 `sasi-ingest-export` e `controles-vitais-janela` passaram a usar os termos e os limiares do design.
 
 - `sasi-ingest-export` — extrai dados de fotos/PDFs/laudos → payload JSON validado; gera “Exportar Evolução” e “Exportar Turno”.
 - `admissao-uti` — nota de admissão (modo D1).
 - `controles-vitais-janela` — folha de enfermagem → sumário 24h/12h + flags.
 
-**References:** `01-schema-eventos-clinicos`, `02-extraction-dictionary`, `03-clinical-sanity-checks`, `04-export-evolucao-template_v2` (+ v1 legado), `05-export-passagem-turno`.
+**References** de `sasi-ingest-export`: `00-estilo-texto-clinico`, `01-schema-eventos-clinicos`, `02-extraction-dictionary`, `03-clinical-sanity-checks`, `04-export-evolucao-template`, `05-export-passagem-turno`, `06-api-automation-prompts`, `07-export-prescricao-ordenada`, `08-p0-banco-10ago`.
 
-**Espelhos da doutrina:**
-
-- **Notion** → espaço 🪖 SASI → página “📐 Doutrina SASI — SKILLs & Templates” (9 subpáginas, escrito direto via MCP).
-- **Obsidian/Drive** → `SASI_OBSIDIAN_doutrina.zip` + Drive “SASI — Arquivo de Operação”.
+**Espelhos** (Notion, Obsidian/Drive): não conferidos em 22-nov-2026; podem estar desatualizados.
 
 ### Estrutura do repositório
 
 ```
 src/            telas e código do app (app/ = rotas, components/, lib/)
 public/         fontes (Atkinson Hyperlegible)
+e2e/            conferência automática com banco falso (falso.cjs, confere.cjs, fotos.cjs)
 docs/           MEMORY.md, STATUS.md, _SASI_TEMPLATE_BASE_v2.md
-supabase/       migrations/ (histórico do banco), snippets/ (consultas e molde), functions/ (ocr-ingest, ingest-patient), config.toml
+supabase/       migrations/, snippets/ (plantao.sql, molde_paciente.sql), functions/ (ocr-ingest, ingest-patient), config.toml
 mcp-server/     pacote à parte: skills → Supabase
-.github/  .claude/  .mcp.json
-package.json  next.config.ts  tsconfig.json  .env.example  THIRD_PARTY_LICENSES.md
+.github/        workflows/ci.yml, PULL_REQUEST_TEMPLATE.md
+.claude/        settings.json, rules/supabase.md
+.mcp.json  .env.example  .editorconfig  .gitignore
+package.json  next.config.ts  tsconfig.json  README.md  THIRD_PARTY_LICENSES.md
 ```
 
 - Um app só, na raiz. Não recriar `app/` (o Next tomaria como pasta de rotas), `sasi-v2/`, `frontend/`, `packages/`, `memory/` nem `doctrine/`.
@@ -154,9 +153,7 @@ package.json  next.config.ts  tsconfig.json  .env.example  THIRD_PARTY_LICENSES.
 
 - **Saída clínica:** duas partes — (1) SITREP de triagem rankeado por acuidade, depois (2) notas de evolução completas, prontas pro prontuário.
 - **Planos de manejo:** blocos numerados com título de sistema, mapeamento 1:1 com problemas ativos.
-- **Tabela tática de pacientes:** `intel()` deriva tiers de severidade de limiares fisiológicos (não do status declarado) — CRÍTICO / INSTÁVEL / VIGILÂNCIA / ESTÁVEL.
-- **Documentos:** `.docx` em Times New Roman 10pt, A4, via lib `docx`, validado com OXML validator, entregue em `/mnt/user-data/outputs/`.
-- **Comando “deploy”:** executa INSERT direto no Supabase via MCP sem pedir confirmação adicional.
+- **Comando “deploy”:** grava sem pedir confirmação adicional (ver §2, item 7).
 
 -----
 
@@ -168,21 +165,5 @@ Terso, operacional, com inflexão militar (SITREP tático). **Chain-of-draft** q
 
 ## 10. Aprendizados de engenharia (anti-armadilha)
 
-- **Migração Supabase:** uma única chamada `apply_migration` lida com DDL interdependente (enums → tabelas → triggers → views) com mais confiabilidade que `execute_sql` sequencial.
-- **Views:** `security_invoker = true` previne bypass de RLS.
-- **Alertas:** dedupe por hash SHA-256 em `alerts_log` previne alarm fatigue.
-- **Arquivos disfarçados:** `.pdf` pode ser container ZIP/Office — identificar por magic bytes `PK\x03\x04` (`xxd`), extrair com `unzip`.
-- **Extração XLSX:** copiar para `/tmp/`, `load_workbook(data_only=True)`, iterar sheets, primeiras 25 linhas por sheet pra triagem rápida.
-- **Upload a Drive:** base64 grande em `create_file` trunca silenciosamente — usar `textContent` para arquivos de texto.
-- **Sandbox reseta entre sessões.** Arquivos de sessões passadas (binários, .docx, código) não persistem. `mkdir -p /mnt/user-data/outputs/SASI_BACKUP/` no início da sessão. Ler o SKILL.md relevante antes de processar.
-- **MCP instalado no meio da conversa** só fica disponível na próxima sessão.
-- **GitHub MCP indisponível** → pedir `git log --oneline -20 && git status -s && git branch -a && git remote -v` e reconstruir o estado a partir disso.
-
------
-
-## 11. Setup de sessão (checklist)
-
-1. Ler o SKILL.md relevante antes de qualquer processamento.
-1. `mkdir -p /mnt/user-data/outputs/SASI_BACKUP/`.
-1. Fazer backup de arquivos-fonte antes de transformar.
-   1. Tratar `_HANDOFF_BRIEFING.md` (23-Abr-2026) como STALE — este `CLAUDE.md` e os artefatos entregues prevalecem em qualquer conflito.
+- **Views:** `security_invoker = true` (a view respeita as regras de acesso de quem consulta, não as do dono) previne bypass de RLS.
+- **Alertas:** o registro `alerts_log` usa a coluna `hash_key` para não repetir o mesmo alerta (evita fadiga de alarme).
