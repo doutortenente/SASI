@@ -2,7 +2,7 @@
 
 | Item | Papel |
 |---|---|
-| `migrations/` | Histórico do banco vivo e fonte única do esquema. São 37 arquivos, iguais aos 37 registros de migração do banco, com o mesmo carimbo e nome. Já aplicadas: não editar nem reaplicar |
+| `migrations/` | Histórico do banco vivo e fonte única do esquema. São 38 arquivos, iguais aos 38 registros de migração do banco, com o mesmo carimbo e nome. Já aplicadas: não editar nem reaplicar |
 | `snippets/` | `plantao.sql` (consultas de plantão para o DataGrip) e `molde_paciente.sql` (paciente fictício para teste) |
 | `functions/` | Edge functions `ocr-ingest` e `ingest-patient` (antigas, publicadas no projeto): não usar no dia a dia. `functions/.env.example` lista as variáveis para rodá-las localmente |
 | `config.toml` | Configuração do Supabase CLI |
