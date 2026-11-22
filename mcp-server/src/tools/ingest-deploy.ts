@@ -1,6 +1,7 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from "zod";
 import {getDB, handleDBError} from "../db.js";
+import {AVISO_DISPOSITIVOS, retirarDerivados} from "../derivados.js";
 
 const UTI_ENUM = z.enum(["UTI2", "UTI3", "UTI4"]);
 const PLANTAO_ENUM = z.enum(["manha", "tarde", "noite", "plantao_24h"]);
@@ -101,6 +102,8 @@ Sem plantao válido, a ferramenta decide: turno válido (noturna = noite; diurna
 Args:
   - payload (object): JSON completo com $schema "sasi-ocr-ingest/v1"
 
+Em paciente_upsert, o campo dispositivos é ignorado (o banco calcula sozinho); se vier, entra um aviso em warnings (em qualquer caminho, mesmo quando o paciente já existe e o paciente_upsert não é usado).
+
 Retorna: paciente_id, evolucao_id, eventos_inseridos, warnings.`,
       inputSchema: z.object({
         payload: PayloadSchema,
@@ -114,6 +117,9 @@ Retorna: paciente_id, evolucao_id, eventos_inseridos, warnings.`,
       let pendencias_inseridas = 0;
 
       try {
+        const upsertLimpo = payload.paciente_upsert ? retirarDerivados(payload.paciente_upsert) : null;
+        if (upsertLimpo?.retirados.includes("dispositivos")) warnings.push(`paciente_upsert: ${AVISO_DISPOSITIVOS}`);
+
         let paciente_id: string | null = payload.target.paciente_id ?? null;
 
         if (!paciente_id) {
@@ -133,8 +139,9 @@ Retorna: paciente_id, evolucao_id, eventos_inseridos, warnings.`,
           if (existing?.id) {
             paciente_id = existing.id;
           } else if (payload.paciente_upsert) {
+            const limpo = upsertLimpo?.limpo ?? {};
             const upsertBody = {
-              ...payload.paciente_upsert,
+              ...limpo,
               uti: payload.target.uti,
               leito: payload.target.leito,
               user_id,

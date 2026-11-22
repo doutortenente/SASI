@@ -40,7 +40,7 @@ antibiograma, alerts_log).
 | `sasi_ack_all_alerts`   | Reconhece todos os alertas ativos (paciente ou UTI inteira)                                        |
 
 
-As ferramentas `sasi_admit_patient` e `sasi_update_patient` aceitam `dispositivos`, mas no banco esse campo é derivado: não preencher à mão (ver `CLAUDE.md` §4).
+O campo `dispositivos` é calculado pelo banco (a partir dos episódios de dispositivo, dos antibióticos e da última evolução). O servidor nunca o grava: `sasi_admit_patient`, `sasi_update_patient` e o `paciente_upsert` do `sasi_deploy_ingest` ainda aceitam o campo na entrada, mas o ignoram e devolvem um aviso. `sasi_update_patient` chamado só com `dispositivos` não toca no banco.
 
 ---
 

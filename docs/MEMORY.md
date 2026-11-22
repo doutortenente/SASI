@@ -41,7 +41,4 @@ docs/
 6. **CSP pendente** — CSP é a regra do navegador que limita quais scripts podem rodar. Há 1 `<script>` em linha (tema) em `src/app/layout.tsx`; CSP estrita exige nonce (código de uso único no script).
 7. **`save_ficha` no banco** — função antiga que apaga campos do paciente quando a chave não vem. O app não usa. Corrigir ou remover.
 8. **Esquema `arquivo`** — cópias do "antes" da troca de termos (22-nov). Apagar quando não for mais preciso desfazer.
-9. **Migrações de 30-jul sem registro correspondente** — os arquivos `20260730120000_enums_e_dimensao_eventos.sql`, `20260730120100_eventos_tipo_fk.sql` e `20260730120200_memorias_dono_e_severidade_insert.sql` não têm registro com esse nome no banco; no lugar deles o banco registra `20260730065335_modelo_dados_v3_formalizacao` e `20260730065515_fix_enums_por_tipo`. O conteúdo não foi comparado.
-10. **Skills médicas sobrepostas** — o operador disse em 22-nov-2026 que `controles-vitais-janela` é redundante com as outras. Fica para a próxima; sem plano.
-11. **Regras de alerta** — conferido no banco em 22-nov-2026: das 28 regras de `alert_rules`, 27 têm a fonte gravada; 1 regra de sódio (`na`) está sem fonte. O limiar 250 de Dx é operacional (contra excesso de alarme), não de diretriz; isso está escrito na própria regra.
-12. **`dispositivos` no MCP** — as ferramentas de admitir e de atualizar paciente (`mcp-server/src/tools/pacientes.ts`) ainda aceitam o campo `dispositivos`, que no banco é derivado e não se escreve à mão.
+9. **Skills médicas sobrepostas** — o operador disse em 22-nov-2026 que `controles-vitais-janela` é redundante com as outras. Fica para a próxima; sem plano.
