@@ -9,7 +9,7 @@
 | Camada | O que é |
 |---|---|
 | App | raiz do repositório (`src/`) — Next.js 15 + React 19 + TypeScript. Único app do repositório |
-| Design | "Comando UTI · Folha de plantão" (https://claude.ai/artifact/DfrYNmPhnsB5VS3m4hdR4T): folha de estilos, fontes e ícones copiados do design |
+| Design | "Comando UTI · Folha de plantão" (https://claude.ai/artifact/DfrYNmPhnsB5VS3m4hdR4T): folha de estilos, fontes e ícones copiados do design. Desde 22/11/2026 as cores dos dois temas são as da versão 14 do design (pedido do operador) |
 | Publicação | Vercel, Root Directory vazio (raiz do repositório); `sasi-coral.vercel.app` redireciona para `sasi-uti.vercel.app` |
 | Banco | Supabase; uso pessoal e solo, sem login (decisão do operador) |
 | Ingest | Skill `sasi-ingest-export` → JSON → MCP `sasi_deploy_ingest` (grava também intercorrências, prescrição, tipo de nota, gravidade, turno e data do plantão); as telas Exames e Evolução também gravam Sem essa ferramenta (claude.ai só com o conector do Supabase), a gravação é por SQL, seguindo o manual que está no banco (`avisos_agentes`, linha "MANUAL DO BANCO"). |

@@ -31,6 +31,7 @@ docs/
 - **Um app só**, na raiz do repositório. Não recriar `app/`, `frontend/`, `packages/` nem pasta com "v2" no nome.
 - **Produção é `sasi-uti.vercel.app`**, servindo este repositório (22-nov-2026).
 - **Tema claro por padrão**, com a escolha Claro | Escuro no pé do menu (pedido do operador, 22-nov-2026; o design system não tem esse botão).
+- **Cores da versão 14 do design** nos dois temas (pedido do operador, 22-nov-2026, com duas fotos de referência): claro em cinza frio com botão preto; escuro em preto. Fonte e disposição continuam as da Folha de plantão.
 - **SOFA fora do projeto** (ordem do operador, 22-nov-2026). Talvez reimplementar no futuro; as peças do banco e as menções no servidor MCP ficaram como estavam.
 - **Senhas não serão trocadas** (decisão do operador, 22-nov-2026). Proibido propor ou mencionar a troca de novo.
 - **Nada de tarefa para o operador.** O que depende dele não entra em lista de pendência nem é cobrado (falas dele em 22-nov-2026: "faça você", "proibido de me mandar fazer isso de novo").
