@@ -43,7 +43,7 @@ Toda documentação clínica é em **Português do Brasil**.
 - **App:** Next.js 15 (App Router) + React 19 + TypeScript strict, **na raiz do repositório** (`src/`, `public/`) → **Vercel** (Root Directory vazio = raiz), produção em **https://sasi-uti.vercel.app**. É o ÚNICO app do repositório.
 - **Banco:** Supabase (PostgreSQL 17, projeto `idswehsvvqczzkiatuzu`, região `sa-east-1`).
 - **Ingest clínico:** Claude (skill `sasi-ingest-export`) → JSON → MCP. As telas Exames e Evolução também gravam.
-- **Edge Functions:** `ocr-ingest` legado no repo — **não** é fluxo operacional.
+- **Edge Functions:** `ocr-ingest` e `ingest-patient` são funções antigas, publicadas no Supabase, com código em `supabase/functions/` — **não** são fluxo operacional.
 - **Operador:** uso **pessoal e solo** (Dr. Nicolas). Não é produto multi-usuário nem deploy hospitalar.
 
 ### Design: "Comando UTI · Folha de plantão" (fonte única)
@@ -68,7 +68,7 @@ O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmP
 
 ## 4. Banco (estado vivo em 22-nov-2026)
 
-Fonte única do esquema: `supabase/migrations/` (36 arquivos, com o mesmo carimbo do banco). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
+Fonte única do esquema: `supabase/migrations/` (37 arquivos, com o mesmo carimbo do banco). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
 **17 tabelas · 10 views · 19 enums · 80 códigos de evento.** RLS ligada com `dev_bypass` (uso solo, decisão do operador).
 
 **Os termos do banco são os do design** (migração `20261122040931_termos_do_design`):
@@ -138,7 +138,7 @@ Fonte da verdade: **`docs/_SASI_TEMPLATE_BASE_v2.md`** (Ramo C) — anatomia id�
 src/            telas e código do app (app/ = rotas, components/, lib/)
 public/         fontes (Atkinson Hyperlegible)
 docs/           MEMORY.md, STATUS.md, _SASI_TEMPLATE_BASE_v2.md
-supabase/       migrations/ (histórico do banco), snippets/ (consultas e molde), functions/ocr-ingest, config.toml
+supabase/       migrations/ (histórico do banco), snippets/ (consultas e molde), functions/ (ocr-ingest, ingest-patient), config.toml
 mcp-server/     pacote à parte: skills → Supabase
 .github/  .claude/  .mcp.json
 package.json  next.config.ts  tsconfig.json  .env.example  THIRD_PARTY_LICENSES.md
