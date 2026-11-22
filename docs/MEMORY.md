@@ -31,13 +31,10 @@ docs/
 - **Produção é `sasi-uti.vercel.app`**, servindo este repositório (22-nov-2026).
 - **Tema claro por padrão**, com a escolha Claro | Escuro no pé do menu (pedido do operador, 22-nov-2026; o design system não tem esse botão).
 - **SOFA fora do projeto** (ordem do operador, 22-nov-2026). Talvez reimplementar no futuro; as peças do banco e as menções no servidor MCP ficaram como estavam.
+- **Senhas não serão trocadas** (decisão do operador, 22-nov-2026). Proibido propor ou mencionar a troca de novo.
+- **Nada de tarefa para o operador.** O que depende dele não entra em lista de pendência nem é cobrado (falas dele em 22-nov-2026: "faça você", "proibido de me mandar fazer isso de novo").
 
 ## Débitos
 
-1. 🔴 **SEGREDOS EXPOSTOS (30-jul)** — o cofre `.env` foi colado num chat. **Rotacionar**: token GitHub, `service_role` + senha do banco Supabase, senha-mestra do Vaultwarden, senhas de e-mail. Prioridade máxima.
-2. **Cópia da skill de ingest no claude.ai desatualizada** — a skill `sasi-ingest-export` do repositório `claude-workspace` passou a usar os termos do design em 22-nov-2026 (commit `9144948` daquele repositório); a cópia instalada no claude.ai ainda escreve `pa_sys`, `tax_max`, `obs`… O banco converte na entrada (gatilho `trg_00_termos_design`; mapa em `CLAUDE.md` §4).
-3. **eventos_clinicos** — fila de revisão (`vw_eventos_pendentes_revisao`).
-4. **Janelas de 27-set** — foram contadas com os limiares antigos (FR > 20, PAD < 50, SpO2 < 92 e T > 37,8); o design usa FR > 25, PAD < 45, SpO2 < 88 e T > 38. A tela mostra o limiar gravado em cada linha. A skill `controles-vitais-janela` já conta com os do design.
-5. **CSP pendente** — CSP é a regra do navegador que limita quais scripts podem rodar. Há 1 `<script>` em linha (tema) em `src/app/layout.tsx`; CSP estrita exige nonce (código de uso único no script).
-6. **Esquema `arquivo`** — cópias do "antes" da troca de termos (22-nov). Apagar quando não for mais preciso desfazer.
-7. **Skills médicas sobrepostas** — o operador disse em 22-nov-2026 que `controles-vitais-janela` é redundante com as outras. Fica para a próxima; sem plano.
+1. **CSP pendente** — CSP é a regra do navegador que limita quais scripts podem rodar. Há 1 `<script>` em linha (tema) em `src/app/layout.tsx`; CSP estrita exige nonce (código de uso único no script).
+2. **Skills médicas sobrepostas** — o operador disse em 22-nov-2026 que `controles-vitais-janela` é redundante com as outras. Fica para a próxima; sem plano.
