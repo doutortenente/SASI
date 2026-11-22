@@ -7,9 +7,9 @@
 - Proibido: sigla crua sem expandir, jargão solto, "é só rodar X" sem dizer em palavras o que X faz e por quê.
 
 > Briefing operacional do projeto. Lido pelo Claude Code ao abrir o repo.
-> **Última atualização:** 22-nov-2026 — design "Comando UTI" no app; termos do banco iguais aos do design; pasta `app/`.
+> **Última atualização:** 22-nov-2026 — app na raiz do repositório, no padrão do Next.js.
 > Este arquivo substitui qualquer `_HANDOFF_BRIEFING.md` (datado 23-Abr-2026, **STALE** — não é fonte da verdade).
-> **Memória persistente do projeto:** @memory/MEMORY.md
+> **Memória persistente do projeto:** @docs/MEMORY.md
 
 -----
 
@@ -40,7 +40,7 @@ Toda documentação clínica é em **Português do Brasil**.
 
 ## 3. Stack
 
-- **App:** **`app/`** — Next.js 15 (App Router) + React 19 + TypeScript strict → **Vercel** (Root Directory = `app`), produção em **https://sasi-uti.vercel.app**. É o ÚNICO app do repositório. *(A pasta se chamava `sasi-v2/` até 22-nov-2026.)*
+- **App:** Next.js 15 (App Router) + React 19 + TypeScript strict, **na raiz do repositório** (`src/`, `public/`) → **Vercel** (Root Directory vazio = raiz), produção em **https://sasi-uti.vercel.app**. É o ÚNICO app do repositório.
 - **Banco:** Supabase (PostgreSQL 17, projeto `idswehsvvqczzkiatuzu`, região `sa-east-1`).
 - **Ingest clínico:** Claude (skill `sasi-ingest-export`) → JSON → MCP. As telas Exames e Evolução também gravam.
 - **Edge Functions:** `ocr-ingest` legado no repo — **não** é fluxo operacional.
@@ -50,7 +50,7 @@ Toda documentação clínica é em **Português do Brasil**.
 
 O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmPhnsB5VS3m4hdR4T. **O design manda; o app copia.**
 
-- **Onde está no app:** `app/src/styles/comando-uti.css` (variáveis e folha de estilos do design, copiadas do artefato: **não editar à mão**), `app/src/components/icones.ts` (ícones), `app/public/fonts/` (Atkinson Hyperlegible) e `app/src/lib/termos.ts` (nomes e opções).
+- **Onde está no app:** `src/app/comando-uti.css` (variáveis e folha de estilos do design, copiadas do artefato: **não editar à mão**), `src/components/icones.ts` (ícones), `public/fonts/` (Atkinson Hyperlegible) e `src/lib/termos.ts` (nomes e opções).
 - **Telas (menu, nesta ordem):** Cards · Round · Tabela · Passagem · Exames · Evolução. UTI 2, 13 leitos (no banco existe `UTI2-L13`); computador (1440 px) e tablet (1194 px); tema claro ou escuro pelo tema do aparelho.
 - **Regras fixas do médico (nenhuma mudança pode quebrá-las):**
   1. Número nunca muda de cor. Valor fora do limiar aparece só como pílula vermelha com a contagem (`5x < 65`).
@@ -68,13 +68,13 @@ O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmP
 
 ## 4. Banco (estado vivo em 22-nov-2026)
 
-Retrato: `supabase/schema-live-dump.sql` (somar as duas migrações de 22-nov). Histórico: `supabase/migrations/` (36 arquivos, com o mesmo carimbo do banco).
+Fonte única do esquema: `supabase/migrations/` (36 arquivos, com o mesmo carimbo do banco). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
 **17 tabelas · 10 views · 19 enums · 80 códigos de evento.** RLS ligada com `dev_bypass` (uso solo, decisão do operador).
 
 **Os termos do banco são os do design** (migração `20261122040931_termos_do_design`):
 
 - **Vocabulário de eventos (`evento_tipo_ref`):** `pas`, `pad`, `pam`, `fc`, `fr`, `spo2`, `temp`, `dx`, `cai` (cálcio iônico), `uf_trs`… com `rotulo` (nome da tela Exames) e `sigla` (nome curto da ficha). Tipo novo = nova LINHA, não mexe em código.
-- **`evolucoes`:** uma coluna JSON por quadro (`neuro`, `resp`, `hemo` = Cardio-hemodinâmica, `tgi`, `renal`, `hemato`, `infecto`). A chave é o nome do campo no design, em minúsculas (`pas_max`, `temp_max`, `diurese_ml` + `diurese_h`, `notas`…); a escolha guarda o texto do botão ("Não aplicável"). Contrato completo: `app/src/app/evolucao/Ficha.tsx`.
+- **`evolucoes`:** uma coluna JSON por quadro (`neuro`, `resp`, `hemo` = Cardio-hemodinâmica, `tgi`, `renal`, `hemato`, `infecto`). A chave é o nome do campo no design, em minúsculas (`pas_max`, `temp_max`, `diurese_ml` + `diurese_h`, `notas`…); a escolha guarda o texto do botão ("Não aplicável"). Contrato completo: `src/app/evolucao/Ficha.tsx`.
 - **Termo antigo ainda é aceito na ENTRADA** e trocado pelo do design por gatilho (`trg_00_termos_design`): `pa_sys`→`pas`, `pa_dia`→`pad`, `glicemia`→`dx`, `uf_dialise`→`uf_trs`, `ca` em mmol/L→`cai`; nas evoluções, `pa_sys_*`→`pas_*`, `pa_dia_*`→`pad_*`, `tmax`/`tax_*`→`temp_*`, `obs`→`notas`, `diurese_24h_ml`→`diurese_ml` + `diurese_h`; sistema da conduta `hemo`→`Cardio-hemodinâmica`. Leucócitos e plaquetas ficam em ×10³/µL.
 - **O "antes" da troca** está no esquema `arquivo` (tabelas `termos_20261122_*`), para desfazer.
 - **Códigos internos que NÃO mudaram** (o nome do design está no comentário do tipo ou da coluna): `isolamento_enum` (`contact` = contato…), `dispositivo_tipo_enum` (`arterial` = PAI, `trr` = Shiley, `traqueo` = TQT) e a coluna `hemo`.
@@ -96,7 +96,7 @@ Retrato: `supabase/schema-live-dump.sql` (somar as duas migrações de 22-nov). 
 - `save_ficha` (função antiga) apaga HD, idade, peso, altura e alergias quando o campo não vem. O app NÃO usa; não chamar.
 - As janelas de 27-set-2026 foram contadas com limiares antigos (FR > 20, SpO2 < 92…): a pílula mostra o limiar gravado na linha.
 - SOFA: o cálculo mora no banco (`vw_sofa_diario`); falta dado (bilirrubina e PaO2 raramente lançadas). Nunca estimar.
-- Migração: uma única chamada `apply_migration`; passos em `supabase/migrations/_gated/` NÃO rodam sozinhos.
+- Migração: uma única chamada `apply_migration`.
 
 -----
 
@@ -111,13 +111,13 @@ Retrato: `supabase/schema-live-dump.sql` (somar as duas migrações de 22-nov). 
 
 ## 6. Estado e próximos passos
 
-Estado atual, o que o app ainda não faz e pendências: `memory/notes/STATUS.md`. Débitos e decisões que não se reabrem: `memory/MEMORY.md`.
+Estado atual, o que o app ainda não faz e pendências: `docs/STATUS.md`. Débitos e decisões que não se reabrem: `docs/MEMORY.md`.
 
 -----
 
 ## 7. Doutrina clínica (skills + templates)
 
-Fonte da verdade: **`_SASI_TEMPLATE_BASE_v2.md`** (Ramo C) — anatomia idêntica nas duas skills; alterou em uma, replica na outra no mesmo commit (divergência = bug clínico-legal).
+Fonte da verdade: **`docs/_SASI_TEMPLATE_BASE_v2.md`** (Ramo C) — anatomia idêntica nas duas skills; alterou em uma, replica na outra no mesmo commit (divergência = bug clínico-legal).
 
 **Skills** (fonte única: `~/projetos/claude/skills/` · symlink `~/.claude/skills` · commit `582f117`):
 
@@ -132,49 +132,21 @@ Fonte da verdade: **`_SASI_TEMPLATE_BASE_v2.md`** (Ramo C) — anatomia idêntic
 - **Notion** → espaço 🪖 SASI → página “📐 Doutrina SASI — SKILLs & Templates” (9 subpáginas, escrito direto via MCP).
 - **Obsidian/Drive** → `SASI_OBSIDIAN_doutrina.zip` + Drive “SASI — Arquivo de Operação”.
 
-### 7-A. Faxina estrutural (10-jul-2026)
+### Estrutura do repositório
 
-Docs clínicas de `docs/` viraram conhecimento do cérebro do Claude — movidas pra
-`~/vaults/celebro/conhecimento/projetos/` com prefixo `sasi-`: `sasi-decisoes-clinicas.md`,
-`sasi-sofa-ruleset.md`, `sasi-vera-ingest-spec.md`, `sasi-backlog-clinico.md`,
-`sasi-moc-doutrina.md`. `docs/STATUS.md` → `memory/notes/STATUS.md`. `docs/motor-clinico-v2/`
-(staging) → `~/projetos/rascunhos/sasi-motor-clinico-v2/`. `docs/legado/` → `~/vaults/celebro/_arquivo/sasi-legado/`.
-`docs/JETBRAINS.md` + `docs/idea-runConfigurations/` deletados (duplicata das run configs vivas em
-`~/projetos/.idea/runConfigurations/`). `doctrine/references/06-api-automation-prompts.md` deletado
-(idêntico ao canônico em `../claude/skills-que-prestam/01-pacote-skills-medicas/sasi-ingest-export/`). `doctrine/casos/VANESSA_v2_PROVA.md`
-(PHI) → `~/vaults/celebro/90-PHI-LOCAL/casos-sasi/`. `design-system/` (staging, 75 arquivos nunca
-consumidos pelo app) → `~/projetos/rascunhos/sasi-design-system/`. `docs/AGENTS.md` e `docs/SETUP.md`
-permanecem no repo — não se encaixam com evidência em conhecimento-clínico/staging/duplicata.
-**Fecho da divergência (11-jul-2026):** o restante de `doctrine/` foi resolvido — 6 arquivos
-ancestrais-puros deletados; 4 regras de sanity-check únicas migradas pro canônico
-(`../claude/skills-que-prestam/01-pacote-skills-medicas/sasi-ingest-export/references/03-clinical-sanity-checks.md`); a skill de admissão
-foi UNIFICADA na canônica `../claude/skills-que-prestam/01-pacote-skills-medicas/admissao-uti` (base Ramo C + enxertos da v1, aprovado pelo
-operador). Em `doctrine/` sobra SÓ `_SASI_TEMPLATE_BASE_v2.md` (fonte da verdade compartilhada, §7).
+```
+src/            telas e código do app (app/ = rotas, components/, lib/)
+public/         fontes (Atkinson Hyperlegible)
+docs/           MEMORY.md, STATUS.md, _SASI_TEMPLATE_BASE_v2.md
+supabase/       migrations/ (histórico do banco), snippets/ (consultas e molde), functions/ocr-ingest, config.toml
+mcp-server/     pacote à parte: skills → Supabase
+.github/  .claude/  .mcp.json
+package.json  next.config.ts  tsconfig.json  .env.example  THIRD_PARTY_LICENSES.md
+```
 
-### 7-B. Faxina estrutural (31-jul-2026) — aposentadoria do app antigo
-
-Metade do repositório (187 de 375 arquivos) era código que ninguém consumia. Saíram:
-
-- **`frontend/`** (86 arquivos) — app React+Vite, substituído por `sasi-v2/` (hoje `app/`) em 30-jul-2026 e
-  nunca aposentado. Levava junto `frontend/vercel.json`, que era armadilha de deploy: com a
-  Vercel apontada pra raiz, publicava o app **errado**.
-- **`packages/`** (101 arquivos) — `clinical-engine` (SOFA, parse pt-BR, testes Vitest) e
-  `design-system`. Era a MAIOR pasta do repo. O `clinical-engine` tinha **um único
-  consumidor: o próprio `frontend/`** (`src/hooks/useSofaDiario.ts`) — por isso os dois
-  saíram no MESMO passo; remover `packages/` mantendo `frontend/` teria quebrado o app antigo.
-  O `design-system` não tinha consumidor nenhum.
-
-**Recuperação:** nada foi destruído. Tag **`pre-faxina-2026-07-31`** e branch
-**`archive/frontend-e-packages`** (as duas no GitHub) guardam o estado completo anterior.
-Cópia local de `packages/` entregue em zip ao operador para `~/projetos/rascunhos/`.
-
-**Consertado no mesmo commit:** `.github/workflows/ci.yml` repontado de `frontend` para
-`sasi-v2`, hoje `app` (senão toda subida passaria a falhar — a automação só sabia compilar o app antigo);
-`README.md`, este arquivo (§3, §4, §6), `memory/MEMORY.md`, `docs/PLANO-SASI-v3.{md,html}`,
-`.env.example` e `.gitignore`.
-
-**Regra para sessões futuras:** o repo tem **UM app** (`app/`; a pasta se chamava `sasi-v2/` até 22-nov-2026). Não recriar `frontend/`
-nem `packages/`; staging vai para `~/projetos/rascunhos/`, fora do repositório.
+- Um app só, na raiz. Não recriar `app/` (o Next tomaria como pasta de rotas), `sasi-v2/`, `frontend/`, `packages/`, `memory/` nem `doctrine/`.
+- Rascunho e staging ficam fora do repositório.
+- Recuperação do passado: tag `pre-faxina-2026-07-31` e ramo `archive/frontend-e-packages`.
 
 -----
 
