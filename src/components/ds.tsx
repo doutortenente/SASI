@@ -5,7 +5,7 @@ import { Icone } from "./Icone";
 import type { NomeIcone } from "./icones";
 import { Check } from "./Check";
 import {
-  DISPOSITIVO, GRAVIDADE, GRAVIDADES, INTENCAO, ISOLAMENTO, MATERIAL, QUADROS, alergiaDe, ddmm, diasEntre, hdItens, nf, somaDias,
+  DISPOSITIVO, GRAVIDADE, GRAVIDADES, INTENCAO, ISOLAMENTO, MATERIAL, QUADROS, alergiaDe, ddmm, diaSP, diasEntre, hdItens, nf, somaDias,
   type Conduta, type Pendencia,
 } from "@/lib/termos";
 import { contaGravidade, type Grafico, type Atb, type Cultura, type Dispositivo, type Leito, type Paciente } from "@/lib/uti";
@@ -196,7 +196,7 @@ export function AtbCulturas({ atbs, culturas, hoje }: { atbs: Atb[]; culturas: C
           {culturas.map((c) => (
             <tr key={c.id}>
               <td><b>{MATERIAL[c.material] ?? c.material}</b>{c.observacoes ? <small>{c.observacoes}</small> : null}</td>
-              <td className="ds-mono">{ddmm(c.coleta_ts)}</td>
+              <td className="ds-mono">{ddmm(diaSP(c.coleta_ts))}</td>
               {c.crescimento ? (
                 <td><b>{c.agente ?? "positiva"}</b>{c.ufc_por_ml != null ? <small>{nf(Number(c.ufc_por_ml))} UFC/mL</small> : null}
                   {c.antibiograma?.length ? (

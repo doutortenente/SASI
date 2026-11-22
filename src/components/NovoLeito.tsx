@@ -29,6 +29,7 @@ export function NovoLeito({ vagos, leito: inicial, hoje }: { vagos: string[]; le
     const iso = dm ? `${dm[3]}-${dm[2].padStart(2, "0")}-${dm[1].padStart(2, "0")}` : null;
     if (!leito || !f.nome.trim() || !f.gravidade) return setMsg("Escolha o leito, escreva o nome e marque a gravidade.");
     if ((f.idade.trim() && idade == null) || (f.peso.trim() && peso == null) || (f.altura.trim() && altura == null)) return setMsg("Idade, peso e altura têm de ser números.");
+    if (idade != null && !Number.isInteger(idade)) return setMsg("A idade deve ser um número inteiro.");
     if (!dentro(idade, 0, 130) || !dentro(peso, 1, 400) || !dentro(altura, 30, 250)) return setMsg("Confira idade (0 a 130 anos), peso (1 a 400 kg) e altura (30 a 250 cm).");
     const real = iso && new Date(iso + "T12:00:00Z").toISOString().slice(0, 10) === iso;
     if (!iso || !real) return setMsg("A data de admissão deve ser dia/mês/ano, por exemplo 22/11/2026.");

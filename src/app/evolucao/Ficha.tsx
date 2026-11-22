@@ -30,6 +30,7 @@ interface CulturaLocal {
 }
 const MATERIAIS = Object.values(MATERIAL);
 const CODIGO_MATERIAL: Record<string, string> = Object.fromEntries(Object.entries(MATERIAL).map(([c, t]) => [t, c]));
+class ErroDeFicha extends Error {}
 /** Dias previstos: inteiro a partir de 1; vazio fica vazio (null). */
 function diasPrevistos(t: string): number | null {
   if (!t.trim()) return null;
@@ -115,6 +116,8 @@ export function Ficha(props: Props) {
   const [id, setId] = useState(props.evolucaoId);
   const [sujo, setSujo] = useState(false);
   const [estado, setEstado] = useState<"" | "salvando" | "erro" | "copiado">("");
+  const [erroMsg, setErroMsg] = useState("");
+  const salvandoRef = useRef(false);
   const [hora, setHora] = useState(props.salvoEm);
   const [glasgowAberto, setGlasgowAberto] = useState(false);
   const [popAberto, setPopAberto] = useState<"dvas" | "sedativos" | null>(null);
@@ -218,6 +221,39 @@ export function Ficha(props: Props) {
     return ini && ate ? diasEntre(ini, ate) + 1 : null;
   };
   type Sb = ReturnType<typeof getSupabaseBrowser>;
+  /** Confere tudo ANTES da primeira gravação: se algo está errado, nada é gravado e o médico vê o que corrigir. */
+  function validaAntes() {
+    const falha = (m: string) => { throw new ErroDeFicha(m); };
+    for (const a of atbL) {
+      if (a.x) continue;
+      if (!a.id) {
+        if (!a.droga.trim()) { if (a.esquema.trim() || a.previstos.trim()) falha("Antimicrobiano sem nome: escreva o nome ou apague a linha"); continue; }
+        if (a.inicio.trim() && !isoDeDdMm(a.inicio, hoje)) falha(`Início inválido em ${a.droga.trim()}`);
+        try { diasPrevistos(a.previstos); } catch { falha(`Dias previstos inválidos em ${a.droga.trim()}`); }
+        continue;
+      }
+      const o = a.orig; if (!o) continue;
+      if (a.inicio !== o.inicio && !isoDeDdMm(a.inicio, hoje)) falha(`Início inválido em ${a.droga}`);
+      if (a.previstos !== o.previstos) { try { diasPrevistos(a.previstos); } catch { falha(`Dias previstos inválidos em ${a.droga}`); } }
+      if (a.fim !== o.fim && a.fim != null && !isoDeDdMm(a.fim, hoje)) falha(`Data de fim inválida em ${a.droga}`);
+    }
+    for (const c of cultL) {
+      if (c.x) continue;
+      if (!c.id) {
+        if (!c.material && !c.coleta.trim() && !c.resultado) continue;
+        if (!c.material || !CODIGO_MATERIAL[c.material]) falha("Cultura sem material: escolha o material ou apague a linha");
+        if (!isoDeDdMm(c.coleta, hoje)) falha("Cultura sem data de coleta válida (dia/mês)");
+        if (!c.resultado) falha("Cultura sem resultado: marque Em andamento, Positiva ou Negativa");
+        continue;
+      }
+      const o = c.orig; if (!o || !c.coletaTs) continue;
+      if (c.coleta !== o.coleta) {
+        const iso = isoDeDdMm(c.coleta, hoje);
+        if (!iso) falha("Data de coleta inválida na cultura");
+        else if (c.laudoTs && Date.parse(`${iso}T${horaSP(c.coletaTs)}:00-03:00`) > Date.parse(c.laudoTs)) falha("A coleta não pode ser depois do laudo da cultura");
+      }
+    }
+  }
   async function gravaAtbs(sb: Sb) {
     let agora = atbL;
     const troca = (k: string, m: Partial<AtbLocal>) => { agora = agora.map((x) => (x.k === k ? { ...x, ...m } : x)); };
@@ -269,7 +305,7 @@ export function Ficha(props: Props) {
         if (!c.id) {
           if (!c.material && !c.coleta.trim() && !c.resultado) { agora = agora.filter((x) => x.k !== c.k); continue; }
           const iso = isoDeDdMm(c.coleta, hoje);
-          if (!c.material || !CODIGO_MATERIAL[c.material] || !iso) continue; // incompleta: fica na tela, sem gravar
+          if (!c.material || !CODIGO_MATERIAL[c.material] || !iso) throw new ErroDeFicha("Cultura incompleta"); // já barrado por validaAntes
           const coletaTs = iso === hoje ? new Date().toISOString() : `${iso}T12:00:00-03:00`;
           const laudoTs = c.resultado === "Negativa" ? laudoAgora(coletaTs) : null;
           const { data, error } = await sb.from("culturas").insert({ paciente_id: pacienteId, material: CODIGO_MATERIAL[c.material], coleta_ts: coletaTs, laudo_ts: laudoTs, crescimento: c.resultado === "Positiva", agente }).select("id").single();
@@ -289,6 +325,7 @@ export function Ficha(props: Props) {
           else if (c.resultado === "Negativa") { laudoTs = laudoTs ?? laudoAgora(coletaTs); campos.laudo_ts = laudoTs; }
         }
         if (c.resultado === "Positiva" && c.germe !== o.germe) campos.agente = agente;
+        if (c.resultado !== o.resultado && c.resultado !== "Positiva") campos.agente = null; // saiu de Positiva: o germe antigo não vale mais
         if (!Object.keys(campos).length) continue;
         const { error } = await sb.from("culturas").update(campos).eq("id", c.id); if (error) throw error;
         troca(c.k, { coletaTs, laudoTs, orig: snap });
@@ -297,8 +334,11 @@ export function Ficha(props: Props) {
   }
 
   async function salvar(): Promise<boolean> {
-    setEstado("salvando");
+    if (salvandoRef.current) return false; // já está salvando: não grava duas vezes
+    salvandoRef.current = true;
+    setEstado("salvando"); setErroMsg("");
     try {
+      validaAntes();
       const sb = getSupabaseBrowser();
       const linha = linhaDoBanco();
       let evoId = id;
@@ -320,6 +360,7 @@ export function Ficha(props: Props) {
           pend.push({ ...p, id: (data as { id: string }).id, mudou: false });
         }
       }
+      setSt((s) => ({ ...s, pend })); // guarda já os ids das pendências novas: se o passo seguinte falhar, o "tentar de novo" não duplica
       await gravaAtbs(sb);
       await gravaCulturas(sb);
       setSt((s) => ({
@@ -330,7 +371,8 @@ export function Ficha(props: Props) {
       setHora(new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" }));
       rota.refresh();
       return true;
-    } catch { setEstado("erro"); return false; }
+    } catch (e) { setErroMsg(e instanceof ErroDeFicha ? e.message : ""); setEstado("erro"); return false; }
+    finally { salvandoRef.current = false; }
   }
 
   // ---- texto da evolução, para copiar --------------------------------------------
@@ -482,7 +524,7 @@ export function Ficha(props: Props) {
         <h1>Evolução</h1>
         <div className="ds-topo__acoes">
           <span className="ds-topo__estado" role="status">
-            {estado === "erro" ? <>Não salvo, sem conexão<button className="ds-link" type="button" onClick={() => void salvar()}>Tentar de novo</button></>
+            {estado === "erro" ? <>{erroMsg ? `Não salvo: ${erroMsg}` : "Não salvo, sem conexão ou recusado pelo banco"}<button className="ds-link" type="button" onClick={() => void salvar()}>Tentar de novo</button></>
               : estado === "salvando" ? "Salvando" : sujo ? "Alterações não salvas" : hora ? `Salvo às ${hora}` : ""}
           </span>
           <button className="ds-btn" type="button" onClick={async () => { await navigator.clipboard.writeText(textoDaEvolucao()); setEstado("copiado"); setTimeout(() => setEstado((e) => (e === "copiado" ? "" : e)), 2000); }}>

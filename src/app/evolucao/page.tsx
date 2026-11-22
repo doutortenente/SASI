@@ -1,6 +1,6 @@
 import { Faixa, FichaPaciente, Topo } from "@/components/ds";
 import { leitoPedido } from "@/components/Leito";
-import { DISPOSITIVO, MATERIAL, SUPORTES, TURNO, ddmm, ddmmaaaa, diasEntre, esquemaDe, hdItens, horaSP, nf, plantaoAtual, somaDias, type Dados, type Quadro } from "@/lib/termos";
+import { DISPOSITIVO, MATERIAL, SUPORTES, TURNO, ddmm, ddmmaaaa, diaSP, diasEntre, esquemaDe, hdItens, horaSP, nf, plantaoAtual, somaDias, type Dados, type Quadro } from "@/lib/termos";
 import { carregarDetalhe, pilulas, porDia } from "@/lib/uti";
 import { Ficha, type Estado } from "./Ficha";
 
@@ -89,7 +89,7 @@ export default async function Evolucao({ searchParams }: { searchParams: Promise
       hoje={pl.hoje}
       atbs={d.atbs.filter((a) => !a.data_fim || a.data_fim === pl.hoje).map((a) => ({ id: a.id, droga: a.droga, esquema: esquemaDe(a.dose, a.via, a.frequencia), inicio: a.data_inicio, fim: a.data_fim, previstos: a.duracao_planejada_dias }))}
       culturas={d.culturas.map((c) => ({
-        id: c.id, material: MATERIAL[c.material] ?? c.material, coleta: ddmm(c.coleta_ts), coletaTs: c.coleta_ts, laudoTs: c.laudo_ts,
+        id: c.id, material: MATERIAL[c.material] ?? c.material, coleta: ddmm(diaSP(c.coleta_ts)), coletaTs: c.coleta_ts, laudoTs: c.laudo_ts,
         resultado: c.crescimento ? "Positiva" : c.laudo_ts ? "Negativa" : "Em andamento",
         germe: c.crescimento ? c.agente ?? "" : "", ufc: c.ufc_por_ml != null ? Number(c.ufc_por_ml) : null,
         s: (c.antibiograma ?? []).filter((x) => x.resultado === "S").map((x) => x.antibiotico).join(", "),
