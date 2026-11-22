@@ -19,8 +19,8 @@ export function Num({ r, v, on, larg }: { r: string; v: unknown; on: (v: string)
   return <label className="ds-f" style={{ "--larg": `${Math.max(larg ?? 58, Math.round(t.length * 9.8) + 18)}px` } as CSSProperties}><input aria-label={r} inputMode="decimal" value={t} onChange={(e) => on(e.target.value)} /></label>;
 }
 
-export function Txt({ r, v, on, larg }: { r: string; v: unknown; on: (v: string) => void; larg?: number }) {
-  return <label className="ds-f ds-f--t" style={larg ? { flex: `0 1 ${larg}px` } : undefined}><input aria-label={r} value={txt(v)} onChange={(e) => on(e.target.value)} /></label>;
+export function Txt({ r, v, on, larg, onFoco, onSai }: { r: string; v: unknown; on: (v: string) => void; larg?: number; onFoco?: () => void; onSai?: () => void }) {
+  return <label className="ds-f ds-f--t" style={larg ? { flex: `0 1 ${larg}px` } : undefined}><input aria-label={r} value={txt(v)} onChange={(e) => on(e.target.value)} onFocus={onFoco} onBlur={onSai} /></label>;
 }
 
 export const M = ({ children }: { children: ReactNode }) => <span className="ds-ev__m">{children}</span>;

@@ -70,6 +70,24 @@ require('fs').mkdirSync(dir, { recursive: true });
     await p.locator('.ds-novo').screenshot({ path: `${dir}/novo-leito-${tema}.png` });
     await ctx.close();
   }
+  // alta, troca de leito e sugestões de antimicrobiano
+  for (const [w, tema] of [[1440, 'light'], [1440, 'dark'], [1194, 'light'], [1194, 'dark']]) {
+    const ctx = await b.newContext({ viewport: { width: w, height: 900 }, colorScheme: tema });
+    const p = await ctx.newPage();
+    p.on('pageerror', (e) => erros.push('alta/troca ERRO: ' + String(e).slice(0, 200)));
+    const sufixo = `${w}-${tema}`;
+    await p.goto('http://localhost:3111/evolucao?leito=03', { waitUntil: 'networkidle' });
+    await p.getByRole('button', { name: 'Alta', exact: true }).click(); await p.getByRole('radio', { name: 'Transferência' }).click();
+    await p.getByLabel('Setor de destino').fill('Enfermaria'); await p.getByLabel('Observações', { exact: true }).fill('Paciente estável, sem dispositivos.');
+    await p.screenshot({ path: `${dir}/alta-pagina-${sufixo}.png` });
+    await p.locator('.ds-novo').screenshot({ path: `${dir}/alta-${sufixo}.png` });
+    await p.getByRole('button', { name: 'Trocar de leito', exact: true }).click(); await p.getByRole('radio', { name: '07' }).click();
+    await p.locator('.ds-novo').screenshot({ path: `${dir}/troca-${sufixo}.png` });
+    await p.reload({ waitUntil: 'networkidle' });
+    await p.getByRole('button', { name: 'Adicionar antimicrobiano' }).click(); await p.getByLabel('Antimicrobiano', { exact: true }).focus();
+    await p.locator('[data-sis="Infecto"]').screenshot({ path: `${dir}/atb-sugestoes-${sufixo}.png` });
+    await ctx.close();
+  }
   console.log('erros no navegador:', erros.length ? '\n' + erros.join('\n') : 'nenhum');
   await b.close();
 })();

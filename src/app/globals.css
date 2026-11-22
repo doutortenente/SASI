@@ -35,3 +35,5 @@ a.ds-leito:hover { border-color: var(--borda-forte); }
 @media print { .ds-menu, .ds-topo__acoes { display: none; } .ds-app { display: block; } }
 /* painel Novo leito: o design mostra o botão, não o formulário; usa as peças da ficha */
 .ds-novo__acoes { padding-top: 12px; }
+/* Alta e Trocar de leito, junto do cabeçalho do paciente (botões e painel do design) */
+.ds-leito-acoes { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }

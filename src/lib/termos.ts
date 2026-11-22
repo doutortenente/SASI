@@ -8,6 +8,8 @@ export type Turno = "diurna" | "noturna";
 export const GRAVIDADES: readonly Gravidade[] = ["critico", "instavel", "watcher", "estavel"];
 export const GRAVIDADE: Record<Gravidade, string> = { estavel: "Estável", watcher: "Watcher", instavel: "Instável", critico: "Crítico" };
 export const TURNO: Record<Turno, string> = { diurna: "diurno", noturna: "noturno" };
+/** Desfechos da internação: código do banco -> texto da tela. */
+export const DESFECHO: Record<string, string> = { alta_uti: "Alta da UTI", alta_hospitalar: "Alta hospitalar", obito: "Óbito", transferencia: "Transferência" };
 export const ISOLAMENTO: Record<string, string> = { contact: "contato", droplet: "gotícula", aerosol: "aerossol" };
 export const INTENCAO: Record<string, string> = { empirica: "empírica", dirigida: "dirigida", profilatica: "profilática" };
 export const DISPOSITIVO: Record<string, string> = {

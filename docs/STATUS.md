@@ -19,6 +19,7 @@
 Cards · Round · Tabela · Passagem · Exames · Evolução (UTI 2, 13 leitos).
 
 - **Evolução** grava a ficha em `evolucoes` (uma linha por paciente, data do plantão e turno) e as pendências em `pendencias`. Copia a evolução em texto. Trocar de leito ou de tela com alteração não salva grava antes de sair.
+- **Alta e Trocar de leito** (dois botões junto do cabeçalho do paciente, na Evolução) chamam as funções do banco `dar_alta_paciente` (desfecho, data digitada, destino e observações; a data nunca é deixada para o banco escolher) e `transferir_leito` (só leitos vagos da UTI 2). Com alteração não salva, a ficha é salva antes; se não salvar, nada é feito. O erro da função aparece na tela com o texto que veio.
 - **Exames** lança a coleta de hoje em `eventos_clinicos` (só acrescenta, nunca apaga).
 - **Passagem** copia o texto e imprime (PDF pelo navegador). Marcar pendência como feita grava na hora.
 
@@ -26,7 +27,7 @@ Cards · Round · Tabela · Passagem · Exames · Evolução (UTI 2, 13 leitos).
 
 - "Novo leito": o design mostra só o botão (no topo dos Cards e no cartão de leito vago), não o formulário. O formulário é escolha nossa, montado com as peças da ficha: leito vago, nome, idade, sexo, peso, altura, HD, alergias, isolamento (contato, gotícula, aerossol), data de admissão e gravidade. Nome, data de admissão e gravidade são obrigatórios; a data começa vazia; o que fica vazio grava null (isolamento sem marca não envia a coluna). Grava em `pacientes` e o banco abre a internação sozinho.
 - Na Prescrição vigente do Round, os itens por sistema vêm do campo de prescrição gravado na evolução; "Hematológico" e o preparo das ampolas ("8 amp/250 mL") não têm fonte no banco e aparecem como travessão ou ficam de fora.
-- Antimicrobianos e culturas: o antibiograma continua só para leitura na ficha. Antimicrobiano novo começa com o início vazio, mas o início é obrigatório: sem data válida o salvar recusa com aviso e nada é enviado.
+- Antimicrobianos e culturas: o antibiograma continua só para leitura na ficha, porque é assim no design. A hora da coleta da cultura não existe no design, então a ficha mostra só o dia. O nome do antimicrobiano oferece como sugestão os nomes já usados no banco (`atbs.droga`) e aceita nome novo. Antimicrobiano novo começa com o início vazio, mas o início é obrigatório: sem data válida o salvar recusa com aviso e nada é enviado.
 - Tema claro ou escuro: o design não tem botão; o app segue o aparelho (decisão fechada, nada a fazer).
 
 ## 4. Banco
