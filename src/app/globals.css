@@ -16,7 +16,7 @@ a.ds-leito:hover { border-color: var(--borda-forte); }
 /* linha do tempo na meia largura do Round: a coluna do nome cede espaço para caberem as seis datas */
 .ds-lt { grid-template-columns: 120px minmax(0, 1fr) 48px; }
 .ds-lt__datas span { padding-left: 3px; }
-.ds-f:focus-within, .ds-celula:focus-within { border-bottom-color: var(--acento); box-shadow: inset 0 -1px 0 var(--acento); outline: 2px solid var(--acento); outline-offset: 2px; }
+.ds-f:focus-within, .ds-celula:focus-within { border-bottom-color: var(--acento-texto); box-shadow: inset 0 -1px 0 var(--acento-texto); outline: 2px solid var(--acento-texto); outline-offset: 2px; }
 .ds-busca { color: var(--texto); }
 .ds-busca .ds-icone { color: var(--texto-4); }
 .ds-busca input::placeholder { color: var(--texto-4); }

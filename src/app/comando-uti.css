@@ -1,62 +1,62 @@
 /* Comando UTI — variáveis do design system (tokens.json do artefato). Não editar à mão. */
 :root, [data-theme="claro"] {
-  --fundo: #f5f3ee;
+  --fundo: #eef0f3;
   --superficie: #ffffff;
-  --superficie-2: #f3f1eb;
-  --superficie-3: #e7e3da;
-  --borda: #dcd7cc;
-  --borda-forte: #827c71;
-  --texto: #181b21;
-  --texto-2: #3a3f48;
-  --texto-3: #5c616a;
-  --texto-4: #666b74;
-  --acento: #0e6b70;
-  --acento-hover: #0a565a;
-  --acento-fundo: #d8eeee;
-  --acento-texto: #0b5a5f;
+  --superficie-2: #f3f4f6;
+  --superficie-3: #e4e7eb;
+  --borda: #dde0e5;
+  --borda-forte: #80858f;
+  --texto: #0a0b0d;
+  --texto-2: #2f3238;
+  --texto-3: #5a5f69;
+  --texto-4: #686d77;
+  --acento: #0a0b0d;
+  --acento-hover: #2f3238;
+  --acento-fundo: #e4e7eb;
+  --acento-texto: #00639d;
   --sobre-acento: #ffffff;
-  --anel-foco: #0e6b7066;
-  --gravidade-estavel: #27ae6a;
-  --gravidade-estavel-sobre: #06200f;
-  --gravidade-watcher: #f4c63d;
-  --gravidade-watcher-sobre: #2a2000;
-  --gravidade-instavel: #ef7d28;
-  --gravidade-instavel-sobre: #2a1100;
-  --gravidade-critico: #cf2030;
+  --anel-foco: #0071b366;
+  --gravidade-estavel: #1fb955;
+  --gravidade-estavel-sobre: #0a0b0d;
+  --gravidade-watcher: #f58300;
+  --gravidade-watcher-sobre: #0a0b0d;
+  --gravidade-instavel: #f02d3a;
+  --gravidade-instavel-sobre: #0a0b0d;
+  --gravidade-critico: #8c0d1c;
   --gravidade-critico-sobre: #ffffff;
-  --alerta: #b04a0c;
-  --critico: #bf1d2a;
-  --grafico-linha: #3d434d;
+  --alerta: #a34300;
+  --critico: #c01022;
+  --grafico-linha: #24272c;
   --grade: #0000000b;
 }
 [data-theme="escuro"] {
-  --fundo: #15171b;
-  --superficie: #1d2025;
-  --superficie-2: #26292f;
-  --superficie-3: #32363d;
-  --borda: #2f3239;
-  --borda-forte: #757a83;
-  --texto: #f3f2ef;
-  --texto-2: #d2d0cb;
-  --texto-3: #a4a29c;
-  --texto-4: #92908a;
-  --acento: #45bfc0;
-  --acento-hover: #74d6d6;
-  --acento-fundo: #163a3c;
-  --acento-texto: #74d6d6;
-  --sobre-acento: #04191a;
-  --anel-foco: #45bfc073;
-  --gravidade-estavel: #2fbf74;
-  --gravidade-estavel-sobre: #06200f;
-  --gravidade-watcher: #f6cb46;
-  --gravidade-watcher-sobre: #2a2000;
-  --gravidade-instavel: #f5852f;
-  --gravidade-instavel-sobre: #2a1100;
-  --gravidade-critico: #d92b3b;
+  --fundo: #000000;
+  --superficie: #0d0e11;
+  --superficie-2: #16181c;
+  --superficie-3: #212329;
+  --borda: #25282e;
+  --borda-forte: #666b75;
+  --texto: #f5f6f8;
+  --texto-2: #c8ccd3;
+  --texto-3: #9ba0aa;
+  --texto-4: #878c96;
+  --acento: #f5f6f8;
+  --acento-hover: #d9dce1;
+  --acento-fundo: #212329;
+  --acento-texto: #5ac8fa;
+  --sobre-acento: #000000;
+  --anel-foco: #5ac8fa80;
+  --gravidade-estavel: #30d158;
+  --gravidade-estavel-sobre: #0a0b0d;
+  --gravidade-watcher: #ff9f0a;
+  --gravidade-watcher-sobre: #0a0b0d;
+  --gravidade-instavel: #ff453a;
+  --gravidade-instavel-sobre: #0a0b0d;
+  --gravidade-critico: #9f1428;
   --gravidade-critico-sobre: #ffffff;
-  --alerta: #ff9e4f;
-  --critico: #ff8080;
-  --grafico-linha: #b9b7b1;
+  --alerta: #ffa426;
+  --critico: #ff5a50;
+  --grafico-linha: #e6e8ec;
   --grade: #ffffff07;
 }
 :root {
@@ -258,7 +258,7 @@
 .ds-campo__vazio { color: var(--texto-4); }
 .ds-campo--n .ds-campo__ctrl { font-family: var(--font-mono); font-weight: 700; }
 .ds-campo--area .ds-campo__ctrl { align-items: flex-start; min-height: 76px; }
-.ds-campo--foco .ds-campo__ctrl { border-bottom-color: var(--acento); box-shadow: 0 0 0 3px var(--anel-foco); }
+.ds-campo--foco .ds-campo__ctrl { border-bottom-color: var(--acento-texto); box-shadow: 0 0 0 3px var(--anel-foco); }
 .ds-campo--alerta .ds-campo__ctrl { border-bottom-color: var(--alerta); color: var(--alerta); }
 .ds-campo--critico .ds-campo__ctrl { border-bottom-color: var(--critico); color: var(--critico); }
 .ds-campo--erro .ds-campo__ctrl { border-bottom-color: var(--critico); border-bottom-width: 3px; }
@@ -273,7 +273,7 @@
 .ds-f--t { display: flex; justify-content: flex-start; flex: 1; min-width: 0; padding: 4px 8px; font-family: var(--font-sans); font-size: 15px; font-weight: 400; white-space: normal; }
 .ds-f--sel { justify-content: space-between; font-family: var(--font-sans); font-size: 15px; font-weight: 600; }
 .ds-f--sel .ds-icone { width: 16px; height: 16px; color: var(--texto-3); }
-.ds-f--foco { border-bottom-color: var(--acento); box-shadow: 0 0 0 3px var(--anel-foco); }
+.ds-f--foco { border-bottom-color: var(--acento-texto); box-shadow: 0 0 0 3px var(--anel-foco); }
 .ds-f.ds-va { border-bottom-color: var(--alerta); color: var(--alerta); }
 .ds-f.ds-vc { border-bottom-color: var(--critico); color: var(--critico); }
 .ds-r { flex: none; font-size: 13px; font-weight: 600; line-height: 18px; color: var(--texto-3); white-space: nowrap; }
@@ -423,7 +423,7 @@
 .ds-folhao__vazio { color: var(--texto-4) !important; font-weight: 400 !important; }
 .ds-folhao th.ds-folhao__hoje, .ds-folhao td.ds-folhao__hoje { background: var(--acento-fundo); }
 .ds-folhao td .ds-celula { display: inline-flex; align-items: center; justify-content: flex-end; width: 72px; height: 30px; padding: 0 8px; border-bottom: 2px solid var(--borda-forte); border-radius: var(--raio-p) var(--raio-p) 0 0; background: var(--superficie); font-weight: 700; }
-.ds-folhao td .ds-celula--foco { border-bottom-color: var(--acento); box-shadow: 0 0 0 3px var(--anel-foco); }
+.ds-folhao td .ds-celula--foco { border-bottom-color: var(--acento-texto); box-shadow: 0 0 0 3px var(--anel-foco); }
 .ds-legenda { display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: 13px; color: var(--texto-3); }
 
 /* gráfico de tendência */
@@ -537,7 +537,7 @@
 .ds-ev__serie { align-items: baseline; }
 .ds-ev__ant { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--texto-4); }
 .ds-ev__seta { align-self: center; width: 12px; height: 12px; color: var(--texto-4); }
-/* escolha única: botões emendados · marcar vários: blocos soltos · marcado: petróleo cheio */
+/* escolha única: botões emendados · marcar vários: blocos soltos · marcado: tinta cheia */
 .ds-seg { display: inline-flex; flex-wrap: wrap; flex: 0 1 auto; max-width: 100%; gap: 1px; border: 1.5px solid var(--borda-forte); border-radius: var(--raio-m); background: var(--borda-forte); }
 .ds-seg > span { display: inline-flex; flex: 1 0 auto; align-items: center; justify-content: center; min-height: calc(var(--campo-folha) - 3px); min-width: 30px; padding: 0 10px; background: var(--superficie); color: var(--texto-2); font-size: 14px; font-weight: 600; line-height: 20px; white-space: nowrap; cursor: pointer; }
 .ds-seg > span:first-child { border-radius: 4px 0 0 4px; }
@@ -552,12 +552,12 @@
 /* mouse por cima */
 .ds-seg > span:not(.ds-seg--on):hover, .ds-seg > .ds-hover:not(.ds-seg--on), .ds-bloco:not(.ds-bloco--on):hover, .ds-bloco.ds-hover:not(.ds-bloco--on) { background: var(--superficie-3); }
 .ds-ev .ds-lista__x:hover, .ds-ev .ds-lista__x.ds-hover, .ds-ev .ds-link:hover, .ds-ev .ds-link.ds-hover { color: var(--texto); }
-/* onde o cursor está: moldura petróleo cheia, com respiro; na caixa de digitar, a linha de baixo também fica petróleo e mais grossa */
-.ds-ev :focus-visible, .ds-ev .ds-foco, .ds-ev .ds-f--foco { outline: 2px solid var(--acento); outline-offset: 2px; box-shadow: none; }
+/* onde o cursor está: moldura azul cheia, com respiro; na caixa de digitar, a linha de baixo também fica azul e mais grossa */
+.ds-ev :focus-visible, .ds-ev .ds-foco, .ds-ev .ds-f--foco { outline: 2px solid var(--acento-texto); outline-offset: 2px; box-shadow: none; }
 .ds-seg > span:focus-visible, .ds-seg > .ds-foco { position: relative; z-index: 1; border-radius: 3px; }
-.ds-ev .ds-f:focus-visible, .ds-ev .ds-f--foco { border-bottom-color: var(--acento); box-shadow: inset 0 -1px 0 var(--acento); }
-/* o que abre ao escolher (parâmetros do suporte, dieta enteral, achados do exame alterado), com o fio petróleo à esquerda */
-.ds-ev__sub { display: flex; flex-direction: column; gap: 6px; margin: 2px 0 5px; padding: 8px 10px; border: 1px solid var(--borda); border-left: 3px solid var(--acento); border-radius: var(--raio-p); }
+.ds-ev .ds-f:focus-visible, .ds-ev .ds-f--foco { border-bottom-color: var(--acento-texto); box-shadow: inset 0 -1px 0 var(--acento-texto); }
+/* o que abre ao escolher (parâmetros do suporte, dieta enteral, achados do exame alterado), com o fio azul à esquerda */
+.ds-ev__sub { display: flex; flex-direction: column; gap: 6px; margin: 2px 0 5px; padding: 8px 10px; border: 1px solid var(--borda); border-left: 3px solid var(--acento-texto); border-radius: var(--raio-p); }
 /* bloco com rótulo em cima: infusões, antimicrobianos, culturas */
 .ds-ev__bloco { display: flex; flex-direction: column; gap: 6px; padding: 6px 0 4px; }
 .ds-ev__bloco > .ds-ev__r, .ds-ev__rl > .ds-ev__r { padding-top: 0; }
@@ -604,7 +604,7 @@
 .ds-de-ontem .ds-seg > .ds-seg--on { background: var(--superficie-3); color: var(--texto); }
 .ds-de-ontem .ds-bloco--on { border-color: var(--borda-forte); background: var(--superficie-3); color: var(--texto); }
 .ds-ev__ontem { margin-left: auto; padding: 0 6px; border: 1px dashed var(--borda-forte); border-radius: var(--raio-p); font-size: 12px; line-height: 18px; font-weight: 600; color: var(--texto-3); white-space: nowrap; }
-.ds-ev__igual { margin-left: auto; height: 26px; padding: 0 10px; border: 1.5px solid var(--acento); border-radius: var(--raio-m); background: var(--superficie); color: var(--acento-texto); font-size: 13px; line-height: 1; font-weight: 700; white-space: nowrap; }
+.ds-ev__igual { margin-left: auto; height: 26px; padding: 0 10px; border: 1.5px solid var(--acento-texto); border-radius: var(--raio-m); background: var(--superficie); color: var(--acento-texto); font-size: 13px; line-height: 1; font-weight: 700; white-space: nowrap; }
 .ds-ev__igual:hover { background: var(--acento-fundo); }
 /* número fora da faixa possível: a frase aparece embaixo; o número continua na cor normal */
 .ds-ev__msg { flex-basis: 100%; font-size: 12px; line-height: 16px; font-weight: 700; color: var(--texto); }

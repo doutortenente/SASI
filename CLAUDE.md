@@ -63,6 +63,7 @@ O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmP
 
 - **Onde está no app:** `src/app/comando-uti.css` (variáveis e folha de estilos do design, copiadas do artefato: **não editar à mão**), `src/components/icones.ts` (ícones), `public/fonts/` (Atkinson Hyperlegible) e `src/lib/termos.ts` (nomes e opções).
 - **Telas (menu, nesta ordem):** Cards · Round · Tabela · Passagem · Exames · Evolução. UTI 2, 13 leitos (no banco existe `UTI2-L13`); computador (1440 px) e tablet (1194 px). Tema: o app abre no claro; no pé do menu há a escolha Claro | Escuro (controle segmentado do design), guardada no aparelho. Foi pedido do operador em 22-nov-2026: o design system não tem esse botão.
+- **Cores (22-nov-2026, pedido do operador):** os dois temas usam a paleta da versão 14 do design, já copiada para o design system da Folha de plantão. Claro: fundo cinza frio, folhas brancas, botão preto. Escuro: fundo preto, folhas quase pretas, botão branco. Gravidade: Estável verde, Watcher laranja, Instável vermelho, Crítico vinho. Link e foco em azul. Fonte e disposição não mudaram.
 - **Regras fixas do médico (nenhuma mudança pode quebrá-las):**
   1. Número nunca muda de cor. Valor fora do limiar aparece só como pílula vermelha com a contagem (`5x < 65`).
   2. O quadro se chama "Cardio-hemodinâmica". O nome não muda.
