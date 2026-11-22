@@ -21,6 +21,7 @@ docs/
 | Motor | banco (views `vw_sofa_diario`, `vw_eventos_tendencia`) | SOFA/tendências — **não** há pacote local |
 | Doutrina | `docs/_SASI_TEMPLATE_BASE_v2.md` | template-base Ramo C |
 | Consultas plantão | `supabase/snippets/plantao.sql` | SQL ad-hoc no DataGrip |
+| Conferência | `e2e/` | testes automáticos com banco falso (só dados fictícios) |
 
 ## Decisões do operador (não reabrir)
 
@@ -42,4 +43,5 @@ docs/
 8. **Esquema `arquivo`** — cópias do "antes" da troca de termos (22-nov). Apagar quando não for mais preciso desfazer.
 9. **Migrações de 30-jul sem registro correspondente** — os arquivos `20260730120000_enums_e_dimensao_eventos.sql`, `20260730120100_eventos_tipo_fk.sql` e `20260730120200_memorias_dono_e_severidade_insert.sql` não têm registro com esse nome no banco; no lugar deles o banco registra `20260730065335_modelo_dados_v3_formalizacao` e `20260730065515_fix_enums_por_tipo`. O conteúdo não foi comparado.
 10. **Skills médicas sobrepostas** — o operador disse em 22-nov-2026 que `controles-vitais-janela` é redundante com as outras. Fica para a próxima; sem plano.
-11. **Skill `admissao-uti` com caminho velho** — ela manda ler `~/src/sasi/doctrine/_SASI_TEMPLATE_BASE_v2.md`, que não existe; o template fica em `docs/_SASI_TEMPLATE_BASE_v2.md` neste repositório. Corrigir em `claude-workspace`.
+11. **Regras de alerta** — conferido no banco em 22-nov-2026: das 28 regras de `alert_rules`, 27 têm a fonte gravada; 1 regra de sódio (`na`) está sem fonte. O limiar 250 de Dx é operacional (contra excesso de alarme), não de diretriz; isso está escrito na própria regra.
+12. **`dispositivos` no MCP** — as ferramentas de admitir e de atualizar paciente (`mcp-server/src/tools/pacientes.ts`) ainda aceitam o campo `dispositivos`, que no banco é derivado e não se escreve à mão.
