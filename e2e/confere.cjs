@@ -9,6 +9,7 @@ const lerEscritas = async () => (await fetch(BANCO + '/_escritas')).json();
 const limparEscritas = () => fetch(BANCO + '/_escritas', { method: 'DELETE' });
 const partes = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
 const HOJE = partes.find((x) => x.type === 'year').value + '-' + partes.find((x) => x.type === 'month').value + '-' + partes.find((x) => x.type === 'day').value;
+const HOJE_BR = HOJE.slice(8, 10) + '/' + HOJE.slice(5, 7) + '/' + HOJE.slice(0, 4);
 const HOJE_DDMM = HOJE.slice(8, 10) + '/' + HOJE.slice(5, 7);
 async function fluxos(b, erros) {
   let falhas = 0;
@@ -51,7 +52,7 @@ async function fluxos(b, erros) {
   const atbPatch = de(es, 'atbs', 'PATCH'), atbPost = de(es, 'atbs', 'POST'), atbDel = de(es, 'atbs', 'DELETE');
   ok(atbPatch.length === 1 && atbPatch[0].filtro.includes('id=eq.a2') && JSON.stringify(atbPatch[0].corpo) === JSON.stringify({ data_fim: HOJE }), 'suspender manda só o fim (hoje) da vancomicina', atbPatch);
   ok(atbDel.length === 1 && atbDel[0].filtro.includes('id=eq.a1'), 'apagar manda a exclusão do meropeném', atbDel);
-  ok(atbPost.length === 1 && JSON.stringify(atbPost[0].corpo) === JSON.stringify({ paciente_id: 'p03', droga: 'Amicacina', dose: '1 g', via: 'EV', frequencia: '24/24 h', duracao_planejada_dias: 5, data_inicio: HOJE }), 'incluir manda droga, dose, via, frequência, dias previstos e início', atbPost);
+  ok(atbPost.length === 1 && JSON.stringify(atbPost[0].corpo) === JSON.stringify({ paciente_id: 'p03', droga: 'Amicacina', dose: '1 g', via: 'EV', frequencia: '24/24 h', duracao_planejada_dias: 5, data_inicio: null }), 'incluir sem início manda data_inicio null (nada de hoje por padrão)', atbPost);
   ok(!es.some((x) => x.tabela === 'pacientes'), 'nada é escrito em pacientes (dispositivos é derivado)');
 
   // 4) culturas: mudar resultado, incluir, apagar
@@ -69,6 +70,32 @@ async function fluxos(b, erros) {
   ok(cDel.length === 1 && cDel[0].filtro.includes('id=eq.c3'), 'apagar a urocultura manda a exclusão', cDel);
   ok(cPost.length === 1 && cPost[0].corpo.material === 'urocultura' && cPost[0].corpo.crescimento === false && cPost[0].corpo.agente === null && !!cPost[0].corpo.laudo_ts && cPost[0].corpo.paciente_id === 'p03', 'incluir manda material, coleta e resultado', cPost);
   ok(!es.some((x) => x.tabela === 'antibiograma'), 'o antibiograma não é tocado pela ficha (só leitura)');
+
+  // 4b) recusas da ficha: nada é enviado e o motivo aparece na tela
+  const topo = () => p.locator('.ds-topo__estado').innerText();
+  const tenta = async () => { await p.getByRole('button', { name: 'Salvar evolução' }).click(); await p.waitForFunction(() => /Não salvo/.test(document.querySelector('.ds-topo__estado')?.textContent || ''), null, { timeout: 8000 }); };
+  await p.goto('http://localhost:3111/evolucao?leito=03', { waitUntil: 'networkidle' }); await limparEscritas();
+  await p.getByRole('button', { name: 'Adicionar cultura' }).click();
+  await p.getByLabel('Material da cultura').last().selectOption({ label: 'Urocultura' });
+  await tenta();
+  ok(/Cultura sem data de coleta/.test(await topo()) && !(await lerEscritas()).length, 'cultura incompleta: recusa com o motivo na tela e não envia nada', await topo());
+  await p.goto('http://localhost:3111/evolucao?leito=03', { waitUntil: 'networkidle' }); await limparEscritas();
+  await p.getByLabel('Data da coleta de Aspirado traqueal').fill(HOJE_DDMM);
+  await tenta();
+  ok(/coleta não pode ser depois do laudo/.test(await topo()) && !(await lerEscritas()).length, 'coleta depois do laudo: mostra o aviso e não envia nada', await topo());
+  await p.goto('http://localhost:3111/evolucao?leito=03', { waitUntil: 'networkidle' }); await limparEscritas();
+  await p.getByRole('button', { name: 'Adicionar antimicrobiano' }).click();
+  await p.getByLabel('Dose do antimicrobiano novo').fill('1 g EV');
+  await tenta();
+  ok(/Antimicrobiano sem nome/.test(await topo()) && !(await lerEscritas()).length, 'antimicrobiano sem nome: recusa e não envia nada', await topo());
+  // salvar duas vezes seguidas não envia a mesma inclusão duas vezes
+  await p.goto('http://localhost:3111/evolucao?leito=03', { waitUntil: 'networkidle' }); await limparEscritas();
+  await p.getByRole('button', { name: 'Adicionar antimicrobiano' }).click();
+  await p.getByLabel('Antimicrobiano', { exact: true }).fill('Linezolida');
+  await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => /Salvar evolução/.test(x.textContent || '')); b.click(); b.click(); });
+  await p.waitForFunction(() => /Salvo às/.test(document.querySelector('.ds-topo__estado')?.textContent || ''), null, { timeout: 8000 }); await p.waitForTimeout(500);
+  es = await lerEscritas();
+  ok(de(es, 'atbs', 'POST').length === 1 && (de(es, 'evolucoes', 'PATCH').length + de(es, 'evolucoes', 'POST').length) === 1, 'dois cliques seguidos em Salvar enviam a inclusão uma vez só', es.map((x) => x.metodo + ' ' + x.tabela));
 
   // 5) Round: Prescrição vigente com os dois blocos do design
   await p.goto('http://localhost:3111/round?leito=03', { waitUntil: 'networkidle' });
@@ -94,19 +121,28 @@ async function fluxos(b, erros) {
   await p.getByLabel('Idade', { exact: true }).fill('71'); await p.getByLabel('Peso', { exact: true }).fill('68,5'); await p.getByLabel('Altura', { exact: true }).fill('160');
   await p.getByLabel('Hipótese diagnóstica').fill('Choque séptico de foco urinário');
   await p.getByRole('radio', { name: 'Watcher' }).click();
+  await p.getByRole('button', { name: 'Admitir paciente' }).click();
+  ok(/data de admissão/.test(await p.locator('.ds-novo .ds-ev__msg').innerText()) && !(await lerEscritas()).length, 'admissão sem data: recusa e não grava nada');
+  await p.getByLabel('Data de admissão').fill(HOJE_BR);
   await p.getByRole('button', { name: 'Admitir paciente' }).click(); await p.waitForURL(/\/round|\/cards/, { timeout: 8000 }); await new Promise((r) => setTimeout(r, 500));
   es = await lerEscritas(); const adm = de(es, 'pacientes', 'POST')[0];
-  ok(adm && JSON.stringify(adm.corpo) === JSON.stringify({ uti: 'UTI2', leito: 'UTI2-L02', status_leito: 'ativo', nome: 'Paciente Teste Ficticio', idade: 71, sexo: 'feminino', peso: 68.5, altura: 160, hd: 'Choque séptico de foco urinário', data_adm: HOJE, gravidade: 'watcher' }), 'a admissão grava o paciente no leito escolhido, com os valores digitados', adm && adm.corpo);
+  ok(adm && JSON.stringify(adm.corpo) === JSON.stringify({ uti: 'UTI2', leito: 'UTI2-L02', status_leito: 'ativo', nome: 'Paciente Teste Ficticio', idade: 71, sexo: 'feminino', peso: 68.5, altura: 160, hd: 'Choque séptico de foco urinário', data_adm: HOJE, gravidade: 'watcher', alergias: null }), 'a admissão grava o paciente no leito escolhido, com os valores digitados', adm && adm.corpo);
   ok(!es.some((x) => x.tabela === 'internacoes'), 'a internação não é gravada pela tela (o banco abre sozinho)');
   await limparEscritas();
   await p.goto('http://localhost:3111/cards?novo=04', { waitUntil: 'networkidle' });
   ok(await p.getByRole('radio', { name: '04', checked: true }).count() === 1, 'vindo do cartão vago, o leito já vem marcado');
   await p.getByLabel('Nome do paciente').fill('Outro Paciente Ficticio'); await p.getByRole('radio', { name: 'Crítico' }).click();
+  await p.getByLabel('Data de admissão').fill(HOJE_BR); await p.getByLabel('Alergias', { exact: true }).fill('dipirona'); await p.getByRole('radio', { name: 'Contato' }).click();
   await p.getByRole('button', { name: 'Admitir paciente' }).click(); await new Promise((r) => setTimeout(r, 800));
   es = await lerEscritas(); const adm2 = de(es, 'pacientes', 'POST')[0];
   ok(adm2 && adm2.corpo.idade === null && adm2.corpo.sexo === null && adm2.corpo.peso === null && adm2.corpo.altura === null && adm2.corpo.hd === null && adm2.corpo.leito === 'UTI2-L04' && adm2.corpo.gravidade === 'critico', 'campo vazio grava null (nada de valor padrão)', adm2 && adm2.corpo);
+  ok(adm2 && adm2.corpo.alergias === 'dipirona' && adm2.corpo.isolation === 'contact', 'alergias e isolamento preenchidos vão na admissão (isolation em código do banco)', adm2 && adm2.corpo);
+  ok(adm && adm.corpo.alergias === null && !('isolation' in adm.corpo), 'alergias vazias gravam null e isolamento sem marca não envia a coluna', adm && adm.corpo);
   await p.goto('http://localhost:3111/cards?novo=06', { waitUntil: 'networkidle' }); await limparEscritas();
-  await p.getByLabel('Nome do paciente').fill('Teste Ficticio'); await p.getByRole('radio', { name: 'Estável' }).click(); await p.getByLabel('Idade', { exact: true }).fill('200');
+  await p.getByLabel('Nome do paciente').fill('Teste Ficticio'); await p.getByRole('radio', { name: 'Estável' }).click(); await p.getByLabel('Data de admissão').fill(HOJE_BR); await p.getByLabel('Idade', { exact: true }).fill('7,5');
+  await p.getByRole('button', { name: 'Admitir paciente' }).click();
+  ok(/inteiro/.test(await p.locator('.ds-novo .ds-ev__msg').innerText()) && !(await lerEscritas()).length, 'idade com vírgula: recusa e não grava');
+  await p.getByLabel('Idade', { exact: true }).fill('200');
   await p.getByRole('button', { name: 'Admitir paciente' }).click();
   ok((await p.locator('.ds-novo .ds-ev__msg').innerText()).includes('idade') && !(await lerEscritas()).length, 'idade fora da faixa: avisa e não grava');
 
