@@ -79,7 +79,7 @@ O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmP
 
 ## 4. Banco (estado vivo em 22-nov-2026)
 
-Fonte única do esquema: `supabase/migrations/` (41 arquivos, iguais aos 41 registros de migração do banco, com o mesmo carimbo e nome; conferido em 22-nov-2026). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
+Fonte única do esquema: `supabase/migrations/` (42 arquivos, iguais aos 42 registros de migração do banco, com o mesmo carimbo e nome; conferido em 22-nov-2026). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
 **17 tabelas · 10 views · 19 enums · 80 códigos de evento.** RLS (regras de acesso por linha, do banco) ligada com `dev_bypass` (uso solo, decisão do operador).
 
 **Os termos do banco são os do design** (migração `20261122040931_termos_do_design`):
@@ -108,7 +108,7 @@ Fonte única do esquema: `supabase/migrations/` (41 arquivos, iguais aos 41 regi
 - `janelas_24h` está vazia: as janelas de 27-set-2026 foram apagadas em 22-nov-2026, por ordem do operador. A pílula volta quando entrar janela nova.
 - SOFA: fora do projeto desde 22-nov-2026, por ordem do operador; talvez volte no futuro. As telas não mostram. As peças do banco (`vw_sofa_diario`, `sofa_baseline`, `sofa_snapshot`) e as menções no servidor MCP ficaram como estavam.
 - Migração: uma única chamada `apply_migration`.
-- Pacientes: em 22-nov-2026 os 7 pacientes antigos que ocupavam leito (admitidos de junho a setembro) foram apagados por ordem do operador, com tudo que era deles (`20261122140945_apaga_pacientes_antigos_ativos`). Ficaram 14 pacientes com alta; nenhum leito ocupado naquele momento.
+- Pacientes: em 22-nov-2026 todos os pacientes antigos (de junho a setembro) foram apagados por ordem do operador, com tudo que era deles: primeiro os 7 que ocupavam leito (`20261122140945_apaga_pacientes_antigos_ativos`), depois os 14 com alta e os 17 registros antigos de auditoria de ingest (`20261122142152_apaga_pacientes_antigos_restantes`). O banco ficou sem nenhum paciente; o manual, o vocabulário de eventos e as regras de alerta ficaram.
 
 **Manual e travas para quem grava por fora do app** (migração `20261122135919_manual_do_banco_e_travas_de_gravacao`):
 - **Manual de gravação dentro do banco:** `select corpo from public.avisos_agentes where titulo like 'MANUAL DO BANCO%';`. Ensina qualquer Claude ou ferramenta (claude.ai com o conector do Supabase, servidor MCP antigo) a admitir, dar alta e gravar evolução, exames, janelas, antimicrobianos, culturas, dispositivos e pendências. O comentário das tabelas de gravação aponta para ele e aparece em qualquer listagem de tabelas.
