@@ -270,10 +270,10 @@ export function Ficha(props: Props) {
           const ini = a.inicio.trim() ? isoDeDdMm(a.inicio, hoje) : null;
           if (a.inicio.trim() && !ini) throw new Error("início inválido");
           const campos: Record<string, unknown> = { paciente_id: pacienteId, droga: a.droga.trim(), ...esquemaEmColunas(a.esquema), duracao_planejada_dias: diasPrevistos(a.previstos) };
-          if (ini) campos.data_inicio = ini;
+          campos.data_inicio = ini; // vazio grava null
           const { data, error } = await sb.from("atbs").insert(campos).select("id").single();
           if (error) throw error;
-          troca(a.k, { id: (data as { id: string }).id, orig: { ...snap, inicioIso: ini ?? hoje } });
+          troca(a.k, { id: (data as { id: string }).id, orig: { ...snap, inicioIso: ini ?? "" } });
           continue;
         }
         const o = a.orig;
@@ -741,7 +741,7 @@ export function Ficha(props: Props) {
                           </span>
                         );
                       })}
-                      <button className="ds-link" type="button" onClick={() => { setAtbL((l) => [...l, { k: novaChave(), droga: "", esquema: "", inicio: ddmm(hoje), previstos: "", fim: null }]); setSujo(true); }}><Icone n="mais" />Adicionar antimicrobiano</button>
+                      <button className="ds-link" type="button" onClick={() => { setAtbL((l) => [...l, { k: novaChave(), droga: "", esquema: "", inicio: "", previstos: "", fim: null }]); setSujo(true); }}><Icone n="mais" />Adicionar antimicrobiano</button>
                     </div>
                   </div>
                   <div className="ds-ev__bloco">

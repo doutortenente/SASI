@@ -8,17 +8,18 @@ import { useState } from "react";
 import { Area, G, Linha, M, Num, Seg, Txt, U } from "@/components/controles";
 import { Icone } from "@/components/Icone";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
-import { GRAVIDADE, GRAVIDADES, ddmmaaaa, num, type Gravidade } from "@/lib/termos";
+import { GRAVIDADE, GRAVIDADES, ISOLAMENTO, num, type Gravidade } from "@/lib/termos";
 
 const SEXO = ["Masculino", "Feminino"] as const;
 const NOME_GRAVIDADE = [...GRAVIDADES].reverse().map((g) => GRAVIDADE[g]); // Estável, Watcher, Instável, Crítico
+const NOME_ISOLAMENTO = Object.values(ISOLAMENTO); // contato, gotícula, aerossol
 const dentro = (v: number | null, min: number, max: number) => v == null || (v >= min && v <= max);
 
 /** Painel de admissão. `vagos` são os números dos leitos livres; `leito` é o leito já escolhido (vem do cartão vago). */
 export function NovoLeito({ vagos, leito: inicial, hoje }: { vagos: string[]; leito: string | null; hoje: string }) {
   const rota = useRouter();
   const [leito, setLeito] = useState<string | null>(inicial && vagos.includes(inicial) ? inicial : null);
-  const [f, setF] = useState({ nome: "", idade: "", sexo: null as string | null, peso: "", altura: "", hd: "", data: ddmmaaaa(hoje), gravidade: null as string | null });
+  const [f, setF] = useState({ nome: "", idade: "", sexo: null as string | null, peso: "", altura: "", hd: "", alergias: "", isolamento: null as string | null, data: "", gravidade: null as string | null });
   const [msg, setMsg] = useState("");
   const [gravando, setGravando] = useState(false);
   const set = (k: keyof typeof f) => (v: string | null) => setF((x) => ({ ...x, [k]: v }));
@@ -31,14 +32,17 @@ export function NovoLeito({ vagos, leito: inicial, hoje }: { vagos: string[]; le
     if ((f.idade.trim() && idade == null) || (f.peso.trim() && peso == null) || (f.altura.trim() && altura == null)) return setMsg("Idade, peso e altura têm de ser números.");
     if (idade != null && !Number.isInteger(idade)) return setMsg("A idade deve ser um número inteiro.");
     if (!dentro(idade, 0, 130) || !dentro(peso, 1, 400) || !dentro(altura, 30, 250)) return setMsg("Confira idade (0 a 130 anos), peso (1 a 400 kg) e altura (30 a 250 cm).");
+    if (!f.data.trim()) return setMsg("Escreva a data de admissão (dia/mês/ano).");
     const real = iso && new Date(iso + "T12:00:00Z").toISOString().slice(0, 10) === iso;
     if (!iso || !real) return setMsg("A data de admissão deve ser dia/mês/ano, por exemplo 22/11/2026.");
     if (iso > hoje) return setMsg("A data de admissão não pode ser no futuro.");
     const g = (Object.keys(GRAVIDADE) as Gravidade[]).find((k) => GRAVIDADE[k] === f.gravidade);
+    const iso2 = Object.keys(ISOLAMENTO).find((k) => ISOLAMENTO[k] === f.isolamento);
     setGravando(true); setMsg("");
     const { error } = await getSupabaseBrowser().from("pacientes").insert({
       uti: "UTI2", leito: `UTI2-L${leito}`, status_leito: "ativo", nome: f.nome.trim(), idade, sexo: f.sexo ? f.sexo.toLowerCase() : null,
       peso, altura, hd: f.hd.trim() || null, data_adm: iso, gravidade: g,
+      alergias: f.alergias.trim() || null, ...(iso2 ? { isolation: iso2 } : {}),
     });
     setGravando(false);
     if (error) return setMsg(error.code === "23505" ? "Esse leito acabou de ser ocupado. Escolha outro. Nada foi gravado." : "Não foi possível admitir. Nada foi gravado; tente de novo.");
@@ -56,6 +60,8 @@ export function NovoLeito({ vagos, leito: inicial, hoje }: { vagos: string[]; le
             <Linha r="Idade"><G><Num r="Idade" v={f.idade} on={set("idade")} /><U>anos</U></G><M>Sexo</M><Seg r="Sexo" ops={SEXO} v={f.sexo} on={set("sexo")} /></Linha>
             <Linha r="Peso e altura"><G><Num r="Peso" v={f.peso} on={set("peso")} /><U>kg</U></G><G><Num r="Altura" v={f.altura} on={set("altura")} /><U>cm</U></G></Linha>
             <Linha r="HD"><Area r="Hipótese diagnóstica" v={f.hd} on={set("hd")} /></Linha>
+            <Linha r="Alergias"><Txt r="Alergias" v={f.alergias} on={set("alergias")} /></Linha>
+            <Linha r="Isolamento"><Seg r="Isolamento" ops={NOME_ISOLAMENTO} v={f.isolamento} on={set("isolamento")} /></Linha>
             <Linha r="Admissão"><Txt r="Data de admissão" v={f.data} on={set("data")} larg={120} /></Linha>
             <Linha r="Gravidade"><Seg r="Gravidade" ops={NOME_GRAVIDADE} v={f.gravidade} on={set("gravidade")} /></Linha>
             <div className="ds-ev__v ds-novo__acoes">

@@ -60,6 +60,16 @@ require('fs').mkdirSync(dir, { recursive: true });
     console.log('partes', sufixo, JSON.stringify(m));
     await ctx.close();
   }
+  // painel de admissão (Novo leito), claro e escuro
+  for (const tema of ['light', 'dark']) {
+    const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: tema });
+    const p = await ctx.newPage();
+    p.on('pageerror', (e) => erros.push('novo leito ERRO: ' + String(e).slice(0, 200)));
+    await p.goto('http://localhost:3111/cards?novo=04', { waitUntil: 'networkidle' });
+    await p.getByRole('radio', { name: 'Contato' }).click();
+    await p.locator('.ds-novo').screenshot({ path: `${dir}/novo-leito-${tema}.png` });
+    await ctx.close();
+  }
   console.log('erros no navegador:', erros.length ? '\n' + erros.join('\n') : 'nenhum');
   await b.close();
 })();
