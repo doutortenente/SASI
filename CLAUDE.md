@@ -67,7 +67,7 @@ O app implementa o design system publicado em https://claude.ai/artifact/DfrYNmP
 
 ## 4. Banco (estado vivo em 22-nov-2026)
 
-Fonte única do esquema: `supabase/migrations/` (39 arquivos, iguais aos 39 registros de migração do banco, com o mesmo carimbo e nome; conferido em 22-nov-2026). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
+Fonte única do esquema: `supabase/migrations/` (40 arquivos, iguais aos 40 registros de migração do banco, com o mesmo carimbo e nome; conferido em 22-nov-2026). Os rascunhos antigos (`_archive`, `_gated`, retrato do esquema) estão no histórico do git, commit `0d3610c`.
 **17 tabelas · 10 views · 19 enums · 80 códigos de evento.** RLS (regras de acesso por linha, do banco) ligada com `dev_bypass` (uso solo, decisão do operador).
 
 **Os termos do banco são os do design** (migração `20261122040931_termos_do_design`):
@@ -89,13 +89,18 @@ Fonte única do esquema: `supabase/migrations/` (39 arquivos, iguais aos 39 regi
 | `atbs` · `culturas` · `antibiograma` | Antimicrobianos e microbiologia |
 | `pendencias` | Pendências / riscos (P1 a P3) |
 | `alert_rules` · `trend_rules` · `alerts_log` | Regras e registro de alertas (a tela Exames pinta a célula por `alert_rules`) |
-| `ingest_audit_log` · `memorias` · `avisos_agentes` | Auditoria de ingest, memória e avisos para agentes |
+| `ingest_audit_log` · `memorias` · `avisos_agentes` | Auditoria de ingest, memória e avisos para agentes (a linha "MANUAL DO BANCO" de `avisos_agentes` é o manual de gravação) |
 
 **Atenção:**
 - `save_ficha` (função antiga, sem uso pelo app): corrigida em 22-nov-2026; campo que não vem não é mais apagado.
 - `janelas_24h` está vazia: as janelas de 27-set-2026 foram apagadas em 22-nov-2026, por ordem do operador. A pílula volta quando entrar janela nova.
 - SOFA: fora do projeto desde 22-nov-2026, por ordem do operador; talvez volte no futuro. As telas não mostram. As peças do banco (`vw_sofa_diario`, `sofa_baseline`, `sofa_snapshot`) e as menções no servidor MCP ficaram como estavam.
 - Migração: uma única chamada `apply_migration`.
+
+**Manual e travas para quem grava por fora do app** (migração `20261122135919_manual_do_banco_e_travas_de_gravacao`):
+- **Manual de gravação dentro do banco:** `select corpo from public.avisos_agentes where titulo like 'MANUAL DO BANCO%';`. Ensina qualquer Claude ou ferramenta (claude.ai com o conector do Supabase, servidor MCP antigo) a admitir, dar alta e gravar evolução, exames, janelas, antimicrobianos, culturas, dispositivos e pendências. O comentário das tabelas de gravação aponta para ele e aparece em qualquer listagem de tabelas.
+- **Três travas** que recusam o erro e dizem o que corrigir: `trg_05_valida_leito` (paciente ativo só com leito `UTI#-L##` e em leito vago), `trg_05_ficha_contrato` (evolução só com os campos e opções da ficha; a lista está na função `fn_ficha_contrato`; o app, papel `anon`, não passa por ela) e `trg_05_janela_limiares` (janela de sinal vital só com os limiares do design).
+- **Mudou campo ou opção da ficha (`Ficha.tsx`), limiar ou função de gravação?** Atualizar `fn_ficha_contrato`, `fn_trg_janela_limiares` e o texto do manual na mesma entrega, por migração.
 
 -----
 
@@ -118,7 +123,7 @@ Estado atual, o que o app ainda não faz e pendências: `docs/STATUS.md`. Débit
 
 Fonte da verdade: **`docs/_SASI_TEMPLATE_BASE_v2.md`** (Ramo C). A anatomia é idêntica nas skills `sasi-ingest-export` e `admissao-uti` (que moram em `doutortenente/claude-workspace`): quem mudar a anatomia numa delas atualiza a outra e o template na mesma entrega (divergência = bug clínico-legal).
 
-**Skills:** moram no repositório `doutortenente/claude-workspace`, pasta `skills-que-prestam/01-pacote-skills-medicas/`. Ler o `SKILL.md` da skill antes de processar. Em 22-nov-2026 `sasi-ingest-export` e `controles-vitais-janela` passaram a usar os termos e os limiares do design. A cópia instalada no claude.ai não é atualizada por este repositório e ainda usa os termos antigos; o banco converte na entrada (§4).
+**Skills:** moram no repositório `doutortenente/claude-workspace`, pasta `skills-que-prestam/01-pacote-skills-medicas/`. Ler o `SKILL.md` da skill antes de processar. Em 22-nov-2026 `sasi-ingest-export` e `controles-vitais-janela` passaram a usar os termos e os limiares do design. A cópia instalada no claude.ai não é atualizada por este repositório e ainda usa os termos antigos; o banco converte na entrada (§4). Quem grava sem a skill atualizada segue o manual do banco e esbarra nas travas (§4).
 
 - `sasi-ingest-export` — extrai dados de fotos/PDFs/laudos → payload JSON validado; gera “Exportar Evolução” e “Exportar Turno”.
 - `admissao-uti` — nota de admissão (modo D1).
