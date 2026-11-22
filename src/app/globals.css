@@ -3,6 +3,10 @@ html, body { margin: 0; min-height: 100%; }
 html { background: var(--fundo); }
 .ds-app { min-height: 100vh; }
 .ds-menu { position: sticky; top: 0; align-self: start; height: 100vh; }
+/* escolha Claro | Escuro no pé do menu */
+.ds-tema { margin-top: auto; padding: 0 8px; }
+.ds-tema .ds-seg { display: flex; width: 100%; flex-wrap: nowrap; }
+.ds-tema .ds-seg > span { min-width: 0; padding: 0 6px; font-size: 14px; }
 a.ds-leito:hover { border-color: var(--borda-forte); }
 .ds-f input, .ds-f select, .ds-f textarea, .ds-busca input, .ds-celula input { flex: 1; min-width: 0; width: 100%; border: 0; outline: 0; margin: 0; padding: 0; background: transparent; color: inherit; font: inherit; }
 .ds-f:not(.ds-f--t):not(.ds-f--sel) { width: var(--larg, 58px); }
@@ -20,10 +24,23 @@ a.ds-leito:hover { border-color: var(--borda-forte); }
 .ds-lista__x { cursor: pointer; }
 .ds-riscado .ds-f, .ds-riscado .ds-lista__sisr { color: var(--texto-4); text-decoration: line-through; border-bottom-style: dashed; background: transparent; }
 .ds-ev__corr { font-size: 13px; color: var(--texto-4); }
+@media (max-width: 1280px) {
+  .ds-tema { padding: 0; align-self: stretch; }
+  .ds-tema .ds-seg { flex-direction: column; }
+  .ds-tema .ds-seg > span { padding: 0 2px; font-size: 13px; }
+  .ds-tema .ds-seg > span:first-child { border-radius: 4px 4px 0 0; }
+  .ds-tema .ds-seg > span:last-child { border-radius: 0 0 4px 4px; }
+}
+@media (pointer: coarse) { .ds-tema .ds-seg > span { min-height: 44px; } }
 @media (max-width: 860px) {
   .ds-app { grid-template-columns: minmax(0, 1fr); }
   .ds-menu { position: static; height: auto; flex-direction: row; align-items: center; gap: 12px; padding: 8px 12px; border-right: 0; border-bottom: 1px solid var(--borda); overflow-x: auto; }
   .ds-nav { flex-direction: row; }
+  .ds-tema { margin: 0 0 0 auto; padding: 0 0 0 8px; flex: 0 0 auto; position: sticky; right: 0; z-index: 1; background: var(--superficie); }
+  .ds-tema .ds-seg { width: auto; flex-direction: row; }
+  .ds-tema .ds-seg > span { padding: 0 10px; }
+  .ds-tema .ds-seg > span:first-child { border-radius: 4px 0 0 4px; }
+  .ds-tema .ds-seg > span:last-child { border-radius: 0 4px 4px 0; }
   .ds-grade { --colunas: 2; }
   .ds-col2, .ds-col3, .ds-round, .ds-exames { grid-template-columns: minmax(0, 1fr); }
   .ds-tendencias { --colunas: 2 !important; }

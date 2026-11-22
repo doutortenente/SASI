@@ -219,11 +219,51 @@ async function fluxos(b, erros) {
   await p.getByLabel('Antimicrobiano', { exact: true }).fill('Droga nova xyz');
   ok(await p.getByRole('listbox', { name: 'Sugestões de antimicrobianos' }).count() === 0 && (await p.getByLabel('Antimicrobiano', { exact: true }).inputValue()) === 'Droga nova xyz', 'nome novo continua livre');
 
-  // 9) Tema: sem botão no design; segue o aparelho, claro ou escuro, já na primeira pintura
-  const cEsc = await b.newContext({ colorScheme: 'dark' }); const pe = await cEsc.newPage(); await pe.goto('http://localhost:3111/cards', { waitUntil: 'domcontentloaded' });
-  const cClaro = await b.newContext({ colorScheme: 'light' }); const pc = await cClaro.newPage(); await pc.goto('http://localhost:3111/cards', { waitUntil: 'domcontentloaded' });
-  ok((await pe.evaluate(() => document.documentElement.dataset.theme)) === 'escuro' && (await pc.evaluate(() => document.documentElement.dataset.theme)) === 'claro', 'o tema segue o aparelho (escuro e claro)');
-  await cEsc.close(); await cClaro.close();
+  // 9) Tema: claro por padrão; Claro | Escuro no pé do menu, guardado no aparelho
+  const tema = (pg) => pg.evaluate(() => document.documentElement.dataset.theme);
+  const cEsc = await b.newContext({ colorScheme: 'dark', viewport: { width: 1440, height: 900 } }); const pe = await cEsc.newPage();
+  await pe.addInitScript(() => { window.__t = []; const ligar = () => { const h = document.documentElement; if (!h) return false; window.__t.push(String(h.dataset.theme)); new MutationObserver(() => window.__t.push(String(h.dataset.theme))).observe(h, { attributes: true, attributeFilter: ['data-theme'] }); return true; }; if (!ligar()) { const o = new MutationObserver(() => { if (ligar()) o.disconnect(); }); o.observe(document, { childList: true }); } });
+  await pe.goto('http://localhost:3111/cards', { waitUntil: 'domcontentloaded' });
+  ok((await tema(pe)) === 'claro', 'aparelho escuro sem escolha guardada abre claro');
+  await pe.waitForLoadState('networkidle');
+  const hist = await pe.evaluate(() => window.__t);
+  // 'undefined' = html recém-criado, antes do script do cabeçalho (que roda antes da 1ª pintura); o que não pode aparecer é o tema errado
+  ok(hist.includes('claro') && hist.every((x) => x === 'claro' || x === 'undefined'), 'data-theme já certo antes de a página carregar (sem piscar)', hist);
+  const grupo = pe.getByRole('radiogroup', { name: 'Tema' });
+  ok((await grupo.getByRole('radio', { name: 'Claro' }).getAttribute('aria-checked')) === 'true' && (await grupo.getByRole('radio', { name: 'Escuro' }).getAttribute('aria-checked')) === 'false', 'a opção marcada bate com o tema aplicado');
+  await grupo.getByRole('radio', { name: 'Escuro' }).click();
+  ok((await tema(pe)) === 'escuro' && (await pe.evaluate(() => localStorage.getItem('tema'))) === 'escuro', 'escolher Escuro aplica e guarda');
+  await pe.reload({ waitUntil: 'domcontentloaded' });
+  ok((await tema(pe)) === 'escuro', 'Escuro continua depois de recarregar');
+  await pe.goto('http://localhost:3111/tabela', { waitUntil: 'networkidle' });
+  ok((await tema(pe)) === 'escuro' && (await pe.getByRole('radiogroup', { name: 'Tema' }).getByRole('radio', { name: 'Escuro' }).getAttribute('aria-checked')) === 'true', 'Escuro vale em outra tela, com a opção marcada certa');
+  await pe.getByRole('radiogroup', { name: 'Tema' }).getByRole('radio', { name: 'Claro' }).click();
+  ok((await tema(pe)) === 'claro' && (await pe.evaluate(() => localStorage.getItem('tema'))) === 'claro', 'escolher Claro volta e guarda');
+  await pe.getByRole('radiogroup', { name: 'Tema' }).getByRole('radio', { name: 'Escuro' }).focus(); await pe.keyboard.press('Enter');
+  ok((await tema(pe)) === 'escuro', 'funciona pelo teclado (Enter)');
+  await pe.getByRole('radiogroup', { name: 'Tema' }).getByRole('radio', { name: 'Claro' }).focus(); await pe.keyboard.press('Space');
+  ok((await tema(pe)) === 'claro', 'funciona pelo teclado (Espaço)');
+  await cEsc.close();
+  const cBloq = await b.newContext({ colorScheme: 'dark' }); const pb = await cBloq.newPage();
+  await pb.addInitScript(() => { Object.defineProperty(window, 'localStorage', { get() { throw new Error('bloqueado'); } }); });
+  const errosBloq = []; pb.on('pageerror', (e) => errosBloq.push(String(e)));
+  await pb.goto('http://localhost:3111/cards', { waitUntil: 'networkidle' });
+  await pb.getByRole('radiogroup', { name: 'Tema' }).getByRole('radio', { name: 'Escuro' }).click();
+  ok((await tema(pb)) === 'escuro' && errosBloq.length === 0, 'com o armazenamento bloqueado a página não quebra', errosBloq);
+  await cBloq.close();
+  // teclado: setas movem e escolhem
+  { const ca = await b.newContext({ viewport: { width: 1440, height: 900 } }); const pa = await ca.newPage(); await pa.goto('http://localhost:3111/cards', { waitUntil: 'networkidle' });
+    const g = pa.getByRole('radiogroup', { name: 'Tema' }); await g.getByRole('radio', { name: 'Claro' }).focus(); await pa.keyboard.press('ArrowRight');
+    ok((await tema(pa)) === 'escuro' && (await pa.evaluate(() => document.activeElement.textContent)) === 'Escuro' && (await g.getByRole('radio', { name: 'Claro' }).getAttribute('tabindex')) === '-1', 'seta para a direita escolhe Escuro e move o foco');
+    await pa.keyboard.press('ArrowLeft'); ok((await tema(pa)) === 'claro', 'seta para a esquerda volta a Claro'); await ca.close(); }
+  for (const w of [1440, 1194, 800, 390]) {
+    const cw = await b.newContext({ viewport: { width: w, height: 900 } }); const pw = await cw.newPage(); await pw.goto('http://localhost:3111/cards', { waitUntil: 'networkidle' });
+    const m = await pw.evaluate(() => { const t = document.querySelector('.ds-tema'); const r = t.getBoundingClientRect(); const menu = document.querySelector('.ds-menu').getBoundingClientRect();
+      const spans = [...t.querySelectorAll('.ds-seg > span')]; const rs = spans.map((e) => e.getBoundingClientRect());
+      return { cortado: spans.filter((e) => e.scrollWidth > e.clientWidth + 1).length, dentro: r.left >= menu.left - 1 && r.right <= menu.right + 1 && r.right <= innerWidth + 1 && r.left >= 0 && r.top >= 0 && r.bottom <= innerHeight, sobre: rs[0].right > rs[1].left + 1 && rs[0].bottom > rs[1].top + 1, textos: spans.map((e) => e.textContent).join('|') }; });
+    ok(m.cortado === 0 && m.dentro && !m.sobre && m.textos === 'Claro|Escuro', `menu em ${w} px: escolha de tema visível, sem texto cortado nem sobreposto`, m);
+    await cw.close();
+  }
 
   // 10) Gráficos pequenos do design: faixas nos sinais, linha nos exames
   await p.goto('http://localhost:3111/round?leito=03', { waitUntil: 'networkidle' });

@@ -8,8 +8,9 @@ import { Menu } from "@/components/Menu";
 export const metadata: Metadata = { title: "Comando UTI", description: "Folha de plantão da UTI 2" };
 export const viewport: Viewport = { width: "device-width", initialScale: 1 };
 
-// O tema (claro ou escuro) segue o do aparelho e é aplicado antes da primeira pintura.
-const TEMA = `(function(){try{var m=matchMedia("(prefers-color-scheme: dark)");var p=function(){document.documentElement.dataset.theme=m.matches?"escuro":"claro"};p();m.addEventListener("change",p)}catch(e){}})();`;
+// O tema é claro por padrão, qualquer que seja o do aparelho. Só vira escuro se o médico tiver escolhido "Escuro" no menu
+// (guardado no aparelho, chave "tema"). O script roda antes da primeira pintura, então a página não pisca o tema errado.
+const TEMA = `(function(){var t="claro";try{if(localStorage.getItem("tema")==="escuro")t="escuro"}catch(e){}document.documentElement.dataset.theme=t})();`;
 
 export default function Moldura({ children }: { children: ReactNode }) {
   return (

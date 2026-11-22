@@ -6,10 +6,20 @@ import { txt } from "@/lib/termos";
 export const tecla = (fn: () => void) => (e: KeyboardEvent) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); fn(); } };
 
 /** Escolha única em botões emendados. Tocar de novo no marcado desmarca. */
-export function Seg({ r, ops, v, on, numero, cls }: { r: string; ops: readonly string[]; v: unknown; on: (v: string | null) => void; numero?: boolean; cls?: string }) {
+export function Seg({ r, ops, v, on, numero, cls, setas }: { r: string; ops: readonly string[]; v: unknown; on: (v: string | null) => void; numero?: boolean; cls?: string; setas?: boolean }) {
+  // setas: padrão de grupo de opções do teclado (Tab entra na marcada; setas movem e escolhem). Só no grupo que pedir.
+  const mover = (e: KeyboardEvent<HTMLElement>, i: number) => {
+    const d = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+    if (!d) return false;
+    e.preventDefault();
+    const j = (i + d + ops.length) % ops.length;
+    on(ops[j]);
+    (e.currentTarget.parentElement?.children[j] as HTMLElement | undefined)?.focus();
+    return true;
+  };
   return (
     <span className={"ds-seg" + (numero ? " ds-seg--num" : "") + (cls ? " " + cls : "")} role="radiogroup" aria-label={r}>
-      {ops.map((o) => <span key={o} role="radio" aria-checked={v === o} tabIndex={0} className={v === o ? "ds-seg--on" : undefined} onClick={() => on(v === o ? null : o)} onKeyDown={tecla(() => on(v === o ? null : o))}>{o}</span>)}
+      {ops.map((o, i) => <span key={o} role="radio" aria-checked={v === o} tabIndex={setas && v !== o ? -1 : 0} className={v === o ? "ds-seg--on" : undefined} onClick={() => on(v === o ? null : o)} onKeyDown={(e) => { if (setas && mover(e, i)) return; tecla(() => on(v === o ? null : o))(e); }}>{o}</span>)}
     </span>
   );
 }

@@ -7,7 +7,8 @@ require('fs').mkdirSync(dir, { recursive: true });
   const erros = [];
   const telas = [['cards', '/cards', 'light', 1440], ['round', '/round?leito=03', 'light', 1440], ['tabela', '/tabela', 'light', 1440], ['passagem', '/passagem', 'light', 1440], ['exames', '/exames?leito=03', 'light', 1440], ['evolucao', '/evolucao?leito=03', 'light', 1440], ['evolucao-escuro', '/evolucao?leito=03', 'dark', 1440], ['evolucao-tablet', '/evolucao?leito=03', 'light', 1194], ['evolucao-ontem', '/evolucao?leito=05', 'light', 1440], ['cards-novo', '/cards?novo=04', 'light', 1440], ['cards-novo-escuro', '/cards?novo=04', 'dark', 1194], ['round-graficos', '/round?leito=03', 'dark', 1440], ['exames-graficos', '/exames?leito=03', 'light', 1194]];
   for (const [nome, rota, tema, w] of telas) {
-    const ctx = await b.newContext({ viewport: { width: w, height: 900 }, colorScheme: tema, deviceScaleFactor: 1 });
+    const ctx = await b.newContext({ viewport: { width: w, height: 900 }, deviceScaleFactor: 1 });
+    await ctx.addInitScript((t) => { try { localStorage.setItem('tema', t === 'dark' ? 'escuro' : 'claro'); } catch (e) {} }, tema);
     const p = await ctx.newPage();
     p.on('console', (m) => { if (m.type() === 'error') erros.push(nome + ': ' + m.text().slice(0, 220)); });
     p.on('pageerror', (e) => erros.push(nome + ' ERRO DE PÁGINA: ' + String(e).slice(0, 300)));
@@ -39,7 +40,8 @@ require('fs').mkdirSync(dir, { recursive: true });
 
   // partes do plantão: Infecto (antimicrobianos e culturas), diluição das drogas e Prescrição vigente do Round
   for (const [w, tema] of [[1440, 'light'], [1440, 'dark'], [1194, 'light'], [1194, 'dark']]) {
-    const ctx = await b.newContext({ viewport: { width: w, height: 900 }, colorScheme: tema });
+    const ctx = await b.newContext({ viewport: { width: w, height: 900 } });
+    await ctx.addInitScript((t) => { try { localStorage.setItem('tema', t === 'dark' ? 'escuro' : 'claro'); } catch (e) {} }, tema);
     const p = await ctx.newPage();
     p.on('pageerror', (e) => erros.push('partes ' + w + tema + ' ERRO: ' + String(e).slice(0, 200)));
     await p.goto('http://localhost:3111/evolucao?leito=03', { waitUntil: 'networkidle' });
@@ -62,7 +64,8 @@ require('fs').mkdirSync(dir, { recursive: true });
   }
   // painel de admissão (Novo leito), claro e escuro
   for (const tema of ['light', 'dark']) {
-    const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: tema });
+    const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
+    await ctx.addInitScript((t) => { try { localStorage.setItem('tema', t === 'dark' ? 'escuro' : 'claro'); } catch (e) {} }, tema);
     const p = await ctx.newPage();
     p.on('pageerror', (e) => erros.push('novo leito ERRO: ' + String(e).slice(0, 200)));
     await p.goto('http://localhost:3111/cards?novo=04', { waitUntil: 'networkidle' });
@@ -72,7 +75,8 @@ require('fs').mkdirSync(dir, { recursive: true });
   }
   // alta, troca de leito e sugestões de antimicrobiano
   for (const [w, tema] of [[1440, 'light'], [1440, 'dark'], [1194, 'light'], [1194, 'dark']]) {
-    const ctx = await b.newContext({ viewport: { width: w, height: 900 }, colorScheme: tema });
+    const ctx = await b.newContext({ viewport: { width: w, height: 900 } });
+    await ctx.addInitScript((t) => { try { localStorage.setItem('tema', t === 'dark' ? 'escuro' : 'claro'); } catch (e) {} }, tema);
     const p = await ctx.newPage();
     p.on('pageerror', (e) => erros.push('alta/troca ERRO: ' + String(e).slice(0, 200)));
     const sufixo = `${w}-${tema}`;
@@ -86,6 +90,15 @@ require('fs').mkdirSync(dir, { recursive: true });
     await p.reload({ waitUntil: 'networkidle' });
     await p.getByRole('button', { name: 'Adicionar antimicrobiano' }).click(); await p.getByLabel('Antimicrobiano', { exact: true }).focus();
     await p.locator('[data-sis="Infecto"]').screenshot({ path: `${dir}/atb-sugestoes-${sufixo}.png` });
+    await ctx.close();
+  }
+  // menu lateral com a escolha de tema, nos dois temas
+  for (const [w, tema] of [[1440, 'light'], [1440, 'dark'], [1194, 'light'], [1194, 'dark'], [800, 'light']]) {
+    const ctx = await b.newContext({ viewport: { width: w, height: 900 } });
+    await ctx.addInitScript((t) => { try { localStorage.setItem('tema', t === 'dark' ? 'escuro' : 'claro'); } catch (e) {} }, tema);
+    const p = await ctx.newPage();
+    await p.goto('http://localhost:3111/cards', { waitUntil: 'networkidle' });
+    await p.locator('.ds-menu').screenshot({ path: `${dir}/menu-${w}-${tema}.png` });
     await ctx.close();
   }
   console.log('erros no navegador:', erros.length ? '\n' + erros.join('\n') : 'nenhum');
