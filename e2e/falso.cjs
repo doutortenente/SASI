@@ -37,6 +37,8 @@ const T = {
   vw_dispositivos_ativos: [['iot', 'tubo 8,0', -4], ['cvc', 'jugular interna D', -4], ['arterial', 'radial E', -3], ['svd', null, -4], ['sne', 'pós-pilórica', -3]].map(([tipo, sitio, n]) => ({ paciente_id: 'p03', tipo, sitio, data_inicio: dia(n) })),
   dispositivo_episodios: [['iot', 'tubo 8,0', -4], ['cvc', 'jugular interna D', -4], ['arterial', 'radial E', -3], ['svd', null, -4], ['sne', 'pós-pilórica', -3]].map(([tipo, sitio, n], i) => ({ id: 'd' + i, paciente_id: 'p03', tipo, sitio, data_inicio: dia(n), data_fim: null })),
   atbs: [
+    { id: 'a9', paciente_id: 'p01', droga: 'Piperacilina-tazobactam', dose: '4,5 g', via: 'EV', frequencia: '6/6 h', data_inicio: dia(-1), data_fim: null, intencao: 'empirica', foco: null, duracao_planejada_dias: null },
+    { id: 'a8', paciente_id: 'p01', droga: 'Meropeném', dose: '1 g', via: 'EV', frequencia: '8/8 h', data_inicio: dia(-9), data_fim: dia(-5), intencao: 'empirica', foco: null, duracao_planejada_dias: null },
     { id: 'a0', paciente_id: 'p03', droga: 'Ceftriaxona', dose: '2 g', via: 'EV', frequencia: '1x/dia', data_inicio: dia(-4), data_fim: dia(-3), intencao: 'empirica', foco: null, duracao_planejada_dias: null },
     { id: 'a1', paciente_id: 'p03', droga: 'Meropeném', dose: '1 g', via: 'EV', frequencia: '8/8 h', data_inicio: dia(-2), data_fim: null, intencao: 'dirigida', foco: 'Pulmonar', duracao_planejada_dias: 7 },
     { id: 'a2', paciente_id: 'p03', droga: 'Vancomicina', dose: '1,5 g', via: 'EV', frequencia: '12/12 h', data_inicio: dia(-2), data_fim: null, intencao: 'empirica', foco: 'Pulmonar', duracao_planejada_dias: null },
@@ -73,6 +75,18 @@ http.createServer((req, res) => {
   const h = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*', 'content-type': 'application/json' };
   if (req.method === 'OPTIONS') { res.writeHead(204, h); return res.end(); }
   if (u.pathname === '/_escritas') { if (req.method === 'DELETE') escritas.length = 0; res.writeHead(200, h); return res.end(JSON.stringify(escritas)); }
+  if (u.pathname.startsWith('/rest/v1/rpc/') && req.method === 'POST') {
+    const fn = u.pathname.replace('/rest/v1/rpc/', ''); let b = '';
+    req.on('data', (c) => (b += c));
+    req.on('end', () => {
+      let corpo = null; try { corpo = b ? JSON.parse(b) : null; } catch (e) { corpo = b; }
+      escritas.push({ metodo: 'RPC', tabela: 'rpc/' + fn, filtro: '', corpo }); console.log('RPC', fn, b.slice(0, 600));
+      if (fn === 'dar_alta_paciente') { if (corpo && corpo.p_observacoes === 'FALHAR') { res.writeHead(400, h); return res.end(JSON.stringify({ code: 'P0001', message: 'Data do desfecho anterior à entrada na UTI.' })); } res.writeHead(200, h); return res.end(JSON.stringify('internacao-1')); }
+      if (fn === 'transferir_leito') { if (corpo && corpo.p_leito === 'UTI2-L13') { res.writeHead(400, h); return res.end(JSON.stringify({ code: 'P0001', message: 'Leito de destino ocupado.' })); } res.writeHead(200, h); return res.end('null'); }
+      res.writeHead(404, h); res.end(JSON.stringify({ message: 'sem função ' + fn, code: '404' }));
+    });
+    return;
+  }
   const t = u.pathname.replace('/rest/v1/', '');
   let rows = T[t];
   if (!rows) { console.log('SEM TABELA', t); res.writeHead(404, h); return res.end(JSON.stringify({ message: 'sem tabela ' + t, code: '404' })); }

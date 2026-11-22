@@ -1,7 +1,7 @@
 import { Faixa, FichaPaciente, Topo } from "@/components/ds";
 import { leitoPedido } from "@/components/Leito";
 import { DISPOSITIVO, MATERIAL, SUPORTES, TURNO, ddmm, ddmmaaaa, diaSP, diasEntre, esquemaDe, hdItens, horaSP, nf, plantaoAtual, somaDias, type Dados, type Quadro } from "@/lib/termos";
-import { carregarDetalhe, pilulas, porDia } from "@/lib/uti";
+import { carregarDetalhe, carregarNomesAtb, pilulas, porDia } from "@/lib/uti";
 import { Ficha, type Estado } from "./Ficha";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +24,7 @@ export default async function Evolucao({ searchParams }: { searchParams: Promise
   }
   const p = l.p;
   const pl = plantaoAtual();
-  const d = await carregarDetalhe(p.id);
+  const [d, nomesAtb] = await Promise.all([carregarDetalhe(p.id), carregarNomesAtb()]);
   const evo = d.evoPlantao;
   const ant = d.evoAnterior && diasEntre(d.evoAnterior.data_plantao, pl.data) <= 1 ? d.evoAnterior : null;
 
@@ -86,7 +86,7 @@ export default async function Evolucao({ searchParams }: { searchParams: Promise
         .map((x) => ({ nome: [DISPOSITIVO[x.tipo] ?? x.tipo, x.sitio].filter(Boolean).join(" "), d: diasEntre(x.data_inicio, pl.hoje) }))}
       viaAerea={via ? { via: via.tipo === "iot" ? "IOT" : "TQT", desde: ddmm(via.data_inicio), d: diasEntre(via.data_inicio, pl.hoje) } : null}
       viaEnteral={enteral ? DISPOSITIVO[enteral.tipo] : null} svd={ativos.some((x) => x.tipo === "svd")}
-      hoje={pl.hoje}
+      hoje={pl.hoje} nomesAtb={nomesAtb} vagos={leitos.filter((x) => !x.p).map((x) => x.n)}
       atbs={d.atbs.filter((a) => !a.data_fim || a.data_fim === pl.hoje).map((a) => ({ id: a.id, droga: a.droga, esquema: esquemaDe(a.dose, a.via, a.frequencia), inicio: a.data_inicio, fim: a.data_fim, previstos: a.duracao_planejada_dias }))}
       culturas={d.culturas.map((c) => ({
         id: c.id, material: MATERIAL[c.material] ?? c.material, coleta: ddmm(diaSP(c.coleta_ts)), coletaTs: c.coleta_ts, laudoTs: c.laudo_ts,

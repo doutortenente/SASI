@@ -120,6 +120,12 @@ export interface Detalhe {
   atbs: Atb[]; culturas: Cultura[]; disp: Dispositivo[]; eventos: Evento[]; janelas: Janela[]; pend: Pendencia[];
   evoPlantao: Evolucao | null; evoAnterior: Evolucao | null; vocab: Vocab[]; regras: Regra[];
 }
+/** Nomes de antimicrobianos já usados no banco (só a coluna droga), sem repetir, em ordem. Sugestões da ficha. */
+export const carregarNomesAtb = cache(async (): Promise<string[]> => {
+  const sb = await getSupabaseServer();
+  const r = await ler<{ droga: string | null }>("atbs_nomes", sb.from("atbs").select("droga").order("droga"));
+  return [...new Set(r.map((x) => (x.droga ?? "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+});
 export const carregarVocab = cache(async (): Promise<Vocab[]> => {
   const sb = await getSupabaseServer();
   return ler<Vocab>("evento_tipo_ref", sb.from("evento_tipo_ref").select("codigo,categoria,rotulo,sigla,unidade_padrao,ordem"));

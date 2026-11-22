@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { AltaTroca } from "@/components/AltaTroca";
 import { Icone } from "@/components/Icone";
 import { Area, G, Linha, M, Num, Seg, Txt, U, tecla } from "@/components/controles";
 import type { NomeIcone } from "@/components/icones";
@@ -45,7 +46,7 @@ interface Props {
   labs: Record<string, { hoje: string; antes: string[] }>;
   peso: number | null; altura: number | null; sexo: string | null;
   dispositivos: { nome: string; d: number }[]; viaAerea: { via: string; desde: string; d: number } | null; viaEnteral: string | null; svd: boolean;
-  hoje: string;
+  hoje: string; nomesAtb: string[]; vagos: string[];
   atbs: { id: string; droga: string; esquema: string; inicio: string; fim: string | null; previstos: number | null }[];
   culturas: { id: string; material: string; coleta: string; coletaTs: string; laudoTs: string | null; resultado: string; germe: string; ufc: number | null; s: string; r: string }[];
   bhAcumulado: number | null; children: ReactNode;
@@ -109,12 +110,13 @@ function Sis({ nome, ic, igual, children }: { nome: string; ic: NomeIcone; igual
 const semEstilo: CSSProperties = { border: 0, outline: 0, padding: 0, margin: 0, background: "none", font: "inherit", color: "inherit", appearance: "none" };
 
 export function Ficha(props: Props) {
-  const { pacienteId, leito, dataPlantao, turno, registro, labs, peso, altura, sexo, dispositivos, viaAerea, viaEnteral, svd, hoje, bhAcumulado } = props;
+  const { pacienteId, leito, dataPlantao, turno, registro, labs, peso, altura, sexo, dispositivos, viaAerea, viaEnteral, svd, hoje, bhAcumulado, nomesAtb, vagos } = props;
   const rota = useRouter();
   const [st, setSt] = useState<Estado>(props.inicial);
   const [ont, setOnt] = useState(props.ontem);
   const [id, setId] = useState(props.evolucaoId);
   const [sujo, setSujo] = useState(false);
+  const [sugAberta, setSugAberta] = useState<string | null>(null); // linha de antimicrobiano novo com a lista de nomes aberta
   const [estado, setEstado] = useState<"" | "salvando" | "erro" | "copiado">("");
   const [erroMsg, setErroMsg] = useState("");
   const salvandoRef = useRef(false);
@@ -436,6 +438,9 @@ export function Ficha(props: Props) {
     return () => { document.removeEventListener("click", clique, true); document.removeEventListener("keydown", atalho); window.removeEventListener("beforeunload", sair); };
   }, [rota]);
 
+  // nomes já usados no banco que combinam com o que foi digitado (o nome novo continua livre)
+  const sugestoes = (digitado: string) => { const t = digitado.trim().toLowerCase(); return nomesAtb.filter((n) => n.toLowerCase().includes(t) && n.toLowerCase() !== t); };
+
   // ---- peças que se repetem nos quadros -------------------------------------------
   const numG = (q: Quadro, m: string, r: string, k: string, un?: string, larg?: number) => <G><M>{m}</M><Num r={r} v={v(q)[k]} on={(x) => set(q, k, x)} larg={larg} />{un ? <U>{un}</U> : null}</G>;
   const notas = (q: Quadro, nome: string) => <Linha r="Notas"><Area r={`Notas de ${nome}`} v={v(q).notas} on={(x) => set(q, "notas", x)} /></Linha>;
@@ -536,6 +541,7 @@ export function Ficha(props: Props) {
       </header>
       <main className="ds-conteudo">
         {props.children}
+        <AltaTroca pacienteId={pacienteId} leito={leito} vagos={vagos} hoje={hoje} antes={() => (sujoRef.current ? salvarRef.current() : Promise.resolve(true))} />
         {listaTexto("Intercorrências 24 h", "intercorrencias", "Intercorrência", "a mesma lista do muda-conduta da Passagem", false)}
         <section className="ds-painel">
           <div className="ds-painel__cab"><div><h3 className="ds-painel__titulo">Sistemas</h3></div></div>
@@ -710,7 +716,7 @@ export function Ficha(props: Props) {
                         const muda = (m: Partial<AtbLocal>) => { setAtbL((l) => l.map((x) => (x.k === a.k ? { ...x, ...m } : x))); setSujo(true); };
                         const linha = (
                           <>
-                            {novo ? <Txt r="Antimicrobiano" v={a.droga} on={(x) => muda({ droga: x })} larg={100} /> : <span className="ds-ev__nome">{a.droga}</span>}
+                            {novo ? <Txt r="Antimicrobiano" v={a.droga} on={(x) => { muda({ droga: x }); setSugAberta(a.k); }} larg={100} onFoco={() => setSugAberta(a.k)} onSai={() => setSugAberta((k) => (k === a.k ? null : k))} /> : <span className="ds-ev__nome">{a.droga}</span>}
                             <Txt r={novo ? "Dose do antimicrobiano novo" : `Dose de ${a.droga}`} v={a.esquema} on={(x) => muda({ esquema: x })} />
                             <span className="ds-ev__dia">
                               {novo ? <><M>início</M><Num r={`Data de início de ${nome}`} v={a.inicio} on={(x) => muda({ inicio: x })} larg={58} /></> : null}
@@ -725,6 +731,11 @@ export function Ficha(props: Props) {
                         return (
                           <Fragment key={a.k}>
                             {a.x ? <span className="ds-removido" role="button" tabIndex={0} aria-label="Removido. Tocar para trazer de volta" onClick={() => muda({ x: false })} onKeyDown={tecla(() => muda({ x: false }))}>{linha}</span> : linha}
+                            {novo && sugAberta === a.k && sugestoes(a.droga).length ? (
+                              <span className="ds-pop" role="listbox" aria-label="Sugestões de antimicrobianos" style={{ gridColumn: "1 / -1", justifySelf: "start" }}>
+                                {sugestoes(a.droga).map((n) => <span key={n} role="option" aria-selected={false} tabIndex={0} style={{ cursor: "pointer" }} onMouseDown={(e) => e.preventDefault()} onClick={() => { muda({ droga: n }); setSugAberta(null); }} onKeyDown={tecla(() => { muda({ droga: n }); setSugAberta(null); })}>{n}</span>)}
+                              </span>
+                            ) : null}
                             {inicioAberto === a.k && !novo && !a.x ? (
                               <div className="ds-ev__sub"><div className="ds-ev__v"><G><M>Início</M><Num r={`Data de início de ${a.droga}`} v={a.inicio} on={(x) => muda({ inicio: x })} larg={58} /></G><span className="ds-ev__c">D1 é o dia do início</span></div></div>
                             ) : null}
