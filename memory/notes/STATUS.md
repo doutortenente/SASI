@@ -11,6 +11,10 @@
 > Briefing operacional para IA: [CLAUDE.md](CLAUDE.md).  
 > Sempre atualize este arquivo em mudanças importantes de arquitetura, deploy, auth ou schema.
 
+> ⚠️ **22/11/2026 — schema:** o banco vivo está à frente do que este documento descreve (17 tabelas, 34 migrações;
+> 22 entraram entre 08-ago e 27-set pelo projeto SASI-V3). O repositório foi sincronizado com o banco nesta data:
+> ver a nota em `CLAUDE.md` §4 e o retrato em `supabase/schema-live-dump.sql`.
+
 ---
 
 ## 1. Stack e Arquitetura Atual

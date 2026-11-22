@@ -1,3 +1,7 @@
+-- ⚠️ DESATUALIZADO DESDE 08-AGO-2026. Este arquivo descreve o banco de 30-jul-2026.
+-- Depois dele entraram 22 migrações (enums adotados nas colunas, internações, dispositivos por
+-- episódio, janelas de 24 h, relógios da evolução, intercorrências). O retrato fiel do banco é
+-- supabase/schema-live-dump.sql; o histórico executável é supabase/migrations/.
 -- ============================================================================
 -- SASI v3 — SCHEMA DE PRODUÇÃO  (PostgreSQL 17 / Supabase)
 -- ----------------------------------------------------------------------------

@@ -63,6 +63,20 @@ Direção ASPIRACIONAL para telas novas — **“Monitor de UTI Tático / HUD”
 
 ## 4. Schema do banco (estado VIVO — 30-Jul-2026, **modelo v3**)
 
+> ⚠️ **Atualização de 22-nov-2026 — o resto desta seção descreve o banco de 30-jul e está defasado.**
+> O banco vivo recebeu 22 migrações depois dela (aplicadas pelo projeto SASI-V3) e hoje tem
+> **17 tabelas, 10 views, 19 enums, 79 códigos de evento e 34 migrações**.
+> Retrato fiel: `supabase/schema-live-dump.sql`. Histórico: `supabase/migrations/` (as 22 que faltavam
+> foram recuperadas do próprio banco, com o mesmo carimbo). O que mudou de mais importante:
+> - `gravidade`: `estavel | watcher | instavel | critico` (moderado→watcher, grave→instavel; óbito saiu: o desfecho mora em `status_leito` e em `internacoes.desfecho`).
+> - `internacoes` (episódios de UTI) e `internacao_id` carimbado por gatilho em evoluções, ATBs, culturas, eventos e pendências.
+> - `dispositivo_episodios`: `pacientes.dispositivos` virou DERIVADO, proibido escrever à mão; `vw_dispositivos_ativos` dá os dias de uso.
+> - `evolucoes`: `tipo_nota`, `data_plantao`, `turno` (diurna | noturna), `autor_crm`, `autor_nome`, `illness_severity`, `finalizada_em`, `intercorrencias`; `plantao` virou legado.
+> - `janelas_24h`: máximo, mínimo e nº de medidas fora do limiar por sinal (de onde sai "5x < 65").
+> - Os enums foram ADOTADOS nas colunas (08-ago) e `dev_bypass` foi reaberta em 27-set, por ordem do operador.
+> - Nas linhas de `evolucoes` convivem duas grafias: até jul `pa_sys_*`, `pa_dia_*`, `tmax`; desde ago `pas_*`, `pad_*`, `tax_*`.
+> - **Pendente:** `save_ficha` não grava as colunas novas e apaga HD, idade, peso, altura e alergias quando o campo não vem no envio. Corrigir antes de o app gravar por ela.
+
 Fonte fiel: **migration baseline** `20260626000000_baseline.sql` + **formalização v3** (`20260730120000_enums_e_dimensao_eventos`, `20260730120100_eventos_tipo_fk`, `20260730120200_memorias_dono_e_severidade_insert`), aplicada em produção em 30-jul-2026. Schema de referência completo: `supabase/schema-producao-v3.sql`. RAG (`protocolos`/`protocolo_chunks`, migration `06`) **congelado, não aplicado**. RLS habilitado (`dev_bypass` ainda ativo — remoção é passo *gated*, ver abaixo).
 
 **O que o modelo v3 trouxe (30-jul):**

@@ -19,7 +19,9 @@ export type Json =
 // 1. ENUMS (vocabulários fechados — espelham os enums nativos do Postgres)
 // ---------------------------------------------------------------------------
 export type Uti = 'UTI2' | 'UTI3' | 'UTI4';
-export type Gravidade = 'estavel' | 'moderado' | 'grave' | 'critico' | 'obito';
+// Em 10-ago-2026 o enum do banco mudou: moderado→watcher, grave→instavel; 'obito' saiu
+// (o desfecho mora em status_leito e em internacoes.desfecho).
+export type Gravidade = 'estavel' | 'watcher' | 'instavel' | 'critico';
 export type StatusLeito = 'ativo' | 'alta' | 'obito' | 'transferencia';
 export type Isolamento = 'none' | 'contact' | 'droplet' | 'aerosol';
 export type SeveridadeVisual = 'red' | 'yellow' | 'green';
@@ -36,6 +38,14 @@ export type FonteEvento =
   | 'auto_trigger' | 'edge_function' | 'api_import';
 export type Comparador = 'lt' | 'lte' | 'gt' | 'gte';
 export type TrendModo = 'subida_abs' | 'subida_rel' | 'queda_abs';
+// Enums criados em 10-ago-2026 (internações, dispositivos por episódio, relógios da evolução)
+export type Turno = 'diurna' | 'noturna';
+export type TipoNota = 'admissao' | 'seriada' | 'alta' | 'andar';
+export type DesfechoInternacao = 'alta_uti' | 'alta_hospitalar' | 'obito' | 'transferencia';
+export type DispositivoTipo =
+  | 'iot' | 'traqueo' | 'cvc' | 'picc' | 'arterial' | 'svd' | 'sne' | 'sng'
+  | 'dreno' | 'gtt' | 'trr' | 'marca_passo' | 'outro';
+export type DispositivoMotivoFim = 'eletivo' | 'infeccao' | 'troca' | 'disfuncao' | 'alta' | 'obito' | 'outro';
 
 // Códigos de tipo de evento (dimensão evento_tipo_ref). Extensível como DADO.
 export type EventoTipo =
@@ -94,6 +104,10 @@ export type EventoTipo =
   | 'sofa_cardio'
   | 'sofa_neuro'
   | 'sofa_renal'
+  // acrescentados em 10-ago-2026 (56 → 79 códigos)
+  | 'pas_min' | 'troponina' | 'probnp' | 'tp' | 'ttpa' | 'd_dimero' | 'tgo' | 'tgp' | 'ggt' | 'fa'
+  | 'bd' | 'bi' | 'amilase' | 'lipase' | 'dhl' | 'vhs' | 'tsh' | 't4l'
+  | 'pvc' | 'diurese_24h' | 'diurese_parcial' | 'uf_dialise' | 'debito_dreno'
   | 'custom';
 
 // ---------------------------------------------------------------------------
@@ -198,9 +212,14 @@ export interface PatientSummary {
 }
 
 // evolucoes: sistemas (esquema CANÔNICO Máx–Mín — fonte única da verdade)
+// Atenção (medido no banco em 22-nov-2026): convivem DUAS grafias nas linhas guardadas.
+// Até jul-2026: pa_sys_*, pa_dia_*, tmax. Desde ago-2026 a ingestão grava pas_*, pad_*, tax_*.
+// Quem lê precisa aceitar as duas. Chaves sem tipo certo medido ficam como Json.
 export interface SistemaNeuro {
   descricao?: string | null;
   rass?: string | number | null;
+  exame?: Json;
+  terapia?: Json;
 
   [k: string]: Json | undefined;
 }
@@ -211,6 +230,8 @@ export interface SistemaResp {
   fr_min?: string | number | null;
   spo2_max?: string | number | null;
   spo2_min?: string | number | null;
+  via?: Json;
+  ausculta?: Json;
   obs?: string | null;
 
   [k: string]: Json | undefined;
@@ -225,6 +246,12 @@ export interface SistemaHemo {
   pam_min?: string | number | null;
   fc_max?: string | number | null;
   fc_min?: string | number | null;
+  pas_max?: string | number | null; // desde ago-2026 (no lugar de pa_sys_max)
+  pas_min?: string | number | null;
+  pad_max?: string | number | null; // desde ago-2026 (no lugar de pa_dia_max)
+  pad_min?: string | number | null;
+  exame?: Json;
+  terapia?: Json;
   ritmo?: string | null;
   obs?: string | null;
 
@@ -233,6 +260,10 @@ export interface SistemaHemo {
 
 export interface SistemaTgi {
   dieta?: string | null;
+  abdome?: Json;
+  evacuacao?: Json;
+  evacuacoes_24h?: Json;
+  ingesta_hidrica_ml?: string | number | null;
   obs?: string | null;
 
   [k: string]: Json | undefined;
@@ -243,6 +274,9 @@ export interface SistemaRenal {
   ur?: string | number | null;
   diurese_6_18h_ml?: string | number | null;
   bh_6_18h_ml?: string | number | null;
+  diurese_24h_ml?: string | number | null; // desde ago-2026
+  bh_24h_ml?: string | number | null;      // desde ago-2026
+  terapia?: Json;
   descricao?: string | null;
   obs?: string | null;
 
@@ -253,6 +287,9 @@ export interface SistemaHemato {
   hb?: string | number | null;
   ht?: string | number | null;
   plaq?: string | number | null;
+  leuco?: string | number | null;
+  seg?: string | number | null;
+  bast?: string | number | null;
   obs?: string | null;
 
   [k: string]: Json | undefined;
@@ -262,6 +299,9 @@ export interface SistemaInfecto {
   atb?: string | null;
   tmax?: string | number | null;
   leuco?: string | number | null;
+  tax_max?: string | number | null; // desde ago-2026 (no lugar de tmax)
+  tax_min?: string | number | null;
+  foco?: Json;
   obs?: string | null;
 
   [k: string]: Json | undefined;
@@ -361,6 +401,16 @@ export interface Evolucao {
   sofa_total: number | null;
   created_at: string;
   updated_at: string;
+  // colunas de 10 e 13-ago-2026 (plantao acima virou legado: a referência é data_plantao + turno)
+  internacao_id: string | null;       // carimbado por gatilho
+  tipo_nota: TipoNota;
+  data_plantao: string;               // dia do plantão; noturna antes das 07h cai no dia anterior
+  turno: Turno;
+  autor_crm: string | null;
+  autor_nome: string | null;
+  illness_severity: Gravidade | null; // gravidade no momento da nota
+  finalizada_em: string | null;
+  intercorrencias: string[];
 }
 
 export interface EventoClinico {
@@ -368,6 +418,7 @@ export interface EventoClinico {
   paciente_id: string;
   evolucao_id: string | null;
   user_id: string | null;
+  internacao_id: string | null;
   ts: string;
   tipo: EventoTipo | string;   // FK -> evento_tipo_ref
   valor_num: number | null;
@@ -384,6 +435,7 @@ export interface Atb {
   id: string;
   paciente_id: string;
   user_id: string | null;
+  internacao_id: string | null;
   droga: string;
   dose: string | null;
   via: ViaAtb | null;
@@ -403,6 +455,7 @@ export interface Cultura {
   id: string;
   paciente_id: string;
   user_id: string | null;
+  internacao_id: string | null;
   material: MaterialCultura;
   coleta_ts: string;
   laudo_ts: string | null;
@@ -428,6 +481,7 @@ export interface Pendencia {
   paciente_id: string;
   evolucao_id: string | null;
   user_id: string | null;
+  internacao_id: string | null;
   tarefa: string;
   prioridade: 1 | 2 | 3;
   concluida: boolean;
@@ -558,6 +612,78 @@ export interface OcrIngestPayloadV1 {
 }
 
 // ---------------------------------------------------------------------------
+// 5-B. Tabelas criadas em 10-ago-2026
+// ---------------------------------------------------------------------------
+/** internacoes — um episódio de UTI por linha; a reinternação aponta para a anterior. */
+export interface Internacao {
+  id: string;
+  paciente_id: string;
+  user_id: string | null;
+  int_origem_data: string | null;
+  int_uti_data: string;
+  uti: Uti | null;
+  reinternacao: boolean;
+  internacao_prev_id: string | null;
+  desfecho: DesfechoInternacao | null;
+  desfecho_data: string | null;
+  destino_setor: string | null;
+  destino_especialidade: string | null;
+  observacoes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** dispositivo_episodios — cada dispositivo com início e fim. pacientes.dispositivos é DERIVADO daqui: não escrever à mão. */
+export interface DispositivoEpisodio {
+  id: string;
+  paciente_id: string;
+  internacao_id: string | null;
+  user_id: string | null;
+  tipo: DispositivoTipo;
+  sitio: string | null;
+  data_inicio: string;
+  data_fim: string | null;
+  motivo_fim: DispositivoMotivoFim | null;
+  observacoes: string | null;
+  source_text: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** janelas_24h — máximo, mínimo e nº de medidas fora do limiar de um sinal numa janela (de onde sai "5x < 65"). */
+export interface Janela24h {
+  id: string;
+  paciente_id: string;
+  internacao_id: string | null;
+  evolucao_id: string | null;
+  user_id: string | null;
+  tipo: EventoTipo | string;
+  janela_inicio: string;
+  janela_fim: string;
+  valor_max: number | null;
+  valor_min: number | null;
+  n_total: number;
+  n_fora_alto: number | null;
+  n_fora_baixo: number | null;
+  limiar_alto: number | null;
+  limiar_baixo: number | null;
+  fonte: FonteEvento;
+  confidence: number | null;
+  source_text: string | null;
+  requires_review: boolean;
+  created_at: string;
+}
+
+/** avisos_agentes — recados entre sessões de trabalho sobre o estado do banco. */
+export interface AvisoAgente {
+  id: number;
+  criado_em: string;
+  titulo: string;
+  corpo: string;
+  resolvido: boolean;
+}
+
+// ---------------------------------------------------------------------------
 // 6. Conveniência (mapa nome-da-tabela -> tipo Row), útil no cliente Supabase
 // ---------------------------------------------------------------------------
 export interface SasiTables {
@@ -574,4 +700,8 @@ export interface SasiTables {
   trend_rules: TrendRule;
   ingest_audit_log: IngestAuditLog;
   memorias: Memoria;
+  internacoes: Internacao;
+  dispositivo_episodios: DispositivoEpisodio;
+  janelas_24h: Janela24h;
+  avisos_agentes: AvisoAgente;
 }
