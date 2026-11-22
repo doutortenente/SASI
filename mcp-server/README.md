@@ -96,7 +96,7 @@ Claude Desktop (`claude_desktop_config.json`):
 
 ```
 sasi_sitrep                     → visão geral da UTI
-sasi_get_patient uti=UTI2 leito=L03 → ficha completa do leito
+sasi_get_patient uti=UTI2 leito=UTI2-L03 → ficha completa do leito
 sasi_create_evolution           → registra evolução do turno
 sasi_insert_event tipo=lactato  → atualiza série temporal
 sasi_list_alerts                → confere alertas críticos

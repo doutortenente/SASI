@@ -20,6 +20,8 @@ paths:
 - Comentar todo comando destrutivo (drop/alter/delete).
 - Uma migração por mudança lógica. Aplicar com uma única chamada `apply_migration`.
 - Mudança de estrutura do banco só por migração (arquivo em `supabase/migrations/` aplicado com `apply_migration`), nunca por SQL solto.
+- Antes de gravar no banco, ler o manual: `select corpo from public.avisos_agentes where titulo like 'MANUAL DO BANCO%';`.
+- Mudou campo ou opção da ficha, limiar de sinal vital ou função de gravação: atualizar `fn_ficha_contrato`, `fn_trg_janela_limiares` e o texto do manual na mesma migração.
 
 ## Edge Functions
 

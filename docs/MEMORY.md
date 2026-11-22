@@ -16,6 +16,7 @@ docs/
 | App | `src/` | Telas do plantão (Next.js 15), no design "Comando UTI" — **único app do repo**, na raiz |
 | Design | `src/app/comando-uti.css`, `src/lib/termos.ts` | Folha de estilos e termos copiados do design system |
 | Banco | `supabase/migrations/` | Histórico do banco vivo (fonte única do esquema) |
+| Manual dos agentes | banco: `avisos_agentes`, linha "MANUAL DO BANCO" | Como qualquer Claude grava no banco; as travas `trg_05_*` recusam o que foge dele |
 | MCP | `mcp-server/src/` | skills → Supabase |
 | Ingest | skill + MCP | Claude → JSON → deploy |
 | Motor | banco (view `vw_eventos_tendencia`; `vw_sofa_diario` ficou parada) | tendências — **não** há pacote local |
@@ -37,4 +38,4 @@ docs/
 ## Débitos
 
 1. **CSP pendente** — CSP é a regra do navegador que limita quais scripts podem rodar. Há 1 `<script>` em linha (tema) em `src/app/layout.tsx`; CSP estrita exige nonce (código de uso único no script).
-2. **Skills médicas sobrepostas** — o operador disse em 22-nov-2026 que `controles-vitais-janela` é redundante com as outras. Fica para a próxima; sem plano.
+2. **Skills médicas sobrepostas** — o operador disse em 22-nov-2026 que `controles-vitais-janela` é redundante com as outras. Fica para a próxima; sem plano. Fato conferido em 22-nov-2026: a cópia de `admissao-uti` instalada no claude.ai é uma versão diferente da do repositório (gera a nota em Word e não grava no banco).

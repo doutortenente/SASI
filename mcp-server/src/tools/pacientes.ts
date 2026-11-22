@@ -69,13 +69,13 @@ Retorna: Lista com leito, nome, HD, gravidade, dispositivos, dias de UTI.`,
 
 Args:
   - paciente_id (string): UUID do paciente (use sasi_list_patients para obter)
-  - leito (string): Alternativa ao paciente_id — busca por leito (ex: 'L01', 'L02')
+  - leito (string): Alternativa ao paciente_id — busca por leito escrito por inteiro (ex: 'UTI2-L01'; o banco só encontra assim, o código não converte 'L01')
   - uti ('UTI2'|'UTI3'|'UTI4'): Obrigatório se usar leito
 
 Use um dos dois: paciente_id OU (leito + uti).`,
       inputSchema: z.object({
         paciente_id: z.string().uuid().optional().describe("UUID do paciente (alternativa ao leito+uti)"),
-        leito: z.string().optional().describe("Identificador do leito, ex: 'L01'"),
+        leito: z.string().optional().describe("Leito escrito por inteiro, ex: 'UTI2-L01'"),
         uti: UTI_ENUM.optional().describe("Obrigatório se usar leito"),
       }).strict(),
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -169,7 +169,7 @@ Use um dos dois: paciente_id OU (leito + uti).`,
       description: `Registra um novo paciente na UTI (admissão).
 
 Args:
-  - leito (string): Identificador do leito (ex: 'L01')
+  - leito (string): Leito escrito por inteiro (ex: 'UTI2-L01'; o banco recusa 'L01' ou só o número)
   - uti ('UTI2'|'UTI3'|'UTI4'): Unidade
   - nome (string): Nome do paciente
   - idade (number): Idade em anos
