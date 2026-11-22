@@ -35,6 +35,7 @@ Ver `CLAUDE.md` §4. Migrações em `supabase/migrations/` (36), fonte única do
 
 - 22/11/2026: termos do banco iguais aos do design (`20261122040931_termos_do_design`) e `pacientes.sexo` (`20261122052449_paciente_sexo_do_design`).
 - Os dados clínicos estão parados desde 27/09/2026 (último ingest).
+- Gravação conferida em 22-nov-2026 por leitura do banco real (colunas, tipos, opções, permissões e o gatilho que abre a internação batem com o que o app envia); a gravação ao vivo ainda não foi exercitada.
 
 ## 5. Pendências
 
