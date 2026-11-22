@@ -1,22 +1,13 @@
-# Supabase — SASI
+# supabase — o banco do SASI
 
-## Arquivos canônicos
+| Item | Papel |
+|---|---|
+| `migrations/` | Histórico do banco vivo: cada arquivo tem o mesmo carimbo de `supabase_migrations.schema_migrations`. Já aplicadas: não editar nem reaplicar. `_gated/` guarda passos que NÃO rodam sozinhos |
+| `schema-live-dump.sql` | Retrato do esquema lido do banco (referência; não é migração). O cabeçalho diz a data e o que falta somar |
+| `queries/` | Consultas de plantão para o DataGrip |
+| `templates/` | Molde de paciente fictício para teste |
+| `functions/` | Edge functions legadas (`ocr-ingest`): não usar |
+| `config.toml` | Configuração do Supabase CLI |
 
-| Arquivo                            | Função                                                                       |
-| ---------------------------------- | ---------------------------------------------------------------------------- |
-| `schema-live-dump.sql`             | DDL do schema **real** em produção (2026-06-21, 10 tabelas incl. `memorias`) |
-| `migrations/01`–`06`               | Histórico incremental versionado                                             |
-| `types/database.types.ts`          | Tipos TS gerados do schema (web + mobile)                                    |
-| `functions/ocr-ingest`             | **Legado** — ingest real é Claude→JSON→MCP                                   |
-| `functions/_legacy/ingest-patient` | **Legado** — app mobile antigo; não deployar                                 |
-
-## Regenerar tipos
-
-```bash
-supabase gen types typescript --project-id idswehsvvqczzkiatuzu > supabase/types/database.types.ts
-```
-
-## Snapshot histórico
-
-O snapshot `05_schema_real_snapshot.sql` (2026-06-14, 9 tabelas) vivia no antigo repo
-`comando-uti`. Foi substituído por `schema-live-dump.sql`, que reflete o banco atual.
+Os termos do banco são os do design (ver `CLAUDE.md` §4). Tipos TypeScript gerados não ficam no repositório, porque
+nada os usa; para gerar: `supabase gen types typescript --project-id idswehsvvqczzkiatuzu`.

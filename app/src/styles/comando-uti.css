@@ -1,0 +1,689 @@
+/* Comando UTI — variáveis do design system (tokens.json do artefato). Não editar à mão. */
+:root, [data-theme="claro"] {
+  --fundo: #f5f3ee;
+  --superficie: #ffffff;
+  --superficie-2: #f3f1eb;
+  --superficie-3: #e7e3da;
+  --borda: #dcd7cc;
+  --borda-forte: #827c71;
+  --texto: #181b21;
+  --texto-2: #3a3f48;
+  --texto-3: #5c616a;
+  --texto-4: #666b74;
+  --acento: #0e6b70;
+  --acento-hover: #0a565a;
+  --acento-fundo: #d8eeee;
+  --acento-texto: #0b5a5f;
+  --sobre-acento: #ffffff;
+  --anel-foco: #0e6b7066;
+  --gravidade-estavel: #27ae6a;
+  --gravidade-estavel-sobre: #06200f;
+  --gravidade-watcher: #f4c63d;
+  --gravidade-watcher-sobre: #2a2000;
+  --gravidade-instavel: #ef7d28;
+  --gravidade-instavel-sobre: #2a1100;
+  --gravidade-critico: #cf2030;
+  --gravidade-critico-sobre: #ffffff;
+  --alerta: #b04a0c;
+  --critico: #bf1d2a;
+  --grafico-linha: #3d434d;
+  --grade: #0000000b;
+}
+[data-theme="escuro"] {
+  --fundo: #15171b;
+  --superficie: #1d2025;
+  --superficie-2: #26292f;
+  --superficie-3: #32363d;
+  --borda: #2f3239;
+  --borda-forte: #757a83;
+  --texto: #f3f2ef;
+  --texto-2: #d2d0cb;
+  --texto-3: #a4a29c;
+  --texto-4: #92908a;
+  --acento: #45bfc0;
+  --acento-hover: #74d6d6;
+  --acento-fundo: #163a3c;
+  --acento-texto: #74d6d6;
+  --sobre-acento: #04191a;
+  --anel-foco: #45bfc073;
+  --gravidade-estavel: #2fbf74;
+  --gravidade-estavel-sobre: #06200f;
+  --gravidade-watcher: #f6cb46;
+  --gravidade-watcher-sobre: #2a2000;
+  --gravidade-instavel: #f5852f;
+  --gravidade-instavel-sobre: #2a1100;
+  --gravidade-critico: #d92b3b;
+  --gravidade-critico-sobre: #ffffff;
+  --alerta: #ff9e4f;
+  --critico: #ff8080;
+  --grafico-linha: #b9b7b1;
+  --grade: #ffffff07;
+}
+:root {
+  --espaco-1: 4px;
+  --espaco-2: 8px;
+  --espaco-3: 12px;
+  --espaco-4: 16px;
+  --espaco-6: 24px;
+  --espaco-8: 32px;
+  --raio-p: 4px;
+  --raio-m: 6px;
+  --raio-g: 10px;
+  --menu: 212px;
+  --menu-tablet: 72px;
+  --topo: 64px;
+  --campo: 40px;
+  --campo-folha: 30px;
+  --fio-tinta: 2px;
+  --faixa-gravidade: 6px;
+  --font-sans: "Atkinson Hyperlegible Next", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
+}
+.titulo-tela {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 800;
+}
+.nome-paciente {
+  font-family: var(--font-sans);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 800;
+}
+.titulo-folha {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 700;
+}
+.corpo {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+.corpo-denso {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+.rotulo {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+}
+.legenda {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+}
+.leito-numero {
+  font-family: var(--font-mono);
+  font-size: 30px;
+  line-height: 30px;
+  font-weight: 700;
+}
+.valor-grande {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  line-height: 26px;
+  font-weight: 700;
+}
+.valor {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+}
+.valor-denso {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/fonts/atkinson-next-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/fonts/atkinson-next-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/fonts/atkinson-next-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/fonts/atkinson-next-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/fonts/atkinson-next-800.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Mono";
+  src: url("/fonts/atkinson-mono-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Mono";
+  src: url("/fonts/atkinson-mono-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Comando UTI. Folha de plantão: papel e tinta, fio de tinta sob cabeçalho, números em fonte mono. Temas claro e escuro pelos tokens. */
+
+/* base */
+.ds { font-family: var(--font-sans); font-size: 16px; line-height: 1.5; color: var(--texto-2); background: var(--fundo); -webkit-font-smoothing: antialiased; }
+.ds *, .ds *::before, .ds *::after { box-sizing: border-box; }
+:where(.ds) :is(h1, h2, h3, h4, p, ul, ol, dl, dd, dt) { margin: 0; }
+:where(.ds) :is(ul, ol) { padding: 0; list-style: none; }
+:where(.ds) button { font: inherit; color: inherit; cursor: pointer; }
+:where(.ds) a { color: inherit; text-decoration: none; }
+.ds :focus-visible { outline: none; box-shadow: 0 0 0 3px var(--anel-foco); }
+.ds-icone { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ds-n, .ds-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.ds-tenue { color: var(--texto-4); }
+.ds-va { color: var(--alerta); font-weight: 700; }
+.ds-vc { color: var(--critico); font-weight: 700; }
+.ds-g-estavel { --g: var(--gravidade-estavel); --g-s: var(--gravidade-estavel-sobre); }
+.ds-g-watcher { --g: var(--gravidade-watcher); --g-s: var(--gravidade-watcher-sobre); }
+.ds-g-instavel { --g: var(--gravidade-instavel); --g-s: var(--gravidade-instavel-sobre); }
+.ds-g-critico { --g: var(--gravidade-critico); --g-s: var(--gravidade-critico-sobre); }
+
+/* botão */
+.ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: var(--campo); padding: 0 16px; border: 1.5px solid var(--texto); border-radius: var(--raio-m); background: var(--superficie); color: var(--texto); font-size: 15px; font-weight: 700; line-height: 1; white-space: nowrap; }
+.ds-btn:hover { background: var(--superficie-3); }
+.ds-btn--primario { border-color: var(--acento); background: var(--acento); color: var(--sobre-acento); }
+.ds-btn--primario:hover { border-color: var(--acento-hover); background: var(--acento-hover); }
+.ds-btn--texto { border-color: transparent; background: transparent; color: var(--texto-2); }
+.ds-btn--p { height: 32px; padding: 0 12px; font-size: 14px; }
+.ds-btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+.ds-link { display: inline-flex; align-items: center; gap: 6px; border: 0; padding: 4px 0; background: none; color: var(--acento-texto); font-size: 14px; font-weight: 700; }
+.ds-link .ds-icone { width: 16px; height: 16px; }
+
+/* gravidade */
+.ds-selo { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: var(--raio-m); background: var(--g); color: var(--g-s); font-size: 14px; font-weight: 700; line-height: 1; white-space: nowrap; }
+.ds-selo--p { height: 22px; padding: 0 8px; font-size: 13px; }
+.ds-selo--texto { height: auto; padding: 0; gap: 8px; background: none; color: var(--texto); font-size: 15px; }
+.ds-selo--texto::before { content: ""; width: 12px; height: 12px; border-radius: 3px; background: var(--g); }
+.ds-cont { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--texto-2); white-space: nowrap; }
+.ds-cont::before { content: ""; width: 12px; height: 12px; border-radius: 3px; background: var(--g); }
+.ds-cont b { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: var(--texto); }
+.ds-prio { flex: none; font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--texto-3); }
+.ds-prio--1 { color: var(--critico); }
+.ds-prio--2 { color: var(--alerta); }
+.ds-sir { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: var(--raio-p); font-family: var(--font-mono); font-size: 13px; font-weight: 700; line-height: 1; }
+.ds-sir--s { background: var(--gravidade-estavel); color: var(--gravidade-estavel-sobre); }
+.ds-sir--i { background: var(--gravidade-watcher); color: var(--gravidade-watcher-sobre); }
+.ds-sir--r { background: var(--gravidade-critico); color: var(--gravidade-critico-sobre); }
+.ds-check { display: grid; place-items: center; flex: none; width: 20px; height: 20px; border: 1.5px solid var(--texto); border-radius: var(--raio-p); background: var(--superficie); color: var(--sobre-acento); }
+.ds-check .ds-icone { width: 14px; height: 14px; stroke-width: 3; }
+.ds-check--feito { border-color: var(--acento); background: var(--acento); }
+.ds-chip { font-size: 14px; font-weight: 700; color: var(--texto); white-space: nowrap; }
+.ds-aviso { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700; color: var(--texto); white-space: nowrap; }
+.ds-aviso .ds-icone { width: 15px; height: 15px; }
+.ds-aviso--alergia { color: var(--critico); }
+
+/* campo com rótulo em cima */
+.ds-campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ds-campo__rotulo { font-size: 13px; font-weight: 600; line-height: 18px; color: var(--texto-3); }
+.ds-campo__ctrl { display: flex; align-items: center; gap: 8px; min-height: var(--campo); padding: 7px 10px; border: 0; border-bottom: 2px solid var(--borda-forte); border-radius: var(--raio-p) var(--raio-p) 0 0; background: var(--superficie-2); color: var(--texto); font-size: 16px; line-height: 24px; }
+.ds-campo__ctrl > span:first-child { flex: 1; min-width: 0; }
+.ds-campo__ctrl .ds-icone { color: var(--texto-3); }
+.ds-campo__vazio { color: var(--texto-4); }
+.ds-campo--n .ds-campo__ctrl { font-family: var(--font-mono); font-weight: 700; }
+.ds-campo--area .ds-campo__ctrl { align-items: flex-start; min-height: 76px; }
+.ds-campo--foco .ds-campo__ctrl { border-bottom-color: var(--acento); box-shadow: 0 0 0 3px var(--anel-foco); }
+.ds-campo--alerta .ds-campo__ctrl { border-bottom-color: var(--alerta); color: var(--alerta); }
+.ds-campo--critico .ds-campo__ctrl { border-bottom-color: var(--critico); color: var(--critico); }
+.ds-campo--erro .ds-campo__ctrl { border-bottom-color: var(--critico); border-bottom-width: 3px; }
+.ds-campo--inativo .ds-campo__ctrl { border-bottom-style: dashed; background: transparent; color: var(--texto-4); }
+.ds-campo__nota { font-size: 13px; line-height: 18px; color: var(--texto-3); }
+.ds-campo--alerta .ds-campo__nota { color: var(--alerta); font-weight: 700; }
+.ds-campo--critico .ds-campo__nota, .ds-campo--erro .ds-campo__nota { color: var(--critico); font-weight: 700; }
+.ds-busca { display: flex; align-items: center; gap: 8px; width: 220px; height: var(--campo); padding: 0 12px; border: 0; border-bottom: 2px solid var(--borda-forte); border-radius: var(--raio-p) var(--raio-p) 0 0; background: var(--superficie-2); color: var(--texto-4); font-size: 15px; }
+
+/* campo de folha: o valor fica na linha, sobre um fio */
+.ds-f { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 50px; min-height: var(--campo-folha); padding: 2px 8px; border-bottom: 2px solid var(--borda-forte); border-radius: var(--raio-p) var(--raio-p) 0 0; background: var(--superficie-2); color: var(--texto); font-family: var(--font-mono); font-size: 16px; font-weight: 700; line-height: 22px; white-space: nowrap; }
+.ds-f--t { display: flex; justify-content: flex-start; flex: 1; min-width: 0; padding: 4px 8px; font-family: var(--font-sans); font-size: 15px; font-weight: 400; white-space: normal; }
+.ds-f--sel { justify-content: space-between; font-family: var(--font-sans); font-size: 15px; font-weight: 600; }
+.ds-f--sel .ds-icone { width: 16px; height: 16px; color: var(--texto-3); }
+.ds-f--foco { border-bottom-color: var(--acento); box-shadow: 0 0 0 3px var(--anel-foco); }
+.ds-f.ds-va { border-bottom-color: var(--alerta); color: var(--alerta); }
+.ds-f.ds-vc { border-bottom-color: var(--critico); color: var(--critico); }
+.ds-r { flex: none; font-size: 13px; font-weight: 600; line-height: 18px; color: var(--texto-3); white-space: nowrap; }
+.ds-p { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 8px; row-gap: 1px; min-width: 0; }
+.ds-p > .ds-r { min-width: 40px; }
+.ds-p__v { display: flex; align-items: center; gap: 5px; min-width: 0; color: var(--texto-4); font-size: 13px; }
+.ds-p__n { grid-column: 2; font-size: 13px; line-height: 17px; font-weight: 600; color: var(--texto-3); white-space: nowrap; }
+.ds-p__n.ds-va { color: var(--alerta); font-weight: 700; }
+.ds-p__n.ds-vc { color: var(--critico); font-weight: 700; }
+.ds-p--cheio { grid-column: 1 / -1; }
+.ds-dados { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 20px; align-items: start; }
+.ds-pilha { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+/* folha (painel) */
+.ds-painel { border: 1px solid var(--borda); border-radius: var(--raio-g); background: var(--superficie); padding: 0 16px 16px; min-width: 0; }
+.ds-painel__cab { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 12px 0 9px; border-bottom: var(--fio-tinta) solid var(--texto); }
+.ds-painel__cab > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 10px; }
+.ds-painel__titulo { font-size: 17px; line-height: 24px; font-weight: 700; color: var(--texto); }
+.ds-painel__nota { font-size: 13px; color: var(--texto-3); }
+.ds-painel__corpo { padding-top: 12px; }
+
+/* listas */
+.ds-lista { display: flex; flex-direction: column; gap: 6px; }
+.ds-lista__item { display: flex; align-items: flex-start; gap: 8px; }
+.ds-lista__n { flex: none; width: 18px; font-family: var(--font-mono); font-size: 14px; line-height: 30px; font-weight: 700; color: var(--texto-3); text-align: right; }
+.ds-lista__sis { flex: none; display: inline-flex; align-items: center; justify-content: space-between; gap: 4px; width: 92px; min-height: var(--campo-folha); padding: 0 6px 0 8px; border-bottom: 2px solid var(--borda-forte); border-radius: var(--raio-p) var(--raio-p) 0 0; background: var(--superficie-2); font-size: 15px; font-weight: 700; color: var(--texto); }
+.ds-lista__sis .ds-icone { width: 15px; height: 15px; color: var(--texto-3); }
+.ds-lista__x { display: grid; place-items: center; flex: none; width: 28px; height: 30px; border: 0; background: none; color: var(--texto-4); }
+.ds-lista__x .ds-icone { width: 16px; height: 16px; }
+.ds-lista__item > .ds-check { margin-top: 5px; }
+.ds-lista__item > .ds-prio { line-height: 30px; }
+.ds-lista .ds-link { align-self: flex-start; }
+.ds-itens { display: flex; flex-direction: column; font-size: 15px; line-height: 22px; color: var(--texto); }
+.ds-itens li { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--borda); }
+.ds-itens li:first-child { padding-top: 0; }
+.ds-itens li:last-child { border-bottom: 0; padding-bottom: 0; }
+.ds-itens__t { flex: 1; min-width: 0; }
+.ds-itens__n { flex: none; width: 16px; font-family: var(--font-mono); font-weight: 700; color: var(--texto-3); }
+.ds-itens__sis { flex: none; width: 62px; font-weight: 800; color: var(--texto); }
+.ds-itens li > .ds-check { margin-top: 1px; }
+.ds-itens .ds-feito { color: var(--texto-4); text-decoration: line-through; }
+
+/* menu e topo */
+.ds-app { display: grid; grid-template-columns: var(--menu) minmax(0, 1fr); min-height: 100%; background: var(--fundo); }
+.ds-menu { display: flex; flex-direction: column; gap: 24px; padding: 18px 14px; border-right: 1px solid var(--borda); background: var(--superficie); }
+.ds-marca { padding: 0 8px; }
+.ds-marca b { display: block; font-size: 20px; line-height: 24px; font-weight: 800; letter-spacing: -0.01em; color: var(--texto); white-space: nowrap; }
+.ds-marca small { display: block; margin-top: 2px; font-size: 13px; line-height: 18px; color: var(--texto-3); white-space: nowrap; }
+.ds-nav { display: flex; flex-direction: column; gap: 4px; }
+.ds-nav a { display: flex; align-items: center; gap: 11px; height: 42px; padding: 0 12px; border-radius: var(--raio-m); color: var(--texto-2); font-size: 16px; font-weight: 500; }
+.ds-nav a .ds-icone { width: 20px; height: 20px; }
+.ds-nav a[aria-current] { background: var(--texto); color: var(--superficie); font-weight: 700; }
+.ds-app--tablet { grid-template-columns: var(--menu-tablet) minmax(0, 1fr); }
+.ds-app--tablet .ds-menu { padding: 18px 12px; align-items: center; }
+.ds-app--tablet .ds-marca small, .ds-app--tablet .ds-nav a span { display: none; }
+.ds-app--tablet .ds-marca b { font-size: 0; }
+.ds-app--tablet .ds-marca b::before { content: "UTI"; font-size: 16px; }
+.ds-app--tablet .ds-nav a { width: 48px; height: 46px; padding: 0; justify-content: center; }
+.ds-principal { display: flex; flex-direction: column; min-width: 0; }
+.ds-topo { display: flex; align-items: center; gap: 24px; height: var(--topo); margin: 0 24px; border-bottom: var(--fio-tinta) solid var(--texto); }
+.ds-topo h1 { font-size: 24px; line-height: 30px; font-weight: 800; letter-spacing: -0.01em; color: var(--texto); white-space: nowrap; }
+.ds-topo__resumo { display: flex; gap: 18px; }
+.ds-topo__acoes { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.ds-conteudo { display: flex; flex-direction: column; gap: 16px; padding: 16px 24px 24px; min-width: 0; }
+.ds-faixa { display: flex; flex-wrap: wrap; gap: 6px; }
+.ds-faixa a { display: grid; place-items: center; width: 50px; height: 42px; border: 1px solid var(--borda); border-top: var(--faixa-gravidade) solid var(--g, var(--borda)); border-radius: var(--raio-m); background: var(--superficie); color: var(--texto); font-family: var(--font-mono); font-size: 16px; font-weight: 700; line-height: 1; }
+.ds-faixa a[aria-current] { border-color: var(--texto); border-top-color: var(--g); background: var(--acento-fundo); box-shadow: inset 0 0 0 1px var(--texto); }
+.ds-faixa a.ds-vago { border-style: dashed; border-top-width: 1px; background: transparent; color: var(--texto-4); font-weight: 500; }
+
+/* card de leito */
+.ds-grade { display: grid; grid-template-columns: repeat(var(--colunas, 5), minmax(0, 1fr)); gap: 12px; }
+.ds-leito { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 10px 14px 12px; border: 1px solid var(--borda); border-top: var(--faixa-gravidade) solid var(--g); border-radius: var(--raio-g); background: var(--superficie); }
+.ds-leito__topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ds-leito__n { font-family: var(--font-mono); font-size: 30px; line-height: 30px; font-weight: 700; color: var(--texto); }
+.ds-leito__nome { font-size: 17px; line-height: 22px; font-weight: 700; color: var(--texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ds-leito__meta { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: -4px; font-size: 14px; line-height: 20px; color: var(--texto-3); white-space: nowrap; }
+.ds-leito__meta b { font-weight: 700; color: var(--texto); }
+.ds-leito__hd { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; min-height: 40px; overflow: hidden; font-size: 14px; line-height: 20px; color: var(--texto-2); }
+.ds-leito__vitais { display: grid; grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 8px; padding: 6px 0; border-top: 1px solid var(--borda); border-bottom: 1px solid var(--borda); }
+.ds-leito__vitais dt { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--texto-3); }
+.ds-leito__vitais dd { font-family: var(--font-mono); font-size: 15px; line-height: 20px; font-weight: 700; color: var(--texto); white-space: nowrap; }
+.ds-leito__linhas { display: grid; gap: 2px; font-size: 14px; line-height: 20px; }
+.ds-leito__linhas div { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 6px; }
+.ds-leito__linhas dt { font-size: 13px; font-weight: 600; color: var(--texto-3); }
+.ds-leito__linhas dd { color: var(--texto); }
+.ds-leito__pe { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: auto; padding-top: 6px; }
+.ds-leito--vago { align-items: flex-start; justify-content: space-between; min-height: 200px; border: 1px dashed var(--borda-forte); background: transparent; }
+.ds-leito--vago .ds-leito__n { color: var(--texto-4); }
+.ds-leito--vago p { font-size: 15px; color: var(--texto-3); }
+
+/* lista de leitos do Round */
+.ds-leitos { display: flex; flex-direction: column; border: 1px solid var(--borda); border-radius: var(--raio-g); background: var(--superficie); overflow: hidden; }
+.ds-leitos a { display: grid; grid-template-columns: 6px 34px minmax(0, 1fr); align-items: center; gap: 10px; min-height: 52px; padding: 6px 12px 6px 0; border-bottom: 1px solid var(--borda); }
+.ds-leitos a:last-child { border-bottom: 0; }
+.ds-leitos a::before { content: ""; align-self: stretch; margin: -6px 0; background: var(--g, transparent); }
+.ds-leitos__n { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--texto); }
+.ds-leitos__nome { min-width: 0; font-size: 15px; line-height: 20px; font-weight: 700; color: var(--texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ds-leitos__nome small { display: block; font-size: 13px; line-height: 17px; font-weight: 400; color: var(--texto-3); }
+.ds-leitos a[aria-current] { background: var(--acento-fundo); box-shadow: inset 0 0 0 2px var(--texto); }
+.ds-leitos a.ds-vago .ds-leitos__n, .ds-leitos a.ds-vago .ds-leitos__nome { color: var(--texto-4); font-weight: 400; }
+
+/* ficha do paciente */
+.ds-ficha { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: 4px 18px; padding: 12px 18px 14px; border: 1px solid var(--borda); border-top: var(--faixa-gravidade) solid var(--g); border-radius: var(--raio-g); background: var(--superficie); }
+.ds-ficha__leito { display: flex; flex-direction: column; align-items: center; gap: 2px; padding-right: 18px; border-right: 1px solid var(--borda); font-family: var(--font-mono); font-size: 34px; line-height: 34px; font-weight: 700; color: var(--texto); }
+.ds-ficha__leito small { font-family: var(--font-sans); font-size: 13px; line-height: 16px; font-weight: 600; color: var(--texto-3); }
+.ds-ficha__nome { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; font-size: 22px; line-height: 28px; font-weight: 800; color: var(--texto); }
+.ds-ficha__meta { font-size: 15px; line-height: 22px; color: var(--texto-3); }
+.ds-ficha__hd { display: flex; flex-wrap: wrap; gap: 0 16px; margin-top: 4px; font-size: 15px; line-height: 22px; color: var(--texto); }
+.ds-ficha__hd b { font-family: var(--font-mono); font-weight: 700; color: var(--texto-3); margin-right: 4px; }
+.ds-ficha__hd span { white-space: nowrap; }
+.ds-ficha__lado { display: flex; align-items: flex-end; gap: 8px; }
+
+/* tabelas */
+.ds-tabela-wrap { border: 1px solid var(--borda); border-radius: var(--raio-g); background: var(--superficie); overflow: hidden; }
+.ds-tabela { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 20px; }
+.ds-tabela th { padding: 0 10px 7px; border-bottom: var(--fio-tinta) solid var(--texto); text-align: left; font-size: 13px; font-weight: 600; color: var(--texto-3); white-space: nowrap; }
+.ds-tabela td { padding: 9px 10px; border-bottom: 1px solid var(--borda); vertical-align: top; color: var(--texto); }
+.ds-tabela tr:last-child td { border-bottom: 0; }
+.ds-tabela th:first-child, .ds-tabela td:first-child { padding-left: 0; }
+.ds-tabela th:last-child, .ds-tabela td:last-child { padding-right: 0; }
+.ds-tabela .ds-num { text-align: right; white-space: nowrap; font-family: var(--font-mono); }
+.ds-tabela b { font-weight: 700; color: var(--texto); }
+.ds-tabela small { display: block; font-size: 13px; line-height: 18px; color: var(--texto-3); }
+.ds-tabela .ds-encerrada td, .ds-tabela .ds-encerrada b { color: var(--texto-4); font-weight: 400; }
+.ds-antibiograma { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--texto-2); }
+.ds-antibiograma > span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.ds-tabela--leitos th { padding: 12px; }
+.ds-tabela--leitos td { padding: 10px 12px; vertical-align: middle; font-size: 15px; line-height: 21px; }
+.ds-tabela--leitos th:first-child, .ds-tabela--leitos td:first-child { padding-left: 20px; }
+.ds-tabela--leitos th:last-child, .ds-tabela--leitos td:last-child { padding-right: 16px; }
+.ds-tabela--leitos td:first-child { box-shadow: inset var(--faixa-gravidade) 0 0 var(--g, transparent); font-family: var(--font-mono); font-size: 20px; font-weight: 700; white-space: nowrap; }
+.ds-tabela--leitos .ds-vago td, .ds-tabela--leitos .ds-vago td:first-child { color: var(--texto-4); font-weight: 400; }
+.ds-tabela--leitos .ds-centro { text-align: center; font-family: var(--font-mono); font-weight: 700; }
+.ds-tabela--passagem td { vertical-align: top; padding-top: 12px; padding-bottom: 12px; }
+
+/* folhão de laboratório */
+.ds-folhao { width: 100%; border-collapse: collapse; font-size: 15px; }
+.ds-folhao th { border-bottom: var(--fio-tinta) solid var(--texto); border-left: 1px solid var(--borda); padding: 8px 12px; text-align: right; font-family: var(--font-mono); font-weight: 700; color: var(--texto); white-space: nowrap; }
+.ds-folhao th span { display: block; font-family: var(--font-sans); font-size: 12px; font-weight: 400; color: var(--texto-3); }
+.ds-folhao th.ds-folhao__exame { border-left: 0; min-width: 190px; text-align: left; font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--texto-3); }
+.ds-folhao td { border-bottom: 1px solid var(--borda); border-left: 1px solid var(--borda); padding: 6px 12px; text-align: right; font-family: var(--font-mono); font-weight: 500; color: var(--texto); white-space: nowrap; }
+.ds-folhao tbody tr:last-child td { border-bottom: 0; }
+.ds-folhao td.ds-folhao__exame { border-left: 0; text-align: left; font-family: var(--font-sans); }
+.ds-folhao td.ds-folhao__exame b { font-weight: 500; color: var(--texto); }
+.ds-folhao td.ds-folhao__exame span { margin-left: 8px; font-size: 12px; color: var(--texto-4); }
+.ds-folhao td.ds-folhao__secao { border-left: 0; background: var(--superficie-2); text-align: left; font-family: var(--font-sans); font-size: 15px; font-weight: 800; color: var(--texto); padding: 7px 12px; }
+.ds-folhao__vazio { color: var(--texto-4) !important; font-weight: 400 !important; }
+.ds-folhao th.ds-folhao__hoje, .ds-folhao td.ds-folhao__hoje { background: var(--acento-fundo); }
+.ds-folhao td .ds-celula { display: inline-flex; align-items: center; justify-content: flex-end; width: 72px; height: 30px; padding: 0 8px; border-bottom: 2px solid var(--borda-forte); border-radius: var(--raio-p) var(--raio-p) 0 0; background: var(--superficie); font-weight: 700; }
+.ds-folhao td .ds-celula--foco { border-bottom-color: var(--acento); box-shadow: 0 0 0 3px var(--anel-foco); }
+.ds-legenda { display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: 13px; color: var(--texto-3); }
+
+/* gráfico de tendência */
+.ds-tendencias { display: grid; grid-template-columns: repeat(var(--colunas, 4), minmax(0, 1fr)); gap: 12px; }
+.ds-mini { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px 10px; border: 1px solid var(--borda); border-radius: var(--raio-g); background: var(--superficie); min-width: 0; }
+.ds-mini__cab { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; line-height: 22px; color: var(--texto); white-space: nowrap; }
+.ds-mini__cab .ds-icone { width: 18px; height: 18px; color: var(--texto-3); }
+.ds-mini__cab small { font-size: 12px; font-weight: 400; color: var(--texto-4); }
+.ds-mini__ult { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 10px; min-height: 28px; }
+.ds-mini__ult b { font-family: var(--font-mono); font-size: 22px; line-height: 26px; font-weight: 700; color: var(--texto); white-space: nowrap; }
+.ds-mini__ult b.ds-va { color: var(--alerta); }
+.ds-mini__ult b.ds-vc { color: var(--critico); }
+.ds-mini__ult span { font-size: 13px; font-weight: 600; white-space: nowrap; color: var(--texto-3); }
+.ds-mini__ult span.ds-va { color: var(--alerta); font-weight: 700; }
+.ds-mini__ult span.ds-vc { color: var(--critico); font-weight: 700; }
+.ds-mini svg:not(.ds-icone) { display: block; width: 100%; height: auto; margin-top: auto; overflow: visible; }
+.ds-g-barra { fill: color-mix(in srgb, var(--grafico-linha) 45%, var(--superficie)); }
+.ds-g-alerta { fill: var(--gravidade-instavel); }
+.ds-g-critico { fill: var(--gravidade-critico); }
+.ds-g-base { stroke: var(--texto); stroke-width: 1.5; }
+.ds-g-limiar { stroke: var(--texto-3); stroke-width: 1.25; stroke-dasharray: 4 3; fill: none; }
+.ds-g-rot { fill: var(--texto-4); font-family: var(--font-mono); font-size: 10px; font-weight: 500; }
+.ds-g-rot--hoje { fill: var(--texto); font-weight: 700; }
+.ds-g-rot--lim { fill: var(--texto-3); font-weight: 700; }
+.ds-g-linha { stroke: var(--grafico-linha); stroke-width: 2; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.ds-g-ponto { stroke: var(--superficie); stroke-width: 2; }
+.ds-g-ponto.ds-g-barra { fill: var(--grafico-linha); }
+.ds-g-alvo { fill: transparent; }
+
+/* linha do tempo dos dispositivos */
+.ds-lt { display: grid; grid-template-columns: 170px minmax(0, 1fr) 60px; align-items: stretch; }
+.ds-lt__cab { padding: 0 0 8px; border-bottom: var(--fio-tinta) solid var(--texto); font-size: 13px; font-weight: 600; color: var(--texto-3); white-space: nowrap; }
+.ds-lt__datas { display: grid; grid-template-columns: repeat(var(--dias, 6), minmax(0, 1fr)); padding-bottom: 8px; border-bottom: var(--fio-tinta) solid var(--texto); font-family: var(--font-mono); font-size: 12px; font-weight: 500; color: var(--texto-3); }
+.ds-lt__datas span { padding-left: 6px; }
+.ds-lt__datas span:last-child { color: var(--texto); font-weight: 700; }
+.ds-lt__disp { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 7px 12px 7px 0; border-bottom: 1px solid var(--borda); min-width: 0; }
+.ds-lt__disp small { font-size: 13px; line-height: 17px; color: var(--texto-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.ds-lt__trilho { position: relative; min-height: 52px; border-bottom: 1px solid var(--borda); background: repeating-linear-gradient(to right, var(--borda) 0, var(--borda) 1px, transparent 1px, transparent calc(100% / var(--dias, 6))); }
+.ds-lt__barra { position: absolute; top: 50%; height: 26px; margin-top: -13px; display: flex; align-items: center; padding: 0 10px; border-radius: var(--raio-p); background: var(--texto); font-size: 13px; font-weight: 600; color: var(--superficie); white-space: nowrap; overflow: hidden; }
+.ds-lt__barra--via { background: var(--acento); color: var(--sobre-acento); }
+.ds-lt__barra--retirado { justify-content: center; padding: 0 4px; background: transparent; border: 1.5px dashed var(--borda-forte); color: var(--texto-4); font-weight: 400; }
+.ds-lt__dias { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; border-bottom: 1px solid var(--borda); font-family: var(--font-mono); font-size: 17px; font-weight: 700; line-height: 20px; color: var(--texto); }
+.ds-lt__dias small { font-family: var(--font-sans); font-size: 12px; font-weight: 400; color: var(--texto-3); }
+.ds-lt__dias--retirado { font-family: var(--font-sans); font-size: 13px; font-weight: 400; color: var(--texto-4); }
+
+/* prescrição */
+.ds-presc { display: grid; grid-template-columns: repeat(var(--colunas, 2), minmax(0, 1fr)); gap: 16px 32px; }
+.ds-presc__bloco { display: flex; flex-direction: column; min-width: 0; }
+.ds-presc__titulo { padding-bottom: 7px; border-bottom: var(--fio-tinta) solid var(--texto); font-size: 13px; font-weight: 600; color: var(--texto-3); }
+.ds-presc__classe { padding: 12px 0 2px; font-size: 15px; font-weight: 800; color: var(--texto); }
+.ds-presc__item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--borda); }
+.ds-presc__droga { min-width: 0; font-size: 15px; font-weight: 600; color: var(--texto); }
+.ds-presc__droga small { display: block; font-size: 13px; font-weight: 400; color: var(--texto-3); }
+.ds-presc__dose { text-align: right; white-space: nowrap; font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--texto); }
+.ds-presc__dose small { display: block; font-family: var(--font-sans); font-size: 13px; font-weight: 400; color: var(--texto-3); }
+
+/* layout */
+.ds-col2 { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.ds-col3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.ds-secao { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.ds-secao__titulo { display: flex; align-items: baseline; gap: 10px; font-size: 17px; line-height: 24px; font-weight: 700; color: var(--texto); }
+.ds-secao__titulo small { font-size: 13px; font-weight: 400; color: var(--texto-3); }
+.ds-round { display: grid; grid-template-columns: 272px minmax(0, 1fr); gap: 16px; align-items: start; }
+.ds-detalhe { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.ds-exames { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 16px; align-items: start; }
+
+/* v11 · alerta: o número fica na cor normal; a flag vermelha mostra quantas medidas passaram do limiar (limiares da planilha, Página3) */
+.ds-va, .ds-vc, .ds-f.ds-va, .ds-f.ds-vc, .ds-mini__ult b.ds-va, .ds-mini__ult b.ds-vc { color: inherit; }
+.ds-f.ds-va, .ds-f.ds-vc { border-bottom-color: var(--borda-forte); }
+.ds-campo--alerta .ds-campo__ctrl, .ds-campo--critico .ds-campo__ctrl { color: var(--texto); }
+.ds-flag, .ds-mini__ult span.ds-flag { display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; border-radius: var(--raio-p); background: var(--gravidade-critico); color: var(--gravidade-critico-sobre); font-family: var(--font-sans); font-size: 12px; line-height: 17px; font-weight: 700; white-space: nowrap; vertical-align: middle; }
+.ds-flag .ds-icone { width: 12px; height: 12px; stroke-width: 2.25; }
+.ds-flag--i, .ds-mini__ult span.ds-flag--i { padding: 2px 3px; gap: 0; }
+.ds-folhao td .ds-flag--i { margin-right: 6px; }
+/* v11 · exame fora do limiar na tabela: a célula fica rosa */
+.ds-folhao td:has(> .ds-va), .ds-folhao td:has(> .ds-vc), .ds-folhao td .ds-celula:has(> .ds-va), .ds-folhao td .ds-celula:has(> .ds-vc) { background: color-mix(in srgb, var(--gravidade-critico) 22%, var(--superficie)); }
+.ds-mini__ult .ds-flag { align-self: center; }
+.ds-p__n { display: flex; flex-wrap: wrap; gap: 4px; }
+.ds-leito__vitais .ds-leito__flags { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+/* cabeçalho do paciente: rótulo HD */
+.ds-ficha__hd .ds-ficha__rot { font-size: 13px; font-weight: 600; color: var(--texto-3); margin-right: -8px; }
+/* ficha de evolução: sistemas em duas colunas, cada um num quadro; uma linha por campo (rótulo à esquerda) e Notas no fim */
+.ds-ev { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.ds-ev__col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+@media (max-width: 960px) { .ds-ev { grid-template-columns: minmax(0, 1fr); } }
+.ds-ev__sis { min-width: 0; padding: 0 14px 8px; border: 1px solid var(--borda); border-radius: var(--raio-m); background: var(--superficie); container-type: inline-size; }
+.ds-ev__cab { display: flex; align-items: center; gap: 8px; min-height: 41px; padding: 7px 0 6px; margin-bottom: 4px; border-bottom: 1px solid var(--borda); font-size: 16px; line-height: 22px; font-weight: 800; color: var(--texto); }
+.ds-ev__cab .ds-icone { width: 18px; height: 18px; color: var(--texto-3); }
+.ds-ev__l { display: grid; grid-template-columns: 92px minmax(0, 1fr); column-gap: 10px; align-items: start; padding: 3px 0; }
+.ds-ev__r { padding-top: 6px; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--texto-3); }
+.ds-ev__v { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-width: 0; min-height: var(--campo-folha); color: var(--texto-4); font-size: 13px; }
+.ds-ev__v > .ds-f--t, .ds-ev__v > .ds-f--sel.ds-ev__largo { flex: 1; min-width: 0; }
+/* quando falta largura, o que não cabe desce inteiro para a linha de baixo: nada é espremido nem cortado */
+.ds-ev__g { display: inline-flex; align-items: center; gap: 5px; min-width: 0; white-space: nowrap; }
+.ds-ev__m { font-size: 13px; font-weight: 600; color: var(--texto-3); white-space: nowrap; }
+.ds-ev__u { font-size: 13px; color: var(--texto-4); white-space: nowrap; }
+.ds-ev__u--fixa { min-width: 38px; }
+.ds-ev__c { font-size: 13px; color: var(--texto-3); white-space: nowrap; }
+.ds-ev__tr { color: var(--texto-4); }
+.ds-ev .ds-f { flex: none; }
+.ds-ev .ds-f:not(.ds-f--t):not(.ds-f--sel) { justify-content: flex-end; }
+.ds-ev .ds-f--t { flex: 1 1 140px; }
+.ds-ev .ds-f--sel > span { white-space: nowrap; }
+.ds-ev .ds-f--sel.ds-f--n { min-width: 64px; font-family: var(--font-mono); font-size: 16px; font-weight: 700; }
+/* número calculado pela ficha e exame que vem pronto da tela Exames: negrito, sem caixa */
+.ds-ev__calc { display: inline-flex; align-items: baseline; gap: 4px; font-size: 13px; color: var(--texto-3); white-space: nowrap; }
+.ds-ev__calc b { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--texto); }
+.ds-ev__ex a { border-radius: var(--raio-p); cursor: pointer; }
+.ds-ev__ex a:hover b { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+/* sequência de dias: os anteriores pequenos e cinza, sem caixa; a seta é ícone; o de hoje vem por último */
+.ds-ev__serie { align-items: baseline; }
+.ds-ev__ant { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--texto-4); }
+.ds-ev__seta { align-self: center; width: 12px; height: 12px; color: var(--texto-4); }
+/* escolha única: botões emendados · marcar vários: blocos soltos · marcado: petróleo cheio */
+.ds-seg { display: inline-flex; flex-wrap: wrap; flex: 0 1 auto; max-width: 100%; gap: 1px; border: 1.5px solid var(--borda-forte); border-radius: var(--raio-m); background: var(--borda-forte); }
+.ds-seg > span { display: inline-flex; flex: 1 0 auto; align-items: center; justify-content: center; min-height: calc(var(--campo-folha) - 3px); min-width: 30px; padding: 0 10px; background: var(--superficie); color: var(--texto-2); font-size: 14px; font-weight: 600; line-height: 20px; white-space: nowrap; cursor: pointer; }
+.ds-seg > span:first-child { border-radius: 4px 0 0 4px; }
+.ds-seg > span:last-child { border-radius: 0 4px 4px 0; }
+.ds-seg > span:only-child { border-radius: 4px; }
+.ds-seg > .ds-seg--on { background: var(--acento); color: var(--sobre-acento); font-weight: 700; }
+.ds-seg--num > span { padding: 0 7px; font-family: var(--font-mono); }
+.ds-blocos { display: flex; flex-wrap: wrap; gap: 6px; }
+.ds-bloco { display: inline-flex; align-items: center; gap: 5px; min-height: var(--campo-folha); padding: 0 10px; border: 1.5px solid var(--borda-forte); border-radius: var(--raio-m); background: var(--superficie); color: var(--texto-2); font-size: 14px; font-weight: 600; line-height: 20px; white-space: nowrap; cursor: pointer; }
+.ds-bloco .ds-icone { width: 14px; height: 14px; stroke-width: 3; margin-left: -2px; }
+.ds-bloco--on { border-color: var(--acento); background: var(--acento); color: var(--sobre-acento); font-weight: 700; }
+/* mouse por cima */
+.ds-seg > span:not(.ds-seg--on):hover, .ds-seg > .ds-hover:not(.ds-seg--on), .ds-bloco:not(.ds-bloco--on):hover, .ds-bloco.ds-hover:not(.ds-bloco--on) { background: var(--superficie-3); }
+.ds-ev .ds-lista__x:hover, .ds-ev .ds-lista__x.ds-hover, .ds-ev .ds-link:hover, .ds-ev .ds-link.ds-hover { color: var(--texto); }
+/* onde o cursor está: moldura petróleo cheia, com respiro; na caixa de digitar, a linha de baixo também fica petróleo e mais grossa */
+.ds-ev :focus-visible, .ds-ev .ds-foco, .ds-ev .ds-f--foco { outline: 2px solid var(--acento); outline-offset: 2px; box-shadow: none; }
+.ds-seg > span:focus-visible, .ds-seg > .ds-foco { position: relative; z-index: 1; border-radius: 3px; }
+.ds-ev .ds-f:focus-visible, .ds-ev .ds-f--foco { border-bottom-color: var(--acento); box-shadow: inset 0 -1px 0 var(--acento); }
+/* o que abre ao escolher (parâmetros do suporte, dieta enteral, achados do exame alterado), com o fio petróleo à esquerda */
+.ds-ev__sub { display: flex; flex-direction: column; gap: 6px; margin: 2px 0 5px; padding: 8px 10px; border: 1px solid var(--borda); border-left: 3px solid var(--acento); border-radius: var(--raio-p); }
+/* bloco com rótulo em cima: infusões, antimicrobianos, culturas */
+.ds-ev__bloco { display: flex; flex-direction: column; gap: 6px; padding: 6px 0 4px; }
+.ds-ev__bloco > .ds-ev__r, .ds-ev__rl > .ds-ev__r { padding-top: 0; }
+.ds-ev__rl { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: 18px; }
+/* droga em uso: nome e diluição · vazão · dose calculada · tirar; vazão embaixo de vazão, dose embaixo de dose */
+.ds-ev__drogas { display: grid; grid-template-columns: max-content max-content max-content minmax(0, 1fr) max-content; grid-auto-flow: row dense; align-items: center; gap: 6px 14px; }
+.ds-ev__droga { display: contents; }
+.ds-ev__dn { grid-column: 1; display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; min-width: 0; }
+.ds-ev__dn b { font-size: 15px; line-height: 22px; font-weight: 700; color: var(--texto); white-space: nowrap; }
+.ds-ev__dil { display: inline-flex; align-items: center; gap: 2px; min-height: 22px; padding: 0; border: 0; border-radius: var(--raio-p); background: none; color: var(--texto-3); font-size: 13px; white-space: nowrap; }
+.ds-ev__dil .ds-icone { width: 14px; height: 14px; }
+.ds-ev__droga > .ds-ev__g { grid-column: 2; }
+.ds-ev__dose { grid-column: 3; font-size: 13px; color: var(--texto-3); white-space: nowrap; }
+.ds-ev__dose b { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--texto); }
+.ds-ev__droga > .ds-lista__x { grid-column: 5; }
+.ds-ev__drogas > .ds-link, .ds-ev__drogas > .ds-ev__vazio { grid-column: 1 / -1; justify-self: start; }
+@container (max-width: 440px) {
+  .ds-ev__drogas { grid-template-columns: minmax(0, 1fr) max-content max-content; }
+  .ds-ev__droga > .ds-ev__dose { grid-column: 1 / -1; }
+  .ds-ev__droga > .ds-lista__x { grid-column: 3; }
+}
+/* listas da ficha: antimicrobianos e culturas */
+.ds-ev__lista { display: grid; align-items: center; gap: 6px 10px; }
+.ds-ev__lista > .ds-f { min-width: 0; }
+.ds-ev__lista > .ds-link:not(.ds-link--p), .ds-ev__lista > .ds-ev__sub, .ds-ev__lista > .ds-ev__ro { grid-column: 1 / -1; }
+.ds-ev__lista > .ds-link { justify-self: start; }
+.ds-ev__lista > .ds-ev__sub { margin: 0 0 2px; }
+.ds-ev__nome { font-size: 15px; line-height: 22px; font-weight: 700; color: var(--texto); white-space: nowrap; }
+.ds-ev__dia { display: inline-flex; align-items: center; gap: 4px; color: var(--texto-4); font-size: 13px; white-space: nowrap; }
+.ds-ev__dia b { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--texto); }
+.ds-ev__dia > .ds-f { min-width: 36px; }
+.ds-link--p { padding: 2px 0; font-size: 13px; }
+/* linha só de leitura (vem de outra tela): texto, sem caixa */
+.ds-ev__ro { color: var(--texto-2); font-size: 13px; line-height: 18px; }
+.ds-ev__ro b { font-weight: 700; color: var(--texto); }
+/* lista aberta (exemplo de estado): uma linha alta por opção */
+.ds-pop { display: inline-flex; flex-direction: column; min-width: 200px; padding: 4px; border: 1.5px solid var(--borda-forte); border-radius: var(--raio-m); background: var(--superficie); }
+.ds-ev__bloco > .ds-pop, .ds-ev__sub > .ds-pop { align-self: flex-start; }
+.ds-pop > span { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 10px; border-radius: var(--raio-p); color: var(--texto-2); font-size: 14px; line-height: 20px; white-space: nowrap; }
+.ds-pop > span b { min-width: 26px; font-family: var(--font-mono); font-weight: 700; color: var(--texto); }
+.ds-pop > .ds-pop--on { background: var(--acento-fundo); color: var(--texto); }
+/* campo que veio de ontem e ainda não foi confirmado: cinza, tracejado, com a palavra "ontem"; o botão do título confirma o quadro */
+.ds-de-ontem .ds-f { border-bottom-style: dashed; background: transparent; color: var(--texto-3); font-weight: 500; }
+.ds-de-ontem .ds-seg > .ds-seg--on { background: var(--superficie-3); color: var(--texto); }
+.ds-de-ontem .ds-bloco--on { border-color: var(--borda-forte); background: var(--superficie-3); color: var(--texto); }
+.ds-ev__ontem { margin-left: auto; padding: 0 6px; border: 1px dashed var(--borda-forte); border-radius: var(--raio-p); font-size: 12px; line-height: 18px; font-weight: 600; color: var(--texto-3); white-space: nowrap; }
+.ds-ev__igual { margin-left: auto; height: 26px; padding: 0 10px; border: 1.5px solid var(--acento); border-radius: var(--raio-m); background: var(--superficie); color: var(--acento-texto); font-size: 13px; line-height: 1; font-weight: 700; white-space: nowrap; }
+.ds-ev__igual:hover { background: var(--acento-fundo); }
+/* número fora da faixa possível: a frase aparece embaixo; o número continua na cor normal */
+.ds-ev__msg { flex-basis: 100%; font-size: 12px; line-height: 16px; font-weight: 700; color: var(--texto); }
+/* item tirado pelo ×: riscado e cinza até salvar; tocar traz de volta */
+.ds-removido { display: contents; cursor: pointer; }
+.ds-removido > *, .ds-removido b, .ds-removido .ds-f { color: var(--texto-4); text-decoration: line-through; }
+.ds-removido .ds-f { border-bottom-style: dashed; background: transparent; }
+/* tablet: alvos de toque de 44 px, sem mudar o tamanho da letra */
+.ds-toque { --campo-folha: 44px; }
+.ds-toque .ds-seg > span { min-width: 44px; min-height: 44px; }
+.ds-toque .ds-ev__ex a { display: inline-flex; align-items: center; min-height: 44px; }
+.ds-toque .ds-lista__x { width: 44px; height: 44px; }
+.ds-toque .ds-link, .ds-toque .ds-ev__dil { min-height: 44px; }
+.ds-toque .ds-ev__igual { height: 44px; }
+.ds-toque .ds-ev__l > .ds-ev__r { padding-top: 13px; }
+.ds-toque .ds-ev__cab { min-height: 59px; }
+.ds-toque .ds-pop > span { min-height: 44px; }
+.ds-toque .ds-ev__drogas { column-gap: 12px; }
+/* ficha · neuro */
+.ds-ev__sob { padding: 0; border: 0; border-radius: var(--raio-p); background: none; color: var(--texto-3); font-size: 13px; line-height: 18px; white-space: nowrap; }
+.ds-ev__sob:hover { color: var(--texto); }
+.ds-toque .ds-ev__sob { min-height: 44px; }
+/* ficha · resp */
+/* E32: no tablet, os seis botões do Suporte ficam um pouco mais juntos, para caber numa linha */
+.ds-toque .ds-ev__sup > span { min-width: 44px; padding: 0 6px; }
+/* ficha · hemato */
+.ds-ev__prof { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; gap: 6px 8px; flex: 1; min-width: 0; }
+.ds-ev__prof > .ds-f--sel { min-width: 0; }
+/* ficha · infecto */
+.ds-ev__lista--atb { grid-template-columns: max-content minmax(0, 1fr) max-content max-content max-content; }
+.ds-ev__lista--cult { grid-template-columns: minmax(0, 1.25fr) 72px minmax(0, 1fr) max-content; }
+.ds-ev__lista.ds-ev__lista--atb > .ds-link--p { grid-column: auto; }
+.ds-ev__dif { gap: 10px; }
+.ds-ev__disp { white-space: nowrap; }
+.ds-ev__dbtn { padding: 0; border: 0; border-radius: var(--raio-p); background: none; color: inherit; font: inherit; cursor: pointer; }
+.ds-toque .ds-ev__dbtn { min-height: 44px; }
+.ds-ev__susp { color: var(--texto-3); }
+.ds-ev__susp .ds-link--p { margin-left: 2px; }
+/* tela Evolução */
+/* barra do alto da Evolução: fica parada enquanto a página rola; o estado do salvamento vem antes dos botões */
+.ds-topo--fixo { position: sticky; top: 0; z-index: 5; margin: 0; padding: 0 24px; border-bottom: 0; background: var(--fundo); }
+.ds-topo--fixo::after { content: ""; position: absolute; left: 24px; right: 24px; bottom: 0; height: var(--fio-tinta); background: var(--texto); }
+.ds-topo__estado { display: inline-flex; align-items: center; gap: 8px; margin-right: 4px; font-size: 13px; line-height: 18px; color: var(--texto-3); white-space: nowrap; }
+.ds-topo__estado .ds-link { padding: 0; font-size: 13px; }
+/* plano de conduta da Evolução: o sistema fica em cima do texto, com o nome inteiro do quadro */
+.ds-lista__item--sis { display: grid; grid-template-columns: minmax(0, 1fr) max-content; gap: 2px 8px; align-items: start; }
+.ds-lista__sisr { grid-column: 1 / -1; justify-self: start; display: inline-flex; align-items: center; gap: 4px; min-height: 22px; border-radius: var(--raio-p); font-size: 13px; line-height: 18px; font-weight: 700; color: var(--texto); cursor: pointer; }
+.ds-lista__sisr .ds-icone { width: 14px; height: 14px; color: var(--texto-3); }
+.ds-toque .ds-lista .ds-f--t { min-height: 44px; }
+.ds-toque .ds-lista__sisr { min-height: 44px; }
+.ds-toque .ds-lista__item > .ds-check { width: 28px; height: 28px; margin: 8px; }
+.ds-toque .ds-lista__n, .ds-toque .ds-lista__item > .ds-prio { line-height: 44px; }
+
+/* ---- app: o cartão de tablet do design vira regra de largura de tela ---- */
+@media (max-width: 1280px) {
+  .ds-app { grid-template-columns: var(--menu-tablet) minmax(0, 1fr); }
+  .ds-app .ds-menu { padding: 18px 12px; align-items: center; }
+  .ds-app .ds-marca small, .ds-app .ds-nav a span { display: none; }
+  .ds-app .ds-marca b { font-size: 0; }
+  .ds-app .ds-marca b::before { content: "UTI"; font-size: 16px; }
+  .ds-app .ds-nav a { width: 48px; height: 46px; padding: 0; justify-content: center; }
+  .ds-grade { --colunas: 4; }
+}
+@media (pointer: coarse) {
+  .ds-conteudo { --campo-folha: 44px; }
+  .ds-conteudo .ds-seg > span { min-width: 44px; min-height: 44px; }
+  .ds-conteudo .ds-ev__ex a { display: inline-flex; align-items: center; min-height: 44px; }
+  .ds-conteudo .ds-lista__x { width: 44px; height: 44px; }
+  .ds-conteudo .ds-link, .ds-conteudo .ds-ev__dil { min-height: 44px; }
+  .ds-conteudo .ds-ev__igual { height: 44px; }
+  .ds-conteudo .ds-ev__l > .ds-ev__r { padding-top: 13px; }
+  .ds-conteudo .ds-ev__cab { min-height: 59px; }
+  .ds-conteudo .ds-pop > span { min-height: 44px; }
+  .ds-conteudo .ds-ev__drogas { column-gap: 12px; }
+  .ds-conteudo .ds-ev__sob { min-height: 44px; }
+  .ds-conteudo .ds-ev__sup > span { min-width: 44px; padding: 0 6px; }
+  .ds-conteudo .ds-ev__dbtn { min-height: 44px; }
+  .ds-conteudo .ds-lista .ds-f--t { min-height: 44px; }
+  .ds-conteudo .ds-lista__sisr { min-height: 44px; }
+  .ds-conteudo .ds-lista__item > .ds-check { width: 28px; height: 28px; margin: 8px; }
+  .ds-conteudo .ds-lista__n, .ds-conteudo .ds-lista__item > .ds-prio { line-height: 44px; }
+}

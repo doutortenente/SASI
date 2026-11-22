@@ -137,20 +137,20 @@ $$
             jsonb_build_object('descricao', null, 'rass', null), -- neuro
             jsonb_build_object('suporte', null, -- resp
                                'fr_max', null, 'fr_min', null,
-                               'spo2_max', null, 'spo2_min', null, 'obs', null),
+                               'spo2_max', null, 'spo2_min', null, 'notas', null),
             jsonb_build_object( -- hemo (cardiovascular)
-              'pa_sys_max', null, 'pa_sys_min', null, -- PAS máx/mín
-              'pa_dia_max', null, 'pa_dia_min', null, -- PAD máx/mín
+              'pas_max', null, 'pas_min', null, -- PAS máx/mín
+              'pad_max', null, 'pad_min', null, -- PAD máx/mín
               'pam_max', null, 'pam_min', null, -- PAM máx/mín
               'fc_max', null, 'fc_min', null, -- FC  máx/mín
-              'ritmo', null, 'obs', null),
-            jsonb_build_object('dieta', null, 'obs', null), -- tgi (glicemia -> use eventos, tipo 'glicemia')
+              'ritmo', null, 'notas', null),
+            jsonb_build_object('dieta', null, 'notas', null), -- tgi (glicemia -> use eventos, tipo 'dx')
             jsonb_build_object('cr', null, 'ur', null, -- renal
                                'diurese_6_18h_ml', null, 'bh_6_18h_ml', null,
-                               'descricao', null, 'obs', null),
-            jsonb_build_object('hb', null, 'ht', null, 'plaq', null, 'obs', null),-- hemato
+                               'descricao', null, 'notas', null),
+            jsonb_build_object('hb', null, 'ht', null, 'plaq', null, 'notas', null),-- hemato
             jsonb_build_object('atb', null, 'tmax', null, -- infecto (temperatura = tmax aqui)
-                               'leuco', null, 'obs', null),
+                               'leuco', null, 'notas', null),
 
              -- ---- Drogas em infusão contínua (aba "Uso") -----------------------
              -- formato de cada item: {"droga":"...","dose":"...","unidade":"..."}
@@ -196,12 +196,12 @@ $$
     values
       (v_pac_id, v_evol_id, now(), 'fc',       112,  'bpm',    'manual', 1.0, jsonb_build_object('param','fc_max')),
       (v_pac_id, v_evol_id, now(), 'fc',       78,   'bpm',    'manual', 1.0, jsonb_build_object('param','fc_min')),
-      (v_pac_id, v_evol_id, now(), 'pa_sys',   135,  'mmHg',   'manual', 1.0, jsonb_build_object('param','pa_sys_max')),
+      (v_pac_id, v_evol_id, now(), 'pas',      135,  'mmHg',   'manual', 1.0, jsonb_build_object('param','pas_max')),
       (v_pac_id, v_evol_id, now(), 'pam_min',  62,   'mmHg',   'manual', 1.0, jsonb_build_object('param','pam_min')),
       (v_pac_id, v_evol_id, now(), 'spo2',     91,   '%',      'manual', 1.0, jsonb_build_object('param','spo2_min')),
       (v_pac_id, v_evol_id, now(), 'fr',       28,   'ipm',    'manual', 1.0, jsonb_build_object('param','fr_max')),
       (v_pac_id, v_evol_id, now(), 'temp',     38.2, 'C',      'manual', 1.0, jsonb_build_object('param','tax_max')),
-      (v_pac_id, v_evol_id, now(), 'glicemia', 148,  'mg/dL',  'manual', 1.0, jsonb_build_object('param','dextro')),
+      (v_pac_id, v_evol_id, now(), 'dx',       148,  'mg/dL',  'manual', 1.0, jsonb_build_object('param','dextro')),
       (v_pac_id, v_evol_id, now(), 'lactato',  2.1,  'mmol/L', 'manual', 1.0, jsonb_build_object('param','lactato')),
       (v_pac_id, v_evol_id, now(), 'cr',       1.8,  'mg/dL',  'manual', 1.0, jsonb_build_object('param','cr')),
       (v_pac_id, v_evol_id, now(), 'k',        4.2,  'mEq/L',  'manual', 1.0, jsonb_build_object('param','k'));
@@ -255,7 +255,7 @@ $$;
 -- =====================================================================
 -- ANEXO A — CÓDIGOS ACEITOS EM eventos_clinicos.tipo
 -- (use exatamente estes; o banco recusa qualquer outro)
---   Vitais:   pa_sys  pa_dia  pam  pam_min  fc  fr  spo2  temp  pf_ratio
+--   Vitais:   pas  pad  pam  pam_min  fc  fr  spo2  temp  pf_ratio
 --   Metabol.: glicemia  lactato  ph  pco2  po2  hco3  be
 --   Renais:   cr  ur  na  k  mg  ca  p  diurese_h  bh_h  bh_acumulado
 --   Hemato:   hb  ht  plaq  leuco  inr

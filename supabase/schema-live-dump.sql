@@ -1,3 +1,5 @@
+-- ATENÇÃO: retrato lido do banco em 22-nov-2026 ANTES das duas migrações desse dia
+-- (20261122040931_termos_do_design e 20261122052449_paciente_sexo_do_design). Somar as duas a este retrato.
 -- ============================================================================
 -- SASI — RETRATO DO BANCO DE PRODUÇÃO (schema public)
 -- Gerado em 2026-11-22T02:36:04 UTC por consultas de LEITURA ao catálogo do Postgres.

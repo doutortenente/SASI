@@ -5,13 +5,13 @@ import {fmtTs, getDB, handleDBError} from "../db.js";
 // Tipos válidos do CHECK constraint da tabela eventos_clinicos
 const TIPO_EVENTO = z.enum([
   "sofa_total","sofa_resp","sofa_coag","sofa_liver","sofa_cardio","sofa_neuro","sofa_renal",
-  "pam","pam_min","pa_sys","pa_dia","pf_ratio","spo2","fr","fc","temp",
+  "pam","pam_min","pas","pad","pf_ratio","spo2","fr","fc","temp",
   "lactato","ph","pco2","po2","hco3","be",
   "diurese_h","bh_h","bh_acumulado",
   "hb","ht","plaq","leuco","cr","ur","na","k","mg","ca","p","bb","inr","pcr","procalcitonina",
   "nor_dose","adr_dose","vaso_dose","dobuta_dose","dopa_dose",
   "fent_dose","midaz_dose","propofol_dose","precedex_dose",
-  "gcs","rass","cam_icu","bps","cpot","glicemia","custom"
+  "gcs","rass","cam_icu","bps","cpot","dx","cai","uf_trs","custom"
 ]);
 
 const FONTE_ENUM = z.enum(["manual","gemini_ocr","claude_ocr","appsheet","auto_trigger","edge_function","api_import"]);

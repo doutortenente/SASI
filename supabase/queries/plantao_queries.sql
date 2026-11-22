@@ -127,7 +127,7 @@ select distinct on (e.paciente_id, e.tipo) p.leito,
                                            e.ts
 from eventos_clinicos e
        join pacientes p on p.id = e.paciente_id
-where e.tipo in ('pam_min', 'fc', 'temp', 'lactato', 'gcs', 'glicemia')
+where e.tipo in ('pam_min', 'fc', 'temp', 'lactato', 'gcs', 'dx')
 order by e.paciente_id, e.tipo, e.ts desc;
 
 
