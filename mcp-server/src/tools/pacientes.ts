@@ -1,6 +1,7 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from "zod";
 import {fmtTs, getDB, handleDBError, semaforo} from "../db.js";
+import {AVISO_DISPOSITIVOS, retirarDerivados} from "../derivados.js";
 
 const UTI_ENUM = z.enum(["UTI2", "UTI3", "UTI4"]);
 const GRAVIDADE_ENUM = z.enum(["estavel", "moderado", "grave", "critico", "obito"]);
@@ -179,7 +180,7 @@ Args:
   - gravidade ('estavel'|'moderado'|'grave'|'critico'): Classificação (default: 'estavel')
   - sofa_baseline (number): SOFA na admissão (opcional)
   - data_adm (string): Data de admissão YYYY-MM-DD (default: hoje)
-  - dispositivos (object): {mv, dva, sed, atb, cvc, trr} — booleans
+  - dispositivos (object): IGNORADO. O banco calcula esse campo sozinho; se vier, a resposta traz um aviso.
   - isolation ('none'|'contact'|'droplet'|'aerosol'): Precaução (default: 'none')
 
 Retorna: ID e leito do paciente criado.`,
@@ -209,6 +210,8 @@ Retorna: ID e leito do paciente criado.`,
     },
     async (params) => {
       try {
+        const { retirados } = retirarDerivados(params);
+        const aviso = retirados.includes("dispositivos") ? `\n⚠️ ${AVISO_DISPOSITIVOS}` : "";
         const { data, error } = await getDB()
           .from("pacientes")
           .insert({
@@ -223,7 +226,6 @@ Retorna: ID e leito do paciente criado.`,
             gravidade: params.gravidade,
             sofa_baseline: params.sofa_baseline,
             data_adm: params.data_adm ?? new Date().toISOString().split("T")[0],
-            dispositivos: params.dispositivos ?? {},
             isolation: params.isolation,
           })
           .select("id, leito, uti, nome")
@@ -232,7 +234,7 @@ Retorna: ID e leito do paciente criado.`,
         if (error) return { content: [{ type: "text", text: handleDBError(error) }] };
         const p = data as { id: string; leito: string; uti: string; nome: string };
         return {
-          content: [{ type: "text", text: `✅ Paciente admitido: **${p.nome}** | ${p.uti} / ${p.leito} | ID: \`${p.id}\`` }],
+          content: [{ type: "text", text: `✅ Paciente admitido: **${p.nome}** | ${p.uti} / ${p.leito} | ID: \`${p.id}\`${aviso}` }],
           structuredContent: p,
         };
       } catch (e) {
@@ -246,17 +248,17 @@ Retorna: ID e leito do paciente criado.`,
     "sasi_update_patient",
     {
       title: "SASI — Atualizar Paciente",
-      description: `Atualiza campos de um paciente (gravidade, status, dispositivos, isolamento, HD).
+      description: `Atualiza campos de um paciente (gravidade, status, isolamento, HD).
 Apenas os campos informados são alterados.
 
 Args:
   - paciente_id (string): UUID do paciente
-  - gravidade, status_leito, isolation, hd, dispositivos, alergias, peso, sofa_baseline: campos opcionais
+  - gravidade, status_leito, isolation, hd, alergias, peso, sofa_baseline: campos opcionais
+  - dispositivos: IGNORADO (o banco calcula sozinho); se vier, a resposta traz um aviso
 
 Exemplos:
   - Alta → status_leito="alta"
-  - Piora clínica → gravidade="critico"
-  - Iniciou VM → dispositivos={mv:true}`,
+  - Piora clínica → gravidade="critico"`,
       inputSchema: z.object({
         paciente_id: z.string().uuid(),
         gravidade: GRAVIDADE_ENUM.optional(),
@@ -277,10 +279,16 @@ Exemplos:
       }).strict(),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     },
-    async ({ paciente_id, ...fields }) => {
+    async ({ paciente_id, ...entrada }) => {
       try {
+        const { limpo: fields, retirados } = retirarDerivados(entrada);
+        const aviso = retirados.includes("dispositivos") ? AVISO_DISPOSITIVOS : "";
+        if (retirados.length > 0 && Object.keys(fields).length === 0) {
+          return {
+            content: [{ type: "text", text: `Nada a atualizar: nenhum campo gravável foi enviado.${aviso ? `\n⚠️ ${aviso}` : ""}` }],
+          };
+        }
         const patch: Record<string, unknown> = { ...fields, updated_at: new Date().toISOString() };
-        delete patch["paciente_id"];
 
         const { data, error } = await getDB()
           .from("pacientes")
@@ -292,7 +300,7 @@ Exemplos:
         if (error) return { content: [{ type: "text", text: handleDBError(error) }] };
         const p = data as { id: string; leito: string; uti: string; nome: string; gravidade: string; status_leito: string };
         return {
-          content: [{ type: "text", text: `✅ Paciente atualizado: **${p.nome}** | ${p.uti}/${p.leito} | ${p.gravidade} | ${p.status_leito}` }],
+          content: [{ type: "text", text: `✅ Paciente atualizado: **${p.nome}** | ${p.uti}/${p.leito} | ${p.gravidade} | ${p.status_leito}${aviso ? `\n⚠️ ${aviso}` : ""}` }],
           structuredContent: p,
         };
       } catch (e) {

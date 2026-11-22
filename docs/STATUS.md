@@ -32,7 +32,7 @@ Cards · Round · Tabela · Passagem · Exames · Evolução (UTI 2, 13 leitos).
 
 ## 4. Banco
 
-Ver `CLAUDE.md` §4. Migrações em `supabase/migrations/` (37 arquivos; o banco registra 36), fonte única do esquema. Os 3 arquivos de 30-jul sem registro correspondente estão em `docs/MEMORY.md`.
+Ver `CLAUDE.md` §4. Migrações em `supabase/migrations/` (37 arquivos, iguais aos 37 registros de migração do banco), fonte única do esquema.
 
 - 22/11/2026: termos do banco iguais aos do design (`20261122040931_termos_do_design`) e `pacientes.sexo` (`20261122052449_paciente_sexo_do_design`).
 - Gravação testada ao vivo no banco real em 22-nov-2026, com paciente fictício e tudo desfeito no fim: admissão com alergias e isolamento, internação aberta pelo gatilho, recusa de segundo paciente no mesmo leito, evolução (incluir e alterar), conversão dos termos antigos, pendência, antimicrobiano com data, cultura e exame.
