@@ -1,68 +1,34 @@
-<!--
-PR Template — comando-uti / SASI
-Há mais de uma sessão Claude (chat / cowork / Claude Code) trabalhando neste repo.
-Este checklist evita que mudanças entrem sem que outras sessões fiquem sabendo.
--->
+## O que mudou e por quê
 
-## 🩺 O que mudou e por quê
+<!-- 1-3 frases. Foque no porquê, não só no quê. -->
 
-<!-- 1-3 frases. Foque no PORQUÊ, não só no quê. -->
+## Tipo de mudança
 
-## 🔎 Tipo de mudança
+- [ ] Correção de erro
+- [ ] Funcionalidade nova
+- [ ] Refatoração (sem mudar o comportamento)
+- [ ] Build, CI ou configuração (publicação, variáveis de ambiente, dependências)
+- [ ] Documentação
+- [ ] Limpeza de código morto
 
-- [ ] 🐛 Bug fix (não muda comportamento esperado)
-- [ ] ✨ Feature (adiciona funcionalidade)
-- [ ] ♻️ Refator (sem mudança de comportamento)
-- [ ] 🛠 Build / CI / config (deploy, env vars, dependências)
-- [ ] 📚 Docs / STATUS.md
-- [ ] 🗑 Limpeza / dead code
-
-## ✅ Checklist obrigatório
-
-### Multi-Claude sync
-
-- [ ] Atualizei `docs/STATUS.md` se a mudança afeta deploy, schema, auth, ou arquitetura
-- [ ] Adicionei linha em "Histórico de decisões" se for decisão importante
-- [ ] Não introduzi caminhos novos com caracteres não-ASCII
-
-### Código
+## Conferência
 
 - [ ] `npm run typecheck` passa
-- [ ] `npm run build` passa localmente
-- [ ] Testei manualmente o fluxo afetado (login, dashboard, modal, etc.)
-- [ ] Não tem `console.log` debug esquecido
-- [ ] Não tem `any` novo (use `unknown` + narrow)
+- [ ] `npm run build` passa
+- [ ] `npm run test:e2e` passa, se mexeu em tela (ver `README.md`, seção Rodar)
+- [ ] Testei na mão o fluxo afetado
+- [ ] Atualizei `docs/STATUS.md` se a mudança afeta publicação, banco ou arquitetura
+- [ ] Nenhuma chave, token, senha ou dado de paciente no diff
+- [ ] A chave `service_role` não entrou em código do app
+- [ ] Mudança de banco tem migração em `supabase/migrations/`
+- [ ] Views `vw_*` continuam com `security_invoker`
 
-### Segurança / dados clínicos
-
-- [ ] Nenhuma key, token, senha, ou PII está no diff
-- [ ] Nenhum endpoint novo escreve em `pacientes`/`evolucoes` sem audit log
-- [ ] RLS continua intacta (não troquei `auth.uid() = user_id` por `using (true)`)
-- [ ] `service_role` key NÃO foi usada em código frontend
-
-### Banco
-
-- [ ] Mudanças de schema têm migration explícita (`supabase/migrations/`)
-- [ ] Constraint `uti IN ('UTI2','UTI3','UTI4')` continua válida
-- [ ] Views `vw_*` continuam `security_invoker`
-
-## 🧪 Como testar
-
-<!-- Passos concretos pra outro Claude (ou você no futuro) reproduzir. -->
+## Como testar
 
 1.
 2.
 3.
 
-## 📸 Screenshots (se UI)
+## Imagens (se mexeu em tela)
 
-<!-- Drag & drop ou link. -->
-
-## 🔗 Links relevantes
-
-<!-- docs/STATUS.md sections afetadas, issues, decisões prévias. -->
-
----
-
-> **Lembrete:** se este PR muda env vars na Vercel, deploy strategy, ou auth URL, **AVISE no commit message**. Outro
-> Claude vai ler o `git log` antes de mexer.
+> Se este PR muda variáveis de ambiente na Vercel ou a forma de publicar, diga na mensagem do commit.

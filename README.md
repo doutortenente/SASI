@@ -1,7 +1,7 @@
 # SASI — Comando UTI
 
 Folha de plantão da UTI 2 (13 leitos) do Dr. Nicolas Nagaita. Ferramenta **pessoal** de plantão, sem login.
-Produção: **https://sasi-uti.vercel.app** (cada merge na `main` publica).
+Produção: **https://sasi-uti.vercel.app**.
 
 O app (Next.js 15 + React 19 + TypeScript) segue o design "Comando UTI · Folha de plantão"
 (https://claude.ai/artifact/DfrYNmPhnsB5VS3m4hdR4T): o design manda, o app copia.
@@ -32,7 +32,7 @@ npm run dev                  # http://localhost:3000
 npm run typecheck && npm run build   # conferência (Node 20+)
 ```
 
-Conferência das telas (só dados fictícios, nunca toca o banco real; precisa do Playwright, que já vem no ambiente de nuvem do Claude):
+Conferência das telas (só dados fictícios, nunca toca o banco real; precisa do Playwright, biblioteca que controla um navegador; ele não vem no `package.json`, então o teste só roda onde o Playwright já estiver instalado):
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=chave-de-teste npm run build
@@ -45,7 +45,7 @@ node e2e/fotos.cjs         # opcional: fotos das telas em e2e/saida/
 ## Onde está cada coisa
 
 - Leitura do banco: só em `src/lib/uti.ts`, no servidor. Erro de leitura vira tela de erro, nunca tela vazia.
-- Gravação: `src/app/evolucao/Ficha.tsx` (evolução e pendências), `src/app/exames/Folhao.tsx` (coleta de hoje, só acrescenta) e `src/components/Check.tsx` (pendência feita).
+- Gravação: `src/app/evolucao/Ficha.tsx` (evolução, pendências, antimicrobianos e culturas), `src/app/exames/Folhao.tsx` (coleta de hoje, só acrescenta), `src/components/Check.tsx` (pendência feita), `src/components/NovoLeito.tsx` (admissão, grava em `pacientes`) e `src/components/AltaTroca.tsx` (alta e troca de leito, pelas funções do banco `dar_alta_paciente` e `transferir_leito`).
 - Regras do design e do banco: `CLAUDE.md` §3 e §4.
 - Estado atual e pendências: `docs/STATUS.md`.
 - Histórico antigo (app React+Vite e pacotes): tag `pre-faxina-2026-07-31` e ramo `archive/frontend-e-packages`.
